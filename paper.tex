@@ -1,0 +1,70 @@
+\documentclass[runningheads,a4paper]{llncs}
+\pdfoutput=1
+
+\bibliographystyle{plainurl}
+
+\usepackage{amssymb}
+\setcounter{tocdepth}{3}
+\usepackage{enumerate}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage{tikz}
+\usepackage{xcolor,latexsym,amsmath,extarrows,alltt}
+\usepackage{xspace}
+\usepackage{booktabs}
+\usepackage{mathtools}
+\usepackage{enumitem}
+\usepackage{stmaryrd}
+\usepackage{microtype}
+\usepackage{bussproofs}
+\usepackage{multirow}
+
+\newcommand{\World}{\mathcal{W}}
+
+\begin{document}
+
+\mainmatter
+
+\title{TODO list
+  \thanks{The authors are supported by lots of people.}}
+\subtitle{What we need to do to get where we want to be}
+
+\author{Lukasz Czajka and Cynthia Kop}
+\authorrunning{L. Czajka and C. Kop}
+\institute{
+Department of Computer Science, University of Copenhagen (DIKU)
+\quad\quad\quad
+Institute of Computer Science, Radboud University Nijmegen (RU)
+\\
+\email{lukaszcz@mimuw.edu.pl}
+\quad\quad\quad
+\email{C.Kop@cs.ru.nl}
+}
+
+\maketitle
+
+\begin{abstract}
+The introduction of this paper is a TODO list.
+The remainder is meant for filling in the TODOs with what we already
+have.
+The hope is that the end result is something useful. :)
+\end{abstract}
+
+\section*{THE LIST}
+
+Here's what we need to do:
+\begin{enumerate}
+\item Define a world $\World$ and a well-founded ordering $\succ$ on
+  $\World$:
+  \begin{enumerate}
+  \item Define a set of terms $\World$ typed under some variation of
+    System F-$\omega$.
+  \item Define relations $\succ$ and $\succeq$ on the elements of $\World$.
+  \item Prove that $\succ$ is a well-founded ordering relation and that
+    $\succeq$ is a compatible quasi-ordering.
+  \end{enumerate}
+\item Specify what systems we are interested in analysing, and prove
+  standard results which will make their analysis doable.
+\end{enumerate}
+
+\end{document}
+
