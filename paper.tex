@@ -19,6 +19,9 @@
 \usepackage{multirow}
 
 \newcommand{\World}{\mathcal{W}}
+\newcommand{\Rules}{\mathcal{R}}
+\newcommand{\interpret}[1]{\llparenthesis #1 \rrparenthesis}
+\newcommand{\arr}[1]{\to_{#1}}
 
 \begin{document}
 
@@ -64,7 +67,57 @@ Here's what we need to do:
   \end{enumerate}
 \item Specify what systems we are interested in analysing, and prove
   standard results which will make their analysis doable.
+  \begin{enumerate}
+  \item Specify a form of system which includes all the systems of interest.
+  \item Specify a default way of interpreting terms in these systems.
+  \item Prove that in all such systems, using our way of interpreting
+    terms: if $\interpret{\ell} \succ \interpret{r}$ (resp.\ $\interpret{
+    \ell} \succeq \interpret{r}$) for a rule  $\ell \to r$, then
+    $\interpret{s} \succ \interpret{t}$ whenever $s \arr{\Rules} t$ by
+    this rule (resp.\ $\interpret{s} \succeq \interpret{t}$).
+  \end{enumerate}
+\item Obtain useful lemmas regarding these defaults.
+  \begin{enumerate}
+  \item $\interpret{s[x:=t]} = \interpret{s}[x:=\interpret{t}]$.
+  \item $\interpret{s\sigma} = \interpret{s}\sigma$.
+  \item \dots?
+  \end{enumerate}
+\item For some system of interest, prove its termination:
+  \begin{enumerate}
+  \item Present the system and give interpretations (following the
+    default scheme) for all ways of constructing terms.
+  \item Show that $\ell \succ r$ or $\ell \succeq r$ for all rules.
+  \item Remove the rules which are oriented using $\succ$ and repeat,
+    until all rules have been removed.
+  \end{enumerate}
 \end{enumerate}
+
+We use \emph{rule removal}:
+
+\begin{theorem}
+Let $\Rules = \Rules_1 \cup \Rules_2$, and suppose that $\arr{\Rules_1}\:
+\subseteq\:\succ$ and $\arr{\Rules_2}\:\subseteq\:\succeq$ for a
+well-founded ordering $\succ$ and a compatible quasi-ordering $\succeq$.
+Then $\arr{\Rules}$ is terminating if and only if $\arr{\Rules_2}$ is
+(which is certainly the case if $\Rules_2 = \emptyset$).
+\end{theorem}
+
+\begin{proof}
+By well-foundedness of $\succ$, every infinite decreasing $\arr{\Rules}$
+sequence can only use finitely many steps using $\arr{\Rules_1}$.
+\qed
+\end{proof}
+
+This gives rise to the following algorithm:
+\begin{enumerate}
+\item While $\Rules$ is non-empty:
+  \begin{enumerate}
+  \item Orient all rules in $\Rules$ using $\succeq$ or $\succ$; at least
+    one of them must be oriented using $\succ$.
+  \item Remove all rules ordered by $\succ$ from $\Rules$.
+  \end{enumerate}
+\end{enumerate}
+If this algorithm succeeds, we have proven termination.
 
 \end{document}
 
