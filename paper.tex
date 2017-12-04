@@ -18,10 +18,30 @@
 \usepackage{bussproofs}
 \usepackage{multirow}
 
+\newcommand{\Iterms}{\mathcal{I}}
 \newcommand{\World}{\mathcal{W}}
 \newcommand{\Rules}{\mathcal{R}}
+\newcommand{\Typevars}{\mathcal{A}}
+\newcommand{\Vars}{\mathcal{V}}
+\newcommand{\Types}{\mathcal{T}}
+
+\newcommand{\quant}[2]{\forall #1[#2]}
 \newcommand{\interpret}[1]{\llparenthesis #1 \rrparenthesis}
 \newcommand{\arr}[1]{\to_{#1}}
+\newcommand{\arrtype}{\Rightarrow}
+\newcommand{\abs}[2]{\lambda #1.#2}
+\newcommand{\tabs}[2]{\Lambda #1.#2}
+\newcommand{\app}[2]{#1 \cdot #2}
+\newcommand{\tapp}[2]{#1 * #2}
+\newcommand{\subst}[2]{#1:=#2}
+
+\newcommand{\FTV}{\mathit{FTV}}
+\newcommand{\FV}{\mathit{FV}}
+
+\newcommand{\nat}{\mathtt{nat}}
+\newcommand{\proj}{\pi}
+\newcommand{\flatten}{\mathtt{flatten}}
+\newcommand{\lift}{\mathtt{lift}}
 
 \begin{document}
 
@@ -53,6 +73,8 @@ The hope is that the end result is something useful. :)
 \end{abstract}
 
 \section*{THE LIST}
+
+\renewcommand{\theenumii}{\arabic{enumi}.\arabic{enumii}}
 
 Here's what we need to do:
 \begin{enumerate}
@@ -87,10 +109,12 @@ Here's what we need to do:
   \item Present the system and give interpretations (following the
     default scheme) for all ways of constructing terms.
   \item Show that $\ell \succ r$ or $\ell \succeq r$ for all rules.
-  \item Remove the rules which are oriented using $\succ$ and repeat,
+    Remove the rules which are oriented using $\succ$ and repeat,
     until all rules have been removed.
   \end{enumerate}
 \end{enumerate}
+
+\renewcommand{\theenumii}{\alph{enumii}}
 
 We use \emph{rule removal}:
 
@@ -118,6 +142,115 @@ This gives rise to the following algorithm:
   \end{enumerate}
 \end{enumerate}
 If this algorithm succeeds, we have proven termination.
+
+\section{Defining a world}
+
+\subsection{Defining the set $\World$}
+
+We define the set of types for interpretation terms.
+
+\begin{definition}
+We assume given an infinite set $\Typevars$ of \emph{type variables}.
+The set $\Types$ of types is given by:
+\begin{itemize}
+\item $\alpha \in \Types$ for all $\alpha \in \Typevars$, and
+  $\FTV(\alpha) = \{ \alpha \}$.
+\item $\nat \in \Types$, and $\FTV(\nat) = \emptyset$.
+\item $\sigma \arrtype \tau \in \Types$ if both $\sigma \in \Types$
+  and $\tau \in \Types$, and $\FTV(\sigma \arrtype \tau) = \FTV(\sigma)
+  \cup \FTV(\tau)$.
+\item $\sigma \times \tau \in \Types$ if both $\sigma \in \Types$
+  and $\tau \in \Types$, and $\FTV(\sigma \times \tau) = \FTV(\sigma)
+  \cup \FTV(\tau)$.
+\item $\quant{\alpha}{\sigma} \in \Types$ if $\alpha \in \Typevars$ and
+  $\sigma \in \Types$, and $\FTV(\quant{\alpha}{\sigma}) =
+  \FTV(\sigma) \setminus \{ \alpha \}$.
+\end{itemize}
+\end{definition}
+
+The set $\Iterms$ of interpretation terms is now defined as follows.
+
+\begin{definition}
+We assume given an infinite set $\Vars$ of variables, and let $\Gamma$
+refer to a mapping from a finite subset of $\Vars$ to the set of
+interpretation types.  The set $\Iterms$ of interpretation terms consists
+of all expressions $s$ such that $\Gamma \vdash s : \sigma$ can be
+inferred for some interpretation type $\sigma$ and mapping $\Gamma$ by
+the following clauses:
+\begin{itemize}
+\item $\Gamma \vdash n : \nat$ for every natural number $n$.
+\item $\Gamma \vdash x : \sigma$ for every $(x : \sigma) \in \Gamma$.
+\item $\Gamma \vdash \mathtt{f} : \sigma$ for all $(\mathtt{f} :
+  \sigma)$ in the following set: $\{ \oplus_\sigma : \sigma \arrtype
+  \sigma \arrtype \sigma,\ \otimes : \sigma \arrtype \sigma \arrtype
+  \sigma,\ \proj^1_{\sigma,\tau} : (\sigma \times \tau) \arrtype
+  \sigma,\ \proj^2_{\sigma,\tau} : (\sigma \times \tau) \arrtype \tau,\ 
+  \flatten_{\sigma} : \sigma \arrtype \nat,\ 
+  \lift_{\sigma} : \nat \arrtype \sigma
+  \mid \sigma \in \Types \}$
+\item $\Gamma \vdash \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
+  \in \Vars$ and $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$.
+\item $\Gamma \vdash \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
+  $\alpha \in \Typevars$ and $\Gamma \vdash s : \sigma$ and for all
+  $(x : \tau) \in \Gamma$: $\alpha \notin \FTV(\tau)$
+\item $\Gamma \vdash \app{s}{t} : \tau$ if $\Gamma \vdash s :
+  \sigma \arrtype \tau$ and $\Gamma \vdash t : \sigma$
+\item $\Gamma \vdash \tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$ if
+  $\Gamma \vdash s : \quant{\alpha}{\sigma}$\footnote{TODO: a
+  definition of type substitution}
+\end{itemize}
+We say that $s$ is \emph{closed} if $\emptyset \vdash s : \sigma$.
+\end{definition}
+
+Note that for a given $\Gamma$, if $s$ is typable under $\Gamma$, then
+there is only one choice for the type (this is easily proved by
+induction on the form of $s$).  Thus, all closed terms have a unique
+type.
+
+\medskip
+To define the world of \emph{final interpretation terms}, we will
+normalise certain elements of $\Iterms$ using the relation $\leadsto$:
+
+\begin{definition}
+Let $s,t$ be closed interpretation terms of the same type $\sigma$ such
+that $\FTV(\sigma) = \emptyset$.  We say $s \leadsto t$ if we can denote
+$s = C[\ell]$ and $t = C[r]$\footnote{TODO: a definition of contexts.}
+for some rule scheme $\ell \leadsto r$ in the following list:
+\begin{itemize}
+\item $\app{\app{\oplus_{\nat}}{n}}{m} \leadsto (n+m)$ 
+\item $\app{\app{\otimes_{\nat}}{n}}{m} \leadsto (n \cdot m)$ 
+\item $\app{\app{\oplus_{\sigma \arrtype \tau}}{(\abs{x:\sigma}{s})}}{
+  (\abs{x:\sigma}{t})} \leadsto \abs{x:\sigma}{\app{\app{\oplus_\tau}{
+  s}}{t}}$
+\item TODO
+\end{itemize}
+\end{definition}
+
+\subsection{Defining $\succ$ and $\succeq$}
+
+\subsection{Properties of $\succ$ and $\succeq$}
+
+\section{Systems of interest and their properties}
+
+\subsection{Systems of interest}
+
+\subsection{Interpreting interesting terms}
+
+\subsection{Monotonicity}
+
+\section{Some useful lemmas}
+
+\subsection{Orienting $\beta$-reduction}
+
+\subsection{Orienting type instantiation}
+
+\subsection{Other}
+
+\section{Some system of interest -- urzy\_emb?}
+
+\subsection{Interpretations}
+
+\subsection{Rule orientation}
 
 \end{document}
 
