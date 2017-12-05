@@ -23,7 +23,12 @@
 \newcommand{\Rules}{\mathcal{R}}
 \newcommand{\Typevars}{\mathcal{A}}
 \newcommand{\Vars}{\mathcal{V}}
+\newcommand{\ITypes}{\mathcal{Y}}
 \newcommand{\Types}{\mathcal{T}}
+\newcommand{\Terms}{\mathcal{T}\!\mathit{erms}}
+\newcommand{\TypeConstructors}{\mathcal{C}}
+\newcommand{\Typemap}{\mathcal{T\!M}}
+\newcommand{\Termmap}{\mathcal{J}}
 
 \newcommand{\quant}[2]{\forall #1[#2]}
 \newcommand{\interpret}[1]{\llparenthesis #1 \rrparenthesis}
@@ -32,6 +37,7 @@
 \newcommand{\abs}[2]{\lambda #1.#2}
 \newcommand{\tabs}[2]{\Lambda #1.#2}
 \newcommand{\app}[2]{#1 \cdot #2}
+\newcommand{\apps}[3]{#1 \cdot #2 \cdots #3}
 \newcommand{\tapp}[2]{#1 * #2}
 \newcommand{\subst}[2]{#1:=#2}
 
@@ -42,6 +48,7 @@
 \newcommand{\proj}{\pi}
 \newcommand{\flatten}{\mathtt{flatten}}
 \newcommand{\lift}{\mathtt{lift}}
+\newcommand{\con}{\mathtt{c}}
 
 \begin{document}
 
@@ -149,21 +156,21 @@ If this algorithm succeeds, we have proven termination.
 
 We define the set of types for interpretation terms.
 
-\begin{definition}
+\begin{definition}\label{def:itypes}
 We assume given an infinite set $\Typevars$ of \emph{type variables}.
-The set $\Types$ of types is given by:
+The set $\ITypes$ of \emph{interpretation types} is given by:
 \begin{itemize}
-\item $\alpha \in \Types$ for all $\alpha \in \Typevars$, and
+\item $\alpha \in \ITypes$ for all $\alpha \in \Typevars$, and
   $\FTV(\alpha) = \{ \alpha \}$.
-\item $\nat \in \Types$, and $\FTV(\nat) = \emptyset$.
-\item $\sigma \arrtype \tau \in \Types$ if both $\sigma \in \Types$
-  and $\tau \in \Types$, and $\FTV(\sigma \arrtype \tau) = \FTV(\sigma)
+\item $\nat \in \ITypes$, and $\FTV(\nat) = \emptyset$.
+\item $\sigma \arrtype \tau \in \ITypes$ if both $\sigma \in \ITypes$
+  and $\tau \in \ITypes$, and $\FTV(\sigma \arrtype \tau) = \FTV(\sigma)
   \cup \FTV(\tau)$.
-\item $\sigma \times \tau \in \Types$ if both $\sigma \in \Types$
-  and $\tau \in \Types$, and $\FTV(\sigma \times \tau) = \FTV(\sigma)
+\item $\sigma \times \tau \in \ITypes$ if both $\sigma \in \ITypes$
+  and $\tau \in \ITypes$, and $\FTV(\sigma \times \tau) = \FTV(\sigma)
   \cup \FTV(\tau)$.
-\item $\quant{\alpha}{\sigma} \in \Types$ if $\alpha \in \Typevars$ and
-  $\sigma \in \Types$, and $\FTV(\quant{\alpha}{\sigma}) =
+\item $\quant{\alpha}{\sigma} \in \ITypes$ if $\alpha \in \Typevars$ and
+  $\sigma \in \ITypes$, and $\FTV(\quant{\alpha}{\sigma}) =
   \FTV(\sigma) \setminus \{ \alpha \}$.
 \end{itemize}
 \end{definition}
@@ -187,7 +194,9 @@ the following clauses:
   \sigma,\ \proj^2_{\sigma,\tau} : (\sigma \times \tau) \arrtype \tau,\ 
   \flatten_{\sigma} : \sigma \arrtype \nat,\ 
   \lift_{\sigma} : \nat \arrtype \sigma
-  \mid \sigma \in \Types \}$
+  \mid \sigma \in \ITypes \}$.
+\item $\Gamma \vdash (s,t) : \sigma \times \tau$ if $\Gamma \vdash s :
+  \sigma$ and $\Gamma \vdash t : \tau$.
 \item $\Gamma \vdash \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
   \in \Vars$ and $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$.
 \item $\Gamma \vdash \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
@@ -219,24 +228,297 @@ for some rule scheme $\ell \leadsto r$ in the following list:
 \begin{itemize}
 \item $\app{\app{\oplus_{\nat}}{n}}{m} \leadsto (n+m)$ 
 \item $\app{\app{\otimes_{\nat}}{n}}{m} \leadsto (n \cdot m)$ 
-\item $\app{\app{\oplus_{\sigma \arrtype \tau}}{(\abs{x:\sigma}{s})}}{
-  (\abs{x:\sigma}{t})} \leadsto \abs{x:\sigma}{\app{\app{\oplus_\tau}{
-  s}}{t}}$
-\item TODO
+\item $\app{\app{\circ_{\sigma \arrtype \tau}}{(\abs{x:\sigma}{s})}}{
+  (\abs{x:\sigma}{t})} \leadsto \abs{x:\sigma}{\app{\app{\circ_\tau}{
+  s}}{t}}$ for $\circ \in \{ \oplus, \otimes \}$
+\item $\app{\app{\circ_{\quant{\alpha}{\sigma}}}{(\tabs{\alpha}{s})}}{
+  (\tabs{\alpha}{t})} \leadsto \tabs{\alpha}{\app{\app{\circ}{s}}{t}}$
+  for $\circ \in \{ \oplus, \otimes \}$
+\item $\app{\proj^1_{\sigma,\tau}}{(s,t)} \leadsto s$
+\item $\app{\proj^2_{\sigma,\tau}}{(s,t)} \leadsto t$
+\item $\app{\flatten_\nat}{s} \leadsto s$
+\item $\app{\flatten_{\sigma \arrtype \tau}}{s} \leadsto
+  \app{s}{(\app{\lift_\sigma}{0})}$
+\item $\app{\flatten_{\quant{\alpha}{\sigma}}}{s} \leadsto
+  \app{\flatten_{\sigma[\subst{\alpha}{\nat}]}}{(\tapp{s}{\nat})}$
+\item $\app{\lift_\nat}{s} \leadsto s$
+\item $\app{\lift_{\sigma \arrtype \tau}}{s} \leadsto
+  \abs{x:\sigma}{\app{\lift_{\tau}}{x}}$
+\item $\app{\lift_{\quant{\alpha}{\sigma}}}{s} \leadsto
+  \tabs{\alpha}{\app{\lift_{\sigma}}{s}}$
+\item $\app{(\abs{x:\sigma}{s})}{t} \leadsto s[\subst{x}{t}]$
+\item $\tapp{(\tabs{\alpha}{s})}{\sigma} \leadsto
+  s[\subst{\alpha}{\sigma}]$.
 \end{itemize}
+A \emph{final interpretation term} is a term $s \in \Iterms$ such that
+$\FV(s) = \FTV(s) = \emptyset$ and $s$ is in normal form with respect
+to $\leadsto$.  We let $\World$ be the set of all final interpretation
+terms.
 \end{definition}
+
+\begin{lemma}
+Every term $s \in \Iterms$ with $\FV(s) = \FTV(s) = \emptyset$ reduces
+to a unique final interpretation term $s\downarrow$.
+\end{lemma}
+
+\begin{proof}
+By proving termination and local confluence of $\leadsto$ (although it
+actually suffices to only prove local confluence for fully closed terms).
+
+TODO.
+\qed
+\end{proof}
+
+\begin{lemma}
+The only final interpretation terms of type $\nat$ are the natural
+numbers.
+\end{lemma}
+
+\begin{proof}
+TODO.
+\qed
+\end{proof}
 
 \subsection{Defining $\succ$ and $\succeq$}
 
+As an aide, we will need \emph{valuations}:
+
+\begin{definition}
+A valuation for $\Gamma$ is a substitution which, for each $(x:\sigma)
+\in \Gamma$, maps $x$ to a final interpretation term of type $\sigma$.
+\end{definition}
+
+We will define $\succ$ and $\succeq$ on elements of $\World$, using a
+recursive procedure: $s \succ t$ (resp.\ $s \succeq t$) if $[] \Vdash
+s \succ_\sigma t$ (resp.\ $[] \Vdash s \succeq_\sigma t$) can be
+obtained for $\sigma$ the type of $s,t$, following
+Definition~\ref{def:succ}.
+
+\begin{definition}\label{def:succ}
+Let $\Gamma$ be an environment\footnote{TODO: introduce the word
+environment sometime before this point.}, $\gamma$ a valuation for $\Gamma$ and
+$s,t$ interpretation terms such that (1) $s$ and $t$ have the same type
+under $\Gamma$ (so $\Gamma \vdash s : \sigma$ and $\Gamma \vdash t :
+\sigma$ for the same type $\sigma$), and (2) $\abs{x_1:\sigma_1\dots
+x_n:\sigma_n}{s}$ and $\abs{x_1:\sigma_1\dots x_n:\sigma_n}{t}$ are final
+interpretation terms if $\Gamma = \{ (x_1:\sigma_1),\dots,(x_n:\sigma_n)
+\}$.  For $R \in \{ \succ,\succeq \}$, we say $\gamma \Vdash s\ R_{
+\sigma}\ t$ if this can be obtained using the following recursive clauses:
+\begin{itemize}
+\item $\gamma \Vdash s\ R_\nat\ t$ if $s\gamma\downarrow\ R\ t\gamma
+  \downarrow$ in the natural numbers
+\item $\gamma \Vdash s\ R_{\sigma \arrtype \tau} t$ if:
+  \begin{itemize}
+  \item $s = \abs{x:\sigma}{s'}$ and $t = \abs{x:\sigma}{t'}$ and
+    $\gamma \cup [x:=u] \Vdash s'\ R_{\tau}\ t'$ for all final
+    interpretation terms of type $\sigma$
+  \item TODO: cases for $s$ or $t$ having a form $\apps{x}{s_1}{s_n}$
+    with $x \in \Vars$ and $n \geq 0$
+  \end{itemize}
+\item $\gamma \Vdash s\ R_{\quant{\alpha}{\sigma}}\ t$ if:
+  \begin{itemize}
+  \item $s = \tabs{\alpha}{s'}$ and $t = \tabs{\alpha}{t'}$ and
+    $s'[\subst{\alpha}{\tau}]\ R_\sigma\ t'[\subst{\alpha}{\tau}]$ for
+    all types $\tau$
+  \item TODO: perhaps cases for $s$ or $t$ having a variable at the
+    head as well
+  \end{itemize}
+\end{itemize}
+\end{definition}
+
 \subsection{Properties of $\succ$ and $\succeq$}
+
+We're going to at least need to see that $\succ$ is a well-founded ordering:
+
+\begin{lemma}
+$\succ$ is well-founded.
+\end{lemma}
+
+\begin{proof}
+TODO.
+\qed
+\end{proof}
+
+\begin{lemma}
+Both $\succ$ and $\succeq$ are transitive.
+\end{lemma}
+
+\begin{proof}
+TODO.
+\qed
+\end{proof}
+
+And that $\succeq$ is a quasi-ordering:
+
+\begin{lemma}
+$\succeq$ is reflexive.
+\end{lemma}
+
+\begin{proof}
+TODO.
+\qed
+\end{proof}
+
+Finally, they must be compatible:
+
+\begin{lemma}
+We have $\succ \cdot \succeq\ \subseteq\ \succ$
+\end{lemma}
+
+\begin{proof}
+TODO.  Note that proving $\succeq \cdot \succ\ \subseteq\ \succ$ is
+just as useful, if that so happens to be easier (but I imagine it does
+not make the slightest difference, given the definition).
+\qed
+\end{proof}
+
+I think that's all that absolutely \emph{has} to be proven to make the
+argument work.  However, it would be great if we could also for
+instance obtain that always $\app{\app{\oplus}{s}}{t} \succeq s$ and
+that $\app{\app{\oplus}{s}}{(\app{\lift}{1})} \succ s$.
 
 \section{Systems of interest and their properties}
 
+The systems of interest are sets of terms with a rewriting relation on
+them.  Interestingly, $\Iterms$ can be seen of an instance of this general
+scheme.
+
 \subsection{Systems of interest}
+
+Types are built from a set of type constructors, using $\arrtype$ and
+$\forall$.
+
+\begin{definition}
+We assume given a fixed set $\TypeConstructors$ of \emph{type
+constructors}, each paired with an integer \emph{arity} $\geq 0$, as
+well as the infinite set $\Typevars$ of type variables.  The set
+$\Types$ of types is given by:
+\begin{itemize}
+\item $\alpha \in \Types$ for all $\alpha \in \Typevars$
+\item $\con(\sigma_1,\dots,\sigma_n) \in \Types$ if $(\con,n) \in
+  \TypeConstructors$ and $\sigma_1,\dots,\sigma_n \in \Types$
+\item $\sigma \arrtype \tau \in \Types$ if $\sigma,\tau \in \Types$
+\item $\quant{\alpha}{\sigma} \in \Types$ if $\alpha \in \Typevars$ and
+  $\sigma \in \Types$
+\end{itemize}
+We let $\FTV(\sigma)$ be defined in the obvious way (much like
+Definition~\ref{def:itypes}).
+\end{definition}
+
+Terms are built from a set of function symbols, using (type) abstraction
+and (type) application as for interpretation terms.
+
+\begin{definition}
+We assume given a fixed set $\Sigma$ of \emph{function symbols}, each
+paired with an arity $n$ and a type $\sigma_1 \arrtype \dots \arrtype
+\sigma_n \arrtype \tau$, as well as the infinite set $\Vars$ of variables.
+The set $\Terms$ of terms consists of those expressions $s$ such that
+$\Gamma \vdash s : \sigma$ can be derived for some type $\sigma$ and
+environment $\Gamma$ using the following clauses:
+\begin{itemize}
+\item $\Gamma \vdash x : \sigma$ for every $(x : \sigma) \in \Gamma$.
+\item $\Gamma \vdash \mathtt{f}(s_1,\dots,s_n) : \tau$ if
+  $(\mathtt{f} : (n,\sigma_1 \arrtype \dots \arrtype \sigma_n \arrtype
+  \tau))$ in $\Sigma$ and $\Gamma \vdash s_i : \sigma_i$ for $1 \leq
+  i \leq n$
+\item $\Gamma \vdash \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
+  \in \Vars$ and $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$.
+\item $\Gamma \vdash \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
+  $\alpha \in \Typevars$ and $\Gamma \vdash s : \sigma$ and for all
+  $(x : \tau) \in \Gamma$: $\alpha \notin \FTV(\tau)$
+\item $\Gamma \vdash \tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$ if
+  $\Gamma \vdash s : \quant{\alpha}{\sigma}$
+\end{itemize}
+\end{definition}
+
+Note that there is no explicit application; systems which include a form
+of application should be modelled simply using a set of symbols $\{
+@_{\sigma,\tau}: (2,(\sigma \arrtype \tau) \arrtype \sigma \arrtype \tau)
+\mid \sigma,\tau \in \Types \} \subseteq \Sigma$.
+
+TODO: are there interesting systems where the type application $*$ is
+not the only way for types to appear in terms?  If so, we might as well
+not have the exceptional case, easier to go general straight away.
+
+TODO: describe what rules look like.  Are the cases where substitution
+/ type substitution is used limited to a few special cases (in which
+case we can just add those cases as special) or is it very typical?
+Should we describe rules using variables which are instantiated, or
+simply assume that typical systems have infinitely many rules (e.g., all
+instances of $\beta$-reductions are a separate rule)?  We're already
+using infinite signatures -- should we head straight for polymorphism?
+
+\subsubsection{Some example systems.}
+
+TODO: describe here how system F and urzy\_emb can be seen as instances
+of this general case.
 
 \subsection{Interpreting interesting terms}
 
+To start, all types must be mapped to interesting types.  This is
+easily done:
+
+\begin{definition}
+A \emph{type constructor mapping} is a function $\Typemap$ which assigns
+to each $(\con:n) \in \TypeConstructors$ a type $\sigma$ with
+$\FTV(\sigma) \subseteq \{ \alpha_1,\dots,\alpha_n \}$.  A type
+constructor mapping is extended to a function operating on types as
+follows:
+\[
+\begin{array}{rcl}
+\Typemap(\alpha) & = & \alpha \\
+\Typemap(\con(\sigma_1,\dots,\sigma_n)) & = &
+  \tau[\alpha_1:=\Typemap(\sigma_1),\dots,\alpha_n:=\Typemap(\sigma_n)]\ 
+  \text{if}\ \Typemap(\con) = \tau \\
+\Typemap(\sigma \arrtype \tau) & = & \Typemap(\sigma) \arrtype
+  \Typemap(\tau) \\
+\Typemap(\quant{\alpha}{\sigma}) & = & \quant{\alpha}{\Typemap(\sigma)} \\
+\end{array}
+\]
+\end{definition}
+
+Clearly, a type constructor mapping maps types to interpretation types,
+and $\FTV(\Typemap(\sigma)) \subseteq \FTV(\sigma)$.
+
+Terms are mapped to interpretation terms in a very similar way:
+
+\begin{definition}
+A \emph{symbol mapping} is a function $\Termmap$ which assigns to each
+$(\mathtt{f}:(n,\sigma)) \in \Sigma$ a final interpretation term
+$\Termmap(\mathtt{f})$ of the form $\abs{x_1:\sigma_1 \dots x_n:
+\sigma_n}{t}$, such that $\emptyset \vdash \Termmap(\mathtt{f}) :
+\Typemap(\sigma)$.  Considering $\Termmap$ fixed, we define the
+\emph{interpretation} of each term $s$, $\interpret{s}$, as follows:
+\[
+\begin{array}{rcl}
+\interpret{x} & = & x \\
+\interpret{\mathtt{f}(s_1,\dots,s_n)} & = &
+  t[x_1:=\interpret{s_1},\dots,x_n:=\interpret{s_n}]\ \text{if}\ 
+  \Termmap(\mathtt{f}) = \abs{x_1:\sigma_1 \dots x_n:\sigma_n}{t} \\
+\interpret{\abs{x:\sigma}{s}} & = & \abs{x:\Termmap(\sigma)}{
+  \interpret{s}} \\
+\interpret{\tabs{\alpha}{s}} & = & \tabs{\alpha}{\interpret{s}} \\
+\interpret{\tapp{s}{\tau}} & = & \tapp{\interpret{s}}{\Termmap(\tau)} \\
+\end{array}
+\]
+\end{definition}
+
+TODO: prove that this indeed maps to well-typed interpretation terms of
+the expected type.
+
+TODO: observe that this choice does not really allow us to order the
+type instantiation rule with $\succ$, just with $\succeq$.  However, this
+isn't actually a problem since, if all other rules can be removed, we have
+termination anyway.  However, we could allow for a custom interpretation
+there as well, or consider the $*$ merely one case of a more general kind
+of function symbol.
+
 \subsection{Monotonicity}
+
+This relies on the definition of rules (a form of stability may also be
+required), but we really want to have that if $\interpret{\ell} \succ
+\interpret{r}$ for some rule, then $\interpret{s} \succ \interpret{t}$
+whenever $s \arr{\Rules} t$ by that rule.
 
 \section{Some useful lemmas}
 
