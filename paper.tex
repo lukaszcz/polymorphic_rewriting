@@ -58,8 +58,8 @@
   \thanks{The authors are supported by lots of people.}}
 \subtitle{What we need to do to get where we want to be}
 
-\author{Lukasz Czajka and Cynthia Kop}
-\authorrunning{L. Czajka and C. Kop}
+\author{{\L}ukasz Czajka and Cynthia Kop}
+\authorrunning{{\L}. Czajka and C. Kop}
 \institute{
 Department of Computer Science, University of Copenhagen (DIKU)
 \quad\quad\quad
@@ -189,7 +189,7 @@ the following clauses:
 \item $\Gamma \vdash x : \sigma$ for every $(x : \sigma) \in \Gamma$.
 \item $\Gamma \vdash \mathtt{f} : \sigma$ for all $(\mathtt{f} :
   \sigma)$ in the following set: $\{ \oplus_\sigma : \sigma \arrtype
-  \sigma \arrtype \sigma,\ \otimes : \sigma \arrtype \sigma \arrtype
+  \sigma \arrtype \sigma,\ \otimes_\sigma : \sigma \arrtype \sigma \arrtype
   \sigma,\ \proj^1_{\sigma,\tau} : (\sigma \times \tau) \arrtype
   \sigma,\ \proj^2_{\sigma,\tau} : (\sigma \times \tau) \arrtype \tau,\ 
   \flatten_{\sigma} : \sigma \arrtype \nat,\ 
@@ -311,7 +311,7 @@ interpretation terms if $\Gamma = \{ (x_1:\sigma_1),\dots,(x_n:\sigma_n)
   \begin{itemize}
   \item $s = \abs{x:\sigma}{s'}$ and $t = \abs{x:\sigma}{t'}$ and
     $\gamma \cup [x:=u] \Vdash s'\ R_{\tau}\ t'$ for all final
-    interpretation terms of type $\sigma$
+    interpretation terms~$u$ of type $\sigma$
   \item TODO: cases for $s$ or $t$ having a form $\apps{x}{s_1}{s_n}$
     with $x \in \Vars$ and $n \geq 0$
   \end{itemize}
@@ -440,13 +440,24 @@ TODO: are there interesting systems where the type application $*$ is
 not the only way for types to appear in terms?  If so, we might as well
 not have the exceptional case, easier to go general straight away.
 
+LC: yes, e.g., when you have explicit existential quantification over
+types, like in urzy\_emb.
+
+I'm thinking that maybe here it will be easier to just go with
+system $F_\omega$ from the beginning instead of system~$F$, because
+there you have in-built type constructors.
+
 TODO: describe what rules look like.  Are the cases where substitution
 / type substitution is used limited to a few special cases (in which
 case we can just add those cases as special) or is it very typical?
+
+LC: (type) substitution occurs with more rules, in e.g. urzy\_emb
+
 Should we describe rules using variables which are instantiated, or
-simply assume that typical systems have infinitely many rules (e.g., all
-instances of $\beta$-reductions are a separate rule)?  We're already
-using infinite signatures -- should we head straight for polymorphism?
+simply assume that typical systems have infinitely many rules (e.g.,
+all instances of $\beta$-reductions are a separate rule)? We're
+already using infinite signatures -- should we head straight for
+polymorphism?
 
 \subsubsection{Some example systems.}
 
