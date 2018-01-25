@@ -318,7 +318,7 @@ interpretation terms if $\Gamma = \{ (x_1:\sigma_1),\dots,(x_n:\sigma_n)
 \item $\gamma \Vdash s\ R_{\quant{\alpha}{\sigma}}\ t$ if:
   \begin{itemize}
   \item $s = \tabs{\alpha}{s'}$ and $t = \tabs{\alpha}{t'}$ and
-    $s'[\subst{\alpha}{\tau}]\ R_{\sigma[\subset{\alpha}{\tau}]}\ t'[\subst{\alpha}{\tau}]$ for all types $\tau$
+    $s'[\subst{\alpha}{\tau}]\ R_{\sigma[\subst{\alpha}{\tau}]}\ t'[\subst{\alpha}{\tau}]$ for all types $\tau$
   \item TODO: perhaps cases for $s$ or $t$ having a variable at the
     head as well
   \end{itemize}
