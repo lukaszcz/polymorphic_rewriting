@@ -17,6 +17,7 @@
 \usepackage{microtype}
 \usepackage{bussproofs}
 \usepackage{multirow}
+\usepackage{proof}
 
 \newcommand{\Iterms}{\mathcal{I}}
 \newcommand{\World}{\mathcal{W}}
@@ -49,6 +50,9 @@
 \newcommand{\flatten}{\mathtt{flatten}}
 \newcommand{\lift}{\mathtt{lift}}
 \newcommand{\con}{\mathtt{c}}
+
+\newcommand{\ur}{\upharpoonright}
+\newcommand{\da}{\downarrow}
 
 \begin{document}
 
@@ -253,7 +257,8 @@ for some rule scheme $\ell \leadsto r$ in the following list:
 A \emph{final interpretation term} is a term $s \in \Iterms$ such that
 $\FV(s) = \FTV(s) = \emptyset$ and $s$ is in normal form with respect
 to $\leadsto$.  We let $\World$ be the set of all final interpretation
-terms.
+terms. By~$\World_\tau$ we denote the set of all final interpretation
+terms of type~$\tau$.
 \end{definition}
 
 \begin{lemma}
@@ -281,48 +286,25 @@ TODO.
 
 \subsection{Defining $\succ$ and $\succeq$}
 
-As an aide, we will need \emph{valuations}:
-
-\begin{definition}
-A valuation for $\Gamma$ is a substitution which, for each $(x:\sigma)
-\in \Gamma$, maps $x$ to a final interpretation term of type $\sigma$.
-\end{definition}
-
-We will define $\succ$ and $\succeq$ on elements of $\World$, using a
-recursive procedure: $s \succ t$ (resp.\ $s \succeq t$) if $[] \Vdash
-s \succ_\sigma t$ (resp.\ $[] \Vdash s \succeq_\sigma t$) can be
-obtained for $\sigma$ the type of $s,t$, following
-Definition~\ref{def:succ}.
+We will define $\succ$ and $\succeq$ on elements of $\World$, using
+coinduction: $s \succ t$ (resp.\ $s \succeq t$) if $s \succ_\sigma t$
+(resp.\ $s \succeq_\sigma t$) can be obtained for $\sigma$ the type of
+$s,t$, following Definition~\ref{def:succ}.
 
 \begin{definition}\label{def:succ}
-Let $\Gamma$ be an environment\footnote{TODO: introduce the word
-environment sometime before this point.}, $\gamma$ a valuation for $\Gamma$ and
-$s,t$ interpretation terms such that (1) $s$ and $t$ have the same type
-under $\Gamma$ (so $\Gamma \vdash s : \sigma$ and $\Gamma \vdash t :
-\sigma$ for the same type $\sigma$), and (2) $\abs{x_1:\sigma_1\dots
-x_n:\sigma_n}{s}$ and $\abs{x_1:\sigma_1\dots x_n:\sigma_n}{t}$ are final
-interpretation terms if $\Gamma = \{ (x_1:\sigma_1),\dots,(x_n:\sigma_n)
-\}$.  For $R \in \{ \succ,\succeq \}$, we say $\gamma \Vdash s\ R_{
-\sigma}\ t$ if this can be obtained using the following recursive clauses:
-\begin{itemize}
-\item $\gamma \Vdash s\ R_\nat\ t$ if $s\gamma\downarrow\ R\ t\gamma
-  \downarrow$ in the natural numbers
-\item $\gamma \Vdash s\ R_{\sigma \arrtype \tau} t$ if:
-  \begin{itemize}
-  \item $s = \abs{x:\sigma}{s'}$ and $t = \abs{x:\sigma}{t'}$ and
-    $\gamma \cup [x:=u] \Vdash s'\ R_{\tau}\ t'$ for all final
-    interpretation terms~$u$ of type $\sigma$
-  \item TODO: cases for $s$ or $t$ having a form $\apps{x}{s_1}{s_n}$
-    with $x \in \Vars$ and $n \geq 0$
-  \end{itemize}
-\item $\gamma \Vdash s\ R_{\quant{\alpha}{\sigma}}\ t$ if:
-  \begin{itemize}
-  \item $s = \tabs{\alpha}{s'}$ and $t = \tabs{\alpha}{t'}$ and
-    $s'[\subst{\alpha}{\tau}]\ R_{\sigma[\subst{\alpha}{\tau}]}\ t'[\subst{\alpha}{\tau}]$ for all types $\tau$
-  \item TODO: perhaps cases for $s$ or $t$ having a variable at the
-    head as well
-  \end{itemize}
-\end{itemize}
+  Let $R \in \{ \succ,\succeq \}$. For~$s,t \in \World_\sigma$, the
+  relation $s\ R_{\sigma}\ t$ is defined coinductively by the
+  following rules.
+  \[
+    \begin{array}{c}
+    \infer={s\ R_\nat\ t}{s\da\ R\ t\da \text{ in natural
+        numbers}}\quad\quad
+    \infer={s\ R_{\sigma\to\tau}\ t}{\app{s}{q}\ R_{\tau}\ \app{t}{q}
+      \text{ for every } q \in \World_\sigma} \\ \\
+    \infer={s\ R_{\forall\alpha[\sigma]}\ t}{\tapp{s}{\tau}\ R_{\sigma[\subst{\alpha}{\tau}]}\ \tapp{t}{\tau}
+      \text{ for every closed type } \tau}
+    \end{array}
+  \]
 \end{definition}
 
 \subsection{Properties of $\succ$ and $\succeq$}
@@ -334,8 +316,16 @@ $\succ$ is well-founded.
 \end{lemma}
 
 \begin{proof}
-TODO.
-\qed
+  By induction on the type~$\tau$ one shows that there does not exist
+  an infinite sequence
+  $t_1 \succ_\tau t_2 \succ_\tau t_3 \succ_\tau \ldots$ For instance,
+  if
+  $t_1 \succ_{\forall\alpha[\tau]} t_2 \succ_{\forall\alpha[\tau]} t_3
+  \succ_{\forall\alpha[\tau]} \ldots$ then
+  $\tapp{t_1}{\nat} \succ_{\tau[\subst{\alpha}{\nat}]}
+  \tapp{t_2}{\nat} \succ_{\tau[\subst{\alpha}{\nat}]} \tapp{t_3}{\nat}
+  \succ_{\tau[\subst{\alpha}{\nat}]} \ldots$, which is impossible by
+  the inductive hypothesis.
 \end{proof}
 
 \begin{lemma}
@@ -343,8 +333,24 @@ Both $\succ$ and $\succeq$ are transitive.
 \end{lemma}
 
 \begin{proof}
-TODO.
-\qed
+  We show this for~$\succeq$, the proof for~$\succ$ being
+  analogous. We proceed by coinduction.
+
+  If $t_1 \succeq_\nat t_2 \succeq_\nat t_3$ then
+  $t_1\da \ge t_2\da \ge t_3\da$, so $t_1\da \ge t_3\da$. Thus
+  $t_1 \succeq_\nat t_3$.
+
+  If $t_1 \succeq_{\sigma\to\tau}t_2\succeq_{\sigma\to\tau}t_3$ then
+  $\app{t_1}{q}\succeq_{\tau}\app{t_2}{q}\succeq_\tau\app{t_3}{q}$ for
+  $q \in \World_\sigma$. Hence $\app{t_1}{q}\succeq_\tau\app{t_3}{q}$
+  for $q \in \World_\sigma$ by the coinductive hypothesis. Thus
+  $t_1\succeq_{\sigma\to\tau} t_3$.
+
+  If $t_1 \succeq_{\forall\alpha[\sigma]}t_2\succeq_{\forall\alpha[\sigma]}t_3$ then
+  $\tapp{t_1}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_2}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}$ for
+  any closed type~$\tau$. Hence
+  $\tapp{t_1}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}$
+  by the coinductive hypothesis. Thus $t_1\succeq_{\forall\alpha[\sigma]} t_3$.\qed
 \end{proof}
 
 And that $\succeq$ is a quasi-ordering:
@@ -354,8 +360,7 @@ $\succeq$ is reflexive.
 \end{lemma}
 
 \begin{proof}
-TODO.
-\qed
+  By coinduction.\qed
 \end{proof}
 
 Finally, they must be compatible:
@@ -365,16 +370,19 @@ We have $\succ \cdot \succeq\ \subseteq\ \succ$
 \end{lemma}
 
 \begin{proof}
-TODO.  Note that proving $\succeq \cdot \succ\ \subseteq\ \succ$ is
-just as useful, if that so happens to be easier (but I imagine it does
-not make the slightest difference, given the definition).
-\qed
+By coinduction, analogous to the transitivity proof.\qed
 \end{proof}
 
 I think that's all that absolutely \emph{has} to be proven to make the
 argument work.  However, it would be great if we could also for
 instance obtain that always $\app{\app{\oplus}{s}}{t} \succeq s$ and
 that $\app{\app{\oplus}{s}}{(\app{\lift}{1})} \succ s$.
+
+LC: I think these also hold by coinduction because they hold for
+type~$\nat$. But one needs to generalize the coinductive hypothesis to
+$\app{\app{\oplus}{s}}{t} \cdot t_1 \cdot \ldots \cdot t_n
+\succeq_\sigma s \cdot t_1 \cdot \ldots \cdot t_n$ (and with some
+additional type arguments also).
 
 \section{Systems of interest and their properties}
 
