@@ -53,6 +53,11 @@
 
 \newcommand{\ur}{\upharpoonright}
 \newcommand{\da}{\downarrow}
+\newcommand{\SN}{\mathrm{SN}}
+\newcommand{\Cb}{\mathbb{C}}
+\newcommand{\Nbb}{\mathbb{N}}
+\newcommand{\val}[3]{\ensuremath{\llbracket#1\rrbracket_{#2}^{#3}}}
+\newcommand{\proves}{\vdash}
 
 \begin{document}
 
@@ -181,7 +186,7 @@ The set $\ITypes$ of \emph{interpretation types} is given by:
 
 The set $\Iterms$ of interpretation terms is now defined as follows.
 
-\begin{definition}
+\begin{definition}\label{def_typing}
 We assume given an infinite set $\Vars$ of variables, and let $\Gamma$
 refer to a mapping from a finite subset of $\Vars$ to the set of
 interpretation types.  The set $\Iterms$ of interpretation terms consists
@@ -217,7 +222,7 @@ We say that $s$ is \emph{closed} if $\emptyset \vdash s : \sigma$.
 
 Note that for a given $\Gamma$, if $s$ is typable under $\Gamma$, then
 there is only one choice for the type (this is easily proved by
-induction on the form of $s$).  Thus, all closed terms have a unique
+induction on the form of $s$). Thus, all closed terms have a unique
 type.
 
 \medskip
@@ -236,7 +241,7 @@ for some rule scheme $\ell \leadsto r$ in the following list:
   (\abs{x:\sigma}{t})} \leadsto \abs{x:\sigma}{\app{\app{\circ_\tau}{
   s}}{t}}$ for $\circ \in \{ \oplus, \otimes \}$
 \item $\app{\app{\circ_{\quant{\alpha}{\sigma}}}{(\tabs{\alpha}{s})}}{
-  (\tabs{\alpha}{t})} \leadsto \tabs{\alpha}{\app{\app{\circ}{s}}{t}}$
+    (\tabs{\alpha}{t})} \leadsto \tabs{\alpha}{\app{\app{\circ_\sigma}{s}}{t}}$
   for $\circ \in \{ \oplus, \otimes \}$
 \item $\app{\proj^1_{\sigma,\tau}}{(s,t)} \leadsto s$
 \item $\app{\proj^2_{\sigma,\tau}}{(s,t)} \leadsto t$
@@ -260,6 +265,276 @@ to $\leadsto$.  We let $\World$ be the set of all final interpretation
 terms. By~$\World_\tau$ we denote the set of all final interpretation
 terms of type~$\tau$.
 \end{definition}
+
+\begin{lemma}[Subject reduction]
+  If $\Gamma \vdash t : \tau$ and $t \leadsto t'$ then
+  $\Gamma \vdash t' : \tau$.
+\end{lemma}
+
+\begin{proof}
+  TODO
+\end{proof}
+
+In the rest of this section we adapt the Tait-Girard computability
+method to prove termination of~$\leadsto$. The proof is an adaptation
+of chapters~6 and~14 from the book ``Proofs and Types'' by Girard, and
+chapters~10 and~11 from the book ``Lectures on the Curry-Howard
+Isomorphism'' by Sorensen and Urzyczyn.
+
+By~$\SN$ we denote the set of all terminating interpretation terms. We
+use the notation $t u$ for either $\app{t}{u}$ when~$u$ is a term, or
+$\tapp{t}{u}$ when~$u$ is a type.
+
+NOTE: For now the proof does not take product types into account. I'm
+not sure if explicit products are necessary in the definition, because
+in contrast to the simply-typed lambda-calculus they may be encoded in
+the polymorphic lambda-calculus.
+
+\begin{definition}\label{def_candidate}
+  A term~$t$ is \emph{neutral} if there does not exists a sequence of
+  terms or types~$u_1,\ldots,u_n$ with $n \ge 1$ such that
+  $t u_1 \ldots u_n$ is a redex (by~$\leadsto$).
+
+  A set~$X$ of interpretation terms of type~$\tau$ in context~$\Gamma$
+  is a \emph{candidate of type~$\tau$} when:
+  \begin{enumerate}
+  \item $X \subseteq \SN$;
+  \item if $t \in X$ and $t \leadsto t'$ then $t' \in X$;
+  \item if $t$ is neutral and for every~$t'$ with $t \leadsto t'$ we
+    have $t' \in X$, then $t \in X$.
+  \end{enumerate}
+  Note that the last item above implies:
+  \begin{itemize}
+  \item[4.] if $t$ is neutral and in normal form then $t \in X$.
+  \end{itemize}
+  The set of all candidates of type~$\tau$ in context~$\Gamma$ is
+  denoted by~$\Cb_\tau^\Gamma$.
+\end{definition}
+
+\begin{definition}\label{def_reducibility_valuation}
+  Let $\omega$ be a mapping from type variables to types. A
+  \emph{$\Gamma,\omega$-valuation} is a mapping~$\xi$ from type
+  variables to candidates such that $\xi(\alpha)$ is a candidate of
+  type~$\omega(\alpha)$ (in context~$\Gamma$).
+
+  For each type~$\sigma$, context~$\Gamma$, mapping~$\omega$
+  and each $\Gamma,\omega$-valuation~$\xi$, the set $\val{\sigma}{\omega,\xi}{\Gamma}$ is
+  defined by induction on~$\sigma$:
+  \begin{itemize}
+  \item $\val{\alpha}{\omega,\xi}{\Gamma} = \xi(\alpha)$ for a type
+    variable~$\alpha$,
+  \item $\val{\nat}{\omega,\xi}{\Gamma}$ is the set of all
+    terms~$t \in \SN$ such that $\Gamma \proves t : \nat$,
+  \item $\val{\sigma \to \tau}{\omega,\xi}{\Gamma}$ is the set of all
+    terms~$t$ such that $\Gamma \proves t : \omega(\sigma \to \tau)$,
+    and for every~$s \in \val{\sigma}{\omega,\xi}{\Gamma}$ we have
+    $\app{t}{s} \in \val{\tau}{\omega,\xi}{\Gamma}$,
+  \item $\val{\forall\alpha[\sigma]}{\omega,\xi}{\Gamma}$ is the set
+    of all terms~$t$ such that
+    $\Gamma \proves t : \omega(\forall\alpha[\sigma])$ and for every
+    type~$\tau$ and every $X \in \Cb_\tau^\Gamma$ we have
+    $\tapp{t}{\alpha} \in
+    \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$.
+  \end{itemize}
+\end{definition}
+
+\begin{lemma}\label{lem_val_typable}
+  If $t \in \val{\sigma}{\omega,\xi}{\Gamma}$ then
+  $\Gamma \proves t : \omega(\sigma)$.
+\end{lemma}
+
+\begin{proof}
+  Follows from definitions.
+\end{proof}
+
+\begin{lemma}\label{lem_nat_reducible}
+  $\val{\nat}{\omega,\xi}{\Gamma} \in \Cb_{\nat}^\Gamma$.
+\end{lemma}
+
+\begin{proof}
+  We check the conditions in Definition~\ref{def_candidate}.
+  \begin{enumerate}
+  \item $\val{\nat}{\omega,\xi}{\Gamma} \subseteq \SN$ follows
+    directly from Definition~\ref{def_reducibility_valuation}.
+  \item Let $t \in \val{\nat}{\omega,\xi}{\Gamma}$ and
+    $t \leadsto t'$. Then $\Gamma \proves t : \nat$ and $t \in
+    \SN$. Hence $t' \in \SN$, and $\Gamma \proves t' : \nat$ by the
+    subject reduction lemma. Thus
+    $t' \in \val{\nat}{\omega,\xi}{\Gamma}$.
+  \item Let $t$ be neutral and $\Gamma \proves t : \nat$. Assume that
+    for all~$t'$ with $t \leadsto t'$ we have
+    $t' \in \val{\nat}{\omega,\xi}{\Gamma}$, so in particular
+    $t' \in \SN$. But then $t \in \SN$. Hence
+    $t \in \val{\nat}{\omega,\xi}{\Gamma}$.
+  \end{enumerate}
+\end{proof}
+
+\begin{lemma}\label{lem_val_computable}
+  $\val{\sigma}{\omega,\xi}{\Gamma} \in \Cb_{\omega(\sigma)}^\Gamma$.
+\end{lemma}
+
+\begin{proof}
+  Induction on~$\sigma$. First, if $\sigma = \alpha$ for a type
+  variable~$\alpha$ then
+  $\val{\sigma}{\omega,\xi}{\Gamma} = \xi(\alpha) \in
+  \Cb_{\omega(\sigma)}^\Gamma$ by definition. If $\sigma = \nat$ then
+  $\val{\nat}{\omega,\xi}{\Gamma} \in \Cb_{\nat}^\Gamma$ by
+  Lemma~\ref{lem_nat_reducible}.
+
+  Assume $\sigma = \tau_1 \to \tau_2$. We check the conditions in
+  Definition~\ref{def_candidate}.
+  \begin{enumerate}
+  \item Let $t \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$ and
+    assume there is an infinite reduction
+    $t \leadsto t_1 \leadsto t_2 \leadsto t_3 \leadsto \ldots$. By the
+    inductive hypothesis $\val{\tau_1}{\omega,\xi}{\Gamma}$ and
+    $\val{\tau_2}{\omega,\xi}{\Gamma}$ are candidates. So
+    $x \in \val{\tau_1}{\omega,\xi}{\Gamma}$ because it is neutral and
+    normal. Then $t x \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Thus
+    $t x$~is strongly normalising. But
+    $t x \leadsto t_1 x \leadsto t_2 x \leadsto t_3 x \leadsto
+    \ldots$. Contradiction.
+  \item Let $t \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$ and
+    $t \leadsto t'$. Let $u \in
+    \val{\tau_1}{\omega,\xi}{\Gamma}$. Then
+    $t u \in \val{\tau_2}{\omega,\xi}{\Gamma}$. By the inductive
+    hypothesis $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a candidate, so
+    $t' u \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Also note that
+    $\Gamma \proves t' : \omega(\tau_1 \to \tau_2)$ by the subject
+    reduction lemma. Hence
+    $t' \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
+  \item Let $t$ be neutral and $\Gamma \proves t : \omega(\tau_1 \to \tau_2)$
+    and assume for every~$t'$ with $t \leadsto t'$ we have
+    $t' \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$. Let
+    $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$. By the inductive
+    hypothesis $\val{\tau_1}{\omega,\xi}{\Gamma}$ is a candidate, so
+    $u \in \SN$. By induction on the length of the longest reduction
+    starting at~$u$ we show that
+    $t u \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Assume
+    $t u \leadsto t''$. We show
+    $t'' \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Because~$t$ is
+    neutral, $t u$ cannot be a redex. So there are two cases.
+    \begin{itemize}
+    \item $t'' = t u'$ with $u \leadsto u'$. Then
+      $t u' \in \val{\tau_2}{\omega,\xi}{\Gamma}$ by the inductive
+      hypothesis for~$u$.
+    \item $t'' = t' u$ with $t \leadsto t'$. Then
+      $t' \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$, so
+      $t' u \in \val{\tau_2}{\omega,\xi}{\Gamma}$.
+    \end{itemize}
+    We have thus shown that if $t u \leadsto t''$ then
+    $t'' \in \val{\tau_2}{\omega,\xi}{\Gamma}$. By the (main)
+    inductive hypothesis $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a
+    candidate, and $t u$ is neutral, so also
+    $t u \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Since
+    $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$ was arbitrary, we have
+    shown $t \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
+  \end{enumerate}
+
+  Assume $\sigma = \forall\alpha[\tau]$. We check the conditions in
+  Definition~\ref{def_candidate}.
+  \begin{enumerate}
+  \item Let $t \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$ and
+    assume there is an infinite reduction
+    $t \leadsto t_1 \leadsto t_2 \leadsto t_3 \leadsto
+    \ldots$. Let~$\tau'$ be an arbitrary type and let
+    $S \in \Cb_{\tau'}^\Gamma$ (e.g.~take~$S$ to be the set of
+    terminating terms of type~$\tau'$ in context~$\Gamma$). Then
+    $t \tau' \in
+    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{S}]}{\Gamma}$. By
+    the inductive hypothesis
+    $\val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{S}]}{\Gamma}$
+    is a candidate, so $t \tau' \in \SN$. But
+    $t \tau' \leadsto t_1 \tau' \leadsto t_2 \tau' \leadsto t_3 \tau'
+    \leadsto \ldots$. Contradiction.
+  \item Let $t \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$ and
+    $t \leadsto t'$. By the subject reduction lemma
+    $\Gamma \proves t' : \omega(\forall\alpha[\tau])$. Let~$\tau'$ be
+    a type and~$X \in \Cb_{\tau'}^\Gamma$. Then
+    $t \tau' \in
+    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$. By
+    the inductive hypothesis
+    $\val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$
+    is a candidate, so
+    $t' \tau' \in
+    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$. Therefore
+    $t' \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$.
+  \item Let $t$ be neutral and
+    $\Gamma \proves t : \omega(\forall\alpha[\tau])$ and assume for
+    every~$t'$ with $t \leadsto t'$ we have
+    $t' \in
+    \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$. Let~$\tau'$ be a
+    type and~$X \in \Cb_{\tau'}^\Gamma$. Assume
+    $t \tau' \leadsto t''$. Then $t'' = t' \tau'$ with
+    $t \leadsto t'$, because~$t$ is neutral. Hence
+    $t \tau' \leadsto t' \tau' \in
+    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$. By
+    the inductive
+    hypothesis~$\val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$
+    is a candidate, and also $t \tau'$ is neutral, so
+    $t \tau' \in
+    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$. This
+    implies that
+    $t \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$.
+  \end{enumerate}
+\end{proof}
+
+\begin{lemma}
+  $\val{\sigma[\subst{\alpha}{\tau}]}{\omega,\xi}{\Gamma} =
+  \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{\val{\tau}{\omega,\xi}{\Gamma}}]}{\Gamma}$.
+\end{lemma}
+
+\begin{proof}
+  TODO
+\end{proof}
+
+\begin{lemma}
+  $\circ_{\omega(\sigma)} \in \val{\sigma \to \sigma \to
+    \sigma}{\omega,\xi}{\Gamma}$ for
+  $\circ \in \{ \oplus, \otimes \}$.
+\end{lemma}
+
+\begin{proof}
+  We have
+  $\Gamma \proves \circ_{\omega(\sigma)} : \omega(\sigma \to \sigma
+  \to \sigma)$ by Definition~\ref{def_typing}. Let
+  $u_1,u_2 \in \val{\sigma}{\omega,\xi}{\Gamma}$. By
+  Lemma~\ref{lem_val_computable} we have $u_1,u_2 \in \SN$. Hence
+  $\circ_{\omega(\sigma)} u_1 u_2 \in \SN$ follows from definitions
+  (TODO: this is not completely trivial!). By induction on the length
+  of the longest reduction from $\circ_{\omega(\sigma)} u_1 u_2$ to
+  normal form we show that
+  $\circ_{\omega(\sigma)} u_1 u_2 \in
+  \val{\sigma}{\omega,\xi}{\Gamma}$, for
+  arbitrary~$\sigma,\omega,\xi$. The term
+  $\circ_{\omega(\sigma)} u_1 u_2$ is neutral, so it suffices to show
+  that for every~$t$ with $\circ_{\omega(\sigma)} u_1 u_2 \leadsto t$
+  we have $t \in \val{\sigma}{\omega,\xi}{\Gamma}$. If
+  $t = \circ_{\omega(\sigma)} u_1' u_2$ or
+  $t = \circ_{\omega(\sigma)} u_1 u_2'$ with $u_i \leadsto u_i'$ then
+  this follows from the inductive hypothesis. Assume
+  $\omega(\sigma) = \nat$ and $u_1,u_2 \in \Nbb$ and
+  $\circ_{\omega(\sigma)} u_1 u_2 \leadsto (n_1 \circ n_2) = t$. If
+  $\sigma = \nat$ then
+  $t \in \val{\nat}{\omega,\xi}{\Gamma} =
+  \val{\sigma}{\omega,\xi}{\Gamma}$. Otherwise $\sigma = \alpha$ is a
+  type variable and $\omega(\alpha) = \nat$. Then
+  $t \in \xi(\alpha) = \val{\sigma}{\omega,\xi}{\Gamma}$ because~$t$
+  is neutral and normal. Assume $\omega(\sigma) = \tau_1 \to \tau_2$
+  and $u_1 = \lambda x : \tau_1 . u_1'$,
+  $u_2 = \lambda x : \tau_1 . u_2'$ and
+  $t = \lambda x : \tau_1 . \circ_{\tau_2} u_1' u_2'$. Let
+  $u \in \val{\tau_1}{}{\Gamma}$ TODO
+\end{proof}
+
+\begin{lemma}
+  If $\Gamma \proves t : \sigma$ then
+  $\omega(t) \in \val{\sigma}{\omega,\xi}{\Gamma}$.
+\end{lemma}
+
+\begin{proof}
+  By induction on~$t$, using the previous lemmas.
+\end{proof}
 
 \begin{lemma}
 Every term $s \in \Iterms$ with $\FV(s) = \FTV(s) = \emptyset$ reduces
