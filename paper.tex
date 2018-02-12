@@ -281,14 +281,27 @@ of chapters~6 and~14 from the book ``Proofs and Types'' by Girard, and
 chapters~10 and~11 from the book ``Lectures on the Curry-Howard
 Isomorphism'' by Sorensen and Urzyczyn.
 
-By~$\SN$ we denote the set of all terminating interpretation terms. We
-use the notation $t u$ for either $\app{t}{u}$ when~$u$ is a term, or
-$\tapp{t}{u}$ when~$u$ is a type.
+By~$\SN$ we denote the set of all terminating interpretation
+terms. For $t \in \SN$ by~$\nu(t)$ we denote the length of the longest
+reduction starting at~$t$. We use the notation $t u$ for either
+$\app{t}{u}$ when~$u$ is a term, or $\tapp{t}{u}$ when~$u$ is a type.
 
 NOTE: For now the proof does not take product types into account. I'm
 not sure if explicit products are necessary in the definition, because
 in contrast to the simply-typed lambda-calculus they may be encoded in
 the polymorphic lambda-calculus.
+
+NOTE: Currently, $\flatten$ and $\lift$ are not accounted for either,
+but adding them should be similar to~$\oplus$ and~$\otimes$.
+
+\begin{lemma}\label{lem_circ_sn}
+  If $t_1,t_2 \in \SN$ then $\circ_\tau t_1 t_2 \in \SN$ for
+  $\circ \in \{\oplus,\otimes\}$.
+\end{lemma}
+
+\begin{proof}
+  TODO
+\end{proof}
 
 \begin{definition}\label{def_candidate}
   A term~$t$ is \emph{neutral} if there does not exists a sequence of
@@ -301,11 +314,13 @@ the polymorphic lambda-calculus.
   \item $X \subseteq \SN$;
   \item if $t \in X$ and $t \leadsto t'$ then $t' \in X$;
   \item if $t$ is neutral and for every~$t'$ with $t \leadsto t'$ we
-    have $t' \in X$, then $t \in X$.
+    have $t' \in X$, then $t \in X$;
+  \item if $t_1,t_2 \in X$ then $\circ_\tau t_1 t_2 \in X$ for $\circ
+    \in \{\oplus,\otimes\}$.
   \end{enumerate}
   Note that the last item above implies:
   \begin{itemize}
-  \item[4.] if $t$ is neutral and in normal form then $t \in X$.
+  \item if $t$ is neutral and in normal form then $t \in X$.
   \end{itemize}
   The set of all candidates of type~$\tau$ in context~$\Gamma$ is
   denoted by~$\Cb_\tau^\Gamma$.
@@ -366,6 +381,11 @@ the polymorphic lambda-calculus.
     $t' \in \val{\nat}{\omega,\xi}{\Gamma}$, so in particular
     $t' \in \SN$. But then $t \in \SN$. Hence
     $t \in \val{\nat}{\omega,\xi}{\Gamma}$.
+  \item Let $t_1,t_2 \in \SN$ be such that
+    $\Gamma \proves t_i : \nat$. Obviously,
+    $\Gamma \proves \circ_\nat t_1 t_2 : \nat$. Also
+    $\circ_\nat t_1 t_2 \in \SN$ follows from definitions. So
+    $\circ_\nat t_1 t_2 \in \val{\nat}{\omega,\xi}{\Gamma}$.
   \end{enumerate}
 \end{proof}
 
@@ -403,13 +423,13 @@ the polymorphic lambda-calculus.
     $\Gamma \proves t' : \omega(\tau_1 \to \tau_2)$ by the subject
     reduction lemma. Hence
     $t' \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
-  \item Let $t$ be neutral and $\Gamma \proves t : \omega(\tau_1 \to \tau_2)$
-    and assume for every~$t'$ with $t \leadsto t'$ we have
+  \item Let $t$ be neutral and
+    $\Gamma \proves t : \omega(\tau_1 \to \tau_2)$ and assume for
+    every~$t'$ with $t \leadsto t'$ we have
     $t' \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$. Let
     $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$. By the inductive
     hypothesis $\val{\tau_1}{\omega,\xi}{\Gamma}$ is a candidate, so
-    $u \in \SN$. By induction on the length of the longest reduction
-    starting at~$u$ we show that
+    $u \in \SN$. By induction on~$\nu(u)$ we show that
     $t u \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Assume
     $t u \leadsto t''$. We show
     $t'' \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Because~$t$ is
@@ -429,6 +449,42 @@ the polymorphic lambda-calculus.
     $t u \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Since
     $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$ was arbitrary, we have
     shown $t \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
+  \item Assume
+    $t_1,t_2 \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$. We have
+    already shown that this implies $t_1,t_2 \in \SN$. Hence also
+    $\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2 \in \SN$ by
+    Lemma~\ref{lem_circ_sn}. We show
+    $\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2 \in
+    \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$ by induction
+    on~$\nu(\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2)$. We have already
+    proven that, because $\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2$ is
+    neutral, it suffices to show that if
+    $\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2 \leadsto t$ then
+    $t \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$. If
+    $t = \circ_{\omega(\tau_1\to\tau_2)} t_1' t_2$ or
+    $t = \circ_{\omega(\tau_1\to\tau_2)} t_1 t_2'$ with
+    $t_i \leadsto t_i'$ then this follows from the inductive
+    hypothesis. So assume $t_i = \lambda x : \omega(\tau_1) . t_i'$
+    and
+    $t = \lambda x : \omega(\tau_1) . \circ_{\omega(\tau_2)} t_1'
+    t_2'$. Note that $t \in \SN$. Let
+    $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$. By nested induction on
+    $\nu(u) + \nu(t)$ we show that if $t u \leadsto w$ then
+    $w \in \val{\tau_2}{\omega,\xi}{\Gamma}$. This suffices,
+    because~$t u$ is neutral. The only case which doesn't follow
+    directly from the inductive hypothesis is when
+    $w = \circ_{\omega(\tau_2)} t_1'[\subst{x}{u}]
+    t_2'[\subst{x}{u}]$. Because
+    $\lambda x : \omega(\tau_1) . t_i' \in
+    \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$ and
+    $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$, we have
+    $(\lambda x : \sigma(\tau_1) . t_i') u \in
+    \val{\tau_2}{\omega,\xi}{\Gamma}$. Hence,
+    $t_i'[\subst{x}{u}] \in \val{\tau_2}{\omega,\xi}{\Gamma}$
+    because~$\val{\tau_2}{\omega,\xi}{\Gamma}$ is a candidate by the
+    inductive hypothesis. Thus also
+    $w = \circ_{\omega(\tau_2)} t_1'[\subst{x}{u}] t_2'[\subst{x}{u}]
+    \in \val{\tau_2}{\omega,\xi}{\Gamma}$.
   \end{enumerate}
 
   Assume $\sigma = \forall\alpha[\tau]$. We check the conditions in
@@ -476,10 +532,46 @@ the polymorphic lambda-calculus.
     \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$. This
     implies that
     $t \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$.
+  \item Assume
+    $t_1,t_2 \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$. We
+    have already shown that this implies $t_1,t_2 \in \SN$. Hence also
+    $\circ_{\omega(\forall\alpha[\tau])} t_1 t_2 \in \SN$ by
+    Lemma~\ref{lem_circ_sn}. We show
+    $\circ_{\omega(\forall\alpha[\tau])} t_1 t_2 \in
+    \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$ by induction
+    on~$\nu(\circ_{\omega(\forall\alpha[\tau])} t_1 t_2)$. We have
+    already proven that, because
+    $\circ_{\omega(\forall\alpha[\tau])} t_1 t_2$ is neutral, it
+    suffices to show that if
+    $\circ_{\omega(\forall\alpha[\tau])} t_1 t_2 \leadsto t$ then
+    $t \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$. If
+    $t = \circ_{\omega(\forall\alpha[\tau])} t_1' t_2$ or
+    $t = \circ_{\omega(\forall\alpha[\tau])} t_1 t_2'$ with
+    $t_i \leadsto t_i'$ then this follows from the inductive
+    hypothesis. So assume $t_i = \Lambda\alpha . t_i'$ and
+    $t = \Lambda \alpha . \circ_{\tau} t_1' t_2'$. Note that
+    $t \in \SN$. Let $\tau'$ be a type and $X \in
+    \Cb_{\tau'}^\Gamma$. By nested induction on~$\nu(t)$ we show that
+    if $t \alpha \leadsto w$ then
+    $w \in
+    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$. This
+    suffices, because~$t \alpha$ is neutral. The only case which
+    doesn't follow directly from the inductive hypothesis is when
+    $w = \circ_{\omega(\tau)} t_1' t_2'$. Because
+    $\Lambda \alpha . t_i' \in
+    \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$, we have
+    $(\Lambda \alpha . t_i') \alpha \in
+    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$. Hence,
+    $t_i' \in
+    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$
+    because~$\val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$
+    is a candidate by the inductive hypothesis. Thus also
+    $w = \circ_{\omega(\tau)} t_1' t_2' \in
+    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$.
   \end{enumerate}
 \end{proof}
 
-\begin{lemma}
+\begin{lemma}\label{lem_val_subst}
   $\val{\sigma[\subst{\alpha}{\tau}]}{\omega,\xi}{\Gamma} =
   \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{\val{\tau}{\omega,\xi}{\Gamma}}]}{\Gamma}$.
 \end{lemma}
@@ -495,45 +587,140 @@ the polymorphic lambda-calculus.
 \end{lemma}
 
 \begin{proof}
-  We have
-  $\Gamma \proves \circ_{\omega(\sigma)} : \omega(\sigma \to \sigma
-  \to \sigma)$ by Definition~\ref{def_typing}. Let
-  $u_1,u_2 \in \val{\sigma}{\omega,\xi}{\Gamma}$. By
-  Lemma~\ref{lem_val_computable} we have $u_1,u_2 \in \SN$. Hence
-  $\circ_{\omega(\sigma)} u_1 u_2 \in \SN$ follows from definitions
-  (TODO: this is not completely trivial!). By induction on the length
-  of the longest reduction from $\circ_{\omega(\sigma)} u_1 u_2$ to
-  normal form we show that
-  $\circ_{\omega(\sigma)} u_1 u_2 \in
-  \val{\sigma}{\omega,\xi}{\Gamma}$, for
-  arbitrary~$\sigma,\omega,\xi$. The term
-  $\circ_{\omega(\sigma)} u_1 u_2$ is neutral, so it suffices to show
-  that for every~$t$ with $\circ_{\omega(\sigma)} u_1 u_2 \leadsto t$
-  we have $t \in \val{\sigma}{\omega,\xi}{\Gamma}$. If
-  $t = \circ_{\omega(\sigma)} u_1' u_2$ or
-  $t = \circ_{\omega(\sigma)} u_1 u_2'$ with $u_i \leadsto u_i'$ then
-  this follows from the inductive hypothesis. Assume
-  $\omega(\sigma) = \nat$ and $u_1,u_2 \in \Nbb$ and
-  $\circ_{\omega(\sigma)} u_1 u_2 \leadsto (n_1 \circ n_2) = t$. If
-  $\sigma = \nat$ then
-  $t \in \val{\nat}{\omega,\xi}{\Gamma} =
-  \val{\sigma}{\omega,\xi}{\Gamma}$. Otherwise $\sigma = \alpha$ is a
-  type variable and $\omega(\alpha) = \nat$. Then
-  $t \in \xi(\alpha) = \val{\sigma}{\omega,\xi}{\Gamma}$ because~$t$
-  is neutral and normal. Assume $\omega(\sigma) = \tau_1 \to \tau_2$
-  and $u_1 = \lambda x : \tau_1 . u_1'$,
-  $u_2 = \lambda x : \tau_1 . u_2'$ and
-  $t = \lambda x : \tau_1 . \circ_{\tau_2} u_1' u_2'$. Let
-  $u \in \val{\tau_1}{}{\Gamma}$ TODO
+  Follows from Definition~\ref{def_typing} and
+  Lemma~\ref{lem_val_computable}.
 \end{proof}
 
 \begin{lemma}
+  $\flatten_{\omega(\sigma)} \in
+  \val{\sigma\to\nat}{\omega,\xi}{\Gamma}$.
+\end{lemma}
+
+\begin{proof}
+  TODO
+\end{proof}
+
+\begin{lemma}
+  $\lift_{\omega(\sigma)} \in
+  \val{\nat\to\sigma}{\omega,\xi}{\Gamma}$.
+\end{lemma}
+
+\begin{proof}
+  TODO
+\end{proof}
+
+\begin{lemma}
+  If for all $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$ we have
+  $t[\subst{x}{u}] \in \val{\tau_2}{\omega,\xi}{\Gamma}$, then
+  $\lambda x : \omega(\tau_1) . t \in
+  \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
+\end{lemma}
+
+\begin{proof}
+  By Lemma~\ref{lem_val_computable} the
+  sets~$\val{\tau_i}{\omega,\xi}{\Gamma}$ are candidates, so
+  $\val{\tau_i}{\omega,\xi}{\Gamma} \subseteq \SN$. Let
+  $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$. We show
+  $(\lambda x : \omega(\tau_1) . t) u \in
+  \val{\tau_2}{\omega,\xi}{\Gamma}$ by induction on $\nu(t) +
+  \nu(u)$. Suppose $(\lambda x : \omega(\tau_1) . t) u \leadsto
+  w$. There are three cases.
+  \begin{itemize}
+  \item $w = t[\subst{x}{u}]$. Then
+    $w \in \val{\tau_2}{\omega,\xi}{\Gamma}$ by assumption.
+  \item $w = (\lambda x : \omega(\tau_1) . t') u$ with
+    $t \leadsto t'$. Because $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a
+    candidate, still
+    $t'[\subst{x}{u}] \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Also
+    $\nu(t') < \nu(t)$, so $w \in \val{\tau_2}{\omega,\xi}{\Gamma}$
+    follows from the inductive hypothesis.
+  \item $w = (\lambda x : \omega(\tau_1) . t) u'$ with
+    $u \leadsto u'$. Because $\val{\tau_i}{\omega,\xi}{\Gamma}$ are
+    candidates, still $u' \in \val{\tau_1}{\omega,\xi}{\Gamma}$ and
+    $t[\subst{x}{u'}] \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Also
+    $\nu(u') < \nu(u)$, so $w \in \val{\tau_2}{\omega,\xi}{\Gamma}$
+    follows from the inductive hypothesis.
+  \end{itemize}
+  Because $(\lambda x : \omega(\tau_1) . t) u$ is neutral and
+  $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a candidate, this shows
+  $(\lambda x : \omega(\tau_1) . t) u \in
+  \val{\tau_2}{\omega,\xi}{\Gamma}$.
+\end{proof}
+
+\begin{lemma}
+  If for every type~$\tau$ and every $X \in \Cb_\tau^\Gamma$ we have
+  $t \in
+  \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$,
+  then
+  $\Lambda \alpha . t \in
+  \val{\forall\alpha[\sigma]}{\omega,\xi}{\Gamma}$.
+\end{lemma}
+
+\begin{proof}
+  Let~$\tau$ be a type and $X \in \Cb_\tau^\Gamma$. By
+  Lemma~\ref{lem_val_computable} the
+  set~$\val{\forall\alpha[\sigma]}{\omega,\xi}{\Gamma}$ is a
+  candidate, so $t \in \SN$. By induction on~$\nu(t)$ we show
+  $(\Lambda \alpha . t) \alpha \in
+  \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$.
+  Because~$\val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$
+  is a candidate by Lemma~\ref{lem_val_computable}, it suffices to
+  show that for every~$w$ with $(\Lambda \alpha . t) \leadsto w$ we
+  have
+  $w \in
+  \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$. There
+  are two cases.
+  \begin{itemize}
+  \item $w = (\Lambda \alpha . t') \alpha$. Then $\nu(t') < \nu(t)$
+    and
+    $w \in
+    \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$
+    follows from the inductive hypothesis.
+  \item $w = t$. Then
+    $w \in
+    \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$
+    by assumption.
+  \end{itemize}
+\end{proof}
+
+\begin{lemma}
+  If $t \in \val{\forall\alpha[\sigma]}{\omega,\xi}{\Gamma}$ then
+  $t \tau \in \val{\sigma[\subst{\alpha}{\tau}]}{\omega,\xi}{\Gamma}$
+  for any type~$\tau$.
+\end{lemma}
+
+\begin{proof}
+  By Lemma~\ref{lem_val_computable} the
+  set~$\val{\tau}{\omega,\xi}{\Gamma}$ is a candidate of
+  type~$\tau$. By hypothesis
+  $t \tau \in
+  \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{\val{\tau}{\omega,\xi}{\Gamma}}]}{\Gamma}$. Hence
+  $t \tau \in \val{\sigma[\subst{\alpha}{\tau}]}{\omega,\xi}{\Gamma}$
+  by Lemma~\ref{lem_val_subst}.
+\end{proof}
+
+\begin{lemma}\label{lem_typable_computable}
   If $\Gamma \proves t : \sigma$ then
   $\omega(t) \in \val{\sigma}{\omega,\xi}{\Gamma}$.
 \end{lemma}
 
 \begin{proof}
-  By induction on~$t$, using the previous lemmas.
+  Idea: by induction on~$t$, using the previous lemmas. One
+  generalizes the inductive hypothesis to: if
+  $x_1 : \tau_1,\ldots,x_n:\tau_n \proves t : \sigma$ then for all
+  $u_1\in\val{\tau_1}{\omega,\xi}{\Gamma},\ldots,u_n\in\val{\tau_n}{\omega,\xi}{\Gamma}$
+  we have
+  $\omega(t[\subst{x_1}{u_1},\ldots,\subst{x_n}{u_n}]) \in
+  \val{\sigma}{\omega,\xi}{\Gamma}$.
+\end{proof}
+
+\begin{corollary}
+  If $\Gamma \proves t : \sigma$ then $t \in \SN$.
+\end{corollary}
+
+\begin{proof}
+  Follows from Lemma~\ref{lem_typable_computable},
+  Lemma~\ref{lem_val_computable} and Definition~\ref{def_candidate}.
 \end{proof}
 
 \begin{lemma}
@@ -555,8 +742,9 @@ numbers.
 \end{lemma}
 
 \begin{proof}
-TODO.
-\qed
+  This is~NOT~TRUE. Consider
+  $\oplus_{\nat\to\nat} \lift_\nat \lift_\nat n$. Need to add more
+  rewrite rules?
 \end{proof}
 
 \subsection{Defining $\succ$ and $\succeq$}
