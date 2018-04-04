@@ -71,7 +71,7 @@
 \authorrunning{{\L}. Czajka and C. Kop}
 \institute{
 Department of Computer Science, University of Copenhagen (DIKU)
-\quad\quad\quad
+\\
 Institute of Computer Science, Radboud University Nijmegen (RU)
 \\
 \email{lukaszcz@mimuw.edu.pl}
@@ -184,6 +184,15 @@ The set $\ITypes$ of \emph{interpretation types} is given by:
 \end{itemize}
 \end{definition}
 
+\begin{definition}\label{def:typesubst}
+A \emph{type substitution} is a partial function $[\alpha_1:=\sigma_1,
+\dots,\alpha_n:=\sigma_n]$ mapping a finite set of type variables to
+types.  We let $\tau[\alpha_1:=\sigma_1,\dots,\alpha_n:=\sigma_n]$
+denote $\tau$ with all occurrences of some $\alpha_i$ replaced by the
+corresponding $\sigma_i$.  We use alpha-conversion to guarantee that
+substitution does not capture variables in any of the $\sigma_i$.
+\end{definition}
+
 The set $\Iterms$ of interpretation terms is now defined as follows.
 
 \begin{definition}\label{def_typing}
@@ -214,8 +223,7 @@ the following clauses:
 \item $\Gamma \vdash \app{s}{t} : \tau$ if $\Gamma \vdash s :
   \sigma \arrtype \tau$ and $\Gamma \vdash t : \sigma$
 \item $\Gamma \vdash \tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$ if
-  $\Gamma \vdash s : \quant{\alpha}{\sigma}$\footnote{TODO: a
-  definition of type substitution}
+  $\Gamma \vdash s : \quant{\alpha}{\sigma}$
 \end{itemize}
 We say that $s$ is \emph{closed} if $\emptyset \vdash s : \sigma$.
 \end{definition}
