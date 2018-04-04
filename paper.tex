@@ -35,12 +35,16 @@
 \newcommand{\interpret}[1]{\llparenthesis #1 \rrparenthesis}
 \newcommand{\arr}[1]{\to_{#1}}
 \newcommand{\arrtype}{\Rightarrow}
+\newcommand{\arreta}{\rightarrow_\eta}
 \newcommand{\abs}[2]{\lambda #1.#2}
 \newcommand{\tabs}[2]{\Lambda #1.#2}
 \newcommand{\app}[2]{#1 \cdot #2}
 \newcommand{\apps}[3]{#1 \cdot #2 \cdots #3}
 \newcommand{\tapp}[2]{#1 * #2}
+\newcommand{\pair}[2]{\langle #1,#2 \rangle}
 \newcommand{\subst}[2]{#1:=#2}
+\newcommand{\etalong}[1]{#1\uparrow^\eta}
+\newcommand{\almostetalong}[1]{\overline{#1}}
 
 \newcommand{\FTV}{\mathit{FTV}}
 \newcommand{\FV}{\mathit{FV}}
@@ -213,8 +217,8 @@ the following clauses:
   \flatten_{\sigma} : \sigma \arrtype \nat,\ 
   \lift_{\sigma} : \nat \arrtype \sigma
   \mid \sigma \in \ITypes \}$.
-\item $\Gamma \vdash (s,t) : \sigma \times \tau$ if $\Gamma \vdash s :
-  \sigma$ and $\Gamma \vdash t : \tau$.
+\item $\Gamma \vdash \pair{s}{t} : \sigma \times \tau$ if $\Gamma \vdash
+  s : \sigma$ and $\Gamma \vdash t : \tau$.
 \item $\Gamma \vdash \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
   \in \Vars$ and $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$.
 \item $\Gamma \vdash \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
@@ -232,6 +236,84 @@ Note that for a given $\Gamma$, if $s$ is typable under $\Gamma$, then
 there is only one choice for the type (this is easily proved by
 induction on the form of $s$). Thus, all closed terms have a unique
 type.
+
+\medskip
+Term equality is considered modulo $\alpha$-conversion.  In addition,
+we are particularly interested in interpretation terms in
+\emph{$\eta$-long form}.
+
+\begin{definition}
+For a given variable environment $\Gamma$ and interpretation term $s$
+which is well-typed under $\Gamma$, the \emph{$\eta$-long form} of $s$,
+denoted $\etalong{s}$, is defined as follows:
+\begin{itemize}
+\item if $\Gamma \vdash s : \sigma \arrtype \tau$ and $s = \abs{x}{s'}$,
+  then $\etalong{s} =  \abs{x}{(\etalong{s'})}$
+\item if $\Gamma \vdash s : \sigma \arrtype \tau$ and $s$ does not have
+  the form $\abs{x}{s'}$, then $\etalong{s} =  \abs{x}{(
+  \etalong{(\app{s}{x})})}$
+\item if $\Gamma \vdash s : \quant{\alpha}{\sigma}$ and $s = \tabs{
+  \alpha}{s'}$, then $\etalong{s} = \tabs{\alpha}{(\etalong{s'})}$
+\item if $\Gamma \vdash s : \quant{\alpha}{\sigma}$ and $s$ does not have
+  the form $\tabs{\alpha}{s'}$, then $\etalong{s} = \tabs{\alpha}{
+  (\etalong{(\tapp{s}{\alpha})})}$
+\item if $\Gamma \vdash s : \nat$ or $\Gamma \vdash s : \alpha$ or
+  $\Gamma \vdash s : \sigma \times \tau$, then $\etalong{s} =
+  \almostetalong{s}$, where
+  \begin{itemize}
+  \item $\almostetalong{s} = s$ if $s$ is a natural number, variable or
+    function symbol
+  \item $\almostetalong{s} = \pair{\etalong{s_1}}{\etalong{s_2}}$ if
+    $s = \pair{s_1}{s_2}$
+  \item $\almostetalong{s} = \etalong{s}$ if $s$ has the form
+    $\abs{x}{s'}$ or $\tabs{\alpha}{s'}$
+  \item $\almostetalong{s} = \app{\almostetalong{s_1}}{(\etalong{s_2})}$
+    if $s = \app{s_1}{s_2}$
+  \item $\almostetalong{s} = \tapp{\almostetalong{s'}}{\tau}$
+    if $s = \tapp{s'}{\tau}$
+  \end{itemize}
+\end{itemize}
+\end{definition}
+
+It is clear that the $\eta$-long form of an interpretation term is
+unique; the following lemma shows that it is also always well-defined.
+
+\begin{lemma}
+For all interpretation terms $s$, the function $\etalong{s}$ is
+well-defined.
+\end{lemma}
+
+\begin{proof}
+Define here the \emph{depth} function on interpretation terms as
+follows:
+\begin{itemize}
+\item $\mathit{depth}(n) = \mathit{depth}(x) = \mathit{depth}(\mathtt{f})
+  = 0$
+\item $\mathit{depth}(\pair{s}{t}) = \max(\mathit{depth}(s),\mathit{
+  depth}(t)) + 1$
+\item $\mathit{depth}(\abs{x}{s}) = \mathit{depth}(\tabs{\alpha}{s}) =
+  \mathit{depth}(s) + 1$
+\item $\mathit{depth}(\app{s}{t}) = \max(\mathit{depth}(s),\mathit{
+  depth}(t)+1)$
+\item $\mathit{depth}(\tapp{s}{\tau}) = \mathit{depth}(s)$
+\end{itemize}
+(This definition is clearly well-defined as the term under consideration
+becomes smaller each step.)
+We can see that $\etalong{x}$ is well-defined for all variables by
+induction on their type.  This we use to see that $\etalong{(\apps{s}{
+x_1}{x_n})}$ is well-defined for $s$ a variable, natural number or
+function symbol by induction on its type.  Thus, well-definedness of
+$\etalong{s}$ for all $s$ with depth $0$ follows; also $\almostetalong{
+s} = s$ is well-defined for such $s$.
+For interpretation terms of depth $\geq 1$, well-definedness of
+$\etalong{s}$ and $\overline{s}$ follows by induction on
+$(\mathit{depth}(s)$, $1$, the size of the type of $s)$ in the case
+of $\etalong{s}$ and
+$(\mathit{depth}(s)$, $0$, the size of $s)$ in the case of
+$\almostetalong{s}$.
+\end{proof}
+
+===================================
 
 \medskip
 To define the world of \emph{final interpretation terms}, we will
