@@ -273,6 +273,7 @@ denoted $\etalong{s}$, is defined as follows:
     if $s = \tapp{s'}{\tau}$
   \end{itemize}
 \end{itemize}
+A term $s$ is in \emph{$\eta$-long form} if $s = \etalong{s}$.
 \end{definition}
 
 It is clear that the $\eta$-long form of an interpretation term is
@@ -313,11 +314,8 @@ $(\mathit{depth}(s)$, $0$, the size of $s)$ in the case of
 $\almostetalong{s}$.
 \end{proof}
 
-===================================
-
-\medskip
 To define the world of \emph{final interpretation terms}, we will
-normalise certain elements of $\Iterms$ using the relation $\leadsto$:
+normalise certain elements of $\Iterms$ using the relation $\leadsto$.
 
 \begin{definition}
 Let $s,t$ be closed interpretation terms of the same type $\sigma$ such
@@ -347,13 +345,13 @@ for some rule scheme $\ell \leadsto r$ in the following list:
   \tabs{\alpha}{\app{\lift_{\sigma}}{s}}$
 \item $\app{(\abs{x:\sigma}{s})}{t} \leadsto s[\subst{x}{t}]$
 \item $\tapp{(\tabs{\alpha}{s})}{\sigma} \leadsto
-  s[\subst{\alpha}{\sigma}]$.
+  \etalong{s[\subst{\alpha}{\sigma}]}$.
 \end{itemize}
 A \emph{final interpretation term} is a term $s \in \Iterms$ such that
-$\FV(s) = \FTV(s) = \emptyset$ and $s$ is in normal form with respect
-to $\leadsto$.  We let $\World$ be the set of all final interpretation
-terms. By~$\World_\tau$ we denote the set of all final interpretation
-terms of type~$\tau$.
+(a) $\FV(s) = \FTV(s) = \emptyset$, (b) $s$ is in normal form with
+respect to $\leadsto$, and (c) $s$ is in $\eta$-long form.  We let
+$\World$ be the set of all final interpretation terms. By~$\World_\tau$
+we denote the set of all final interpretation terms of type~$\tau$.
 \end{definition}
 
 \begin{lemma}[Subject reduction]
@@ -363,6 +361,16 @@ terms of type~$\tau$.
 
 \begin{proof}
   TODO
+\end{proof}
+
+\begin{lemma}
+If $s$ is a closed interpretation term in $\eta$-long form which is
+terminating under $\leadsto$, then there is a final interpretation term
+$t$ such that $s \leadsto^* t$.
+\end{lemma}
+
+\begin{proof}
+TODO
 \end{proof}
 
 In the rest of this section we adapt the Tait-Girard computability
