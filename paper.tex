@@ -35,7 +35,10 @@
 \newcommand{\interpret}[1]{\llparenthesis #1 \rrparenthesis}
 \newcommand{\arr}[1]{\to_{#1}}
 \newcommand{\arrtype}{\Rightarrow}
-\newcommand{\arreta}{\rightarrow_\eta}
+\newcommand{\arreta}{\leadsto_\eta}
+\newcommand{\arretain}{\leadsto_\eta^{\mathtt{in}}}
+\newcommand{\arrnormalise}{\leadsto}
+\newcommand{\normstep}{\leadsto_\mu}
 \newcommand{\abs}[2]{\lambda #1.#2}
 \newcommand{\tabs}[2]{\Lambda #1.#2}
 \newcommand{\app}[2]{#1 \cdot #2}
@@ -62,6 +65,8 @@
 \newcommand{\Nbb}{\mathbb{N}}
 \newcommand{\val}[3]{\ensuremath{\llbracket#1\rrbracket_{#2}^{#3}}}
 \newcommand{\proves}{\vdash}
+
+\newcommand{\CK}[1]{\textcolor{blue}{#1}}
 
 \begin{document}
 
@@ -243,119 +248,75 @@ we are particularly interested in interpretation terms in
 \emph{$\eta$-long form}.
 
 \begin{definition}
-For a given variable environment $\Gamma$ and interpretation term $s$
-which is well-typed under $\Gamma$, the \emph{$\eta$-long form} of $s$,
-denoted $\etalong{s}$, is defined as follows:
+For a given variable environment $\Gamma$ and interpretation terms $s,
+t$ which are well-typed under $\Gamma$, we let $\arreta$ be defined
+inductively together with a helper relationship $\arretain$, as follows.
 \begin{itemize}
-\item if $\Gamma \vdash s : \sigma \arrtype \tau$ and $s = \abs{x}{s'}$,
-  then $\etalong{s} =  \abs{x}{(\etalong{s'})}$
-\item if $\Gamma \vdash s : \sigma \arrtype \tau$ and $s$ does not have
-  the form $\abs{x}{s'}$, then $\etalong{s} =  \abs{x}{(
-  \etalong{(\app{s}{x})})}$
-\item if $\Gamma \vdash s : \quant{\alpha}{\sigma}$ and $s = \tabs{
-  \alpha}{s'}$, then $\etalong{s} = \tabs{\alpha}{(\etalong{s'})}$
-\item if $\Gamma \vdash s : \quant{\alpha}{\sigma}$ and $s$ does not have
-  the form $\tabs{\alpha}{s'}$, then $\etalong{s} = \tabs{\alpha}{
-  (\etalong{(\tapp{s}{\alpha})})}$
-\item if $\Gamma \vdash s : \nat$ or $\Gamma \vdash s : \alpha$ or
-  $\Gamma \vdash s : \sigma \times \tau$, then $\etalong{s} =
-  \almostetalong{s}$, where
-  \begin{itemize}
-  \item $\almostetalong{s} = s$ if $s$ is a natural number, variable or
-    function symbol
-  \item $\almostetalong{s} = \pair{\etalong{s_1}}{\etalong{s_2}}$ if
-    $s = \pair{s_1}{s_2}$
-  \item $\almostetalong{s} = \etalong{s}$ if $s$ has the form
-    $\abs{x}{s'}$ or $\tabs{\alpha}{s'}$
-  \item $\almostetalong{s} = \app{\almostetalong{s_1}}{(\etalong{s_2})}$
-    if $s = \app{s_1}{s_2}$
-  \item $\almostetalong{s} = \tapp{\almostetalong{s'}}{\tau}$
-    if $s = \tapp{s'}{\tau}$
-  \end{itemize}
+\item $s \arreta \abs{x}{(\app{s}{x})}$ if $s : \sigma \arrtype \tau$
+  and $s$ is not an abstraction $\abs{y}{s'}$
+\item $s \arreta \tabs{\alpha}{(\tapp{s}{\alpha})}$ if $s : \quant{
+  \alpha}{\tau}$ and $s$ is not a type abstraction $\tabs{\beta}{s'}$
+\item $s \arreta t$ if $s \arretain t$
+\item $\abs{x}{s} \arretain \abs{x}{t}$ if $s \arreta t$
+\item $\tabs{\alpha}{s} \arretain \tabs{\alpha}{t}$ if $s \arreta t$
+\item $\app{s}{u} \arretain \app{s}{v}$ if $u \arreta v$
+\item $\app{s}{u} \arretain \app{t}{v}$ if $s \arretain t$
+\item $\tapp{s}{\sigma} \arretain \app{t}{\sigma}$ if $s \arretain t$
 \end{itemize}
-A term $s$ is in \emph{$\eta$-long form} if $s = \etalong{s}$.
+A term is in \emph{$\eta$-long form} if it cannot be reduced by
+$\arreta$.
 \end{definition}
 
-It is clear that the $\eta$-long form of an interpretation term is
-unique; the following lemma shows that it is also always well-defined.
-
-\begin{lemma}
-For all interpretation terms $s$, the function $\etalong{s}$ is
-well-defined.
-\end{lemma}
-
-\begin{proof}
-Define here the \emph{depth} function on interpretation terms as
-follows:
-\begin{itemize}
-\item $\mathit{depth}(n) = \mathit{depth}(x) = \mathit{depth}(\mathtt{f})
-  = 0$
-\item $\mathit{depth}(\pair{s}{t}) = \max(\mathit{depth}(s),\mathit{
-  depth}(t)) + 1$
-\item $\mathit{depth}(\abs{x}{s}) = \mathit{depth}(\tabs{\alpha}{s}) =
-  \mathit{depth}(s) + 1$
-\item $\mathit{depth}(\app{s}{t}) = \max(\mathit{depth}(s),\mathit{
-  depth}(t)+1)$
-\item $\mathit{depth}(\tapp{s}{\tau}) = \mathit{depth}(s)$
-\end{itemize}
-(This definition is clearly well-defined as the term under consideration
-becomes smaller each step.)
-We can see that $\etalong{x}$ is well-defined for all variables by
-induction on their type.  This we use to see that $\etalong{(\apps{s}{
-x_1}{x_n})}$ is well-defined for $s$ a variable, natural number or
-function symbol by induction on its type.  Thus, well-definedness of
-$\etalong{s}$ for all $s$ with depth $0$ follows; also $\almostetalong{
-s} = s$ is well-defined for such $s$.
-For interpretation terms of depth $\geq 1$, well-definedness of
-$\etalong{s}$ and $\overline{s}$ follows by induction on
-$(\mathit{depth}(s)$, $1$, the size of the type of $s)$ in the case
-of $\etalong{s}$ and
-$(\mathit{depth}(s)$, $0$, the size of $s)$ in the case of
-$\almostetalong{s}$.
-\end{proof}
-
 To define the world of \emph{final interpretation terms}, we will
-normalise certain elements of $\Iterms$ using the relation $\leadsto$.
+normalise certain elements of $\Iterms$ using the relation
+$\arrnormalise$, which contains both $\arreta$ and key normalisation
+steps.
 
 \begin{definition}
-Let $s,t$ be closed interpretation terms of the same type $\sigma$ such
-that $\FTV(\sigma) = \emptyset$.  We say $s \leadsto t$ if we can denote
-$s = C[\ell]$ and $t = C[r]$\footnote{TODO: a definition of contexts.}
-for some rule scheme $\ell \leadsto r$ in the following list:
+We define the relation $\normstep$ on interpretation terms of the same
+type as the smallest relation for which the following properties are
+satisfied:
 \begin{itemize}
-\item $\app{\app{\oplus_{\nat}}{n}}{m} \leadsto (n+m)$ 
-\item $\app{\app{\otimes_{\nat}}{n}}{m} \leadsto (n \cdot m)$ 
+\item if $s \normstep t$ then both $\abs{x}{s} \normstep \abs{x}{t}$ and
+  $\tabs{\alpha}{s} \normstep \tabs{\alpha}{t}$
+\item if $s' \normstep t'$ then both $\app{s'}{u} \normstep \app{t'}{u}$
+  and $\app{u}{s'} \normstep \app{u}{t'}$ and $\tapp{s'}{\sigma} \normstep
+  \tapp{t'}{\sigma}$
+\item $\app{\app{\oplus_{\nat}}{n}}{m} \normstep (n+m)$ 
+\item $\app{\app{\otimes_{\nat}}{n}}{m} \normstep (n * m)$ 
 \item $\app{\app{\circ_{\sigma \arrtype \tau}}{(\abs{x:\sigma}{s})}}{
-  (\abs{x:\sigma}{t})} \leadsto \abs{x:\sigma}{\app{\app{\circ_\tau}{
+  (\abs{x:\sigma}{t})} \normstep \abs{x:\sigma}{\app{\app{\circ_\tau}{
   s}}{t}}$ for $\circ \in \{ \oplus, \otimes \}$
 \item $\app{\app{\circ_{\quant{\alpha}{\sigma}}}{(\tabs{\alpha}{s})}}{
-    (\tabs{\alpha}{t})} \leadsto \tabs{\alpha}{\app{\app{\circ_\sigma}{s}}{t}}$
+    (\tabs{\alpha}{t})} \normstep \tabs{\alpha}{\app{\app{\circ_\sigma}{s}}{t}}$
   for $\circ \in \{ \oplus, \otimes \}$
-\item $\app{\proj^1_{\sigma,\tau}}{(s,t)} \leadsto s$
-\item $\app{\proj^2_{\sigma,\tau}}{(s,t)} \leadsto t$
-\item $\app{\flatten_\nat}{s} \leadsto s$
-\item $\app{\flatten_{\sigma \arrtype \tau}}{s} \leadsto
+\item $\app{\proj^1_{\sigma,\tau}}{(s,t)} \normstep s$
+\item $\app{\proj^2_{\sigma,\tau}}{(s,t)} \normstep t$
+\item $\app{\flatten_\nat}{s} \normstep s$
+\item $\app{\flatten_{\sigma \arrtype \tau}}{s} \normstep
   \app{s}{(\app{\lift_\sigma}{0})}$
-\item $\app{\flatten_{\quant{\alpha}{\sigma}}}{s} \leadsto
+\item $\app{\flatten_{\quant{\alpha}{\sigma}}}{s} \normstep
   \app{\flatten_{\sigma[\subst{\alpha}{\nat}]}}{(\tapp{s}{\nat})}$
-\item $\app{\lift_\nat}{s} \leadsto s$
-\item $\app{\lift_{\sigma \arrtype \tau}}{s} \leadsto
+\item $\app{\lift_\nat}{s} \normstep s$
+\item $\app{\lift_{\sigma \arrtype \tau}}{s} \normstep
   \abs{x:\sigma}{\app{\lift_{\tau}}{x}}$
-\item $\app{\lift_{\quant{\alpha}{\sigma}}}{s} \leadsto
+\item $\app{\lift_{\quant{\alpha}{\sigma}}}{s} \normstep
   \tabs{\alpha}{\app{\lift_{\sigma}}{s}}$
-\item $\app{(\abs{x:\sigma}{s})}{t} \leadsto s[\subst{x}{t}]$
-\item $\tapp{(\tabs{\alpha}{s})}{\sigma} \leadsto
-  \etalong{s[\subst{\alpha}{\sigma}]}$.
+\item $\app{(\abs{x:\sigma}{s})}{t} \normstep s[\subst{x}{t}]$
+\item $\tapp{(\tabs{\alpha}{s})}{\sigma} \normstep
+  s[\subst{\alpha}{\sigma}]$.
 \end{itemize}
+We let $\arrnormalise$ be the union of $\arreta$ and $\normstep$.
+
 A \emph{final interpretation term} is a term $s \in \Iterms$ such that
-(a) $\FV(s) = \FTV(s) = \emptyset$, (b) $s$ is in normal form with
-respect to $\leadsto$, and (c) $s$ is in $\eta$-long form.  We let
-$\World$ be the set of all final interpretation terms. By~$\World_\tau$
-we denote the set of all final interpretation terms of type~$\tau$.
+(a) $\FV(s) = \FTV(s) = \emptyset$, and (b) $s$ is in normal form with
+respect to $\leadsto$.  We let $\World$ be the set of all final
+interpretation terms. By~$\World_\tau$ we denote the set of all final
+interpretation terms of type~$\tau$.
 \end{definition}
 
 \begin{lemma}[Subject reduction]
-  If $\Gamma \vdash t : \tau$ and $t \leadsto t'$ then
+  If $\Gamma \vdash t : \tau$ and $t \arrnormalise t'$ then
   $\Gamma \vdash t' : \tau$.
 \end{lemma}
 
@@ -363,21 +324,11 @@ we denote the set of all final interpretation terms of type~$\tau$.
   TODO
 \end{proof}
 
-\begin{lemma}
-If $s$ is a closed interpretation term in $\eta$-long form which is
-terminating under $\leadsto$, then there is a final interpretation term
-$t$ such that $s \leadsto^* t$.
-\end{lemma}
-
-\begin{proof}
-TODO
-\end{proof}
-
 In the rest of this section we adapt the Tait-Girard computability
-method to prove termination of~$\leadsto$. The proof is an adaptation
-of chapters~6 and~14 from the book ``Proofs and Types'' by Girard, and
-chapters~10 and~11 from the book ``Lectures on the Curry-Howard
-Isomorphism'' by Sorensen and Urzyczyn.
+method to prove termination of~$\arrnormalise$. The proof is an
+adaptation of chapters~6 and~14 from the book ``Proofs and Types'' by
+Girard, and chapters~10 and~11 from the book ``Lectures on the
+Curry-Howard Isomorphism'' by Sorensen and Urzyczyn.
 
 By~$\SN$ we denote the set of all terminating interpretation
 terms. For $t \in \SN$ by~$\nu(t)$ we denote the length of the longest
@@ -416,7 +367,7 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
   \item if $t_1,t_2 \in X$ then $\circ_\tau t_1 t_2 \in X$ for $\circ
     \in \{\oplus,\otimes\}$.
   \end{enumerate}
-  Note that the last item above implies:
+  Note that the third item above implies:
   \begin{itemize}
   \item if $t$ is neutral and in normal form then $t \in X$.
   \end{itemize}
@@ -446,8 +397,9 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
     of all terms~$t$ such that
     $\Gamma \proves t : \omega(\forall\alpha[\sigma])$ and for every
     type~$\tau$ and every $X \in \Cb_\tau^\Gamma$ we have
-    $\tapp{t}{\alpha} \in
-    \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$.
+    $\tapp{t}{\tau} \in \val{\sigma}{\omega[\subst{\alpha}{\tau}],
+    \xi[\subst{\alpha}{X}]}{\Gamma}$. \CK{Replaced $\tapp{t}{\alpha}$
+    by $\tapp{t}{\tau}$ here (tentatively).}
   \end{itemize}
 \end{definition}
 
