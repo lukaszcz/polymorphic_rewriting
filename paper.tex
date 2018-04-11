@@ -38,6 +38,7 @@
 \newcommand{\arreta}{\rightarrow_\eta}
 \newcommand{\abs}[2]{\lambda #1.#2}
 \newcommand{\tabs}[2]{\Lambda #1.#2}
+\newcommand{\abstraction}[2]{\backslash #1.#2}
 \newcommand{\app}[2]{#1 \cdot #2}
 \newcommand{\apps}[3]{#1 \cdot #2 \cdots #3}
 \newcommand{\tapp}[2]{#1 * #2}
@@ -62,6 +63,8 @@
 \newcommand{\Nbb}{\mathbb{N}}
 \newcommand{\val}[3]{\ensuremath{\llbracket#1\rrbracket_{#2}^{#3}}}
 \newcommand{\proves}{\vdash}
+
+\newcommand{\CK}[1]{\textcolor{blue}{#1}}
 
 \begin{document}
 
@@ -167,6 +170,7 @@ If this algorithm succeeds, we have proven termination.
 
 \subsection{Defining the set $\World$}
 
+\subsubsection{Interpretation terms}
 We define the set of types for interpretation terms.
 
 \begin{definition}\label{def:itypes}
@@ -237,7 +241,7 @@ there is only one choice for the type (this is easily proved by
 induction on the form of $s$). Thus, all closed terms have a unique
 type.
 
-\medskip
+\subsubsection{Normalising interpretation terms}
 Term equality is considered modulo $\alpha$-conversion.  In addition,
 we are particularly interested in interpretation terms in
 \emph{$\eta$-long form}.
@@ -318,19 +322,29 @@ To define the world of \emph{final interpretation terms}, we will
 normalise certain elements of $\Iterms$ using the relation $\leadsto$.
 
 \begin{definition}
-Let $s,t$ be closed interpretation terms of the same type $\sigma$ such
-that $\FTV(\sigma) = \emptyset$.  We say $s \leadsto t$ if we can denote
-$s = C[\ell]$ and $t = C[r]$\footnote{TODO: a definition of contexts.}
-for some rule scheme $\ell \leadsto r$ in the following list:
-\begin{itemize}
-\item $\app{\app{\oplus_{\nat}}{n}}{m} \leadsto (n+m)$ 
-\item $\app{\app{\otimes_{\nat}}{n}}{m} \leadsto (n \cdot m)$ 
-\item $\app{\app{\circ_{\sigma \arrtype \tau}}{(\abs{x:\sigma}{s})}}{
-  (\abs{x:\sigma}{t})} \leadsto \abs{x:\sigma}{\app{\app{\circ_\tau}{
-  s}}{t}}$ for $\circ \in \{ \oplus, \otimes \}$
-\item $\app{\app{\circ_{\quant{\alpha}{\sigma}}}{(\tabs{\alpha}{s})}}{
-    (\tabs{\alpha}{t})} \leadsto \tabs{\alpha}{\app{\app{\circ_\sigma}{s}}{t}}$
-  for $\circ \in \{ \oplus, \otimes \}$
+We define the relation $\leadsto$ on interpretation terms as the
+smallest relation for which the following properties are satisfied:
+\begin{enumerate}
+\item\label{leadsto:mono:abs}
+  if $s \leadsto t$ then both $\abs{x}{s} \leadsto \abs{x}{t}$ and
+  $\tabs{\alpha}{s} \leadsto \tabs{\alpha}{t}$
+\item\label{leadsto:mono:right}
+  if $s \leadsto t$ then $\app{u}{s} \leadsto \app{u}{t}$
+\item\label{leadsto:mono:left}
+  if $s \leadsto t$ then both $\app{s}{u} \leadsto \app{t}{u}$ and
+  $\tapp{s}{\sigma} \leadsto \tapp{t}{\sigma}$
+\item\label{leadsto:plus:base}
+  $\app{\app{\oplus_{\nat}}{n}}{m} \leadsto (n+m)$ 
+\item\label{leadsto:times:base}
+  $\app{\app{\otimes_{\nat}}{n}}{m} \leadsto (n \cdot m)$ 
+\item\label{leadsto:circ:arrow}
+  $\app{\app{\circ_{\sigma \arrtype \tau}}{s}}{t} \leadsto \abs{x:
+  \sigma}{\app{\app{\circ_\tau}{(\app{s}{x})}}{(\app{t}{x})}}$ for
+  $\circ \in \{ \oplus, \otimes \}$
+\item\label{leadsto:circ:forall}
+  $\app{\app{\circ_{\quant{\alpha}{\sigma}}}{s}}{t} \leadsto
+  \tabs{\alpha}{\app{\app{\circ_\sigma}{(\tapp{s}{\alpha})}}{(
+  \tapp{t}{\alpha})}}$ for $\circ \in \{ \oplus, \otimes \}$
 \item $\app{\proj^1_{\sigma,\tau}}{(s,t)} \leadsto s$
 \item $\app{\proj^2_{\sigma,\tau}}{(s,t)} \leadsto t$
 \item $\app{\flatten_\nat}{s} \leadsto s$
@@ -343,16 +357,45 @@ for some rule scheme $\ell \leadsto r$ in the following list:
   \abs{x:\sigma}{\app{\lift_{\tau}}{x}}$
 \item $\app{\lift_{\quant{\alpha}{\sigma}}}{s} \leadsto
   \tabs{\alpha}{\app{\lift_{\sigma}}{s}}$
-\item $\app{(\abs{x:\sigma}{s})}{t} \leadsto s[\subst{x}{t}]$
-\item $\tapp{(\tabs{\alpha}{s})}{\sigma} \leadsto
+\item\label{leadsto:beta:abs}
+  $\app{(\abs{x:\sigma}{s})}{t} \leadsto s[\subst{x}{t}]$
+\item\label{leadsto:beta:tabs}
+  $\tapp{(\tabs{\alpha}{s})}{\sigma} \leadsto
   \etalong{s[\subst{\alpha}{\sigma}]}$.
-\end{itemize}
+\end{enumerate}
+We say that $s$ is a \emph{redex} if $s$ reduces by one of the rules
+(\ref{leadsto:plus:base})--(\ref{leadsto:beta:tabs}), and that $s$
+\emph{reduces at the head} to $t$ if the derivation of $s \leadsto t$
+does not use (\ref{leadsto:mono:abs}) or (\ref{leadsto:mono:right}).
+
 A \emph{final interpretation term} is a term $s \in \Iterms$ such that
 (a) $\FV(s) = \FTV(s) = \emptyset$, (b) $s$ is in normal form with
 respect to $\leadsto$, and (c) $s$ is in $\eta$-long form.  We let
 $\World$ be the set of all final interpretation terms. By~$\World_\tau$
 we denote the set of all final interpretation terms of type~$\tau$.
 \end{definition}
+
+NOTE: in the remainder of this section, we shall often speak simply of
+``terms'' when referring to interpretation terms.
+
+\subsubsection{Key properties of $\leadsto$}
+In the remainder of this section, we will often abuse notation to omit
+$\cdot$ and $*$.  Thus, $s t$ can refer to both $\app{s}{t}$ and
+$\tapp{s}{t}$.  Due to typing, this notation is not ambiguous.  We will
+also denote $\abstraction{a}{s}$ for either $\abs{a}{s}$ or
+$\tabs{a}{s}$, depending on typing.  Thus, we have:
+
+\begin{lemma}\label{lem_abusive_notation}
+Every interpretation term has the form $s t_1 \dots t_n$ with
+$s$ a variable, function symbol or abstraction $\abstraction{a}{s'}$
+(for $n \geq 0$).
+\end{lemma}
+
+\begin{proof}
+By induction on the size of interpretation terms (and a simple case
+analysis).
+\qed
+\end{proof}
 
 \begin{lemma}[Subject reduction]
   If $\Gamma \vdash t : \tau$ and $t \leadsto t'$ then
@@ -363,6 +406,45 @@ we denote the set of all final interpretation terms of type~$\tau$.
   TODO
 \end{proof}
 
+By~$\SN$ we denote the set of all terminating interpretation
+terms. For $t \in \SN$ by~$\nu(t)$ we denote the length of the longest
+reduction starting at~$t$. We use the notation $t u$ for either
+$\app{t}{u}$ when~$u$ is a term, or $\tapp{t}{u}$ when~$u$ is a type.
+
+The following lemma is obvious, but worth stating explicitly.
+
+\begin{lemma}\label{lem_reduce_abs}
+If $\abstraction{a}{s} \leadsto^* t$, then $t = \abstraction{a}{
+t}$ and $s \leadsto^* t'$.
+If $s \in \SN$ then both $\abs{x}{s}$ and $\tabs{\alpha}{s}$ are also
+in $\SN$.
+\end{lemma}
+
+\begin{proof}
+We observe that every reduct of $\abs{x}{s}$ has the form $\abs{x}{s'}$
+with $s \leadsto s'$, and similar for $\tabs{\alpha}{s}$.
+Thus, the first statement follows by induction on the length of the
+reduction $\abstraction{a}{s} \leadsto^* t$, and the second by induction
+on $s$ using $\leadsto$.
+\qed
+\end{proof}
+
+\begin{lemma}\label{lem_circ_sn_base}
+  If $t_1,t_2 \in \SN$ then $\circ_\nat t_1 t_2 \in \SN$ for
+  $\circ \in \{\oplus,\otimes\}$.
+  \CK{Changed this because I don't think it'll work out to do this for
+  higher types without assuming a kind of computability of $t_1,t_2$.}
+\end{lemma}
+
+\begin{proof}
+  By induction on $t_1,t_2$ oriented with $\leadsto$.
+  $\circ_\nat t_1 t_2 \in \SN$ if $s \in \SN$ for all $s$ such that
+  $\circ_\nat t_1 t_2 \in \SN \leadsto s$.
+  If $s = \circ_\nat t_1' t_2$ or $s = \circ_\nat t_1 t_2'$ then we
+  complete by the induction hypothesis.  Otherwise $s \in \mathbb{N}$ is
+  obviously in $\SN$.
+\end{proof}
+
 \begin{lemma}
 If $s$ is a closed interpretation term in $\eta$-long form which is
 terminating under $\leadsto$, then there is a final interpretation term
@@ -371,18 +453,17 @@ $t$ such that $s \leadsto^* t$.
 
 \begin{proof}
 TODO
+\CK{And honestly not sure whether we even need this.}
 \end{proof}
 
+====================
+
+\subsubsection{Computability}
 In the rest of this section we adapt the Tait-Girard computability
 method to prove termination of~$\leadsto$. The proof is an adaptation
 of chapters~6 and~14 from the book ``Proofs and Types'' by Girard, and
 chapters~10 and~11 from the book ``Lectures on the Curry-Howard
 Isomorphism'' by Sorensen and Urzyczyn.
-
-By~$\SN$ we denote the set of all terminating interpretation
-terms. For $t \in \SN$ by~$\nu(t)$ we denote the length of the longest
-reduction starting at~$t$. We use the notation $t u$ for either
-$\app{t}{u}$ when~$u$ is a term, or $\tapp{t}{u}$ when~$u$ is a type.
 
 NOTE: For now the proof does not take product types into account. I'm
 not sure if explicit products are necessary in the definition, because
@@ -391,15 +472,6 @@ the polymorphic lambda-calculus.
 
 NOTE: Currently, $\flatten$ and $\lift$ are not accounted for either,
 but adding them should be similar to~$\oplus$ and~$\otimes$.
-
-\begin{lemma}\label{lem_circ_sn}
-  If $t_1,t_2 \in \SN$ then $\circ_\tau t_1 t_2 \in \SN$ for
-  $\circ \in \{\oplus,\otimes\}$.
-\end{lemma}
-
-\begin{proof}
-  TODO
-\end{proof}
 
 \begin{definition}\label{def_candidate}
   A term~$t$ is \emph{neutral} if there does not exists a sequence of
@@ -482,9 +554,59 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
   \item Let $t_1,t_2 \in \SN$ be such that
     $\Gamma \proves t_i : \nat$. Obviously,
     $\Gamma \proves \circ_\nat t_1 t_2 : \nat$. Also
-    $\circ_\nat t_1 t_2 \in \SN$ follows from definitions. So
-    $\circ_\nat t_1 t_2 \in \val{\nat}{\omega,\xi}{\Gamma}$.
+    $\circ_\nat t_1 t_2 \in \SN$ follows by Lemma~\ref{lem_circ_sn_base}.
+    So $\circ_\nat t_1 t_2 \in \val{\nat}{\omega,\xi}{\Gamma}$.
   \end{enumerate}
+\end{proof}
+
+\begin{lemma}\label{lem_abstraction_computable}
+  Suppose it is given that $\val{\sigma}{\omega',\xi'}{\Gamma}$ and
+  $\val{\tau}{\omega,\xi}{\Gamma}$ are candidates for all suitable
+  $\omega',\xi'$.  Then
+  \begin{itemize}
+  \item $\abs{x:\tau}{s} \in \val{\tau \arrtype \sigma}{\omega,\xi}{
+    \Gamma}$ if and only if
+    $s[x:=t] \in \val{\sigma}{\omega,\xi}{\Gamma}$ for all $t \in \val{
+    \tau}{\omega,\xi}{\Gamma}$;
+  \item $\tabs{\alpha}{s} \in \val{\quant{\alpha}{\sigma}}{\omega,\xi}{
+    \Gamma}$ if and only if for all $X \in \Cb_\tau^\Gamma$:
+    $s[\alpha:=\tau] \in
+    \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$.
+  \end{itemize}
+\end{lemma}
+
+\begin{proof}
+  First suppose $\abs{x:\sigma}{s} \in \val{\sigma \arrtype \tau}{\omega,
+  \xi}{\Gamma}$.  Then for all $t \in \val{\sigma}{\omega,\xi}{\Gamma}$ we
+  have $\app{(\abs{x:\sigma}{s})}{t} \in \val{\tau}{\omega,\xi}{\Gamma}$.
+  As this set is a candidate, it is closed under $\leadsto$, so also
+  $s[x:=t] \in \val{\tau}{\omega,\xi}{\Gamma}$.
+  Similarly, if $\tabs{\alpha}{s} \in \quant{\alpha}{\sigma}$, then
+  $\tapp{(\tabs{\alpha}{s})}{\tau} \in \val{\sigma}{
+  \omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$, and we are
+  done because $\tapp{(\tabs{\alpha}{s})}{\tau} \leadsto s[\alpha:=\tau]$.
+
+  Now suppose (**): $s[x:=t] \in \val{\sigma}{\omega,\xi}{\Gamma}$ for all
+  $t \in \val{\tau}{\omega,\xi}{\Gamma}$.  Let $t \in \val{\tau}{\omega,
+  \xi}{\Gamma}$.  Then:
+  \begin{itemize}
+  \item $t \in \SN$ because $\val{\tau}{\omega,\xi}{\Gamma}$ is a candidate;
+  \item $s \in \SN$ because every infinite reduction in $s$ induces an
+    infinite reduction in $t$ ($\leadsto$ is stable);
+  \item if $s \leadsto^* s'$ and $t \leadsto^* t'$, then:
+    \begin{itemize}
+    \item $s[x:=t] \leadsto^* s'[x:=t']$ by monotonicity and stability of
+      $\leadsto$;
+    \item therefore $s'[x:=t'] \in \val{\sigma}{\omega,\xi}{\Gamma}$, because
+      $\val{\sigma}{\omega,\xi}{\Gamma}$ is a candidate and therefore closed
+      under $\leadsto$;
+    \item $\app{(\abs{x}{s'})}{t'}$ is neutral, so in
+      $\val{\sigma}{\omega,\xi}{\Gamma}$ if all its reducts are;
+    \item by induction on $s',t'$ oriented with $\leadsto$ therefore
+      $\app{(\abs{x}{s'})}{t'} \in \val{\sigma}{\omega,\xi}{\Gamma}$.
+    \end{itemize}
+  \end{itemize}
+  A similar reasoning applies to $s[\alpha:=\tau]$.
 \end{proof}
 
 \begin{lemma}\label{lem_val_computable}
@@ -547,42 +669,31 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
     $t u \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Since
     $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$ was arbitrary, we have
     shown $t \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
-  \item Assume
-    $t_1,t_2 \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$. We have
-    already shown that this implies $t_1,t_2 \in \SN$. Hence also
-    $\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2 \in \SN$ by
-    Lemma~\ref{lem_circ_sn}. We show
-    $\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2 \in
-    \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$ by induction
-    on~$\nu(\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2)$. We have already
-    proven that, because $\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2$ is
-    neutral, it suffices to show that if
-    $\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2 \leadsto t$ then
-    $t \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$. If
-    $t = \circ_{\omega(\tau_1\to\tau_2)} t_1' t_2$ or
-    $t = \circ_{\omega(\tau_1\to\tau_2)} t_1 t_2'$ with
-    $t_i \leadsto t_i'$ then this follows from the inductive
-    hypothesis. So assume $t_i = \lambda x : \omega(\tau_1) . t_i'$
-    and
-    $t = \lambda x : \omega(\tau_1) . \circ_{\omega(\tau_2)} t_1'
-    t_2'$. Note that $t \in \SN$. Let
-    $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$. By nested induction on
-    $\nu(u) + \nu(t)$ we show that if $t u \leadsto w$ then
-    $w \in \val{\tau_2}{\omega,\xi}{\Gamma}$. This suffices,
-    because~$t u$ is neutral. The only case which doesn't follow
-    directly from the inductive hypothesis is when
-    $w = \circ_{\omega(\tau_2)} t_1'[\subst{x}{u}]
-    t_2'[\subst{x}{u}]$. Because
-    $\lambda x : \omega(\tau_1) . t_i' \in
-    \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$ and
-    $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$, we have
-    $(\lambda x : \sigma(\tau_1) . t_i') u \in
-    \val{\tau_2}{\omega,\xi}{\Gamma}$. Hence,
-    $t_i'[\subst{x}{u}] \in \val{\tau_2}{\omega,\xi}{\Gamma}$
-    because~$\val{\tau_2}{\omega,\xi}{\Gamma}$ is a candidate by the
-    inductive hypothesis. Thus also
-    $w = \circ_{\omega(\tau_2)} t_1'[\subst{x}{u}] t_2'[\subst{x}{u}]
-    \in \val{\tau_2}{\omega,\xi}{\Gamma}$.
+  \item Assume $t_1,t_2 \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
+    We have already shown that this implies $t_1,t_2 \in \SN$.
+    Since $s := \circ_{\omega(\tau_1\to\tau_2)} t_1 t_2$ is neutral,
+    we have also already seen that $s \in \val{\tau_1\to\tau_2}{\omega,
+    \xi}{\Gamma}$ if $s' \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$
+    whenever $s \leadsto s'$.
+    This we show by induction on $t_1,t_2$ (oriented with $\leadsto$).
+    If $s' = \circ_{\omega(\tau_1\to\tau_2)} t_1' t_2$, then note that
+    $t_1' \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$ because we
+    have already shown that $\val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$
+    is closed under $\leadsto$; thus, we can complete by the induction
+    hypothesis.
+    If $s' = \circ_{\omega(\tau_1\to\tau_2)} t_1 t_2'$, we complete in
+    the same way.
+    The only alternative is that $s' = \abs{x:\omega(\tau_1)}{\circ_{
+    \omega(\tau_2)} (t_1 x) (t_2 x)}$.
+    Let $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$.  Since $t_1,t_2 \in
+    \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$, we have that $t_1 u$
+    and $t_2 u$ are in $\val{\tau_2}{\omega,\xi}{\Gamma}$ by
+    definition.  Since, $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a
+    candidate, this means that $\circ_{\omega(\tau_2)} (t_1 u) (t_2 u) =
+    (\circ_{\omega(\tau_2)} (t_1 x) (t_2 x))[x:=u]$ is in
+    $\val{\tau_2}{\omega,\xi}{\Gamma}$ as well.  By
+    Lemma~\ref{lem_abstraction_computable}, we conclude that $s' \in
+    \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
   \end{enumerate}
 
   Assume $\sigma = \forall\alpha[\tau]$. We check the conditions in
@@ -593,7 +704,11 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
     $t \leadsto t_1 \leadsto t_2 \leadsto t_3 \leadsto
     \ldots$. Let~$\tau'$ be an arbitrary type and let
     $S \in \Cb_{\tau'}^\Gamma$ (e.g.~take~$S$ to be the set of
-    terminating terms of type~$\tau'$ in context~$\Gamma$). Then
+    terminating terms of type~$\tau'$ in context~$\Gamma$).
+    \CK{It is not guaranteed that this will work! For that we really
+    do need that $\circ s t$ is SN if $s$ and $t$ are.  However, can't
+    we just take $\tau' := \nat$?}
+    Then
     $t \tau' \in
     \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{S}]}{\Gamma}$. By
     the inductive hypothesis
@@ -632,40 +747,26 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
     $t \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$.
   \item Assume
     $t_1,t_2 \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$. We
-    have already shown that this implies $t_1,t_2 \in \SN$. Hence also
-    $\circ_{\omega(\forall\alpha[\tau])} t_1 t_2 \in \SN$ by
-    Lemma~\ref{lem_circ_sn}. We show
-    $\circ_{\omega(\forall\alpha[\tau])} t_1 t_2 \in
-    \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$ by induction
-    on~$\nu(\circ_{\omega(\forall\alpha[\tau])} t_1 t_2)$. We have
-    already proven that, because
-    $\circ_{\omega(\forall\alpha[\tau])} t_1 t_2$ is neutral, it
-    suffices to show that if
-    $\circ_{\omega(\forall\alpha[\tau])} t_1 t_2 \leadsto t$ then
-    $t \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$. If
-    $t = \circ_{\omega(\forall\alpha[\tau])} t_1' t_2$ or
-    $t = \circ_{\omega(\forall\alpha[\tau])} t_1 t_2'$ with
-    $t_i \leadsto t_i'$ then this follows from the inductive
-    hypothesis. So assume $t_i = \Lambda\alpha . t_i'$ and
-    $t = \Lambda \alpha . \circ_{\tau} t_1' t_2'$. Note that
-    $t \in \SN$. Let $\tau'$ be a type and $X \in
-    \Cb_{\tau'}^\Gamma$. By nested induction on~$\nu(t)$ we show that
-    if $t \alpha \leadsto w$ then
-    $w \in
-    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$. This
-    suffices, because~$t \alpha$ is neutral. The only case which
-    doesn't follow directly from the inductive hypothesis is when
-    $w = \circ_{\omega(\tau)} t_1' t_2'$. Because
-    $\Lambda \alpha . t_i' \in
-    \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$, we have
-    $(\Lambda \alpha . t_i') \alpha \in
-    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$. Hence,
-    $t_i' \in
-    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$
-    because~$\val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$
-    is a candidate by the inductive hypothesis. Thus also
-    $w = \circ_{\omega(\tau)} t_1' t_2' \in
-    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$.
+    have already shown that this implies $t_1,t_2 \in \SN$, and since
+    $s := \circ_{\omega(\forall\alpha[\tau])} t_1 t_2$ is neutral, that
+    $s \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$ if $s' \in
+    \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$ whenever $s \leadsto
+    s'$.  This we show by induction on $t_1,t_2$.
+    The cases when $t_1$ or $t_2$ are reduced are immediate with the
+    induction hypotheses; the only remaining case is when $s' =
+    \tabs{\alpha}{\circ_{\omega(\tau)} (t_1 \alpha) (t_2 \alpha)}$.
+    For all types $\sigma$ and $X \in \Cb_{\sigma}^\Gamma$ we have both
+    $t_1 \sigma$ and $t_2 \sigma$ in $\val{\tau}{\omega[\subst{\alpha}{
+    \sigma}],\xi[\subst{\alpha}{X}]}{\Gamma}$ (by definition of
+    $t_1,t_2 \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$).
+    But then, because $\val{\tau}{\omega[\subst{\alpha}{\sigma}],
+    \xi[\subst{\alpha}{X}]}{\Gamma}$ is a candidate by the inductive
+    hypothesis, we have $\circ_{\omega(\tau[\subst{\alpha}{\sigma})}
+    (t_1 \sigma) (t_2\sigma) = (\circ_{\omega(\tau)} (t_1 \alpha) (t_2
+    \alpha))[\subst{\alpha}{\sigma}] \in \val{\tau}{\omega[\subst{
+    \alpha}{\sigma}],\xi[\subst{\alpha}{X}]}{\Gamma}$ for all types
+    $\sigma$, so $s' \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$
+    by Lemma~\ref{lem_abstraction_computable}.
   \end{enumerate}
 \end{proof}
 
@@ -707,79 +808,79 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
   TODO
 \end{proof}
 
-\begin{lemma}
-  If for all $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$ we have
-  $t[\subst{x}{u}] \in \val{\tau_2}{\omega,\xi}{\Gamma}$, then
-  $\lambda x : \omega(\tau_1) . t \in
-  \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
-\end{lemma}
-
-\begin{proof}
-  By Lemma~\ref{lem_val_computable} the
-  sets~$\val{\tau_i}{\omega,\xi}{\Gamma}$ are candidates, so
-  $\val{\tau_i}{\omega,\xi}{\Gamma} \subseteq \SN$. Let
-  $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$. We show
-  $(\lambda x : \omega(\tau_1) . t) u \in
-  \val{\tau_2}{\omega,\xi}{\Gamma}$ by induction on $\nu(t) +
-  \nu(u)$. Suppose $(\lambda x : \omega(\tau_1) . t) u \leadsto
-  w$. There are three cases.
-  \begin{itemize}
-  \item $w = t[\subst{x}{u}]$. Then
-    $w \in \val{\tau_2}{\omega,\xi}{\Gamma}$ by assumption.
-  \item $w = (\lambda x : \omega(\tau_1) . t') u$ with
-    $t \leadsto t'$. Because $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a
-    candidate, still
-    $t'[\subst{x}{u}] \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Also
-    $\nu(t') < \nu(t)$, so $w \in \val{\tau_2}{\omega,\xi}{\Gamma}$
-    follows from the inductive hypothesis.
-  \item $w = (\lambda x : \omega(\tau_1) . t) u'$ with
-    $u \leadsto u'$. Because $\val{\tau_i}{\omega,\xi}{\Gamma}$ are
-    candidates, still $u' \in \val{\tau_1}{\omega,\xi}{\Gamma}$ and
-    $t[\subst{x}{u'}] \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Also
-    $\nu(u') < \nu(u)$, so $w \in \val{\tau_2}{\omega,\xi}{\Gamma}$
-    follows from the inductive hypothesis.
-  \end{itemize}
-  Because $(\lambda x : \omega(\tau_1) . t) u$ is neutral and
-  $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a candidate, this shows
-  $(\lambda x : \omega(\tau_1) . t) u \in
-  \val{\tau_2}{\omega,\xi}{\Gamma}$.
-\end{proof}
-
-\begin{lemma}
-  If for every type~$\tau$ and every $X \in \Cb_\tau^\Gamma$ we have
-  $t \in
-  \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$,
-  then
-  $\Lambda \alpha . t \in
-  \val{\forall\alpha[\sigma]}{\omega,\xi}{\Gamma}$.
-\end{lemma}
-
-\begin{proof}
-  Let~$\tau$ be a type and $X \in \Cb_\tau^\Gamma$. By
-  Lemma~\ref{lem_val_computable} the
-  set~$\val{\forall\alpha[\sigma]}{\omega,\xi}{\Gamma}$ is a
-  candidate, so $t \in \SN$. By induction on~$\nu(t)$ we show
-  $(\Lambda \alpha . t) \alpha \in
-  \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$.
-  Because~$\val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$
-  is a candidate by Lemma~\ref{lem_val_computable}, it suffices to
-  show that for every~$w$ with $(\Lambda \alpha . t) \leadsto w$ we
-  have
-  $w \in
-  \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$. There
-  are two cases.
-  \begin{itemize}
-  \item $w = (\Lambda \alpha . t') \alpha$. Then $\nu(t') < \nu(t)$
-    and
-    $w \in
-    \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$
-    follows from the inductive hypothesis.
-  \item $w = t$. Then
-    $w \in
-    \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$
-    by assumption.
-  \end{itemize}
-\end{proof}
+%\begin{lemma}
+%  If for all $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$ we have
+%  $t[\subst{x}{u}] \in \val{\tau_2}{\omega,\xi}{\Gamma}$, then
+%  $\lambda x : \omega(\tau_1) . t \in
+%  \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
+%\end{lemma}
+%
+%\begin{proof}
+%  By Lemma~\ref{lem_val_computable} the
+%  sets~$\val{\tau_i}{\omega,\xi}{\Gamma}$ are candidates, so
+%  $\val{\tau_i}{\omega,\xi}{\Gamma} \subseteq \SN$. Let
+%  $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$. We show
+%  $(\lambda x : \omega(\tau_1) . t) u \in
+%  \val{\tau_2}{\omega,\xi}{\Gamma}$ by induction on $\nu(t) +
+%  \nu(u)$. Suppose $(\lambda x : \omega(\tau_1) . t) u \leadsto
+%  w$. There are three cases.
+%  \begin{itemize}
+%  \item $w = t[\subst{x}{u}]$. Then
+%    $w \in \val{\tau_2}{\omega,\xi}{\Gamma}$ by assumption.
+%  \item $w = (\lambda x : \omega(\tau_1) . t') u$ with
+%    $t \leadsto t'$. Because $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a
+%    candidate, still
+%    $t'[\subst{x}{u}] \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Also
+%    $\nu(t') < \nu(t)$, so $w \in \val{\tau_2}{\omega,\xi}{\Gamma}$
+%    follows from the inductive hypothesis.
+%  \item $w = (\lambda x : \omega(\tau_1) . t) u'$ with
+%    $u \leadsto u'$. Because $\val{\tau_i}{\omega,\xi}{\Gamma}$ are
+%    candidates, still $u' \in \val{\tau_1}{\omega,\xi}{\Gamma}$ and
+%    $t[\subst{x}{u'}] \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Also
+%    $\nu(u') < \nu(u)$, so $w \in \val{\tau_2}{\omega,\xi}{\Gamma}$
+%    follows from the inductive hypothesis.
+%  \end{itemize}
+%  Because $(\lambda x : \omega(\tau_1) . t) u$ is neutral and
+%  $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a candidate, this shows
+%  $(\lambda x : \omega(\tau_1) . t) u \in
+%  \val{\tau_2}{\omega,\xi}{\Gamma}$.
+%\end{proof}
+%
+%\begin{lemma}
+%  If for every type~$\tau$ and every $X \in \Cb_\tau^\Gamma$ we have
+%  $t \in
+%  \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$,
+%  then
+%  $\Lambda \alpha . t \in
+%  \val{\forall\alpha[\sigma]}{\omega,\xi}{\Gamma}$.
+%\end{lemma}
+%
+%\begin{proof}
+%  Let~$\tau$ be a type and $X \in \Cb_\tau^\Gamma$. By
+%  Lemma~\ref{lem_val_computable} the
+%  set~$\val{\forall\alpha[\sigma]}{\omega,\xi}{\Gamma}$ is a
+%  candidate, so $t \in \SN$. By induction on~$\nu(t)$ we show
+%  $(\Lambda \alpha . t) \alpha \in
+%  \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$.
+%  Because~$\val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$
+%  is a candidate by Lemma~\ref{lem_val_computable}, it suffices to
+%  show that for every~$w$ with $(\Lambda \alpha . t) \leadsto w$ we
+%  have
+%  $w \in
+%  \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$. There
+%  are two cases.
+%  \begin{itemize}
+%  \item $w = (\Lambda \alpha . t') \alpha$. Then $\nu(t') < \nu(t)$
+%    and
+%    $w \in
+%    \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$
+%    follows from the inductive hypothesis.
+%  \item $w = t$. Then
+%    $w \in
+%    \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$
+%    by assumption.
+%  \end{itemize}
+%\end{proof}
 
 \begin{lemma}
   If $t \in \val{\forall\alpha[\sigma]}{\omega,\xi}{\Gamma}$ then
@@ -843,6 +944,7 @@ numbers.
   This is~NOT~TRUE. Consider
   $\oplus_{\nat\to\nat} \lift_\nat \lift_\nat n$. Need to add more
   rewrite rules?
+  \CK{Better now?}
 \end{proof}
 
 \subsection{Defining $\succ$ and $\succeq$}
