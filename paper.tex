@@ -36,6 +36,7 @@
 \newcommand{\arr}[1]{\to_{#1}}
 \newcommand{\arrtype}{\Rightarrow}
 \newcommand{\arreta}{\leadsto_\eta}
+\newcommand{\arrbeta}{\leadsto_\beta}
 \newcommand{\arretain}{\leadsto_\eta^{\mathtt{in}}}
 \newcommand{\arrnormalise}{\leadsto}
 \newcommand{\normstep}{\leadsto_\mu}
@@ -48,6 +49,7 @@
 \newcommand{\pair}[2]{\langle #1,#2 \rangle}
 \newcommand{\subst}[2]{#1:=#2}
 \newcommand{\etalong}[1]{#1\uparrow^\eta}
+\newcommand{\betanormal}[1]{#1\downarrow_\beta}
 \newcommand{\almostetalong}[1]{\overline{#1}}
 
 \newcommand{\FTV}{\mathit{FTV}}
@@ -245,9 +247,8 @@ induction on the form of $s$). Thus, all closed terms have a unique
 type.
 
 \subsubsection{Normalising interpretation terms}
-Term equality is considered modulo $\alpha$-conversion.  In addition,
-we are particularly interested in interpretation terms in
-\emph{$\eta$-long form}.
+Interpretation term equality is considered modulo $\alpha$-conversion.
+We will be particularly interested in terms in $\eta$-long form.
 
 \begin{definition}
 For a given variable environment $\Gamma$ and interpretation terms $s,
@@ -262,10 +263,11 @@ inductively together with a helper relationship $\arretain$, as follows.
 \item $\abs{x}{s} \arretain \abs{x}{t}$ if $s \arreta t$
 \item $\tabs{\alpha}{s} \arretain \tabs{\alpha}{t}$ if $s \arreta t$
 \item $\app{s}{u} \arretain \app{s}{v}$ if $u \arreta v$
-\item $\app{s}{u} \arretain \app{t}{v}$ if $s \arretain t$
+\item $\app{s}{u} \arretain \app{t}{u}$ if $s \arretain t$
 \item $\tapp{s}{\sigma} \arretain \app{t}{\sigma}$ if $s \arretain t$
 \end{itemize}
-A term is in \emph{$\eta$-long form} if it cannot be reduced by
+A term is in \emph{$\beta$-normal form} if it cannot be reduced by
+$\arrbeta$< and in \emph{$\eta$-long form} if it cannot be reduced by
 $\arreta$.
 \end{definition}
 
@@ -308,6 +310,8 @@ smallest relation for which the following properties are satisfied:
   s[\subst{\alpha}{\sigma}]$.
 \end{itemize}
 We let $\arrnormalise$ be the union of $\arreta$ and $\normstep$.
+We let $\arrbeta$ denote a reduction using the last two rules (which
+may be applied anywhere in an interpretation term).
 
 A \emph{final interpretation term} is a term $s \in \Iterms$ such that
 (a) $\FV(s) = \FTV(s) = \emptyset$, and (b) $s$ is in normal form with
@@ -352,6 +356,7 @@ interpretation terms (and a simple case analysis).
 (\ref{lem_abusive_notation_eta}) follows quickly by the definition of
 $\arreta$ and induction on $n$, using only the first two cases for the
 induction hypothesis with $\arretain$.
+\qed
 \end{proof}
 
 An essential property for reasoning is that $\arrnormalise$ preserves
@@ -370,18 +375,22 @@ By~$\SN$ we denote the set of all interpretation terms which are
 terminating under $\arrnormalise$. For $t \in \SN$ by~$\nu(t)$ we
 denote the length of the longest reduction starting at~$t$.
 
-As abstractions cannot be reduced at the root, the following lemma is
-obvious.
+The following lemma is obvious, but worth stating explicitly.
 
 \begin{lemma}\label{lem_reduce_abs}
-If $s \in \SN$ then both $\abs{x}{s}$ and $\tabs{\alpha}{s}$ are also in
-$\SN$.
+If $\abstraction{a}{s} \arrnormalise^* t$, then $t = \abstraction{a}{
+t}$ and $s \arrnormalise^* t'$.
+If $s \in \SN$ then both $\abs{x}{s}$ and $\tabs{\alpha}{s}$ are also
+in $\SN$.
 \end{lemma}
 
 \begin{proof}
-A trivial induction on $s$ by $\arrnormalise$: every reduct of
-$\abs{x}{s}$ has the form $\abs{x}{s'}$ with $s \arrnormalise s'$ and
-similar for $\tabs{\alpha}{s}$.
+We observe that every reduct of $\abs{x}{s}$ has the form $\abs{x}{s'}$
+with $s \arrnormalise s'$, and similar for $\tabs{\alpha}{s}$.
+Thus, the first statement follows by induction on the length of the
+reduction $\abstraction{a}{s} \arrnormalise^* t$, and the second by
+induction on $s$ using $\arrnormalise$.
+\qed
 \end{proof}
 
 We also quickly see that variables are terminating.
@@ -417,122 +426,47 @@ in $\SN$ as well, and by Lemma~\ref{lem_reduce_abs} so is $t$.
 If $a$ is a type, the reasoning is similar.
 \end{proof}
 
-%\begin{lemma}\label{lem_eta_reduce_substitution}
-%Let $\gamma$ be a substitution mapping variables $x$ to terms $\gamma(
-%x)$ such that $y \arrnormalise^* \gamma(x)$ for some variable $y$ not
-%in the domain of $\gamma$.
-%Let $s$ and $t$ be interpretation terms such that $s$ is linear,
-%$s\gamma \arrnormalise t$ and $\FV(s)$ does not contain variables in
-%the range of $\gamma$.
-%Then there exist $t'$ and a substitution $\delta$ such that:
-%(1) $s \arrnormalise^* t'$;
-%(2) $t = t'\delta$;
-%(3) $\gamma \arrnormalise^* \delta$ (that is, $\delta$ has the same
-%  domain as $\gamma$ and each $\gamma(x) \arrnormalise^* \delta(x)$).
-%\end{lemma}
-%
-%\begin{proof}
-%By induction on the form of $s$, using Lemma~\ref{lem_abusive_notation}
-%for case analysis.
-%
-%First observe that $s$ is not a function symbol, as then $s\gamma = s$
-%does not reduce.
-%
-%Next, suppose that $s$ is a variable $x$.  If $x$ is not in the domain
-%of $\gamma$, then $s = s\gamma \arrnormalise t$, and since
-%$\arrnormalise$ cannot introduce fresh unbound variables, $t = t\gamma$
-%as well; thus, we are done choosing $t' := t$ and $\delta := \gamma$.
-%If $x$ is in the domain of $\gamma$, then we let $t' := x$ (which surely
-%gives $s \arrnormalise^* t'$) and take $\delta := [x:=t] \cup [y:=
-%\gamma(y) \mid y \in \mathtt{domain}(\gamma) \setminus \{x\}]$.  This
-%choice satisfies all properties.
-%
-%Now suppose $s = \abstraction{a}{u}$.  Then by $\alpha$-conversion
-%we can safely assume that $a$ does not occur in domain or range of
-%$\gamma$, so $s\gamma = \abstraction{a}{(u\gamma)}$.
-%Clearly $t = \abstraction{a}{v}$ with $u\gamma \arrnormalise v$.  By the
-%induction hypothesis, we obtain $v'$ and $\delta$ such that $u
-%\arrnormalise v'$ and $v = v'\delta$ and $\gamma \arrnormalise^*
-%\delta$..  Since $\delta$ has the same domain as $\gamma$, $a$ does not
-%appear in it, and since $\arrnormalise$ cannot introduce fresh variables
-%or type variables, $a$ also does not appear in the range of $\delta$.
-%Thus, $t = (\abstraction{a}{v'})\delta$, and we indeed have $s =
-%\abstraction{a}{u} \arrnormalise \abstraction{a}{v'}$.
-%
-%The only remaining case is when $s = u t_1 \ldots t_n$ with $n > 0$ and
-%$u$ not an application.  If $t = (u\gamma) (t_1\gamma) \ldots v_i \ldots
-%(t_n\gamma)$ with $t_i\gamma \arrnormalise v_i$ then the induction
-%hypothesis provides a suitable $\delta$ and $v_i'$ such that $v_i =
-%v_i'\delta$ and $t_i \arrnormalise v_i'$; we are done choosing $t :=
-%u t_1 \ldots v_i' \ldots t_n$. NOPE
-%\end{proof}
+We note that relatively little can be done with terms of variable type.
 
-%\begin{lemma}
-%Let $\gamma$ be a substitution mapping variables $x$ to terms $t$ such
-%that $x \arrnormalise^** t$.  If $s \in \SN$ then also $s\gamma \in
-%\SN$.
-%\end{lemma}
-%
-%\begin{proof}
-%We prove that $s\gamma \in \SN$, ordered by $s$ using the union of
-%$\arrnormalise$ and the subterm relation (which is well-founded on
-%terms in $\SN$).  We note that $s\gamma$ is terminating if all its
-%reducts are terminating, so suppose $s\gamma \arrnormalise t$.  To
-%prove that $t \in \SN$, we consider the form of $s$, using
-%Lemma~\ref{lem_abusive_notation}.
-%
-%First, if $s = \abstraction{a}{s'}$, then $t = \abstraction{a}{t'}$
-%with $s'\gamma \arrnormalise t'$ (since, by $\alpha$-conversion, we
-%can safely assume that $a$ does not occur in the domain or range of
-%$\gamma$).  By induction hypothesis, $t' \in \SN$, so by
-%Lemma~\ref{lem_reduce_abs} so is $t$.
-%
-%Second, if $s$ is neither an abstraction nor an application, then
-%there are two possibilities: $s$ is a function symbol -- in which
-%case $s\gamma = s \in \SN$ by assumption -- or $s$ is a variable --
-%in which case $s\gamma \arrnormalise^* t$ whether or not $s$ is in
-%the domain of $\gamma$.  Since $s \in \SN$ by Lemma~\ref{lem_var_sn},
-%the same holds for its reducts.
-%
-%Third, if $s$ is an application $s' t_1 \ldots t_n$ with $n > 0$ and
-%$t$ has the form $(s\gamma) t_1 \dots t_i' \dots t_n$ with $s_i\gamma
-%\arrnormalise t_i'$, or the form $s'' t_1 \ldots t_n$ with $s'\gamma
-%\arrnormalise s''$, then
-%\end{proof}
+\begin{lemma}\label{lem_typevar_reduce}
+Let $\Gamma \proves s : \alpha$ and suppose $s \arrnormalise t$.
+Then $s \arrbeta t$.
+\CK{Here, I'm actually already assuming that we are avoiding product
+types, as otherwise this statement is not true.}
+\end{lemma}
 
-%\begin{lemma}\label{lem_circ_sn}
-%Let $t_1,\dots,t_n \in \SN$.  Then $\apps{\circ_\sigma}{t_1}{t_n} \in
-%\SN$ for $\circ \in \{\oplus,\otimes\}$
-%and $\sigma := \sigma_3 \arrtype \dots \arrtype \sigma_n \arrtype \tau$.
-%\end{lemma}
-%
-%\begin{proof}
-%TODO
-%
-%We prove the lemma by induction first on the size of $\tau$, second on
-%$(t_1,\dots,t_n)$ ordered by the product extension of $\arrnormalise$.
-%We are done if all reducts of $\apps{a}{t_1}{t_n}$ are in $\SN$, where
-%$a$ is $\circ_\sigma$ or $x$.  Consider what forms such a reduct $t$ may
-%have:
-%\begin{itemize}
-%\item A reduction by $\arreta$ at the root produces
-%  $t := \abs{x}{(\app{\apps{a}{t_1}{t_n}}{x})}$ for a fresh variable $x$
-%  of type $\tau_1$, where $\tau$ is $\tau_1 \arrtype \tau_2$.
-%  Variables have the required form to apply (\ref{lem_base_sn:circ})
-%  (with $n=0$), and $\tau_1$ is smaller than $\tau$, so $x$ is in $\SN$.
-%  Thus, $t' := \app{\apps{a}{t_1}{t_n}}{x}$ satisfies the requirements
-%  to apply the induction hypothesis (since $\Gamma \cup \{x:\tau_1\}
-%  \proves t' : \tau_2$), and if $t'$ is terminating then so is $t$ by
-%  Lemma~\ref{lem_reduce_abs}.
-%\item A reduction by $\normstep$ at the root can only apply if $n = 0$
-%  and $\sigma = \tau = \nat$; then $t \in \Nbb$, so $t$ is in normal
-%  form.
-%\item A reduction by $\normstep$ at the head
-%\end{itemize}
-%\end{proof}
+\begin{proof}
+Evident by investigating the available rules.
+\end{proof}
 
-============================
+It will prove easy to separate $\beta$-reduction steps from the others.
 
+\begin{lemma}\label{lem_beta_props}
+Let $\arrbeta$ denote a reduction using $\normstep$ with one of the last
+two rules (but anywhere in a term).  Then:
+\begin{itemize}
+\item $\arrbeta$ is both terminating and confluent, so we can uniquely
+  define $\betanormal{s}$ for every term $s$;
+\item if $s \arrnormalise t$ then $\betanormal{s} \arrnormalise^*
+  \betanormal{t}$, and if the step $s \arrnormalise t$ is not an
+  $\arrbeta$ step, then even $\betanormal{s} \arrnormalise^+
+  \betanormal{t}$;
+\item therefore, $s \in \SN$ if $\betanormal{s} \in \SN$.
+\end{itemize}
+\end{lemma}
+
+\begin{proof}
+TODO
+
+\CK{Note: I really don't like doing this.  I think it should be possible
+to prove termination of $\arrbeta$ alongside the other rules.  However,
+in the presence of $\eta$-expansion, having these results makes it a lot
+easier to derive the necessary lemmas, so I'm putting the result here
+to make sure that what I write up is actually true.  We can think about
+maybe ditching this lemma later (or keeping it if you think it's fine).}
+
+\CK{Whenever this lemma is used, I will note it using blue text.}
+\end{proof}
 
 \subsubsection{Computability}
 In the rest of this section we adapt the Tait-Girard computability
@@ -567,7 +501,8 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
   \end{enumerate}
   Note that the third item above implies:
   \begin{itemize}
-  \item if $t$ is neutral and in normal form then $t \in X$.
+  \item if $t$ is neutral and in normal form then $t \in X$;
+  \item $X$ contains all variables of type $\tau$.
   \end{itemize}
   The set of all candidates of type~$\tau$ in context~$\Gamma$ is
   denoted by~$\Cb_\tau^\Gamma$.
@@ -607,6 +542,173 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
 
 \begin{proof}
   Follows from definitions.
+\end{proof}
+
+\begin{lemma}\label{lem_abstraction_computability}
+Suppose $\val{\sigma}{\omega,\xi}{\Gamma}$ and $\val{\tau}{\omega,\xi}{
+\Gamma}$ are candidates.
+Then $\abs{x}{s} \in \val{\sigma \to \tau}{\omega,\xi}{\Gamma}$ if and
+only if $s[x:=t] \in \val{\tau}{\omega,\xi}{\Gamma}$ for all $t \in
+\val{\sigma}{\omega,\xi}{\Gamma}$.
+\end{lemma}
+
+=================
+
+\begin{proof}
+First suppose $\abs{x}{s} \in \val{\sigma \to \tau}{\omega,\xi}{\Gamma}$,
+so for all $t \in \val{\sigma}{\omega,\xi}{\Gamma}$ we have
+$(\abs{x}{s})t \in \val{\tau}{\omega,\xi}{\Gamma}$.  As
+$\val{\tau}{\omega,\xi}{\Gamma}$ and $(\abs{x}{s})t \arrnormalise s[x:=
+t]$ we have $s[x:=t] \in \val{\tau}{\omega,\xi}{\Gamma}$ as well.
+
+Now suppose $s[x:=t] \in \val{\tau}{\omega,\xi}{\Gamma}$ for all $t \in
+\val{\sigma}{\omega,\xi}{\Gamma}$.  Let $t \in \val{\sigma}{\omega,\xi}{
+\Gamma}$.  Then:
+\begin{itemize}
+\item $t \in \SN$ because $\val{\sigma}{\omega,\xi}{\Gamma}$ is a
+  candidate
+\item $s = s \in \SN$ because every infinite reduction in $s$ induces
+  an infinite reduction in $s[x:=t]$ -- TODO
+\item if $s \arrnormalise^* s'$ and $t \arrnormalise^* t'$ then
+  $s[x:=t] \arrnormalise^* s'[x:=t'] \in \val{\tau}{\omega,\xi}{\Gamma}$
+  because:
+  \begin{itemize}
+  \item $t' \in \val{\sigma}{\omega,\xi}{\Gamma}$ because
+    $\val{\sigma}{\omega,\xi}{\Gamma}$ is a candidate and therefore
+    closed under reduction
+  \item $s[x:=t'] \in \val{\tau}{\omega,\xi}{\Gamma}$ by assumption
+  \item $s'[x:=t'] \in \val{\tau}{\omega,\xi}{\Gamma}$ because TODO
+  \end{itemize}
+\end{itemize}
+
+PROBLEM: this hinges on the argument that if $s[x:=t]$ is computable
+then so is $s'[x:=t]$ if $s \arrnormalise s$.  This is not obvious in
+the presence of $\eta$-expansion because it is possible that, for
+instance, $s = x$, $s' = \abs{y}{\app{x}{y}}$ and $t = \abs{z}{t'}$,
+in which case we do not have $s[x:=t] \arrnormalise s'[x:=t]$.  I do
+believe that the lemma holds, however\dots\ but am not sure what the
+best way to prove it is. (It would almost certainly work if we proved
+termination of $\beta$ steps separately and used induction on
+$\beta$-normalised terms, but this seems like a step that could be
+avoided.)  It is also very possible that we don't need this in this
+form; for example, we could define $\arrnormalise$ to allow steps with
+$\arreta$ only on terms in $\normstep$-normal form.
+\end{proof}
+
+
+
+
+
+
+
+\begin{lemma}\label{lem_left_monotonicity}
+If $s \normstep t$ or $s \arretain t$, then $s u \arrnormalise t u$ for
+any $u$ of matching type.
+\end{lemma}
+
+\begin{proof}
+If $s \normstep t$ then this follows by monotonicity of $\normstep$.
+If $s \arretain t$, then this follows because $s u \arretain t u$ if
+$s \arretain t$.
+\end{proof}
+
+\begin{lemma}\label{lem_preserve_circ}
+If $s = \circ_\tau s_1 \ldots s_n$ and $s \arrnormalise^* \circ_\tau
+t_1 \ldots t_n$, then each $s_i \arrnormalise^* t_i$.
+\end{lemma}
+
+\begin{proof}
+We say that a term $s$ is $\tau$-headed if (a) $s = \circ_\tau$, (b)
+$s = s_1 s_2$ and $s_1$ is $\tau$-headed, or (c) $s = \abs{x}{s'}$ and
+$s'$ is $\tau$-headed.  A quick case analysis on $\arreta$ and the
+available rules shows that if $s$ is $\tau$-headed and $s \arrnormalise
+t$, then one of the following holds:
+\begin{itemize}
+\item the reduction uses $\arreta$ or is not at the head, and $t$ is
+  also $\tau$-headed;
+\item the reduction uses a rule of $\normstep$ at the head, and $t$ is
+  a natural number or $\sigma$-headed with $\sigma$ a strict subtype of
+  $\tau$.
+\end{itemize}
+
+Now let $s = \circ_\tau s_1 \ldots s_n \arrnormalise^* \circ_\tau
+t_1 \ldots t_n =: t$.  Since both $s$ and $t$ are $\tau$-headed, the
+observation above gives us that this reduction cannot use any $\normstep$
+steps at the head.  It also cannot use $\arreta$ at the head, because
+this would result in an abstraction, which $t$ is not.  Thus, all
+reduction steps must take place in some $s_i$.
+\end{proof}
+
+\begin{lemma}\label{lem:top_reduction}
+If $s \arrnormalise^* t$ and $t \arreta u$ by a reduction at the top,
+then there exists $s'$ such that $s \arreta s'$ at the top, and $s'
+\arrnormalise^* u$.
+If $s \arrnormalise^* t$ and $t \normstep u$ by a reduction at the head,
+and $s \normstep s'$ by a head-reduction with the same rule, then
+$s' \arrnormalise^* u$.
+
+(Here, rules for $\circ_\sigma$ and $\circ_\tau$ are considered different
+if $\sigma \neq \tau$.)
+\end{lemma}
+
+\begin{proof}
+For the first statement, observe that $u = \abstraction{a}{t a}$.
+Since $\arreta$ can be applied, $t$ is not an abstraction, and therefore
+neither is $s$.  Let $s' := \abstraction{a}{s a}$.  Then clearly $s
+\arreta s'$ at the top, and since the reduction $s \arrnormalise^* t$
+does not use any $\arreta$-steps at the top (since $t$ is not an
+abstraction), Lemma~\ref{lem_left_monotonicity} provides $s a
+\arrnormalise^* t a$.
+
+For the second statement, consider the rules that might be applied.
+If $t = \circ n m$ for $n,m \in \mathbb{N}$ and the same rule can be
+applied on $s$, then $s = t$ and there is nothing to prove.
+If $t = \circ (\abstraction{a}{t_1}) (\abstraction{a}{t_2}) t_3 \ldots
+t_n$ and $u = (\abstraction{a}{\circ t_1 t_2}) t_3 \ldots t_n$, then
+because the same rule is already applicable on $s$ and $s$ has the
+same type, we can write $s = \circ (\abstraction{a}{s_1})
+(\abstraction{a}{s_2}) s_3 \ldots s_n$; by
+Lemma~\ref{lem_preserve_circ} each $s_i \arrnormalise^* t_i$.  But then
+$s \arrnormalise (\abstraction{a}{\circ s_1 s_2}) s_3 \ldots s_n$
+indeed reduces to $u$.
+\end{proof}
+
+\begin{lemma}\label{lem_substitute_sn}
+Let $\gamma$ be a substitution. If $s\gamma \in \SN$, then $s \in \SN$.
+\end{lemma}
+
+\begin{proof}
+By induction on $s\gamma$, oriented with the union of $\arrnormalise$
+and the subterm relation.
+
+If $s$ is a natural number or function symbol, then $s = s\gamma \in
+\SN$.
+
+If $s$ is a variable, then $s \in \SN$ by Lemma~\ref{lem_var_sn}.
+
+If $s = \abstraction{a}{s'}$, then by Lemma~\ref{lem_reduce_abs}, $s
+\in \SN$ if $s'$ is; this follows by the induction hypothesis because
+(using $\alpha$-conversion if necessary) $s\gamma = \abstraction{a}{
+s'\gamma}$.
+
+If $s = t s_1 \ldots s_n$ with $n > 0$ and $t$ not an application,
+then note that by the induction hypothesis we can safely assume that
+both $t$ and all $s_i$ are in $\SN$.  For $s$ to not be in $\SN$,
+eventually a reduction at the head or top must be taken.  There are
+three possibilities:
+\begin{itemize}
+\item The first step at the head is $\eta$-expansion:
+  $s \arrnormalise^* t' s_1' \ldots s_n' \arreta \abstraction{a}{t'
+  s_1' \ldots s_n' a} =: u \arrnormalise \dots$.
+  By Lemma~\ref{lem:top_reduction},also $s \arreta \abstraction{a}{
+  t s_1 \ldots s_n a} =: s' \arrnormalise^* u \arrnormalise^* \dots$.
+  Since $n > 0$, $s\gamma$ is not an abstraction, so also
+  $s\gamma \arreta \abstraction{a}{(t\gamma) (s_1\gamma) (s_n\gamma) a}
+  = s'\gamma$.  By the induction hypothesis, $s'$ must be in $\SN$;
+  contradiction.
+\item The first step at the head is $\beta$-reduction:
+\item ================
+\end{itemize}
 \end{proof}
 
 \begin{lemma}\label{lem_nat_reducible}
@@ -665,6 +767,8 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
     $t x$~is strongly normalising. But
     $t x \leadsto t_1 x \leadsto t_2 x \leadsto t_3 x \leadsto
     \ldots$. Contradiction.
+
+    TODO -- same problem
   \item Let $t \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$ and
     $t \leadsto t'$. Let $u \in
     \val{\tau_1}{\omega,\xi}{\Gamma}$. Then
@@ -700,43 +804,30 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
     $t u \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Since
     $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$ was arbitrary, we have
     shown $t \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
-  \item Assume
-    $t_1,t_2 \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$. We have
-    already shown that this implies $t_1,t_2 \in \SN$. Hence also
-    $\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2 \in \SN$ by
-    Lemma~\ref{lem_circ_sn}. We show
-    $\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2 \in
-    \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$ by induction
-    on~$\nu(\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2)$. We have already
-    proven that, because $\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2$ is
-    neutral, it suffices to show that if
-    $\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2 \leadsto t$ then
-    $t \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$. If
-    $t = \circ_{\omega(\tau_1\to\tau_2)} t_1' t_2$ or
-    $t = \circ_{\omega(\tau_1\to\tau_2)} t_1 t_2'$ with
-    $t_i \leadsto t_i'$ then this follows from the inductive
-    hypothesis. So assume $t_i = \lambda x : \omega(\tau_1) . t_i'$
-    and
-    $t = \lambda x : \omega(\tau_1) . \circ_{\omega(\tau_2)} t_1'
-    t_2'$. Note that $t \in \SN$. Let
-    $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$. By nested induction on
-    $\nu(u) + \nu(t)$ we show that if $t u \leadsto w$ then
-    $w \in \val{\tau_2}{\omega,\xi}{\Gamma}$. This suffices,
-    because~$t u$ is neutral. The only case which doesn't follow
-    directly from the inductive hypothesis is when
-    $w = \circ_{\omega(\tau_2)} t_1'[\subst{x}{u}]
-    t_2'[\subst{x}{u}]$. Because
-    $\lambda x : \omega(\tau_1) . t_i' \in
-    \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$ and
-    $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$, we have
-    $(\lambda x : \sigma(\tau_1) . t_i') u \in
-    \val{\tau_2}{\omega,\xi}{\Gamma}$. Hence,
-    $t_i'[\subst{x}{u}] \in \val{\tau_2}{\omega,\xi}{\Gamma}$
-    because~$\val{\tau_2}{\omega,\xi}{\Gamma}$ is a candidate by the
-    inductive hypothesis. Thus also
-    $w = \circ_{\omega(\tau_2)} t_1'[\subst{x}{u}] t_2'[\subst{x}{u}]
-    \in \val{\tau_2}{\omega,\xi}{\Gamma}$.
+  \item Assume $t_1,t_2 \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
+    We have already shown that this implies $t_1,t_2 \in \SN$.
+    Since $\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2$ is neutral, it is
+    in $\val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$ if all its reducts
+    are, which we prove by induction on $t_1,t_2$.  For any reduct of
+    the form $\circ_{\omega(\tau_1\to\tau_2)} t_1' t_2$ or
+    $\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2'$ we complete by the
+    inductive hypothesis.  The only alternative is when $t_1 =
+    \abs{x}{t_1'},\ t_2 = \abs{x}{t_2'}$ and
+    $\circ_{\omega(\tau_1\to\tau_2)} t_1 t_2 \arrnormalise
+    \abs{x}{\circ_{\omega(\tau_2)} t_1' t_2'} =: s$,
+    By Lemma~\ref{lem_abstraction_computability} that is the case if
+    $(\circ_{\omega(\tau_2)} t_1' t_2')[x:=t] \in
+    \val{\tau_2}{\omega,\xi}{\Gamma}$ for all $t \in \val{\tau_1}{
+    \omega,\xi}{\Gamma}$.
+    However, since $t_1 = \abs{x}{t_1'}$ and $t_2 = \abs{x}{t_2'}$ are
+    in $\val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$, the same lemma
+    provides that $t_1'[x:=t]$ and $t_2'[x:=t]$ are in
+    $\val{\tau_2}{\omega,\xi}{\Gamma}$; as this set is a candidate by
+    the inductive hypothesis, we indeed obtain $(\circ_{\omega(\tau_2)}
+    t_1' t_2')[x:=t] \in \val{\tau_2}{\omega,\xi}{\Gamma}$.
   \end{enumerate}
+
+    ===================
 
   Assume $\sigma = \forall\alpha[\tau]$. We check the conditions in
   Definition~\ref{def_candidate}.
