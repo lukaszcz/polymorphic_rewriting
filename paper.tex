@@ -64,7 +64,8 @@
 \newcommand{\val}[3]{\ensuremath{\llbracket#1\rrbracket_{#2}^{#3}}}
 \newcommand{\proves}{\vdash}
 
-\newcommand{\CK}[1]{\textcolor{blue}{#1}}
+\newcommand{\CK}[1]{\textcolor{blue}{CK: #1}}
+\newcommand{\LC}[1]{\textcolor{purple}{LC: #1}}
 
 \begin{document}
 
@@ -979,8 +980,8 @@ $\succ$ is well-founded.
 \end{lemma}
 
 \begin{proof}
-  By induction on the type~$\tau$ one shows that there does not exist
-  an infinite sequence
+  By induction on the size of the type~$\tau$ one shows that there does
+  not exist an infinite sequence
   $t_1 \succ_\tau t_2 \succ_\tau t_3 \succ_\tau \ldots$ For instance,
   if
   $t_1 \succ_{\forall\alpha[\tau]} t_2 \succ_{\forall\alpha[\tau]} t_3
@@ -1041,16 +1042,16 @@ argument work.  However, it would be great if we could also for
 instance obtain that always $\app{\app{\oplus}{s}}{t} \succeq s$ and
 that $\app{\app{\oplus}{s}}{(\app{\lift}{1})} \succ s$.
 
-LC: I think these also hold by coinduction because they hold for
+\LC{I think these also hold by coinduction because they hold for
 type~$\nat$. But one needs to generalize the coinductive hypothesis to
 $\app{\app{\oplus}{s}}{t} \cdot t_1 \cdot \ldots \cdot t_n
 \succeq_\sigma s \cdot t_1 \cdot \ldots \cdot t_n$ (and with some
-additional type arguments also).
+additional type arguments also).}
 
 \section{Systems of interest and their properties}
 
 The systems of interest are sets of terms with a rewriting relation on
-them.  Interestingly, $\Iterms$ can be seen of an instance of this general
+them.  Interestingly, $\Iterms$ can be seen as an instance of this general
 scheme.
 
 \subsection{Systems of interest}
@@ -1106,22 +1107,22 @@ of application should be modelled simply using a set of symbols $\{
 @_{\sigma,\tau}: (2,(\sigma \arrtype \tau) \arrtype \sigma \arrtype \tau)
 \mid \sigma,\tau \in \Types \} \subseteq \Sigma$.
 
-TODO: are there interesting systems where the type application $*$ is
+\CK{are there interesting systems where the type application $*$ is
 not the only way for types to appear in terms?  If so, we might as well
-not have the exceptional case, easier to go general straight away.
+not have the exceptional case, easier to go general straight away.}
 
-LC: yes, e.g., when you have explicit existential quantification over
-types, like in urzy\_emb.
+\LC{yes, e.g., when you have explicit existential quantification over
+types, like in urzy\_emb.}
 
 I'm thinking that maybe here it will be easier to just go with
 system $F_\omega$ from the beginning instead of system~$F$, because
 there you have in-built type constructors.
 
-TODO: describe what rules look like.  Are the cases where substitution
+\CK{describe what rules look like.  Are the cases where substitution
 / type substitution is used limited to a few special cases (in which
-case we can just add those cases as special) or is it very typical?
+case we can just add those cases as special) or is it very typical?}
 
-LC: (type) substitution occurs with more rules, in e.g. urzy\_emb
+\LC{(type) substitution occurs with more rules, in e.g. urzy\_emb}
 
 Should we describe rules using variables which are instantiated, or
 simply assume that typical systems have infinitely many rules (e.g.,
