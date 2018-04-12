@@ -361,7 +361,7 @@ smallest relation for which the following properties are satisfied:
   $\app{(\abs{x:\sigma}{s})}{t} \leadsto s[\subst{x}{t}]$
 \item\label{leadsto:beta:tabs}
   $\tapp{(\tabs{\alpha}{s})}{\sigma} \leadsto
-  \etalong{s[\subst{\alpha}{\sigma}]}$.
+  s[\subst{\alpha}{\sigma}]$.
 \end{enumerate}
 We say that $s$ is a \emph{redex} if $s$ reduces by one of the rules
 (\ref{leadsto:plus:base})--(\ref{leadsto:beta:tabs}), and that $s$
@@ -433,7 +433,9 @@ on $s$ using $\leadsto$.
   If $t_1,t_2 \in \SN$ then $\circ_\nat t_1 t_2 \in \SN$ for
   $\circ \in \{\oplus,\otimes\}$.
   \CK{Changed this because I don't think it'll work out to do this for
-  higher types without assuming a kind of computability of $t_1,t_2$.}
+  higher types without assuming a kind of computability of $t_1,t_2$ --
+  not with the changed definition of the $\circ$ rules (it could be
+  that $t_1$ is terminating but $t_1 x$ is not).}
 \end{lemma}
 
 \begin{proof}
@@ -455,8 +457,6 @@ $t$ such that $s \leadsto^* t$.
 TODO
 \CK{And honestly not sure whether we even need this.}
 \end{proof}
-
-====================
 
 \subsubsection{Computability}
 In the rest of this section we adapt the Tait-Girard computability
