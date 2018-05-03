@@ -436,16 +436,18 @@ on $s$ using $\leadsto$.
   \CK{Changed this because I don't think it'll work out to do this for
   higher types without assuming a kind of computability of $t_1,t_2$ --
   not with the changed definition of the $\circ$ rules (it could be
-  that $t_1$ is terminating but $t_1 x$ is not).}
+  that $t_1$ is terminating but $t_1 x$ is not).} \LC{Right, with the
+  previous rules this was a relatively simple induction on~$\tau$, now
+  it won't work.}
 \end{lemma}
 
 \begin{proof}
   By induction on $t_1,t_2$ oriented with $\leadsto$.
   $\circ_\nat t_1 t_2 \in \SN$ if $s \in \SN$ for all $s$ such that
-  $\circ_\nat t_1 t_2 \in \SN \leadsto s$.
-  If $s = \circ_\nat t_1' t_2$ or $s = \circ_\nat t_1 t_2'$ then we
-  complete by the induction hypothesis.  Otherwise $s \in \mathbb{N}$ is
-  obviously in $\SN$.
+  $\circ_\nat t_1 t_2 \in \SN \leadsto s$.  If
+  $s = \circ_\nat t_1' t_2$ or $s = \circ_\nat t_1 t_2'$ then we
+  complete by the induction hypothesis. Otherwise $s \in \mathbb{N}$
+  is obviously in $\SN$.
 \end{proof}
 
 \begin{lemma}
@@ -458,6 +460,9 @@ $t$ such that $s \leadsto^* t$.
 TODO
 \CK{And honestly not sure whether we even need this.}
 \end{proof}
+
+\LC{What do we need these $\eta$-expansions for? I think this just
+  works now with the modified $\leadsto$-rules for $\oplus,\otimes$.}
 
 \subsubsection{Computability}
 In the rest of this section we adapt the Tait-Girard computability
@@ -487,9 +492,11 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
   \item if $t$ is neutral and for every~$t'$ with $t \leadsto t'$ we
     have $t' \in X$, then $t \in X$;
   \item if $t_1,t_2 \in X$ then $\circ_\tau t_1 t_2 \in X$ for $\circ
-    \in \{\oplus,\otimes\}$.
+    \in \{\oplus,\otimes\}$;
+  \item conditions analogous to the previous one for $\flatten$ and
+    $\lift$ \ldots
   \end{enumerate}
-  Note that the last item above implies:
+  Note that item~3 above implies:
   \begin{itemize}
   \item if $t$ is neutral and in normal form then $t \in X$.
   \end{itemize}
@@ -560,17 +567,27 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
   \end{enumerate}
 \end{proof}
 
+\LC{The following lemma is essentially just the two lemmas you
+  commented out, plus using property 2 of candidates for the other
+  direction. I corrected the statement (the statements of the
+  commented-out lemmas were also incomplete -- I forgot about the
+  typing).}
 \begin{lemma}\label{lem_abstraction_computable}
   Suppose it is given that $\val{\sigma}{\omega',\xi'}{\Gamma}$ and
   $\val{\tau}{\omega,\xi}{\Gamma}$ are candidates for all suitable
   $\omega',\xi'$.  Then
   \begin{itemize}
-  \item $\abs{x:\tau}{s} \in \val{\tau \arrtype \sigma}{\omega,\xi}{
-    \Gamma}$ if and only if
-    $s[x:=t] \in \val{\sigma}{\omega,\xi}{\Gamma}$ for all $t \in \val{
-    \tau}{\omega,\xi}{\Gamma}$;
-  \item $\tabs{\alpha}{s} \in \val{\quant{\alpha}{\sigma}}{\omega,\xi}{
-    \Gamma}$ if and only if for all $X \in \Cb_\tau^\Gamma$:
+  \item
+    $\abs{x:\omega(\tau)}{s} \in \val{\tau \arrtype
+      \sigma}{\omega,\xi}{ \Gamma}$ if and only if
+    $\Gamma \proves \abs{x:\omega(\tau)}{s} : \omega(\tau \arrtype
+    \sigma)$ and $s[x:=t] \in \val{\sigma}{\omega,\xi}{\Gamma}$ for
+    all $t \in \val{ \tau}{\omega,\xi}{\Gamma}$;
+  \item
+    $\tabs{\alpha}{s} \in \val{\quant{\alpha}{\sigma}}{\omega,\xi}{
+      \Gamma}$ if and only if
+    $\Gamma \proves \tabs{\alpha}{s} : \omega(\quant{\alpha}{\sigma})$
+    and for every type~$\tau$ and all $X \in \Cb_\tau^\Gamma$ we have
     $s[\alpha:=\tau] \in
     \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$.
   \end{itemize}
@@ -593,7 +610,7 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
   \begin{itemize}
   \item $t \in \SN$ because $\val{\tau}{\omega,\xi}{\Gamma}$ is a candidate;
   \item $s \in \SN$ because every infinite reduction in $s$ induces an
-    infinite reduction in $t$ ($\leadsto$ is stable);
+    infinite reduction in $s[x:=t]$ ($\leadsto$ is stable);
   \item if $s \leadsto^* s'$ and $t \leadsto^* t'$, then:
     \begin{itemize}
     \item $s[x:=t] \leadsto^* s'[x:=t']$ by monotonicity and stability of
@@ -708,7 +725,7 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
     terminating terms of type~$\tau'$ in context~$\Gamma$).
     \CK{It is not guaranteed that this will work! For that we really
     do need that $\circ s t$ is SN if $s$ and $t$ are.  However, can't
-    we just take $\tau' := \nat$?}
+    we just take $\tau' := \nat$?} \LC{I think $\tau' := \nat$ indeed works here.}
     Then
     $t \tau' \in
     \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{S}]}{\Gamma}$. By
@@ -809,80 +826,6 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
   TODO
 \end{proof}
 
-%\begin{lemma}
-%  If for all $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$ we have
-%  $t[\subst{x}{u}] \in \val{\tau_2}{\omega,\xi}{\Gamma}$, then
-%  $\lambda x : \omega(\tau_1) . t \in
-%  \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
-%\end{lemma}
-%
-%\begin{proof}
-%  By Lemma~\ref{lem_val_computable} the
-%  sets~$\val{\tau_i}{\omega,\xi}{\Gamma}$ are candidates, so
-%  $\val{\tau_i}{\omega,\xi}{\Gamma} \subseteq \SN$. Let
-%  $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$. We show
-%  $(\lambda x : \omega(\tau_1) . t) u \in
-%  \val{\tau_2}{\omega,\xi}{\Gamma}$ by induction on $\nu(t) +
-%  \nu(u)$. Suppose $(\lambda x : \omega(\tau_1) . t) u \leadsto
-%  w$. There are three cases.
-%  \begin{itemize}
-%  \item $w = t[\subst{x}{u}]$. Then
-%    $w \in \val{\tau_2}{\omega,\xi}{\Gamma}$ by assumption.
-%  \item $w = (\lambda x : \omega(\tau_1) . t') u$ with
-%    $t \leadsto t'$. Because $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a
-%    candidate, still
-%    $t'[\subst{x}{u}] \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Also
-%    $\nu(t') < \nu(t)$, so $w \in \val{\tau_2}{\omega,\xi}{\Gamma}$
-%    follows from the inductive hypothesis.
-%  \item $w = (\lambda x : \omega(\tau_1) . t) u'$ with
-%    $u \leadsto u'$. Because $\val{\tau_i}{\omega,\xi}{\Gamma}$ are
-%    candidates, still $u' \in \val{\tau_1}{\omega,\xi}{\Gamma}$ and
-%    $t[\subst{x}{u'}] \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Also
-%    $\nu(u') < \nu(u)$, so $w \in \val{\tau_2}{\omega,\xi}{\Gamma}$
-%    follows from the inductive hypothesis.
-%  \end{itemize}
-%  Because $(\lambda x : \omega(\tau_1) . t) u$ is neutral and
-%  $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a candidate, this shows
-%  $(\lambda x : \omega(\tau_1) . t) u \in
-%  \val{\tau_2}{\omega,\xi}{\Gamma}$.
-%\end{proof}
-%
-%\begin{lemma}
-%  If for every type~$\tau$ and every $X \in \Cb_\tau^\Gamma$ we have
-%  $t \in
-%  \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$,
-%  then
-%  $\Lambda \alpha . t \in
-%  \val{\forall\alpha[\sigma]}{\omega,\xi}{\Gamma}$.
-%\end{lemma}
-%
-%\begin{proof}
-%  Let~$\tau$ be a type and $X \in \Cb_\tau^\Gamma$. By
-%  Lemma~\ref{lem_val_computable} the
-%  set~$\val{\forall\alpha[\sigma]}{\omega,\xi}{\Gamma}$ is a
-%  candidate, so $t \in \SN$. By induction on~$\nu(t)$ we show
-%  $(\Lambda \alpha . t) \alpha \in
-%  \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$.
-%  Because~$\val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$
-%  is a candidate by Lemma~\ref{lem_val_computable}, it suffices to
-%  show that for every~$w$ with $(\Lambda \alpha . t) \leadsto w$ we
-%  have
-%  $w \in
-%  \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$. There
-%  are two cases.
-%  \begin{itemize}
-%  \item $w = (\Lambda \alpha . t') \alpha$. Then $\nu(t') < \nu(t)$
-%    and
-%    $w \in
-%    \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$
-%    follows from the inductive hypothesis.
-%  \item $w = t$. Then
-%    $w \in
-%    \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$
-%    by assumption.
-%  \end{itemize}
-%\end{proof}
-
 \begin{lemma}
   If $t \in \val{\forall\alpha[\sigma]}{\omega,\xi}{\Gamma}$ then
   $t \tau \in \val{\sigma[\subst{\alpha}{\tau}]}{\omega,\xi}{\Gamma}$
@@ -945,7 +888,7 @@ numbers.
   This is~NOT~TRUE. Consider
   $\oplus_{\nat\to\nat} \lift_\nat \lift_\nat n$. Need to add more
   rewrite rules?
-  \CK{Better now?}
+  \CK{Better now?} \LC{Yes, I think it works now.}
 \end{proof}
 
 \subsection{Defining $\succ$ and $\succeq$}
