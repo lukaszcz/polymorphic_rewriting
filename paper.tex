@@ -28,10 +28,12 @@
 \newcommand{\Types}{\mathcal{T}}
 \newcommand{\Terms}{\mathcal{T}\!\mathit{erms}}
 \newcommand{\TypeConstructors}{\mathcal{C}}
+\newcommand{\TypeQuantifiers}{\mathcal{Q}}
 \newcommand{\Typemap}{\mathcal{T\!M}}
 \newcommand{\Termmap}{\mathcal{J}}
 
 \newcommand{\quant}[2]{\forall #1[#2]}
+\newcommand{\qquant}[3]{#1 #2[#3]}
 \newcommand{\interpret}[1]{\llparenthesis #1 \rrparenthesis}
 \newcommand{\arr}[1]{\to_{#1}}
 \newcommand{\arrtype}{\Rightarrow}
@@ -1005,23 +1007,24 @@ scheme.
 
 \subsection{Systems of interest}
 
-Types are built from a set of type constructors, using $\arrtype$ and
-$\forall$.
+Types are built from two sets of type constructors (first-order and
+second-order respectively) which must include the type constructors
+$\arrtype$ and $\forall$ respectively.
 
 \begin{definition}
 We assume given a fixed set $\TypeConstructors$ of \emph{type
-constructors}, each paired with an integer \emph{arity} $\geq 0$, as
-well as the infinite set $\Typevars$ of type variables.
-$\TypeConstructors$ must satisfy the property that if it contains a
-symbol $\mathtt{f}_{\sigma_1,\dots,\sigma_n}$, then it also contains
-$\mathtt{f}_{\sigma_1\gamma,\dots,\sigma_n\gamma}$ for every type
-substitution $\gamma$.  The set $\Types$ of types is given by:
+constructors}, each paired with an integer \emph{arity}, and a set
+$\TypeQuantifiers$ of \emph{type quantifiers}, each quantifier also
+paired with an integer arity; $\TypeConstructors$ must contain
+$\arrtype : 2$ and $\TypeQuantifiers$ must include $\forall : 1$.
+The set $\Types$ of types is given by:
 \begin{itemize}
 \item $\alpha \in \Types$ for all $\alpha \in \Typevars$
-\item $\con(\sigma_1,\dots,\sigma_n) \in \Types$ if $(\con,n) \in
+\item $\con(\sigma_1,\dots,\sigma_n) \in \Types$ if $\con : n \in
   \TypeConstructors$ and $\sigma_1,\dots,\sigma_n \in \Types$
-\item $\sigma \arrtype \tau \in \Types$ if $\sigma,\tau \in \Types$
-\item $\quant{\alpha}{\sigma} \in \Types$ if $\alpha \in \Typevars$ and
+  (but we denote $\arrtype$ infix)
+\item $\qquant{?}{\alpha_1 \dots \alpha_n}{\sigma} \in \Types$ if
+  $? : n \in \TypeQuantifiers$, each $\alpha_i \in \Typevars$ and
   $\sigma \in \Types$
 \end{itemize}
 We let $\FTV(\sigma)$ be defined in the obvious way (much like
@@ -1032,18 +1035,41 @@ Terms are built from a set of (possibly type-indexed) function symbols,
 using abstraction and application as for interpretation terms.
 
 \begin{definition}
+%We assume given a fixed set $\Sigma_{\mathsf{poly}}$ of \emph{function
+%symbols}, each indexed with $0$ or more types variables and paired with
+%an arity $k$ as well as $k$ input types and one output type, denoted
+%$\mathtt{f}_{\alpha_1,\dots,\alpha_n} : [\sigma_1 \times \dots \times
+%\sigma_k] \arrtype \tau$; we require that $\FTV(\sigma_1) \cup \dots
+%\cup \FTV(\sigma_k) \cup \FTV(\tau) \subseteq \{\alpha_1,\dots,
+%\alpha_n\}$.
+%We let $\Sigma$ denote the set of all \emph{instanced} symbols, so
+%$\{ \mathtt{f}_{\gamma(\alpha_1),\dots,\gamma(\alpha_n)} : [\sigma_1
+%\gamma \times \dots \times \sigma_k\gamma] \arrtype \tau\gamma \mid
+%\mathtt{f}_{\alpha_1,\dots,\alpha_n} : \sigma_1 \times \dots \times
+%\sigma_k] \arrtype \tau \in \Sigma_{\mathsf{poly}} \wedge \gamma$ a
+%type substitution$\}$.
 We assume given a fixed set $\Sigma$ of \emph{function symbols}, each
-paired with an arity $k$ and a type $\sigma_1 \arrtype \dots \arrtype
-\sigma_k \arrtype \tau$, as well as the infinite set $\Vars$ of variables.
+indexed with $0$ or more types and paired with an arity $k$ as well as
+$k$ input types and one output types, denoted $\mathtt{f}_{\rho_1,
+\dots,\rho_n} : [\sigma_1 \times \dots \times \sigma_k] \arrtype \tau$;
+we require that for all symbols $\mathtt{f}_{\rho_1,\dots,\rho_n} :
+[\rho_1 \times \dots \times \rho_k] \arrtype \sigma \in \Sigma$:
+\begin{itemize}
+\item there is no other type declaration $D$ such that also
+  $\mathtt{f}_{\rho_1,\dots,\rho_n} : D \in \Sigma$;
+\item for all type substitutions $\gamma$, also $\mathtt{f}_{\rho_1
+  \gamma,\dots,\rho_n\gamma} : [\sigma_1\gamma \times \dots \times
+  \sigma_k\gamma] \arrtype \tau\gamma \in \Sigma$.
+\end{itemize}
 The set $\Terms$ of terms consists of those expressions $s$ such that
 $\Gamma \vdash s : \sigma$ can be derived for some type $\sigma$ and
 environment $\Gamma$ using the following clauses:
 \begin{itemize}
 \item $\Gamma \vdash x : \sigma$ for every $(x : \sigma) \in \Gamma$.
-\item $\Gamma \vdash \mathtt{f}(s_1,\dots,s_k) : \tau$ if
-  $(\mathtt{f} : (k,\sigma_1 \arrtype \dots \arrtype \sigma_k \arrtype
-  \tau))$ in $\Sigma$ and $\Gamma \vdash s_i : \sigma_i$ for $1 \leq
-  i \leq k$
+\item $\Gamma \vdash \mathtt{f}_{\vec{\rho}}(s_1,\dots,s_k) : \tau$ if
+  $(\mathtt{f}_{\vec{\rho}} : [\sigma_1 \times \dots \times \sigma_k]
+  \arrtype \tau) \in \Sigma$ and $\Gamma \vdash s_i : \sigma_i$ for $1
+  \leq i \leq k$
 \item $\Gamma \vdash \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
   \in \Vars$ and $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$.
 \item $\Gamma \vdash \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
@@ -1057,35 +1083,59 @@ environment $\Gamma$ using the following clauses:
 %symbol as $[\sigma_1 \times \dots \times \sigma_k] \arrtype \tau$.
 \end{definition}
 
-Note that there is no explicit application; systems which include a form
-of application can be modelled simply using a set of symbols $\{
-@_{\sigma,\tau}: (2,(\sigma \arrtype \tau) \arrtype \sigma \arrtype \tau)
-\mid \sigma,\tau \in \Types \} \subseteq \Sigma$.  Similarly, there is
-no type application; an application $\tapp{s}{\tau}$ with $s : \sigma$
-could be modelled through a symbol $\mathtt{A}_{\sigma,\tau}(s)$.
+Note that there is no explicit application; application can be modelled
+by including a symbol $@_{\sigma,\tau} : [\sigma \arrtype \tau \times
+\sigma] \arrtype \tau$ in $\Sigma_{\mathsf{poly}}$.
+Similarly, type application is modelled through a symbol
+$\mathtt{A}_{\quant{\alpha}{\sigma},\tau} : [\quant{\alpha}{\sigma}]
+\arrtype \sigma[\alpha:=\tau]$.
 
 % I'm thinking that maybe here it will be easier to just go with
 %system $F_\omega$ from the beginning instead of system~$F$, because
 %there you have in-built type constructors.
 
-\CK{Next: descritve what rules look like.  Q:
-Should we describe rules using variables which are instantiated, or
-simply assume that typical systems have infinitely many rules (e.g.,
-all instances of $\beta$-reductions are a separate rule)? We're
-already using infinite signatures -- should we head straight for
-polymorphism?}
+The rules are simply an infinite set of term pairs, whose monotonic
+closure generates the rewrite relation.
 
-\subsubsection{Some example systems.}
+\begin{definition}
+We assume given a set $\Rules$ of triples $(\Gamma,\ell,r)$ of a
+variable environment and two terms, such that:
+\begin{itemize}
+\item $\FV(r) \subseteq \FV(\ell) \subseteq \mathit{keys}(\Gamma)$;
+\item $\ell$ and $r$ have the same type under $\Gamma$;
+\item $\FTV(\ell) = \FTV(r) = \emptyset$, and all type variables in
+  the range of $\Gamma$ are bound;
+\item $\Rules$ is stable: if $(\Gamma,\ell,r) \in \Rules$ and $\gamma$
+  is a substitution, then $(\Delta,\ell\gamma,r\gamma) \in \Rules$ for
+  appropriate $\Delta$. (\CK{Appropriate depends on the typing of
+  $\gamma$ of course.})
+\end{itemize}
+The reduction relation $\arr{\Rules}$ is the monotonic closure of
+$\Rules$.
+\end{definition}
 
-For the system of urzy\_emb, we have the following type constructors:
+\subsubsection{An example system.}
+
+For the system of urzy\_emb, we have the following type constructors
+and quantifiers:
 \[
-\bot : 0,\quad
-\mathtt{prop} : 0,\quad
-\mathtt{or} : 2,\quad
-\mathtt{and} : 2,\quad
-\mathtt{forall} : 1,\quad
-\mathtt{exists} : 1
+\begin{array}{c}
+\TypeConstructors = \{\quad
+  \bot : 0,\quad
+  \mathtt{or} : 2,\quad
+  \mathtt{and} : 2,\quad
+  \Rightarrow : 2\quad
+  \}\quad \cup\quad
+  \{\quad \mathtt{prop}_i \mid i \in \mathbb{N}\quad \} \\
+\TypeQuantifiers = \{\quad
+  \mathtt{forall} : 1,\quad
+  \mathtt{exists} : 1\quad
+  \} \\
+\end{array}
 \]
+
+=========================
+
 We have the following function symbols:
 \[
 \begin{array}{rcl}
@@ -1164,10 +1214,30 @@ And finally the rules:
   \mathtt{case}_{\sigma,\tau,\rho[\alpha:=\pi]}(u,
   \abs{x}{\mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(s)},
   \abs{y}{\mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(t)}) \\
+\mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,\tau,\mathtt{or}(
+  \rho,\pi)}(u,\abs{x}{s},\abs{y}{t}),\abs{z}{v},\abs{a}{w}) & \to &
+  \mathtt{case}_{\sigma,\tau,\xi}(u,
+    \abs{x}{\mathtt{case}_{\rho,\pi,\xi}(s,\abs{z}{v},\abs{a}{w})},
+    \abs{y}{\mathtt{case}_{\rho,\pi,\xi}(t,\abs{z}{v},\abs{a}{w})}) \\
 \end{array}
 \]
 
-TODO: maybe describe system F too?
+%\subsection*{General proposal}
+%
+%The following is a generalised alternative, that I think could also work.
+%However, if we don't actually get any additional systems out of it, then
+%that is probably not worth the effort of exploring.
+%
+%\begin{definition}
+%We assume given the following sets of type constructors:
+%\begin{itemize}
+%\item $\TypeConstructors_{\mathsf{func}}$: a set of \emph{function
+%  type constructors} (possibly indexed with a number of types) along
+%  with an integer arity;
+%\item $\TypeConstructors_{\mathsf{abs}}$: a set of \emph{abstraction
+%  type constructors}
+%\end{itemize}
+%\end{definition}
 
 \subsection{Interpreting interesting terms}
 
