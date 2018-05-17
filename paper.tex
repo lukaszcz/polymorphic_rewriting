@@ -144,7 +144,7 @@ Here's what we need to do:
 
 We use \emph{rule removal}:
 
-\begin{theorem}
+\begin{theorem}\label{thm:ruleremove}
 Let $\Rules = \Rules_1 \cup \Rules_2$, and suppose that $\arr{\Rules_1}\:
 \subseteq\:\succ$ and $\arr{\Rules_2}\:\subseteq\:\succeq$ for a
 well-founded ordering $\succ$ and a compatible quasi-ordering $\succeq$.
@@ -1110,8 +1110,11 @@ variable environment and two terms, such that:
   appropriate $\Delta$. (\CK{Appropriate depends on the typing of
   $\gamma$ of course.})
 \end{itemize}
-The reduction relation $\arr{\Rules}$ is the monotonic closure of
-$\Rules$.
+Fixing a variable environment $\Gamma$, the reduction relation
+$\arr{\Rules}$ is the smallest monotonic relation that contains all
+pairs $(s,t)$ that are well-typed under $\Gamma$, such that some
+restriction $\Gamma'$ of $\Gamma$ exists with $(\Gamma',s,t) \in
+\Rules$.
 \end{definition}
 
 \subsubsection{An example system.}
@@ -1128,54 +1131,46 @@ and quantifiers:
   \}\quad \cup\quad
   \{\quad \mathtt{prop}_i \mid i \in \mathbb{N}\quad \} \\
 \TypeQuantifiers = \{\quad
-  \mathtt{forall} : 1,\quad
-  \mathtt{exists} : 1\quad
+  \forall : 1,\quad
+  \exists : 1\quad
   \} \\
 \end{array}
 \]
 
-=========================
-
 We have the following function symbols:
 \[
-\begin{array}{rcl}
-\epsilon_\tau & : & (1,\ \bot \arrtype \tau) \\
-@_{\sigma,\tau} & : & (2,\ (\sigma \arrtype \tau) \arrtype \sigma
-  \arrtype \tau) \\
-\mathtt{in}^1_{\sigma,\tau} & : & (1,\ \sigma \arrtype
-  \mathtt{or}(\sigma,\tau)) \\
-\mathtt{in}^2_{\sigma,\tau} & : & (1,\ \tau \arrtype
-  \mathtt{or}(\sigma,\tau)) \\
-\mathtt{case}_{\sigma,\tau,\rho} & : & (3,\ \mathtt{or}(\sigma,\tau)
-  \arrtype (\sigma \arrtype \rho) \arrtype (\tau \arrtype \rho)
-  \arrtype \rho) \\
-\mathtt{pair}_{\sigma,\tau} & : & (2,\ \sigma \arrtype \tau \arrtype
+\begin{array}{rclrcl}
+\epsilon_\tau & : & [\bot] \arrtype \tau &
+\pi^1_{\sigma,\tau} & : & [\mathtt{and}(\sigma,\tau)] \arrtype \sigma \\
+@_{\sigma,\tau} & : & [\sigma \arrtype \tau \times \sigma] \arrtype \tau &
+\pi^2_{\sigma,\tau} & : & [\mathtt{and}(\sigma,\tau)] \arrtype \tau \\
+\mathtt{in}^1_{\sigma,\tau} & : & [\sigma] \arrtype
+  \mathtt{or}(\sigma,\tau) &
+\mathtt{pair}_{\sigma,\tau} & : & [\sigma \times \tau] \arrtype
   \mathtt{and}(\sigma,\tau)) \\
-\pi^1_{\sigma,\tau} & : & (1,\ \mathtt{and}(\sigma,\tau) \arrtype
-  \sigma) \\
-\pi^2_{\sigma,\tau} & : & (1,\ \mathtt{and}(\sigma,\tau) \arrtype \tau) \\
-\mathtt{all}_{\quant{\alpha}{\sigma}} & : & (1,\ 
-  \quant{\alpha}{\sigma} \arrtype \mathtt{forall}(\quant{\alpha}{
-  \sigma})) \\
+\mathtt{in}^2_{\sigma,\tau} & : & [\tau] \arrtype
+  \mathtt{or}(\sigma,\tau) &
 \mathtt{tapp}_{\quant{\alpha}{\sigma},\tau} & : &
-  (1,\ \mathtt{forall}_{\quant{\alpha}{\sigma}} \arrtype
-  \sigma[\alpha:=\tau]) \\
-\mathtt{ext}_{\quant{\alpha}{\sigma},\tau} & : &
-  (1,\ \sigma[\alpha:=\tau] \arrtype \mathtt{exists}(\quant{\alpha}{
-  \sigma})) \\
-\mathtt{let}_{\quant{\alpha}{\sigma},\rho} & : &
-  (2,\ \mathtt{exists}(\quant{\alpha}{\sigma}) \arrtype 
-  (\quant{\alpha}{\sigma \arrtype \rho}) \arrtype \rho) \\
-  & & \phantom{x}\hfill
+  [\quant{\alpha}{\sigma}] \arrtype \sigma[\alpha:=\tau] \\
+\mathtt{case}_{\sigma,\tau,\rho} & : & [\mathtt{or}(\sigma,\tau) \times
+  \sigma \arrtype \rho \times \tau \arrtype \rho] \arrtype \rho\ \ \ & 
+\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\rho} & : &
+  [\qquant{\exists}{\alpha}{\sigma} \times 
+  \quant{\alpha}{\sigma \arrtype \rho}] \arrtype \rho) \\
+\mathtt{ext}_{\qquant{\exists}{\alpha}{\sigma},\tau} & : &
+  [\sigma[\alpha:=\tau]] \arrtype \qquant{\exists}{\alpha}{\sigma}
+  & & & \phantom{x}\hfill
   \text{only for}\ \rho\ \text{with}\ \alpha \notin \FTV(\rho) \\
 \end{array}
 \]
-And finally the rules:
+And finally the rules.  These are represented as \emph{rule schemes},
+representing infinitely many rules at once.  Type substitution is also
+done on the indexes of function symbols (thus giving essentially
+different symbols, but with correct types).
 \[
 \begin{array}{rcl}
 @_{\sigma,\tau}(\abs{x}{s},t) & \to & s[x:=t] \\
-\mathtt{tapp}_{\quant{\alpha}{\sigma},\tau}(
-  \mathtt{all}_{\quant{\alpha}{\sigma}}(\tabs{\alpha}{s})) & \to &
+\mathtt{tapp}_{\quant{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \to &
   s[\alpha:=\tau] \\
 \pi^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \to & s \\
 \pi^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \to & s \\
@@ -1183,15 +1178,18 @@ And finally the rules:
   \abs{x}{s},\abs{y}{t}) & \to & s[x:=u] \\
 \mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^2_{\sigma,\tau}(u),
   \abs{x}{s},\abs{y}{t}) & \to & t[x:=u] \\
-\mathtt{let}_{\quant{\alpha}{\sigma},\rho}(
-  \mathtt{ext}_{\quant{\alpha}{\sigma},\tau}(s),\tabs{\alpha}{\abs{
-    x}{t}}) & \to & t[\alpha:=\tau][x:=s] \\
-\\
+\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\rho}(
+  \mathtt{ext}_{\qquant{\exists}{\alpha}{\sigma},\tau}(s),\tabs{\alpha}{
+    \abs{x}{t}}) & \to & t[\alpha:=\tau][x:=s] \\
+\end{array}
+\]
+\[
+\begin{array}{rcl}
 \epsilon_\tau(\epsilon_\bot(s)) & \to & \epsilon_\tau(s) \\
 @_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) & \to &
   \epsilon_\tau(s) \\
 \mathtt{tapp}_{\quant{\alpha}{\sigma},\tau}(
-  \epsilon_{\mathtt{forall}(\quant{\alpha}{\sigma})}(s)) & \to &
+  \epsilon_{\quant{\alpha}{\sigma}}(s)) & \to &
   \epsilon_{\sigma[\alpha:=\tau]}(s) \\
 \pi^1_{\sigma,\tau}(\epsilon_{\mathtt{and}(\sigma,\tau)}(s)) & \to &
   \epsilon_\sigma(s) \\
@@ -1199,28 +1197,93 @@ And finally the rules:
   \epsilon_\tau(s) \\
 \mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}(\sigma,\tau)}(
   u),\abs{x}{s},\abs{y}{t}) & \to & \epsilon_\rho(s) \\
-\mathtt{let}_{\quant{\alpha}{\sigma},\rho}(\epsilon_{\mathtt{exists}(
-  \quant{\alpha}{\sigma})}(s),\tabs{\alpha}{\abs{x}{t}}) & \to &
+\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\rho}(\epsilon_{\qquant{
+  \exists}{\alpha}{\sigma}}(s),\tabs{\alpha}{\abs{x}{t}}) & \to &
   \epsilon_\rho(s) \\
-\\
-\epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,\abs{x}{s},\abs{y}{t}))
-  & \to & \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x}{\epsilon_\rho(s)},
-  \abs{y}{\epsilon_\rho(t)}) \\
-@_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\rho \arrtype \pi}(u,
-  \abs{x}{s},\abs{y}{t}),v) & \to & \mathtt{case}_{\sigma,\tau,\pi}(u,
-  \abs{x}{@_{\rho,\pi}(s,v)},\abs{y}{@_{\rho,\pi}(t,v)}) \\
-\mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(\mathtt{case}_{\sigma,\tau,
-  \quant{\alpha}{\rho}}(u,\abs{x}{s},\abs{y}{t})) & \to &
-  \mathtt{case}_{\sigma,\tau,\rho[\alpha:=\pi]}(u,
-  \abs{x}{\mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(s)},
-  \abs{y}{\mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(t)}) \\
-\mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,\tau,\mathtt{or}(
-  \rho,\pi)}(u,\abs{x}{s},\abs{y}{t}),\abs{z}{v},\abs{a}{w}) & \to &
-  \mathtt{case}_{\sigma,\tau,\xi}(u,
-    \abs{x}{\mathtt{case}_{\rho,\pi,\xi}(s,\abs{z}{v},\abs{a}{w})},
-    \abs{y}{\mathtt{case}_{\rho,\pi,\xi}(t,\abs{z}{v},\abs{a}{w})}) \\
 \end{array}
 \]
+\begin{itemize}
+%\[
+%\begin{array}{rcl}
+\item $
+\epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,\abs{x}{s},\abs{y}{t}))
+  %& \to &
+  \to
+  \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x}{\epsilon_\rho(s)},
+  \abs{y}{\epsilon_\rho(t)}) $%\\
+\item $
+@_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\rho \arrtype \pi}(u,
+  \abs{x}{s},\abs{y}{t}),v) %& \to &
+  \to
+  \mathtt{case}_{\sigma,\tau,\pi}(u,
+  \abs{x}{@_{\rho,\pi}(s,v)},\abs{y}{@_{\rho,\pi}(t,v)}) $%\\
+\item $
+\mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(\mathtt{case}_{\sigma,\tau,
+  \quant{\alpha}{\rho}}(u,\abs{x}{s},\abs{y}{t})) %& \to &
+  \to
+  \mathtt{case}_{\sigma,\tau,\rho[\alpha:=\pi]}(u,
+  \abs{x}{\mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(s)},\\
+  \abs{y}{\mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(t)}) $%\\
+\item $
+\pi^1_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}(\rho,\pi)}(u,
+  \abs{x}{s},\abs{y}{t})) %& \to &
+  \to
+  \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x}{\pi^1_{\rho,\pi}(s)},
+  \abs{y}{\pi^1_{\rho,\pi}(t)}) $%\\
+\item $
+\pi^2_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}(\rho,\pi)}(u,
+  \abs{x}{s},\abs{y}{t})) %& \to &
+  \to
+  \mathtt{case}_{\sigma,\tau,\pi}(u,\abs{x}{\pi^2_{\rho,\pi}(s)},
+  \abs{y}{\pi^2_{\rho,\pi}(t)}) $%\\
+\item $
+\mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,\tau,\mathtt{or}(
+  \rho,\pi)}(u,\abs{x}{s},\abs{y}{t}),\abs{z}{v},\abs{a}{w}) %& \to &
+  \to\\
+  \mathtt{case}_{\sigma,\tau,\xi}(u,
+    \abs{x}{\mathtt{case}_{\rho,\pi,\xi}(s,\abs{z}{v},\abs{a}{w})},
+    \abs{y}{\mathtt{case}_{\rho,\pi,\xi}(t,\abs{z}{v},\abs{a}{w})}) $%\\
+\item $
+\mathtt{let}_{\qquant{\exists}{\alpha}{\rho}}(
+  \mathtt{case}_{\sigma,\tau,\qquant{\exists}{\alpha}{\rho}}(
+  u,\abs{x}{s},\abs{y}{t}),v) %& \to &
+  \to\\
+  \mathtt{case}_{\sigma,\tau,\rho}(u,
+  \abs{x}{\mathtt{let}_{\qquant{\exists}{\alpha}{\rho}}(s,v)},
+  \abs{y}{\mathtt{let}_{\qquant{\exists}{\alpha}{\rho}}(t,v)})
+  $%\\
+%\end{array}
+%\]
+\end{itemize}
+\begin{itemize}
+\item $\epsilon_\tau(\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},
+  \bot}(s,t)) \to
+  \mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\tau}(s,\epsilon_\tau(t))$
+\item $@_{\tau,\rho}(\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},
+  \tau \arrtype \rho}(s,t),u) \to
+  \mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\rho}(s,@_{\tau,\rho}(t,
+  u))$
+\item $\mathtt{tapp}_{\quant{\alpha}{\tau},\rho}(
+\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\quant{\alpha}{\tau}}(s,t))
+  \to
+  \mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\tau[\alpha:=\rho]}(s,
+  \mathtt{tapp}_{\quant{\alpha}{\tau},\rho}(t))$
+\item $\pi^1_{\tau,\rho}(\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},
+  \mathtt{and}(\tau,\rho)}(s,t)) \to
+  \mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\tau}(s,\pi^1_{\tau,
+  \rho}(t))$
+\item $\pi^2_{\tau,\rho}(\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},
+  \mathtt{and}(\tau,\rho)}(s,t)) \to
+  \mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\rho}(s,\pi^2_{\tau,
+  \rho}(t))$
+\item $\mathtt{case}_{\tau,\rho,\pi}(
+  \mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\mathtt{or}(\tau,
+  \rho)}(s,t),\abs{x}{u},\abs{y}{v}) \to
+  \mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\pi}(s,\mathtt{case}_{
+  \tau,\rho,\pi}(t,\abs{x}{u},\abs{y}{v}))$
+\item $\mathtt{let}_{\qquant{\exists}{\beta}{\tau},\rho}(\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\qquant{\exists}{\beta}{\tau}}(s,t),u) \to
+  \mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\rho}(s,\mathtt{let}_{\qquant{\exists}{\beta}{\tau},\rho}(t,u))$
+\end{itemize}
 
 %\subsection*{General proposal}
 %
@@ -1241,24 +1304,37 @@ And finally the rules:
 
 \subsection{Interpreting interesting terms}
 
-To start, all types must be mapped to interesting types.  This is
-easily done:
+All terms will be mapped to \emph{tuples} of types and interpretation
+terms, the latter of which can be compared using $\succ$ to hopefully
+obtain a decrease that can be used with rule removal.
+
+To start, all types must be mapped to the types of interpretation
+terms.  This we do as follows:
 
 \begin{definition}
 A \emph{type constructor mapping} is a function $\Typemap$ which assigns
 to each $(\con:n) \in \TypeConstructors$ a type $\sigma$ with
-$\FTV(\sigma) \subseteq \{ \alpha_1,\dots,\alpha_n \}$.  A type
-constructor mapping is extended to a function operating on types as
-follows:
+$\FTV(\sigma) \subseteq \{ \alpha_1,\dots,\alpha_n \}$,
+and to each $(\con : n) \in \TypeQuantifiers$ a ``type'' $\sigma$ which
+may include one \emph{type context variable}\footnote{TODO: define this
+-- I basically mean a ``variable'' with given open spots to be
+substituted.} of arity $n$, denoted $\alpha[?_1,\dots,?_n]$ (with the
+$?_i$ replaced by types).  It is allowed for $\sigma$ to have
+additional free type variables.  We require that
+$\Typemap(\arrtype) = \alpha_1 \arrtype \alpha_2$ and $\Typemap(\forall)
+= \quant{\beta}{\alpha[\beta]}$.
+
+A type constructor mapping is extended to a function on types as follows:
 \[
 \begin{array}{rcl}
 \Typemap(\alpha) & = & \alpha \\
 \Typemap(\con(\sigma_1,\dots,\sigma_n)) & = &
   \tau[\alpha_1:=\Typemap(\sigma_1),\dots,\alpha_n:=\Typemap(\sigma_n)]\ 
   \text{if}\ \Typemap(\con) = \tau \\
-\Typemap(\sigma \arrtype \tau) & = & \Typemap(\sigma) \arrtype
-  \Typemap(\tau) \\
-\Typemap(\quant{\alpha}{\sigma}) & = & \quant{\alpha}{\Typemap(\sigma)} \\
+\Typemap(\qquant{\con}{\alpha_1 \dots \alpha_n}{\sigma}) & = &
+  \tau\ \text{with}\ \alpha[\rho_1,\dots,\rho_n]\ \text{replaced
+  by}\ \sigma[\rho_1,\dots,\rho_n] \\
+  & & \phantom{x}\hfill\text{if}\ \Typemap(\con) = \tau
 \end{array}
 \]
 \end{definition}
@@ -1270,11 +1346,13 @@ Terms are mapped to interpretation terms in a very similar way:
 
 \begin{definition}
 A \emph{symbol mapping} is a function $\Termmap$ which assigns to each
-$(\mathtt{f}:(n,\sigma)) \in \Sigma$ a final interpretation term
-$\Termmap(\mathtt{f})$ of the form $\abs{x_1:\sigma_1 \dots x_n:
-\sigma_n}{t}$, such that $\emptyset \vdash \Termmap(\mathtt{f}) :
-\Typemap(\sigma)$.  Considering $\Termmap$ fixed, we define the
-\emph{interpretation} of each term $s$, $\interpret{s}$, as follows:
+$\mathtt{f} : [\sigma_1 \times \dots \times \sigma_n] \arrtype
+\tau \in \Sigma$ an interpretation term $\Termmap(\mathtt{f})$ of the
+form $\abs{x_1:\Typemap(\sigma_1) \dots x_n:\Typemap(\sigma_n)}{t}$,
+such that a type substitution $\gamma$ exists with $\emptyset \vdash
+\Termmap(\mathtt{f}) : \Typemap(\sigma)\gamma$.
+Considering $\Termmap$ fixed, we define the \emph{interpretation} of
+each term $s$, $\interpret{s}$, as follows:
 \[
 \begin{array}{rcl}
 \interpret{x} & = & x \\
@@ -1284,27 +1362,33 @@ $\Termmap(\mathtt{f})$ of the form $\abs{x_1:\sigma_1 \dots x_n:
 \interpret{\abs{x:\sigma}{s}} & = & \abs{x:\Termmap(\sigma)}{
   \interpret{s}} \\
 \interpret{\tabs{\alpha}{s}} & = & \tabs{\alpha}{\interpret{s}} \\
-\interpret{\tapp{s}{\tau}} & = & \tapp{\interpret{s}}{\Termmap(\tau)} \\
 \end{array}
 \]
 \end{definition}
 
-TODO: prove that this indeed maps to well-typed interpretation terms of
-the expected type.
+\begin{lemma}
+If $s : \sigma$ then $\interpret{s} : \Typemap(\sigma)$ is a well-typed
+interpretation term.
+\end{lemma}
 
-TODO: observe that this choice does not really allow us to order the
-type instantiation rule with $\succ$, just with $\succeq$.  However, this
-isn't actually a problem since, if all other rules can be removed, we have
-termination anyway.  However, we could allow for a custom interpretation
-there as well, or consider the $*$ merely one case of a more general kind
-of function symbol.
+\begin{proof}
+TODO
+\end{proof}
 
 \subsection{Monotonicity}
 
-This relies on the definition of rules (a form of stability may also be
-required), but we really want to have that if $\interpret{\ell} \succ
-\interpret{r}$ for some rule, then $\interpret{s} \succ \interpret{t}$
-whenever $s \arr{\Rules} t$ by that rule.
+By imposing certain monotonicity requirements on the choices for
+$\Termmap$, we obtain a pair $(\succ,\succeq)$ that can be used with
+rule removal (Theorem \ref{thm:ruleremove}).
+
+\begin{lemma}
+TODO
+\end{lemma}
+
+Thus, if $\interpret{\ell} \succ \interpret{r}$ for some rule, then
+$\interpret{s}\downarrow \succ \interpret{t}\downarrow$ whenever
+$s \arr{\Rules} t$ by that rule, and similar for $\succeq$.  This
+provides a strategy for termination analysis using rule removal.
 
 \section{Some useful lemmas}
 
