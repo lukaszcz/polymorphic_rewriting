@@ -37,7 +37,6 @@
 \newcommand{\interpret}[1]{\llparenthesis #1 \rrparenthesis}
 \newcommand{\arr}[1]{\to_{#1}}
 \newcommand{\arrtype}{\Rightarrow}
-\newcommand{\arreta}{\rightarrow_\eta}
 \newcommand{\abs}[2]{\lambda #1.#2}
 \newcommand{\tabs}[2]{\Lambda #1.#2}
 \newcommand{\abstraction}[2]{\backslash #1.#2}
@@ -46,8 +45,6 @@
 \newcommand{\tapp}[2]{#1 * #2}
 \newcommand{\pair}[2]{\langle #1,#2 \rangle}
 \newcommand{\subst}[2]{#1:=#2}
-\newcommand{\etalong}[1]{#1\uparrow^\eta}
-\newcommand{\almostetalong}[1]{\overline{#1}}
 
 \newcommand{\FTV}{\mathit{FTV}}
 \newcommand{\FV}{\mathit{FV}}
@@ -93,8 +90,7 @@ Institute of Computer Science, Radboud University Nijmegen (RU)
 
 \begin{abstract}
 The introduction of this paper is a TODO list.
-The remainder is meant for filling in the TODOs with what we already
-have.
+The remainder is meant for filling in the TODOs with what we already have.
 The hope is that the end result is something useful. :)
 \end{abstract}
 
@@ -245,84 +241,9 @@ induction on the form of $s$). Thus, all closed terms have a unique
 type.
 
 \subsubsection{Normalising interpretation terms}
-Term equality is considered modulo $\alpha$-conversion.  In addition,
-we are particularly interested in interpretation terms in
-\emph{$\eta$-long form}.
-
-\begin{definition}
-For a given variable environment $\Gamma$ and interpretation term $s$
-which is well-typed under $\Gamma$, the \emph{$\eta$-long form} of $s$,
-denoted $\etalong{s}$, is defined as follows:
-\begin{itemize}
-\item if $\Gamma \vdash s : \sigma \arrtype \tau$ and $s = \abs{x}{s'}$,
-  then $\etalong{s} =  \abs{x}{(\etalong{s'})}$
-\item if $\Gamma \vdash s : \sigma \arrtype \tau$ and $s$ does not have
-  the form $\abs{x}{s'}$, then $\etalong{s} =  \abs{x}{(
-  \etalong{(\app{s}{x})})}$
-\item if $\Gamma \vdash s : \quant{\alpha}{\sigma}$ and $s = \tabs{
-  \alpha}{s'}$, then $\etalong{s} = \tabs{\alpha}{(\etalong{s'})}$
-\item if $\Gamma \vdash s : \quant{\alpha}{\sigma}$ and $s$ does not have
-  the form $\tabs{\alpha}{s'}$, then $\etalong{s} = \tabs{\alpha}{
-  (\etalong{(\tapp{s}{\alpha})})}$
-\item if $\Gamma \vdash s : \nat$ or $\Gamma \vdash s : \alpha$ or
-  $\Gamma \vdash s : \sigma \times \tau$, then $\etalong{s} =
-  \almostetalong{s}$, where
-  \begin{itemize}
-  \item $\almostetalong{s} = s$ if $s$ is a natural number, variable or
-    function symbol
-  \item $\almostetalong{s} = \pair{\etalong{s_1}}{\etalong{s_2}}$ if
-    $s = \pair{s_1}{s_2}$
-  \item $\almostetalong{s} = \etalong{s}$ if $s$ has the form
-    $\abs{x}{s'}$ or $\tabs{\alpha}{s'}$
-  \item $\almostetalong{s} = \app{\almostetalong{s_1}}{(\etalong{s_2})}$
-    if $s = \app{s_1}{s_2}$
-  \item $\almostetalong{s} = \tapp{\almostetalong{s'}}{\tau}$
-    if $s = \tapp{s'}{\tau}$
-  \end{itemize}
-\end{itemize}
-A term $s$ is in \emph{$\eta$-long form} if $s = \etalong{s}$.
-\end{definition}
-
-It is clear that the $\eta$-long form of an interpretation term is
-unique; the following lemma shows that it is also always well-defined.
-
-\begin{lemma}
-For all interpretation terms $s$, the function $\etalong{s}$ is
-well-defined.
-\end{lemma}
-
-\begin{proof}
-Define here the \emph{depth} function on interpretation terms as
-follows:
-\begin{itemize}
-\item $\mathit{depth}(n) = \mathit{depth}(x) = \mathit{depth}(\mathtt{f})
-  = 0$
-\item $\mathit{depth}(\pair{s}{t}) = \max(\mathit{depth}(s),\mathit{
-  depth}(t)) + 1$
-\item $\mathit{depth}(\abs{x}{s}) = \mathit{depth}(\tabs{\alpha}{s}) =
-  \mathit{depth}(s) + 1$
-\item $\mathit{depth}(\app{s}{t}) = \max(\mathit{depth}(s),\mathit{
-  depth}(t)+1)$
-\item $\mathit{depth}(\tapp{s}{\tau}) = \mathit{depth}(s)$
-\end{itemize}
-(This definition is clearly well-defined as the term under consideration
-becomes smaller each step.)
-We can see that $\etalong{x}$ is well-defined for all variables by
-induction on their type.  This we use to see that $\etalong{(\apps{s}{
-x_1}{x_n})}$ is well-defined for $s$ a variable, natural number or
-function symbol by induction on its type.  Thus, well-definedness of
-$\etalong{s}$ for all $s$ with depth $0$ follows; also $\almostetalong{
-s} = s$ is well-defined for such $s$.
-For interpretation terms of depth $\geq 1$, well-definedness of
-$\etalong{s}$ and $\overline{s}$ follows by induction on
-$(\mathit{depth}(s)$, $1$, the size of the type of $s)$ in the case
-of $\etalong{s}$ and
-$(\mathit{depth}(s)$, $0$, the size of $s)$ in the case of
-$\almostetalong{s}$.
-\end{proof}
-
-To define the world of \emph{final interpretation terms}, we will
-normalise certain elements of $\Iterms$ using the relation $\leadsto$.
+Term equality is considered modulo $\alpha$-conversion. To define the
+world of \emph{final interpretation terms}, we will normalise certain
+elements of $\Iterms$ using the relation $\leadsto$.
 
 \begin{definition}
 We define the relation $\leadsto$ on interpretation terms as the
@@ -372,10 +293,10 @@ We say that $s$ is a \emph{redex} if $s$ reduces by one of the rules
 does not use (\ref{leadsto:mono:abs}) or (\ref{leadsto:mono:right}).
 
 A \emph{final interpretation term} is a term $s \in \Iterms$ such that
-(a) $\FV(s) = \FTV(s) = \emptyset$, (b) $s$ is in normal form with
-respect to $\leadsto$, and (c) $s$ is in $\eta$-long form.  We let
-$\World$ be the set of all final interpretation terms. By~$\World_\tau$
-we denote the set of all final interpretation terms of type~$\tau$.
+(a) $\FV(s) = \FTV(s) = \emptyset$, and (b) $s$ is in normal form with
+respect to $\leadsto$.  We let $\World$ be the set of all final
+interpretation terms. By~$\World_\tau$ we denote the set of all final
+interpretation terms of type~$\tau$.
 \end{definition}
 
 NOTE: in the remainder of this section, we shall often speak simply of
@@ -386,7 +307,7 @@ In the remainder of this section, we will often abuse notation to omit
 $\cdot$ and $*$.  Thus, $s t$ can refer to both $\app{s}{t}$ and
 $\tapp{s}{t}$.  Due to typing, this notation is not ambiguous.  We will
 also denote $\abstraction{a}{s}$ for either $\abs{a}{s}$ or
-$\tabs{a}{s}$, depending on typing.  Thus, we have:
+$\tabs{a}{s}$, depending on typing. Thus, we have:
 
 \begin{lemma}\label{lem_abusive_notation}
 Every interpretation term has the form $s t_1 \dots t_n$ with
@@ -451,20 +372,6 @@ on $s$ using $\leadsto$.
   complete by the induction hypothesis. Otherwise $s \in \mathbb{N}$
   is obviously in $\SN$.
 \end{proof}
-
-\begin{lemma}
-If $s$ is a closed interpretation term in $\eta$-long form which is
-terminating under $\leadsto$, then there is a final interpretation term
-$t$ such that $s \leadsto^* t$.
-\end{lemma}
-
-\begin{proof}
-TODO
-\CK{And honestly not sure whether we even need this.}
-\end{proof}
-
-\LC{What do we need these $\eta$-expansions for? I think this just
-  works now with the modified $\leadsto$-rules for $\oplus,\otimes$.}
 
 \subsubsection{Computability}
 In the rest of this section we adapt the Tait-Girard computability
