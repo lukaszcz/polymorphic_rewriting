@@ -18,6 +18,7 @@
 \usepackage{bussproofs}
 \usepackage{multirow}
 \usepackage{proof}
+\usepackage[T1]{fontenc}
 
 \newcommand{\Iterms}{\mathcal{I}}
 \newcommand{\World}{\mathcal{W}}
@@ -34,7 +35,7 @@
 
 \newcommand{\quant}[2]{\forall #1[#2]}
 \newcommand{\qquant}[3]{#1 #2[#3]}
-\newcommand{\typeinterpret}[1]{\langle #1 \rangle}
+\newcommand{\typeinterpret}[1]{\text{\guillemotleft} #1\! \text{\guillemotright}}
 \newcommand{\interpret}[1]{\llparenthesis #1 \rrparenthesis}
 \newcommand{\arr}[1]{\to_{#1}}
 \newcommand{\arrtype}{\Rightarrow}
@@ -1035,31 +1036,25 @@ by including symbol $@_{\alpha,\beta} : [\alpha \arrtype \beta \times
 \alpha] \arrtype \beta$ in $\Sigma$.
 Similarly, type application is modelled through a symbol
 $\mathtt{A}_{\alpha,\beta} : [\quant{\xi}{\meta{\alpha}{\xi}} \arrtype
-\alpha[\beta]$.
-
-===================
+\meta{\alpha}{\beta}$.
 
 The rules are simply an infinite set of term pairs, whose monotonic
 closure generates the rewrite relation.
 
 \begin{definition}
-We assume given a set $\Rules$ of triples $(\Gamma,\ell,r)$ of a
-variable environment and two terms, such that:
+We fix an infinite variable environment $\Gamma$,
+and assume given a set $\Rules$ of term pairs $(\ell,r)$, such that:
 \begin{itemize}
 \item $\FV(r) \subseteq \FV(\ell) \subseteq \mathit{keys}(\Gamma)$;
 \item $\ell$ and $r$ have the same type under $\Gamma$;
-\item $\FTV(\ell) = \FTV(r) = \emptyset$, and all type variables in
-  the range of $\Gamma$ are bound;
-\item $\Rules$ is stable: if $(\Gamma,\ell,r) \in \Rules$ and $\gamma$
-  is a substitution, then $(\Delta,\ell\gamma,r\gamma) \in \Rules$ for
-  appropriate $\Delta$. (\CK{Appropriate depends on the typing of
-  $\gamma$ of course.})
+\item $\FTV(\ell) = \FTV(r) = \emptyset$;
+  %, and all type variables in
+  %the range of $\Gamma$ are bound;
+\item $\Rules$ is stable: if $(\ell,r) \in \Rules$ and $\gamma$ is a
+  substitution, then $(\ell\gamma,r\gamma) \in \Rules$.
 \end{itemize}
-Fixing a variable environment $\Gamma$, the reduction relation
-$\arr{\Rules}$ is the smallest monotonic relation that contains all
-pairs $(s,t)$ that are well-typed under $\Gamma$, such that some
-restriction $\Gamma'$ of $\Gamma$ exists with $(\Gamma',s,t) \in
-\Rules$.
+The reduction relation $\arr{\Rules}$ is the smallest monotonic
+relation that contains $\Rules$.
 \end{definition}
 
 \subsubsection{An example system.}
@@ -1085,32 +1080,34 @@ and quantifiers:
 We have the following function symbols:
 \[
 \begin{array}{rclrcl}
-\epsilon_\tau & : & [\bot] \arrtype \tau &
-\pi^1_{\sigma,\tau} & : & [\mathtt{and}(\sigma,\tau)] \arrtype \sigma \\
-@_{\sigma,\tau} & : & [\sigma \arrtype \tau \times \sigma] \arrtype \tau &
-\pi^2_{\sigma,\tau} & : & [\mathtt{and}(\sigma,\tau)] \arrtype \tau \\
-\mathtt{in}^1_{\sigma,\tau} & : & [\sigma] \arrtype
-  \mathtt{or}(\sigma,\tau) &
-\mathtt{pair}_{\sigma,\tau} & : & [\sigma \times \tau] \arrtype
-  \mathtt{and}(\sigma,\tau)) \\
-\mathtt{in}^2_{\sigma,\tau} & : & [\tau] \arrtype
-  \mathtt{or}(\sigma,\tau) &
-\mathtt{tapp}_{\quant{\alpha}{\sigma},\tau} & : &
-  [\quant{\alpha}{\sigma}] \arrtype \sigma[\alpha:=\tau] \\
-\mathtt{case}_{\sigma,\tau,\rho} & : & [\mathtt{or}(\sigma,\tau) \times
-  \sigma \arrtype \rho \times \tau \arrtype \rho] \arrtype \rho\ \ \ & 
-\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\rho} & : &
-  [\qquant{\exists}{\alpha}{\sigma} \times 
-  \quant{\alpha}{\sigma \arrtype \rho}] \arrtype \rho) \\
-\mathtt{ext}_{\qquant{\exists}{\alpha}{\sigma},\tau} & : &
-  [\sigma[\alpha:=\tau]] \arrtype \qquant{\exists}{\alpha}{\sigma}
-  & & & \phantom{x}\hfill
-  \text{only for}\ \rho\ \text{with}\ \alpha \notin \FTV(\rho) \\
+\epsilon_\alpha & : & [\bot] \arrtype \alpha &
+\pi^1_{\alpha,\beta} & : & [\mathtt{and}(\alpha,\beta)] \arrtype \alpha \\
+@_{\alpha,\beta} & : & [\alpha \arrtype \beta \times \alpha] \arrtype \beta &
+\pi^2_{\alpha,\beta} & : & [\mathtt{and}(\alpha,\beta)] \arrtype \beta \\
+\mathtt{in}^1_{\alpha,\beta} & : & [\alpha] \arrtype
+  \mathtt{or}(\alpha,\beta) &
+\mathtt{pair}_{\alpha,\beta} & : & [\alpha \times \beta] \arrtype
+  \mathtt{and}(\alpha,\beta) \\
+\mathtt{in}^2_{\alpha,\beta} & : & [\beta] \arrtype
+  \mathtt{or}(\alpha,\beta) &
+\mathtt{tapp}_{\alpha,\beta} & : &
+  [\quant{\xi}{\meta{\alpha}{\xi}}] \arrtype \meta{\alpha}{\beta} \\
+\mathtt{case}_{\alpha,\beta,\xi} & : & [\mathtt{or}(\alpha,\beta) \times
+  \alpha \arrtype \xi \times \beta \arrtype \xi] \arrtype \xi\ \ \ & 
+\mathtt{let}_{\alpha,\beta} & : &
+  \qquant{\exists}{\xi}{\meta{\alpha}{\xi}} \times 
+  \quant{\xi}{\xi \arrtype \beta}] \arrtype \beta \\
+\mathtt{ext}_{\alpha,\beta} & : & [\meta{\alpha}{\beta}] \arrtype
+  \qquant{\exists}{\xi}{\meta{\alpha}{\xi}} \\
 \end{array}
 \]
+(Note that in the $\mathtt{let}$ symbol, the definition of type
+substitution implies that in all instances $\mathtt{let}_{\sigma,\tau}$
+the type $\tau$ cannot contain the bound type variable $\xi$.)
+
 And finally the rules.  These are represented as \emph{rule schemes},
 representing infinitely many rules at once.  Type substitution is also
-done on the indexes of function symbols (thus giving essentially
+done on indexes of function symbols (thus giving essentially
 different symbols, but with correct types).
 \[
 \begin{array}{rcl}
@@ -1123,8 +1120,8 @@ different symbols, but with correct types).
   \abs{x}{s},\abs{y}{t}) & \to & s[x:=u] \\
 \mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^2_{\sigma,\tau}(u),
   \abs{x}{s},\abs{y}{t}) & \to & t[x:=u] \\
-\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\rho}(
-  \mathtt{ext}_{\qquant{\exists}{\alpha}{\sigma},\tau}(s),\tabs{\alpha}{
+\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(
+  \mathtt{ext}_{\qquant{\forall}{\alpha}{\sigma},\tau}(s),\tabs{\alpha}{
     \abs{x}{t}}) & \to & t[\alpha:=\tau][x:=s] \\
 \end{array}
 \]
@@ -1142,8 +1139,8 @@ different symbols, but with correct types).
   \epsilon_\tau(s) \\
 \mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}(\sigma,\tau)}(
   u),\abs{x}{s},\abs{y}{t}) & \to & \epsilon_\rho(s) \\
-\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\rho}(\epsilon_{\qquant{
-  \exists}{\alpha}{\sigma}}(s),\tabs{\alpha}{\abs{x}{t}}) & \to &
+\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(\epsilon_{\qquant{
+  \forall}{\alpha}{\sigma}}(s),\tabs{\alpha}{\abs{x}{t}}) & \to &
   \epsilon_\rho(s) \\
 \end{array}
 \]
@@ -1189,45 +1186,45 @@ different symbols, but with correct types).
     \abs{x}{\mathtt{case}_{\rho,\pi,\xi}(s,\abs{z}{v},\abs{a}{w})},
     \abs{y}{\mathtt{case}_{\rho,\pi,\xi}(t,\abs{z}{v},\abs{a}{w})}) $%\\
 \item $
-\mathtt{let}_{\qquant{\exists}{\alpha}{\rho}}(
-  \mathtt{case}_{\sigma,\tau,\qquant{\exists}{\alpha}{\rho}}(
+\mathtt{let}_{\qquant{\forall}{\alpha}{\rho}}(
+  \mathtt{case}_{\sigma,\tau,\qquant{\forall}{\alpha}{\rho}}(
   u,\abs{x}{s},\abs{y}{t}),v) %& \to &
   \to\\
   \mathtt{case}_{\sigma,\tau,\rho}(u,
-  \abs{x}{\mathtt{let}_{\qquant{\exists}{\alpha}{\rho}}(s,v)},
-  \abs{y}{\mathtt{let}_{\qquant{\exists}{\alpha}{\rho}}(t,v)})
+  \abs{x}{\mathtt{let}_{\qquant{\forall}{\alpha}{\rho}}(s,v)},
+  \abs{y}{\mathtt{let}_{\qquant{\forall}{\alpha}{\rho}}(t,v)})
   $%\\
 %\end{array}
 %\]
 \end{itemize}
 \begin{itemize}
-\item $\epsilon_\tau(\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},
+\item $\epsilon_\tau(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
   \bot}(s,t)) \to
-  \mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\tau}(s,\epsilon_\tau(t))$
-\item $@_{\tau,\rho}(\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},
+  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\tau}(s,\epsilon_\tau(t))$
+\item $@_{\tau,\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
   \tau \arrtype \rho}(s,t),u) \to
-  \mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\rho}(s,@_{\tau,\rho}(t,
+  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(s,@_{\tau,\rho}(t,
   u))$
 \item $\mathtt{tapp}_{\quant{\alpha}{\tau},\rho}(
-\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\quant{\alpha}{\tau}}(s,t))
+\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\quant{\alpha}{\tau}}(s,t))
   \to
-  \mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\tau[\alpha:=\rho]}(s,
+  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\tau[\alpha:=\rho]}(s,
   \mathtt{tapp}_{\quant{\alpha}{\tau},\rho}(t))$
-\item $\pi^1_{\tau,\rho}(\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},
+\item $\pi^1_{\tau,\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
   \mathtt{and}(\tau,\rho)}(s,t)) \to
-  \mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\tau}(s,\pi^1_{\tau,
+  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\tau}(s,\pi^1_{\tau,
   \rho}(t))$
-\item $\pi^2_{\tau,\rho}(\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},
+\item $\pi^2_{\tau,\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
   \mathtt{and}(\tau,\rho)}(s,t)) \to
-  \mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\rho}(s,\pi^2_{\tau,
+  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(s,\pi^2_{\tau,
   \rho}(t))$
 \item $\mathtt{case}_{\tau,\rho,\pi}(
-  \mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\mathtt{or}(\tau,
+  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\mathtt{or}(\tau,
   \rho)}(s,t),\abs{x}{u},\abs{y}{v}) \to
-  \mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\pi}(s,\mathtt{case}_{
+  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\pi}(s,\mathtt{case}_{
   \tau,\rho,\pi}(t,\abs{x}{u},\abs{y}{v}))$
-\item $\mathtt{let}_{\qquant{\exists}{\beta}{\tau},\rho}(\mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\qquant{\exists}{\beta}{\tau}}(s,t),u) \to
-  \mathtt{let}_{\qquant{\exists}{\alpha}{\sigma},\rho}(s,\mathtt{let}_{\qquant{\exists}{\beta}{\tau},\rho}(t,u))$
+\item $\mathtt{let}_{\qquant{\forall}{\beta}{\tau},\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\qquant{\forall}{\beta}{\tau}}(s,t),u) \to
+  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(s,\mathtt{let}_{\qquant{\forall}{\beta}{\tau},\rho}(t,u))$
 \end{itemize}
 
 %\subsection*{General proposal}
@@ -1249,75 +1246,169 @@ different symbols, but with correct types).
 
 \subsection{Interpreting interesting terms}
 
-All terms will be mapped to interpretation terms, the latter of which
-can be compared using $\succ$ to hopefully obtain a decrease that can
-be used with rule removal.
+All terms will be mapped to interpretation terms, which are compared
+using $\succ$ to hopefully obtain a decrease that can be used with
+rule removal.
 
 To start, all types must be mapped to the types of interpretation
 terms.  This we do as follows:
 
 \begin{definition}
-A \emph{type constructor mapping} is a function $\Typemap$ which assigns
-to each $(\con:n) \in \TypeConstructors$ a type $\sigma$ with
-$\FTV(\sigma) \subseteq \{ \alpha_1,\dots,\alpha_n \}$,
-and to each $(\con : n) \in \TypeQuantifiers$ a ``type'' $\sigma$ which
-may include one \emph{type context variable}\footnote{TODO: define this
--- I basically mean a ``variable'' with given open spots to be
-substituted.} of arity $n$, denoted $\alpha[?_1,\dots,?_n]$ (with the
-$?_i$ replaced by types).  It is allowed for $\sigma$ to have
-additional free type variables.  We require that
-$\Typemap(\arrtype) = \alpha_1 \arrtype \alpha_2$ and $\Typemap(\forall)
-= \quant{\beta}{\alpha[\beta]}$.
+A \emph{type mapping} is a function $\typeinterpret{\cdot}$ which,
+given a type $\sigma$ returns an interpretation type $\typeinterpret{
+\sigma}$ such that:
+\begin{itemize}
+\item $\typeinterpret{\quant{\alpha}{\sigma}} =
+  \quant{\alpha}{\typeinterpret{\sigma}}$
+\item $\typeinterpret{\sigma \arrtype \tau} =
+  \quant{\alpha_1 \dots \alpha_n}{\typeinterpret{\sigma}[\beta_1:=
+  \alpha_1,\dots,\beta_n:=\alpha_n] \arrtype
+  \typeinterpret{\tau}}$, \\
+  where $\{\beta_1,\dots,\beta_n\} = \FTV(\typeinterpret{\sigma})
+  \setminus \FTV(\sigma)$ and $\alpha_1,\dots,\alpha_n$ fresh
+  variables
+\end{itemize}
 
-A type constructor mapping is extended to a function on types as follows:
-\[
-\begin{array}{rcl}
-\Typemap(\alpha) & = & \alpha \\
-\Typemap(\con(\sigma_1,\dots,\sigma_n)) & = &
-  \tau[\alpha_1:=\Typemap(\sigma_1),\dots,\alpha_n:=\Typemap(\sigma_n)]\ 
-  \text{if}\ \Typemap(\con) = \tau \\
-\Typemap(\qquant{\con}{\alpha_1 \dots \alpha_n}{\sigma}) & = &
-  \tau\ \text{with}\ \alpha[\rho_1,\dots,\rho_n]\ \text{replaced
-  by}\ \sigma[\rho_1,\dots,\rho_n] \\
-  & & \phantom{x}\hfill\text{if}\ \Typemap(\con) = \tau
-\end{array}
-\]
+\CK{For now, I will not be any more specific than that.  It would be
+  good to give a more well-defined recipe, but first I want to see how
+  this will work out.  If it works out well, it will probably be
+  something where you can indicate exactly how you can translate types
+  recursively based on the root constructor/quantifier, much like the
+  way the interpretation of terms is defined.}
+%A \emph{type constructor mapping} is a function $\Typemap$ which assigns
+%to each $(\con:n) \in \TypeConstructors$ a type $\sigma$ with
+%$\FTV(\sigma) \subseteq \{ \alpha_1,\dots,\alpha_n \}$,
+%and to each $(\con : n) \in \TypeQuantifiers$ a ``type'' $\sigma$ which
+%may include one \emph{type context variable}\footnote{TODO: define this
+%-- I basically mean a ``variable'' with given open spots to be
+%substituted.} of arity $n$, denoted $\alpha[?_1,\dots,?_n]$ (with the
+%$?_i$ replaced by types).  It is allowed for $\sigma$ to have
+%additional free type variables.  We require that
+%$\Typemap(\arrtype) = \alpha_1 \arrtype \alpha_2$ and $\Typemap(\forall)
+%= \quant{\beta}{\alpha[\beta]}$.
+%
+%A type constructor mapping is extended to a function on types as follows:
+%\[
+%\begin{array}{rcl}
+%\Typemap(\alpha) & = & \alpha \\
+%\Typemap(\con(\sigma_1,\dots,\sigma_n)) & = &
+%  \tau[\alpha_1:=\Typemap(\sigma_1),\dots,\alpha_n:=\Typemap(\sigma_n)]\ 
+%  \text{if}\ \Typemap(\con) = \tau \\
+%\Typemap(\qquant{\con}{\alpha_1 \dots \alpha_n}{\sigma}) & = &
+%  \tau\ \text{with}\ \alpha[\rho_1,\dots,\rho_n]\ \text{replaced
+%  by}\ \sigma[\rho_1,\dots,\rho_n] \\
+%  & & \phantom{x}\hfill\text{if}\ \Typemap(\con) = \tau
+%\end{array}
+%\]
 \end{definition}
 
-Clearly, a type constructor mapping maps types to interpretation types,
-and $\FTV(\Typemap(\sigma)) \subseteq \FTV(\sigma)$.
-
-Terms are mapped to interpretation terms in a very similar way:
+Terms are mapped to interpretation terms in a recursive way:
 
 \begin{definition}
 A \emph{symbol mapping} is a function $\Termmap$ which assigns to each
-$\mathtt{f} : [\sigma_1 \times \dots \times \sigma_n] \arrtype
-\tau \in \Sigma$ an interpretation term $\Termmap(\mathtt{f})$ of the
-form $\abs{x_1:\Typemap(\sigma_1) \dots x_n:\Typemap(\sigma_n)}{t}$,
-such that a type substitution $\gamma$ exists with $\emptyset \vdash
-\Termmap(\mathtt{f}) : \Typemap(\sigma)\gamma$.
+instantiated function symbol $\mathtt{f}_{\rho_1,\dots,\rho_n} :
+[\sigma_1 \times \dots \times \sigma_k] \arrtype \tau \in \Sigma$ an
+interpretation term $\Termmap(\mathtt{f}_{\rho_1,\dots,\rho_n})$ such
+that $\Termmap(\mathtt{f}_{\rho_1,\dots,\rho_n})$ has the following
+form:
+\[
+\tabs{\beta_1^1 \dots \beta_1^{n_1} \dots \beta_k^1 \dots \beta_k^{n_k}}{
+\abs{x_1:\typeinterpret{\sigma_1}[\vec{\alpha_i}:=\vec{\beta_i}] \dots
+x_k:\typeinterpret{\sigma_k}[\vec{\alpha_k}:=\vec{\beta_k}]}{t}}
+\]
+Where for all $1 \leq i \leq k$:
+\begin{itemize}
+\item $\FTV(\typeinterpret{\sigma_i}) \setminus \FTV(\sigma_i) =
+  \{ \alpha_i^1,\dots,\alpha_i^{n_i} \}$ (occurring in that order in
+  $\typeinterpret{\sigma_i}$);
+\item $\beta_i^1,\dots,\beta_i^{n_i}$ are fresh variables (disjoint
+    from all other $\beta_j^m$);
+\end{itemize}
+And moreover, if $\FTV(\typeinterpret{\tau}) \setminus \FTV(\tau) =
+\{ \alpha_0^1,\dots,\alpha_0^{n_i} \}$, then there exist types
+$\rho_1,\dots,\rho_{n_i}$ (possibly containing the variables
+$\beta_i^j$, but not $\alpha_i^j$) such that:
+\[
+\{ x_1 : \typeinterpret{\sigma_1}[\vec{\alpha_i}:=\vec{\beta_i}],
+\dots, x_k : \typeinterpret{\sigma_k}[\vec{\alpha_k}:=\vec{\beta_k}]
+\} \vdash t : \typeinterpret{\tau}[\vec{\alpha_0}:=\vec{\rho}]
+\]
 Considering $\Termmap$ fixed, we define the \emph{interpretation} of
 each term $s$, $\interpret{s}$, as follows:
 \[
 \begin{array}{rcl}
 \interpret{x} & = & x \\
+\interpret{\abs{x:\sigma}{s}} & = & \tabs{\alpha_1 \dots \alpha_n}{
+  \abs{x:\typeinterpret{\sigma}[\beta_1:=\alpha_1,\dots,\beta_n:=
+  \alpha_n]}{\interpret{s}}} \\
+  & & \ \hfill
+  \text{if}\ \FTV(\typeinterpret{\sigma}) \setminus \FTV(\sigma) =
+  \{ \beta_1,\dots,\beta_n \}\ \text{and}\ \alpha_1,\dots,\alpha_n\ 
+  \text{fresh} \\
+\interpret{\tabs{\alpha}{s}} & = & \tabs{\alpha}{\interpret{s}} \\
 \interpret{\mathtt{f}(s_1,\dots,s_n)} & = &
   t[x_1:=\interpret{s_1},\dots,x_n:=\interpret{s_n}]\ \text{if}\ 
   \Termmap(\mathtt{f}) = \abs{x_1:\sigma_1 \dots x_n:\sigma_n}{t} \\
-\interpret{\abs{x:\sigma}{s}} & = & \abs{x:\Termmap(\sigma)}{
-  \interpret{s}} \\
-\interpret{\tabs{\alpha}{s}} & = & \tabs{\alpha}{\interpret{s}} \\
 \end{array}
 \]
 \end{definition}
 
+In the following, we say that a type substitution $\gamma$ \emph{fills
+in the blanks caused by interpretation} for a type $\sigma$ if the
+domain of $\gamma$ is included in $\FTV(\typeinterpret{\sigma})
+\setminus \FTV(\sigma)$.
+
 \begin{lemma}
-If $s : \sigma$ then $\interpret{s} : \Typemap(\sigma)$ is a well-typed
-interpretation term.
+Suppose $\Gamma \vdash s : \sigma$, and let $\Delta$ be an environment
+on the same domain as $\Gamma$, such that for every $(x : \tau) \in
+\Gamma$
+%with $\FTV(\typeinterpret{\tau}) \setminus \FTV(\tau) =
+%\{\beta_1,\dots,\beta_n\}$ there exist type variables $\beta_1,\dots,
+%\beta_n$ such that $(x : \interpret{\tau}[\beta_1:=\alpha_1,\dots,
+%\beta_n:=\alpha_n]) \in \Delta$.
+we have $(x : \tau'\delta) \in \Delta$ for some $\delta$ that fills in
+the blanks caused by interpretation of $\tau$.
+
+Then there exists a type substitution $\gamma$
+%on domain $\FTV(
+%\typeinterpret{\sigma}) \setminus \FTV(\sigma)$ such that
+that fills in the blanks caused by interpretation of $\sigma$ such that
+$\Delta \vdash \interpret{s} : \typeinterpret{s}\gamma$.
 \end{lemma}
 
+=======================
+
+We will shortly denote $[\beta_1:=\alpha_1,\dots,\beta_n:=\alpha_n]$ as
+$[\vec{\beta}:=\vec{\alpha}]$.
+
 \begin{proof}
-TODO
+By induction on the form of $s$.
+
+Clearly if $s$ is a variable we are done, letting $\gamma$ map each
+$\alpha$ to itself.
+
+If $s = \tabs{\alpha}{s'}$ we observe that $\interpret{s} = \tabs{
+\alpha}{\interpret{s'}}$ and $\typeinterpret{\quant{\alpha}{\sigma}} =
+\quant{\alpha}{\typeinterpret{\sigma}}$.
+By the induction hypothesis, $\Delta \vdash \interpret{s'} :
+\typeinterpret{\sigma}\gamma$ for some suitable $\gamma$, and we can
+safely assume that $\alpha$ is not in its domain (since either
+$\alpha \in \FTV(\sigma)$ or $s = \tabs{\beta}{s'}$ for infinitely
+many variables $\beta$).  Thus, $\Delta \vdash \interpret{s} :
+\quant{\alpha}{(\typeinterpret{\sigma}\gamma)} =
+(\quant{\alpha}{\typeinterpret{\sigma}})\gamma$.
+
+=======================
+
+If $s = \abs{x:\sigma}{s'}$ with $\Gamma \cup \{ x : \sigma \} \vdash
+s' : \tau$, then $\Gamma \vdash s : \sigma \arrtype \tau$ and
+$\typeinterpret{\sigma \arrtype \tau} = \quant{\alpha_1 \dots \alpha_n}{
+\interpret{\sigma}[\beta_1:=\alpha_1,\dots,\beta_n:=\alpha_n] \arrtype
+\interpret{\tau}}$ with $\{\beta_1,\dots,\beta_n]\} = \FTV(\interpret{
+\sigma}) \setminus \FTV(\sigma)$.
+By the induction hypothesis, there is a type substitution $\gamma$ on
+domain $\FTV(\typeinterpret{\tau}) \setminus \FTV(\tau)$ such that
+$\Delta \cup \{ x : $
 \end{proof}
 
 \subsection{Monotonicity}
