@@ -1366,26 +1366,21 @@ on the same domain as $\Gamma$, such that for every $(x : \tau) \in
 %\{\beta_1,\dots,\beta_n\}$ there exist type variables $\beta_1,\dots,
 %\beta_n$ such that $(x : \interpret{\tau}[\beta_1:=\alpha_1,\dots,
 %\beta_n:=\alpha_n]) \in \Delta$.
-we have $(x : \tau'\delta) \in \Delta$ for some $\delta$ that fills in
-the blanks caused by interpretation of $\tau$.
+we have $(x : \interpret{\tau}\delta) \in \Delta$ for some $\delta$ that
+fills in the blanks caused by interpretation of $\tau$.
 
 Then there exists a type substitution $\gamma$
 %on domain $\FTV(
 %\typeinterpret{\sigma}) \setminus \FTV(\sigma)$ such that
 that fills in the blanks caused by interpretation of $\sigma$ such that
-$\Delta \vdash \interpret{s} : \typeinterpret{s}\gamma$.
+$\Delta \vdash \interpret{s} : \typeinterpret{\sigma}\gamma$.
 \end{lemma}
-
-=======================
-
-We will shortly denote $[\beta_1:=\alpha_1,\dots,\beta_n:=\alpha_n]$ as
-$[\vec{\beta}:=\vec{\alpha}]$.
 
 \begin{proof}
 By induction on the form of $s$.
 
-Clearly if $s$ is a variable we are done, letting $\gamma$ map each
-$\alpha$ to itself.
+Clearly if $s$ is a variable we are done, letting $\gamma$ be such that
+$(x : \interpret{\sigma}\gamma) \in \Delta$.
 
 If $s = \tabs{\alpha}{s'}$ we observe that $\interpret{s} = \tabs{
 \alpha}{\interpret{s'}}$ and $\typeinterpret{\quant{\alpha}{\sigma}} =
@@ -1398,17 +1393,53 @@ many variables $\beta$).  Thus, $\Delta \vdash \interpret{s} :
 \quant{\alpha}{(\typeinterpret{\sigma}\gamma)} =
 (\quant{\alpha}{\typeinterpret{\sigma}})\gamma$.
 
-=======================
-
 If $s = \abs{x:\sigma}{s'}$ with $\Gamma \cup \{ x : \sigma \} \vdash
 s' : \tau$, then $\Gamma \vdash s : \sigma \arrtype \tau$ and
 $\typeinterpret{\sigma \arrtype \tau} = \quant{\alpha_1 \dots \alpha_n}{
 \interpret{\sigma}[\beta_1:=\alpha_1,\dots,\beta_n:=\alpha_n] \arrtype
 \interpret{\tau}}$ with $\{\beta_1,\dots,\beta_n]\} = \FTV(\interpret{
-\sigma}) \setminus \FTV(\sigma)$.
-By the induction hypothesis, there is a type substitution $\gamma$ on
-domain $\FTV(\typeinterpret{\tau}) \setminus \FTV(\tau)$ such that
-$\Delta \cup \{ x : $
+\sigma}) \setminus \FTV(\sigma)$.  As the type variables $\beta_1,
+\dots,\beta_n$ are chosen fresh, we can safely assume that they do not
+occur in $\typeinterpret{\tau}$.
+Let $\Delta' := \Delta \cup \{ x : \typeinterpret{\sigma}[\beta_1:=
+\alpha_1,\dots,\beta_n:=\alpha_n] \}$; then $\Delta'$ fills in the
+blanks of $\Gamma \cup \{ x : \sigma \}$ just like $\Delta$ fills in the
+blanks of $\Gamma$.  By the induction hypothesis, there is a type
+substitution $\gamma$ on domain $\FTV(\typeinterpret{\tau}) \setminus
+\FTV(\tau)$ such that $\Delta' \vdash x : \interpret{\tau}\gamma$.
+Thus, $\Delta \vdash \abs{x:\typeinterpret{\sigma}[\vec{\beta}:=
+\vec{\alpha}]}{\interpret{s'}} : \typeinterpret{\sigma}[\vec{\beta}:=
+\vec{\alpha}] \arrtype (\typeinterpret{\tau}\gamma)$.
+Since the variables that occur in $\typeinterpret{\tau}$ but not in
+$\tau$ are chosen fresh, we can safely assume that they do not occur in
+either $\sigma$ or in $\Delta$, nor are they equal to any $\alpha_i$.
+Thus, the type $\typeinterpret{\sigma}[\vec{\beta}:=\vec{\alpha}]
+\arrtype (\typeinterpret{\tau}\gamma)$ is equal to
+$(\typeinterpret{\sigma}[\vec{\beta}:=\vec{\alpha}] \arrtype
+\typeinterpret{\tau})\gamma$.
+We then easily obtain that $\tabs{\alpha_1 \dots \alpha_n}{\abs{x}{s'}} :
+\quant{\alpha_1 \dots \alpha_n}{\interpret{\sigma}[\vec{\beta}:=\vec{
+\alpha}] \arrtype \tau}\gamma = \typeinterpret{\sigma \arrtype \tau}
+\gamma$.
+
+Finally, suppose $s = \mathtt{f}(s_1,\dots,s_n)$ with $\mathtt{f} :
+[\sigma_1 \times \dots \times \sigma_k] \arrtype \tau \in \Sigma$ and
+$\Gamma \vdash s_i : \sigma_i$ for all $1 \leq i \leq k$.  By the
+induction hypothesis, there exist substitutiongs $\gamma_1,\dots,
+\gamma_n$ such that $\Delta \vdash \interpret{s_i} : \typeinterpret{
+\sigma_i}\gamma_i$ for all $i$.  Letting $\beta_i^1,\dots,\beta_i^{n_i}$
+denote the elements of $\FTV(\typeinterpret{\sigma_i}) \setminus \FTV(
+\sigma_i)$, and $\alpha_i^1,\dots,\alpha_i^{n_i}$ fresh type variables
+(all $\alpha_j^l$ distinct), we can define $\gamma$ as the type
+substitution that maps each $\alpha_i^j$ to $\gamma_i(\beta_i^j)$;
+this gives us $\Delta \vdash \interpret{s_i} : (\typeinterpret{\sigma_i}
+[\vec{\beta_i}:=\vec{\alpha_i}])\gamma$.
+
+=======================
+
+TODO: change the interpretation of f(s1,...,sn) so that this exactly
+matches with J(f).
+
 \end{proof}
 
 \subsection{Monotonicity}
