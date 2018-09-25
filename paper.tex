@@ -37,6 +37,7 @@
 \newcommand{\qquant}[3]{#1 #2[#3]}
 \newcommand{\typeinterpret}[1]{\text{\guillemotleft} #1\! \text{\guillemotright}}
 \newcommand{\interpret}[1]{\llparenthesis #1 \rrparenthesis}
+\newcommand{\fullinterpret}[1]{\Phi(#1)}
 \newcommand{\arr}[1]{\to_{#1}}
 \newcommand{\arrtype}{\Rightarrow}
 \newcommand{\abs}[2]{\lambda #1.#2}
@@ -1258,8 +1259,6 @@ A \emph{type mapping} is a function $\typeinterpret{\cdot}$ which,
 given a type $\sigma$ returns an interpretation type $\typeinterpret{
 \sigma}$ such that:
 \begin{itemize}
-\item $\typeinterpret{\quant{\alpha}{\sigma}} =
-  \quant{\alpha}{\typeinterpret{\sigma}}$
 \item $\typeinterpret{\sigma \arrtype \tau} =
   \quant{\alpha_1 \dots \alpha_n}{\typeinterpret{\sigma}[\beta_1:=
   \alpha_1,\dots,\beta_n:=\alpha_n] \arrtype
@@ -1267,6 +1266,10 @@ given a type $\sigma$ returns an interpretation type $\typeinterpret{
   where $\{\beta_1,\dots,\beta_n\} = \FTV(\typeinterpret{\sigma})
   \setminus \FTV(\sigma)$ and $\alpha_1,\dots,\alpha_n$ fresh
   variables
+\item $\typeinterpret{\quant{\alpha}{\sigma}} =
+  \quant{\alpha}{\typeinterpret{\sigma}}$ \\
+  (where fresh variables in $\FTV(\typeinterpret{\sigma})$ must also
+  be chosen distinct from $\alpha$)
 \end{itemize}
 
 \CK{For now, I will not be any more specific than that.  It would be
@@ -1302,7 +1305,8 @@ given a type $\sigma$ returns an interpretation type $\typeinterpret{
 %\]
 \end{definition}
 
-Terms are mapped to interpretation terms in a recursive way:
+To basis for mapping terms to interpretation terms is a function that
+defines what should be done to function symbols:
 
 \begin{definition}
 A \emph{symbol mapping} is a function $\Termmap$ which assigns to each
@@ -1312,135 +1316,176 @@ interpretation term $\Termmap(\mathtt{f}_{\rho_1,\dots,\rho_n})$ such
 that $\Termmap(\mathtt{f}_{\rho_1,\dots,\rho_n})$ has the following
 form:
 \[
-\tabs{\beta_1^1 \dots \beta_1^{n_1} \dots \beta_k^1 \dots \beta_k^{n_k}}{
-\abs{x_1:\typeinterpret{\sigma_1}[\vec{\alpha_i}:=\vec{\beta_i}] \dots
-x_k:\typeinterpret{\sigma_k}[\vec{\alpha_k}:=\vec{\beta_k}]}{t}}
+\tabs{\alpha_1^1 \dots \alpha_1^{n_1} \dots \alpha_k^1 \dots \alpha_k^{n_k}}{
+\abs{x_1:\typeinterpret{\sigma_1}[\vec{\beta_i}:=\vec{\alpha_i}] \dots
+x_k:\typeinterpret{\sigma_k}[\vec{\beta_k}:=\vec{\alpha_k}]}{t}}
 \]
 Where for all $1 \leq i \leq k$:
 \begin{itemize}
 \item $\FTV(\typeinterpret{\sigma_i}) \setminus \FTV(\sigma_i) =
-  \{ \alpha_i^1,\dots,\alpha_i^{n_i} \}$ (occurring in that order in
+  \{ \beta_i^1,\dots,\beta_i^{n_i} \}$ (occurring in that order in
   $\typeinterpret{\sigma_i}$);
-\item $\beta_i^1,\dots,\beta_i^{n_i}$ are fresh variables (disjoint
-    from all other $\beta_j^m$);
+\item $\alpha_i^1,\dots,\alpha_i^{n_i}$ are fresh variables (disjoint
+    from all other $\alpha_j^m$);
 \end{itemize}
 And moreover, if $\FTV(\typeinterpret{\tau}) \setminus \FTV(\tau) =
-\{ \alpha_0^1,\dots,\alpha_0^{n_i} \}$, then there exist types
+\{ \beta_0^1,\dots,\beta_0^{n_i} \}$, then there exist types
 $\rho_1,\dots,\rho_{n_i}$ (possibly containing the variables
-$\beta_i^j$, but not $\alpha_i^j$) such that:
+$\alpha_i^j$, but not $\beta_i^j$) such that:
 \[
-\{ x_1 : \typeinterpret{\sigma_1}[\vec{\alpha_i}:=\vec{\beta_i}],
-\dots, x_k : \typeinterpret{\sigma_k}[\vec{\alpha_k}:=\vec{\beta_k}]
-\} \vdash t : \typeinterpret{\tau}[\vec{\alpha_0}:=\vec{\rho}]
-\]
-Considering $\Termmap$ fixed, we define the \emph{interpretation} of
-each term $s$, $\interpret{s}$, as follows:
-\[
-\begin{array}{rcl}
-\interpret{x} & = & x \\
-\interpret{\abs{x:\sigma}{s}} & = & \tabs{\alpha_1 \dots \alpha_n}{
-  \abs{x:\typeinterpret{\sigma}[\beta_1:=\alpha_1,\dots,\beta_n:=
-  \alpha_n]}{\interpret{s}}} \\
-  & & \ \hfill
-  \text{if}\ \FTV(\typeinterpret{\sigma}) \setminus \FTV(\sigma) =
-  \{ \beta_1,\dots,\beta_n \}\ \text{and}\ \alpha_1,\dots,\alpha_n\ 
-  \text{fresh} \\
-\interpret{\tabs{\alpha}{s}} & = & \tabs{\alpha}{\interpret{s}} \\
-\interpret{\mathtt{f}(s_1,\dots,s_n)} & = &
-  t[x_1:=\interpret{s_1},\dots,x_n:=\interpret{s_n}]\ \text{if}\ 
-  \Termmap(\mathtt{f}) = \abs{x_1:\sigma_1 \dots x_n:\sigma_n}{t} \\
-\end{array}
+\{ x_1 : \typeinterpret{\sigma_1}[\vec{\beta_i}:=\vec{\alpha_i}],
+\dots, x_k : \typeinterpret{\sigma_k}[\vec{\beta_k}:=\vec{\alpha_k}]
+\} \vdash t : \typeinterpret{\tau}[\vec{\beta_0}:=\vec{\rho}]
 \]
 \end{definition}
 
+Term interpretations are done in a type-conscious way.  Importantly,
+terms are mapped not only to an interpretation term, but rather to a
+pair of an interpretation term and a type substitution, as follows
+below.
 In the following, we say that a type substitution $\gamma$ \emph{fills
 in the blanks caused by interpretation} for a type $\sigma$ if the
 domain of $\gamma$ is included in $\FTV(\typeinterpret{\sigma})
 \setminus \FTV(\sigma)$.
 
 \begin{lemma}
-Suppose $\Gamma \vdash s : \sigma$, and let $\Delta$ be an environment
-on the same domain as $\Gamma$, such that for every $(x : \tau) \in
-\Gamma$
-%with $\FTV(\typeinterpret{\tau}) \setminus \FTV(\tau) =
-%\{\beta_1,\dots,\beta_n\}$ there exist type variables $\beta_1,\dots,
-%\beta_n$ such that $(x : \interpret{\tau}[\beta_1:=\alpha_1,\dots,
-%\beta_n:=\alpha_n]) \in \Delta$.
-we have $(x : \interpret{\tau}\delta) \in \Delta$ for some $\delta$ that
-fills in the blanks caused by interpretation of $\tau$.
+Assume given a fixed symbol mapping $\Termmap$.
 
-Then there exists a type substitution $\gamma$
-%on domain $\FTV(
-%\typeinterpret{\sigma}) \setminus \FTV(\sigma)$ such that
-that fills in the blanks caused by interpretation of $\sigma$ such that
-$\Delta \vdash \interpret{s} : \typeinterpret{\sigma}\gamma$.
+Additionally assume given environments $\Gamma,\Delta$, a term $s$
+and a type $\sigma$ such that (1) $\Gamma \vdash s : \sigma$ and (2)
+for all $(x : \tau) \in \Gamma$ there exists a substitution $\delta$
+that fills in the blanks caused by interpretation of $\tau$ such
+that $(x : \tau\delta) \in \Delta$.
+
+Then the following recursive procedure defines a pair
+$\fullinterpret{s,\Gamma,\Delta} = (\ \interpret{s},\ \gamma\ )$
+of an interpretatin term $\interpret{s}$ and a type substitution
+$\gamma$ that fills in the blanks caused by interpretation of
+$\sigma$, such that $\Delta \vdash \interpret{s} :
+\typeinterpret{\sigma}\gamma$:
+
+\begin{itemize}
+\item If $s$ is a variable, then let $\interpret{x} := x$ and let
+  $\gamma$ be such that $(x : \sigma\gamma) \in \Delta$.
+\item If $s = \tabs{\alpha}{s'}$ -- so $\sigma = \quant{\alpha}{
+  \sigma'}$ -- then denote $\fullinterpret{s',\Gamma,\Delta} = (\ 
+  \interpret{s'},\ \gamma\ )$, and let
+  $\mathit{interpret}(s,\Gamma,\Delta) := (\ 
+    \tabs{\alpha}{\interpret{s}},\ \gamma\ )$ if $\alpha \in \FTV(
+    \interpret{\sigma'})$.
+\item If $s = \abs{x:\tau}{s'}$ -- so $\sigma = \tau \arrtype \rho$,
+  say -- then let $\FTV(\interpret{\tau}) \setminus \FTV(\tau) =
+  \{ \beta_1,\dots,\beta_n \}$ and $\alpha_1,\dots,\alpha_n$ be fresh
+  type variables.  If we denote $\fullinterpret{s',\Gamma \cup \{x:\tau\},
+  \Delta \cup \{ x : \typeinterpret{\tau}[\beta_1:=\alpha_1,\dots,
+  \beta_n:=\alpha_n]\}} = (\ \interpret{s'},\ \gamma\ )$, then we let
+  $\fullinterpret{s,\Gamma,\Delta} := (\ \tabs{\alpha_1 \dots \alpha_n}{
+  \abs{x:\typeinterpret{\tau}[\beta_1:=\alpha_1,\dots,\beta_n:=
+  \alpha_n]}{\interpret{s}}},\ \gamma\ )$.
+\item If $s = \mathtt{f}(s_1,\dots,s_k)$ with $\mathtt{f} :
+  [\tau_1 \times \dots \times \tau_k] \arrtype \sigma \in \Sigma$ then
+  denote $\fullinterpret{s_i,\Gamma,\Delta} = (\ \interpret{s_i},\ 
+  \gamma_i\ )$ and $\FTV(\typeinterpret{\tau_i}) \setminus \FTV(\tau_i)
+  = \{ \beta_i^1,\dots,\beta_i^{n_i} \}$ for $1 \leq i \leq k$.
+  Write $\Termmap(\mathtt{f}) = \tabs{\alpha_1^1 \dots \alpha_k^{n_k}}{
+  \abs{x_1 \dots x_k}{t}}$, and let $\delta$ be the substitution such
+  that $\{ x_1 : \typeinterpret{\tau_1}[\vec{\beta_1}:=\vec{\alpha_1}]
+  \dots x_k : \typeinterpret{\tau_k}[\vec{\beta_k}:=\vec{\alpha_k}] \}
+  \vdash t : \typeinterpret{\sigma}\delta$.  Then
+  $\fullinterpret{s,\Gamma,\Delta} := (\ \interpret{s}, \gamma\ )$,
+  where:
+  \begin{itemize}
+  \item $\interpret{s} = t[\alpha_i^j:=\gamma_i(\beta_i^j) \mid 1 \leq
+    i \leq k \wedge 1 \leq j \leq n_i][x_i:=\interpret{s_i} \mid
+    1 \leq i \leq k]$
+  \item $\gamma = \delta[\alpha_i^j:=\gamma_i(\beta_i^j) \mid 1 \leq
+    i \leq k \wedge 1 \leq j \leq n_i][x_i:=\interpret{s_i} \mid
+    1 \leq i \leq k]$
+  \end{itemize}
+\end{itemize}
+
 \end{lemma}
 
 \begin{proof}
-By induction on the form of $s$.
+Correctness is shown by induction on the form of $s$.
 
-Clearly if $s$ is a variable we are done, letting $\gamma$ be such that
-$(x : \interpret{\sigma}\gamma) \in \Delta$.
+The variable case is obvious.
 
-If $s = \tabs{\alpha}{s'}$ we observe that $\interpret{s} = \tabs{
-\alpha}{\interpret{s'}}$ and $\typeinterpret{\quant{\alpha}{\sigma}} =
-\quant{\alpha}{\typeinterpret{\sigma}}$.
-By the induction hypothesis, $\Delta \vdash \interpret{s'} :
-\typeinterpret{\sigma}\gamma$ for some suitable $\gamma$, and we can
-safely assume that $\alpha$ is not in its domain (since either
-$\alpha \in \FTV(\sigma)$ or $s = \tabs{\beta}{s'}$ for infinitely
-many variables $\beta$).  Thus, $\Delta \vdash \interpret{s} :
-\quant{\alpha}{(\typeinterpret{\sigma}\gamma)} =
-(\quant{\alpha}{\typeinterpret{\sigma}})\gamma$.
+If $s = \tabs{\alpha}{s'}$, then note that $\typeinterpret{\sigma} =
+\typeinterpret{\quant{\alpha}{\sigma'}} = \quant{\alpha}{
+\typeinterpret{\sigma'}}$.  By the induction hypothesis,
+$\Delta \vdash \interpret{s'} : \typeinterpret{\sigma'}\gamma$.
+By definition, $\alpha \notin \FTV(\typeinterpret{\sigma'}) \setminus
+\FTV(\sigma')$, so $\alpha \notin \mathit{domain}(\gamma)$.  Therefore,
+$\Delta \vdash \tabs{\alpha}{\interpret{s}} :
+\quant{\alpha}{\interpret{\sigma'}\gamma} = \interpret{\sigma}\gamma$.
 
-If $s = \abs{x:\sigma}{s'}$ with $\Gamma \cup \{ x : \sigma \} \vdash
-s' : \tau$, then $\Gamma \vdash s : \sigma \arrtype \tau$ and
-$\typeinterpret{\sigma \arrtype \tau} = \quant{\alpha_1 \dots \alpha_n}{
-\interpret{\sigma}[\beta_1:=\alpha_1,\dots,\beta_n:=\alpha_n] \arrtype
-\interpret{\tau}}$ with $\{\beta_1,\dots,\beta_n]\} = \FTV(\interpret{
-\sigma}) \setminus \FTV(\sigma)$.  As the type variables $\beta_1,
-\dots,\beta_n$ are chosen fresh, we can safely assume that they do not
-occur in $\typeinterpret{\tau}$.
-Let $\Delta' := \Delta \cup \{ x : \typeinterpret{\sigma}[\beta_1:=
-\alpha_1,\dots,\beta_n:=\alpha_n] \}$; then $\Delta'$ fills in the
-blanks of $\Gamma \cup \{ x : \sigma \}$ just like $\Delta$ fills in the
-blanks of $\Gamma$.  By the induction hypothesis, there is a type
-substitution $\gamma$ on domain $\FTV(\typeinterpret{\tau}) \setminus
-\FTV(\tau)$ such that $\Delta' \vdash x : \interpret{\tau}\gamma$.
+If $s = \abs{x:\tau}{s'}$ with $\Gamma \cup \{ x : \tau \} \vdash
+s' : \rho$, then $\typeinterpret{\sigma} = \quant{\alpha_1 \dots
+\alpha_n}{\interpret{\tau}[\beta_1:=\alpha_1,\dots,\beta_n:=\alpha_n]
+\arrtype \interpret{\rho}}$ with $\{\beta_1,\dots,\beta_n]\} =
+\FTV(\interpret{\tau}) \setminus \FTV(\tau)$.  As the type variables
+$\beta_1,\dots,\beta_n$ are chosen fresh, they do not occur in
+$\typeinterpret{\rho}$.
+By the induction hypothesis, $\Delta \cup \{ x :
+\typeinterpret{\tau}[\beta_1:=\alpha_1,\dots,\beta_n:=\alpha_n] \} \vdash
+\interpret{s'} : \interpret{\rho}\gamma$.
 Thus, $\Delta \vdash \abs{x:\typeinterpret{\sigma}[\vec{\beta}:=
-\vec{\alpha}]}{\interpret{s'}} : \typeinterpret{\sigma}[\vec{\beta}:=
-\vec{\alpha}] \arrtype (\typeinterpret{\tau}\gamma)$.
-Since the variables that occur in $\typeinterpret{\tau}$ but not in
-$\tau$ are chosen fresh, we can safely assume that they do not occur in
-either $\sigma$ or in $\Delta$, nor are they equal to any $\alpha_i$.
-Thus, the type $\typeinterpret{\sigma}[\vec{\beta}:=\vec{\alpha}]
-\arrtype (\typeinterpret{\tau}\gamma)$ is equal to
-$(\typeinterpret{\sigma}[\vec{\beta}:=\vec{\alpha}] \arrtype
-\typeinterpret{\tau})\gamma$.
+\vec{\alpha}]}{\interpret{s'}} : \typeinterpret{\tau}[\vec{\beta}:=
+\vec{\alpha}] \arrtype (\typeinterpret{\rho}\gamma)$.
+Since the variables that occur in $\typeinterpret{\rho}$ but not in
+$\rho$ are chosen fresh, we can safely assume that they do not occur in
+either $\tau$ or in $\Delta$, nor are they equal to any $\alpha_i$.
+Thus, the type $\typeinterpret{\tau}[\vec{\beta}:=\vec{\alpha}]
+\arrtype (\typeinterpret{\rho}\gamma)$ is equal to
+$(\typeinterpret{\tau}[\vec{\beta}:=\vec{\alpha}] \arrtype
+\typeinterpret{\rho})\gamma$.
 We then easily obtain that $\tabs{\alpha_1 \dots \alpha_n}{\abs{x}{s'}} :
-\quant{\alpha_1 \dots \alpha_n}{\interpret{\sigma}[\vec{\beta}:=\vec{
-\alpha}] \arrtype \tau}\gamma = \typeinterpret{\sigma \arrtype \tau}
-\gamma$.
+\quant{\alpha_1 \dots \alpha_n}{\interpret{\tau}[\vec{\beta}:=\vec{
+\alpha}] \arrtype \rho}\gamma = \typeinterpret{\sigma}\gamma$.
 
-Finally, suppose $s = \mathtt{f}(s_1,\dots,s_n)$ with $\mathtt{f} :
-[\sigma_1 \times \dots \times \sigma_k] \arrtype \tau \in \Sigma$ and
-$\Gamma \vdash s_i : \sigma_i$ for all $1 \leq i \leq k$.  By the
-induction hypothesis, there exist substitutiongs $\gamma_1,\dots,
-\gamma_n$ such that $\Delta \vdash \interpret{s_i} : \typeinterpret{
-\sigma_i}\gamma_i$ for all $i$.  Letting $\beta_i^1,\dots,\beta_i^{n_i}$
-denote the elements of $\FTV(\typeinterpret{\sigma_i}) \setminus \FTV(
-\sigma_i)$, and $\alpha_i^1,\dots,\alpha_i^{n_i}$ fresh type variables
-(all $\alpha_j^l$ distinct), we can define $\gamma$ as the type
-substitution that maps each $\alpha_i^j$ to $\gamma_i(\beta_i^j)$;
-this gives us $\Delta \vdash \interpret{s_i} : (\typeinterpret{\sigma_i}
-[\vec{\beta_i}:=\vec{\alpha_i}])\gamma$.
-
-=======================
-
-TODO: change the interpretation of f(s1,...,sn) so that this exactly
-matches with J(f).
-
+Finally, suppose $s = \mathtt{f}(s_1,\dots,s_k)$ with $\mathtt{f} :
+[\tau_1 \times \dots \times \tau_k] \arrtype \sigma \in \Sigma$ and
+$\Gamma \vdash s_i : \tau_i$ for all $1 \leq i \leq k$.  By the
+induction hypothesis, $\Delta \vdash \interpret{s_i} : \typeinterpret{
+\tau_i}\gamma_i$ forall $i$.
+Since all $\alpha_i^j$ are distinct by definition, we can define
+$\chi$ as the type substitution that maps each $\alpha_i^j$ to
+$\gamma_i(\beta_i^j)$; then we have $\Delta \vdash \interpret{s_i} :
+(\typeinterpret{\tau_i}[\vec{\beta_i}:=\vec{\alpha_i}])\chi$.
+We also have $\{ x_1 : \typeinterpret{\tau_1}[\vec{\beta_1}:=
+\vec{\alpha_1}]\chi, \dots, x_k : \typeinterpret{\tau_k}
+[\vec{\beta_k}:=\vec{\alpha_k}]\chi \} \vdash t\chi :
+\typeinterpret{\sigma}\delta\chi$.
+Substituting each $x_i$ by $\interpret{s_i}$, we thus have:
+$\Delta \vdash t\chi[x_1:=\interpret{s_1},\dots,x_k:=\interpret{s_k}]
+: \typeinterpret{\sigma}\delta\chi$.
+\qed
 \end{proof}
+
+Thus, without reference to the type environment, we have:
+\[
+\begin{array}{rcl}
+\interpret{x} & = & x \\
+\interpret{\tabs{\alpha}{s}} & = & \tabs{\alpha}{\interpret{s}} \\
+\interpret{\abs{x:\sigma}{s}} & = & \tabs{\alpha_1 \dots \alpha_n}{
+  \abs{x:\typeinterpret{\sigma}[\beta_1:=\alpha_1,\dots,\beta_n:=
+  \alpha_n]}{\interpret{s}}} \\
+  & & \ \ \ \ \hfill
+  \text{if}\ \FTV(\typeinterpret{\sigma}) \setminus \FTV(\sigma) =
+  \{ \beta_1,\dots,\beta_n \}\ \text{and}\ \alpha_1,\dots,\alpha_n\ 
+  \text{fresh} \\
+\interpret{\mathtt{f}(s_1,\dots,s_k)} & = &
+  t\gamma[x_1:=\interpret{s_1},\dots,x_n:=\interpret{s_n}] \\
+  & & \ \ \ \ \hfill \text{if}\ 
+  \Termmap(\mathtt{f}) = \tabs{\beta_1^1 \dots \beta_k^{
+  n_k}}{\abs{x_1:\sigma_1 \dots x_n:\sigma_n}{t}}\ \text{and}\ \gamma\ 
+  \text{is a type} \\
+  & & \ \ \ \ \hfill \text{substitution
+  on domain}\ \{ \beta_1^1,\dots,\beta_k^{n_k} \}\ \text{so this is
+  well-typed} \\
+\end{array}
+\]
 
 \subsection{Monotonicity}
 
