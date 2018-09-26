@@ -1510,9 +1510,25 @@ provides a strategy for termination analysis using rule removal.
 
 \subsection{Other}
 
-\section{Some system of interest -- urzy\_emb?}
+\section{Some systems of interest -- urzy\_emb?}
 
 \subsection{Interpretations}
+
+We use the following interpretation of the \emph{types}:
+
+\begin{itemize}
+\item $\typeinterpret{\bot} = \nat$
+\item $\typeinterpret{\mathtt{or}(\sigma,\tau)} =
+  \typeinterpret{\sigma} \times \typeinterpret{\tau}$
+\item $\typeinterpret{\mathtt{and}(\sigma,\tau)} =
+  \typeinterpret{\sigma} \times \typeinterpret{\tau}$
+\item $\typeinterpret{\mathtt{prop}_i} = \nat$
+\item $\typeinterpret{\quant{\alpha}{\sigma}} =
+  \quant{\alpha}{\typeinterpret{\sigma}}$
+\item $\typeinterpret{\qquant{\exists}{\alpha}{\sigma}} = \sigma$
+\end{itemize}
+
+We use the following symbol mapping:
 
 \subsection{Rule orientation}
 
