@@ -58,6 +58,7 @@
 \newcommand{\flatten}{\mathtt{flatten}}
 \newcommand{\lift}{\mathtt{lift}}
 \newcommand{\con}{\mathtt{c}}
+\newcommand{\afun}{\mathtt{f}}
 
 \newcommand{\ur}{\upharpoonright}
 \newcommand{\da}{\downarrow}
@@ -1070,7 +1071,7 @@ and quantifiers:
   \mathtt{and} : 2,\quad
   \Rightarrow : 2\quad
   \}\quad \cup\quad
-  \{\quad \mathtt{prop}_i \mid i \in \mathbb{N}\quad \} \\
+  \{\quad \mathtt{prop}_i : 0 \mid i \in \mathbb{N}\quad \} \\
 \TypeQuantifiers = \{\quad
   \forall : 1,\quad
   \exists : 1\quad
@@ -1252,240 +1253,107 @@ using $\succ$ to hopefully obtain a decrease that can be used with
 rule removal.
 
 To start, all types must be mapped to the types of interpretation
-terms.  This we do as follows:
+terms.  This we do using a \emph{type constructor mapping}:
 
 \begin{definition}
-A \emph{type mapping} is a function $\typeinterpret{\cdot}$ which,
-given a type $\sigma$ returns an interpretation type $\typeinterpret{
-\sigma}$ such that:
+A \emph{type constructor mapping} is a function $\Typemap$ whose domain
+is the set of type constructors and quantifiers, such that:
 \begin{itemize}
-\item $\typeinterpret{\sigma \arrtype \tau} =
-  \quant{\alpha_1 \dots \alpha_n}{\typeinterpret{\sigma}[\beta_1:=
-  \alpha_1,\dots,\beta_n:=\alpha_n] \arrtype
-  \typeinterpret{\tau}}$, \\
-  where $\{\beta_1,\dots,\beta_n\} = \FTV(\typeinterpret{\sigma})
-  \setminus \FTV(\sigma)$ and $\alpha_1,\dots,\alpha_n$ fresh
-  variables
-\item $\typeinterpret{\quant{\alpha}{\sigma}} =
-  \quant{\alpha}{\typeinterpret{\sigma}}$ \\
-  (where fresh variables in $\FTV(\typeinterpret{\sigma})$ must also
-  be chosen distinct from $\alpha$)
+\item for $\con : k \in \TypeConstructors$:
+  $\Typemap(\con)$ is a type $\sigma$ with $\FTV(\sigma) 
+  \subseteq \{\alpha_1,\dots,\alpha_k\}$;
+\item for $\mathtt{Q} : k \in \TypeQuantifiers \setminus \{\forall:1\}$:
+  $\Typemap(\mathtt{Q})$ is a type scheme $\sigma$ with $\FTV(\sigma)
+  \subseteq \{ \alpha \}$, and where $\alpha$ may occur only in the
+  form $\alpha\langle\sigma_1,\dots,\sigma_k\rangle$;
+\item $\Typemap(\arrtype) = \alpha_1 \arrtype \alpha_2$ and
+  $\Typemap(\forall) = \quant{\beta}{\alpha\langle\beta\rangle}$
 \end{itemize}
-
-\CK{For now, I will not be any more specific than that.  It would be
-  good to give a more well-defined recipe, but first I want to see how
-  this will work out.  If it works out well, it will probably be
-  something where you can indicate exactly how you can translate types
-  recursively based on the root constructor/quantifier, much like the
-  way the interpretation of terms is defined.}
-%A \emph{type constructor mapping} is a function $\Typemap$ which assigns
-%to each $(\con:n) \in \TypeConstructors$ a type $\sigma$ with
-%$\FTV(\sigma) \subseteq \{ \alpha_1,\dots,\alpha_n \}$,
-%and to each $(\con : n) \in \TypeQuantifiers$ a ``type'' $\sigma$ which
-%may include one \emph{type context variable}\footnote{TODO: define this
-%-- I basically mean a ``variable'' with given open spots to be
-%substituted.} of arity $n$, denoted $\alpha[?_1,\dots,?_n]$ (with the
-%$?_i$ replaced by types).  It is allowed for $\sigma$ to have
-%additional free type variables.  We require that
-%$\Typemap(\arrtype) = \alpha_1 \arrtype \alpha_2$ and $\Typemap(\forall)
-%= \quant{\beta}{\alpha[\beta]}$.
-%
-%A type constructor mapping is extended to a function on types as follows:
-%\[
-%\begin{array}{rcl}
-%\Typemap(\alpha) & = & \alpha \\
-%\Typemap(\con(\sigma_1,\dots,\sigma_n)) & = &
-%  \tau[\alpha_1:=\Typemap(\sigma_1),\dots,\alpha_n:=\Typemap(\sigma_n)]\ 
-%  \text{if}\ \Typemap(\con) = \tau \\
-%\Typemap(\qquant{\con}{\alpha_1 \dots \alpha_n}{\sigma}) & = &
-%  \tau\ \text{with}\ \alpha[\rho_1,\dots,\rho_n]\ \text{replaced
-%  by}\ \sigma[\rho_1,\dots,\rho_n] \\
-%  & & \phantom{x}\hfill\text{if}\ \Typemap(\con) = \tau
-%\end{array}
-%\]
+For a fixed type mapping $\Typemap$, we define $\typeinterpret{\sigma}$
+as follows:
+\[
+\begin{array}{rcl}
+\typeinterpret{\alpha} & = & \alpha \\
+\typeinterpret{\con(\tau_1,\dots,\tau_n)} & = &
+  \Typemap(\con)[\alpha_1:=\typeinterpret{\tau_1},\dots,\alpha_n:=
+  \typeinterpret{\tau_n}] \\
+\typeinterpret{\qquant{\mathtt{Q}}{\alpha_1 \dots \alpha_n}{\tau}} & =
+  & \Typemap(\mathtt{Q})[\alpha:=\quant{\beta_1 \dots \beta_k}{\tau}] \\
+\end{array}
+\]
 \end{definition}
 
-To basis for mapping terms to interpretation terms is a function that
-defines what should be done to function symbols:
+Thus, for example $\typeinterpret{\quant{\alpha}{\sigma}} =
+\quant{\alpha}{\typeinterpret{\sigma}}$ and $\typeinterpret{\sigma
+\arrtype \tau} = \typeinterpret{\sigma} \arrtype \typeinterpret{\tau}$.
+
+Similarly, we employ a \emph{symbol mapping} as an aid to interpret
+\emph{terms}.
 
 \begin{definition}
 A \emph{symbol mapping} is a function $\Termmap$ which assigns to each
-instantiated function symbol $\mathtt{f}_{\rho_1,\dots,\rho_n} :
+indexed function symbol $\mathtt{f}_{\alpha_1,\dots,\alpha_n} :
 [\sigma_1 \times \dots \times \sigma_k] \arrtype \tau \in \Sigma$ an
-interpretation term $\Termmap(\mathtt{f}_{\rho_1,\dots,\rho_n})$ such
-that $\Termmap(\mathtt{f}_{\rho_1,\dots,\rho_n})$ has the following
-form:
-\[
-\tabs{\alpha_1^1 \dots \alpha_1^{n_1} \dots \alpha_k^1 \dots \alpha_k^{n_k}}{
-\abs{x_1:\typeinterpret{\sigma_1}[\vec{\beta_i}:=\vec{\alpha_i}] \dots
-x_k:\typeinterpret{\sigma_k}[\vec{\beta_k}:=\vec{\alpha_k}]}{t}}
-\]
-Where for all $1 \leq i \leq k$:
-\begin{itemize}
-\item $\FTV(\typeinterpret{\sigma_i}) \setminus \FTV(\sigma_i) =
-  \{ \beta_i^1,\dots,\beta_i^{n_i} \}$ (occurring in that order in
-  $\typeinterpret{\sigma_i}$);
-\item $\alpha_i^1,\dots,\alpha_i^{n_i}$ are fresh variables (disjoint
-    from all other $\alpha_j^m$);
-\end{itemize}
-And moreover, if $\FTV(\typeinterpret{\tau}) \setminus \FTV(\tau) =
-\{ \beta_0^1,\dots,\beta_0^{n_i} \}$, then there exist types
-$\rho_1,\dots,\rho_{n_i}$ (possibly containing the variables
-$\alpha_i^j$, but not $\beta_i^j$) such that:
-\[
-\{ x_1 : \typeinterpret{\sigma_1}[\vec{\beta_i}:=\vec{\alpha_i}],
-\dots, x_k : \typeinterpret{\sigma_k}[\vec{\beta_k}:=\vec{\alpha_k}]
-\} \vdash t : \typeinterpret{\tau}[\vec{\beta_0}:=\vec{\rho}]
-\]
-\end{definition}
-
-Term interpretations are done in a type-conscious way.  Importantly,
-terms are mapped not only to an interpretation term, but rather to a
-pair of an interpretation term and a type substitution, as follows
-below.
-In the following, we say that a type substitution $\gamma$ \emph{fills
-in the blanks caused by interpretation} for a type $\sigma$ if the
-domain of $\gamma$ is included in $\FTV(\typeinterpret{\sigma})
-\setminus \FTV(\sigma)$.
-
-\begin{lemma}
-Assume given a fixed symbol mapping $\Termmap$.
-
-Additionally assume given environments $\Gamma,\Delta$, a term $s$
-and a type $\sigma$ such that (1) $\Gamma \vdash s : \sigma$ and (2)
-for all $(x : \tau) \in \Gamma$ there exists a substitution $\delta$
-that fills in the blanks caused by interpretation of $\tau$ such
-that $(x : \tau\delta) \in \Delta$.
-
-Then the following recursive procedure defines a pair
-$\fullinterpret{s,\Gamma,\Delta} = (\ \interpret{s},\ \gamma\ )$
-of an interpretatin term $\interpret{s}$ and a type substitution
-$\gamma$ that fills in the blanks caused by interpretation of
-$\sigma$, such that $\Delta \vdash \interpret{s} :
-\typeinterpret{\sigma}\gamma$:
-
-\begin{itemize}
-\item If $s$ is a variable, then let $\interpret{x} := x$ and let
-  $\gamma$ be such that $(x : \sigma\gamma) \in \Delta$.
-\item If $s = \tabs{\alpha}{s'}$ -- so $\sigma = \quant{\alpha}{
-  \sigma'}$ -- then denote $\fullinterpret{s',\Gamma,\Delta} = (\ 
-  \interpret{s'},\ \gamma\ )$, and let
-  $\mathit{interpret}(s,\Gamma,\Delta) := (\ 
-    \tabs{\alpha}{\interpret{s}},\ \gamma\ )$ if $\alpha \in \FTV(
-    \interpret{\sigma'})$.
-\item If $s = \abs{x:\tau}{s'}$ -- so $\sigma = \tau \arrtype \rho$,
-  say -- then let $\FTV(\interpret{\tau}) \setminus \FTV(\tau) =
-  \{ \beta_1,\dots,\beta_n \}$ and $\alpha_1,\dots,\alpha_n$ be fresh
-  type variables.  If we denote $\fullinterpret{s',\Gamma \cup \{x:\tau\},
-  \Delta \cup \{ x : \typeinterpret{\tau}[\beta_1:=\alpha_1,\dots,
-  \beta_n:=\alpha_n]\}} = (\ \interpret{s'},\ \gamma\ )$, then we let
-  $\fullinterpret{s,\Gamma,\Delta} := (\ \tabs{\alpha_1 \dots \alpha_n}{
-  \abs{x:\typeinterpret{\tau}[\beta_1:=\alpha_1,\dots,\beta_n:=
-  \alpha_n]}{\interpret{s}}},\ \gamma\ )$.
-\item If $s = \mathtt{f}(s_1,\dots,s_k)$ with $\mathtt{f} :
-  [\tau_1 \times \dots \times \tau_k] \arrtype \sigma \in \Sigma$ then
-  denote $\fullinterpret{s_i,\Gamma,\Delta} = (\ \interpret{s_i},\ 
-  \gamma_i\ )$ and $\FTV(\typeinterpret{\tau_i}) \setminus \FTV(\tau_i)
-  = \{ \beta_i^1,\dots,\beta_i^{n_i} \}$ for $1 \leq i \leq k$.
-  Write $\Termmap(\mathtt{f}) = \tabs{\alpha_1^1 \dots \alpha_k^{n_k}}{
-  \abs{x_1 \dots x_k}{t}}$, and let $\delta$ be the substitution such
-  that $\{ x_1 : \typeinterpret{\tau_1}[\vec{\beta_1}:=\vec{\alpha_1}]
-  \dots x_k : \typeinterpret{\tau_k}[\vec{\beta_k}:=\vec{\alpha_k}] \}
-  \vdash t : \typeinterpret{\sigma}\delta$.  Then
-  $\fullinterpret{s,\Gamma,\Delta} := (\ \interpret{s}, \gamma\ )$,
-  where:
-  \begin{itemize}
-  \item $\interpret{s} = t[\alpha_i^j:=\gamma_i(\beta_i^j) \mid 1 \leq
-    i \leq k \wedge 1 \leq j \leq n_i][x_i:=\interpret{s_i} \mid
-    1 \leq i \leq k]$
-  \item $\gamma = \delta[\alpha_i^j:=\gamma_i(\beta_i^j) \mid 1 \leq
-    i \leq k \wedge 1 \leq j \leq n_i][x_i:=\interpret{s_i} \mid
-    1 \leq i \leq k]$
-  \end{itemize}
-\end{itemize}
-
-\end{lemma}
-
-\begin{proof}
-Correctness is shown by induction on the form of $s$.
-
-The variable case is obvious.
-
-If $s = \tabs{\alpha}{s'}$, then note that $\typeinterpret{\sigma} =
-\typeinterpret{\quant{\alpha}{\sigma'}} = \quant{\alpha}{
-\typeinterpret{\sigma'}}$.  By the induction hypothesis,
-$\Delta \vdash \interpret{s'} : \typeinterpret{\sigma'}\gamma$.
-By definition, $\alpha \notin \FTV(\typeinterpret{\sigma'}) \setminus
-\FTV(\sigma')$, so $\alpha \notin \mathit{domain}(\gamma)$.  Therefore,
-$\Delta \vdash \tabs{\alpha}{\interpret{s}} :
-\quant{\alpha}{\interpret{\sigma'}\gamma} = \interpret{\sigma}\gamma$.
-
-If $s = \abs{x:\tau}{s'}$ with $\Gamma \cup \{ x : \tau \} \vdash
-s' : \rho$, then $\typeinterpret{\sigma} = \quant{\alpha_1 \dots
-\alpha_n}{\interpret{\tau}[\beta_1:=\alpha_1,\dots,\beta_n:=\alpha_n]
-\arrtype \interpret{\rho}}$ with $\{\beta_1,\dots,\beta_n]\} =
-\FTV(\interpret{\tau}) \setminus \FTV(\tau)$.  As the type variables
-$\beta_1,\dots,\beta_n$ are chosen fresh, they do not occur in
-$\typeinterpret{\rho}$.
-By the induction hypothesis, $\Delta \cup \{ x :
-\typeinterpret{\tau}[\beta_1:=\alpha_1,\dots,\beta_n:=\alpha_n] \} \vdash
-\interpret{s'} : \interpret{\rho}\gamma$.
-Thus, $\Delta \vdash \abs{x:\typeinterpret{\sigma}[\vec{\beta}:=
-\vec{\alpha}]}{\interpret{s'}} : \typeinterpret{\tau}[\vec{\beta}:=
-\vec{\alpha}] \arrtype (\typeinterpret{\rho}\gamma)$.
-Since the variables that occur in $\typeinterpret{\rho}$ but not in
-$\rho$ are chosen fresh, we can safely assume that they do not occur in
-either $\tau$ or in $\Delta$, nor are they equal to any $\alpha_i$.
-Thus, the type $\typeinterpret{\tau}[\vec{\beta}:=\vec{\alpha}]
-\arrtype (\typeinterpret{\rho}\gamma)$ is equal to
-$(\typeinterpret{\tau}[\vec{\beta}:=\vec{\alpha}] \arrtype
-\typeinterpret{\rho})\gamma$.
-We then easily obtain that $\tabs{\alpha_1 \dots \alpha_n}{\abs{x}{s'}} :
-\quant{\alpha_1 \dots \alpha_n}{\interpret{\tau}[\vec{\beta}:=\vec{
-\alpha}] \arrtype \rho}\gamma = \typeinterpret{\sigma}\gamma$.
-
-Finally, suppose $s = \mathtt{f}(s_1,\dots,s_k)$ with $\mathtt{f} :
-[\tau_1 \times \dots \times \tau_k] \arrtype \sigma \in \Sigma$ and
-$\Gamma \vdash s_i : \tau_i$ for all $1 \leq i \leq k$.  By the
-induction hypothesis, $\Delta \vdash \interpret{s_i} : \typeinterpret{
-\tau_i}\gamma_i$ forall $i$.
-Since all $\alpha_i^j$ are distinct by definition, we can define
-$\chi$ as the type substitution that maps each $\alpha_i^j$ to
-$\gamma_i(\beta_i^j)$; then we have $\Delta \vdash \interpret{s_i} :
-(\typeinterpret{\tau_i}[\vec{\beta_i}:=\vec{\alpha_i}])\chi$.
-We also have $\{ x_1 : \typeinterpret{\tau_1}[\vec{\beta_1}:=
-\vec{\alpha_1}]\chi, \dots, x_k : \typeinterpret{\tau_k}
-[\vec{\beta_k}:=\vec{\alpha_k}]\chi \} \vdash t\chi :
-\typeinterpret{\sigma}\delta\chi$.
-Substituting each $x_i$ by $\interpret{s_i}$, we thus have:
-$\Delta \vdash t\chi[x_1:=\interpret{s_1},\dots,x_k:=\interpret{s_k}]
-: \typeinterpret{\sigma}\delta\chi$.
-\qed
-\end{proof}
-
-Thus, without reference to the type environment, we have:
+interpretation term $\Termmap(\mathtt{f}_{\alpha_1,\dots,\alpha_n})$
+of the form $\abs{x_1 : \interpret{\sigma_1} \dots x_k : \interpret{
+\sigma_k}}{t}$ where $\{ x_1 : \interpret{\sigma_1}, \dots, x_k :
+\interpret{\sigma_k} \} \vdash t : \interpret{\tau}$.  Here, the only
+type variables that may occur in $\Termmap(\mathtt{f}_{\alpha_1,\dots,
+\alpha_n})$ are the elements of $\{\alpha_1,\dots,\alpha_n\}$.
+For a fixed symbol mapping $\Termmap$, we define $\interpret{s}$ as
+follows:
 \[
 \begin{array}{rcl}
 \interpret{x} & = & x \\
 \interpret{\tabs{\alpha}{s}} & = & \tabs{\alpha}{\interpret{s}} \\
-\interpret{\abs{x:\sigma}{s}} & = & \tabs{\alpha_1 \dots \alpha_n}{
-  \abs{x:\typeinterpret{\sigma}[\beta_1:=\alpha_1,\dots,\beta_n:=
-  \alpha_n]}{\interpret{s}}} \\
-  & & \ \ \ \ \hfill
-  \text{if}\ \FTV(\typeinterpret{\sigma}) \setminus \FTV(\sigma) =
-  \{ \beta_1,\dots,\beta_n \}\ \text{and}\ \alpha_1,\dots,\alpha_n\ 
-  \text{fresh} \\
-\interpret{\mathtt{f}(s_1,\dots,s_k)} & = &
-  t\gamma[x_1:=\interpret{s_1},\dots,x_n:=\interpret{s_n}] \\
-  & & \ \ \ \ \hfill \text{if}\ 
-  \Termmap(\mathtt{f}) = \tabs{\beta_1^1 \dots \beta_k^{
-  n_k}}{\abs{x_1:\sigma_1 \dots x_n:\sigma_n}{t}}\ \text{and}\ \gamma\ 
-  \text{is a type} \\
-  & & \ \ \ \ \hfill \text{substitution
-  on domain}\ \{ \beta_1^1,\dots,\beta_k^{n_k} \}\ \text{so this is
-  well-typed} \\
+\interpret{\abs{x:\sigma}{s}} & = & \abs{x:\typeinterpret{\sigma}}{
+  \interpret{s}} \\
+\interpret{\afun_{\rho_1,\dots,\rho_n}(s_1,\dots,s_k)} & = &
+  t[x_1:=\interpret{s_1},\dots,x_k:=\interpret{s_k}] \\
+  & & \text{if}\ \Termmap(\afun_{\alpha_1,\dots,\alpha_n})[\alpha_1:=
+  \typeinterpret{\rho_1},\dots,\alpha_n:=\typeinterpret{\rho_n}] =
+  \abs{x_1 \dots x_k}{t} \\
 \end{array}
 \]
+\end{definition}
+
+Interpretation mapping preserves typing, in a sense:
+
+\begin{lemma}
+Suppose $\Gamma \vdash s : \sigma$, and let $\Delta := \{ (x :
+\typeinterpret{\tau}) \mid (x : \tau) \in \Gamma \}$.  Then
+$\Delta \vdash \interpret{s} : \typeinterpret{\sigma}$.
+\end{lemma}
+
+\begin{proof}
+By induction on the form of $s$.
+The variable case is obvious.
+The case where $s$ is an abstraction $\abs{x:\tau}{s'}$ or a type
+abstraction $\tabs{\alpha}{s'}$ are both immediate with the induction
+hypothesis and the definition of type interpretation.
+So consider the case where $s = \afun_{\rho_1,\dots,\rho_n}(s_1,\dots,
+s_k)$.  We have:
+\begin{itemize}
+\item $\afun_{\alpha_1,\dots,\alpha_n} : [\tau_1' \times \dots \times
+  \tau_k'] \arrtype \sigma' \in \Sigma$ for some $\vec{\tau'},\sigma'$;
+\item $\sigma = \sigma'[\alpha_1:=\rho_1,\dots,\alpha_n:=\rho_n]$ ;
+\item writing $\tau_i := \tau_i'[\alpha_1:=\rho_1,\dots,\alpha_n:=
+  \rho_n]$ for $1 \leq i \leq k$, we have $\Gamma \vdash s_i : \tau_i$;
+\item by the induction hypothesis, $\Delta \vdash \interpret{s_i} :
+  \interpret{\tau_i}$;
+\item we have $\Termmap(\afun_{\alpha_1,\dots,\alpha_n}) =
+  \abs{x_1 \dots x_k}{t} : \tau_1' \arrtype \dots \arrtype \tau_k'
+  \arrtype \sigma'$;
+\item therefore $\Termmap(\afun_{\alpha_1,\dots,\alpha_n})[\alpha_1:=
+  \typeinterpret{\rho_1},\dots,\alpha_n:=\typeinterpret{\rho_n}] =
+  \abs{x_1: \typeinterpret{\tau_1} \dots x_k : \typeinterpret{\tau_k}}{
+  t}$ with $\{ x_1: \typeinterpret{\tau_1} \dots x_k :
+  \typeinterpret{\tau_k} \} t : \typeinterpret{\sigma}$;
+\item hence, $\Delta \vdash t[x_1:=\interpret{s_1},\dots,x_k:=
+  \interpret{s_k}] : \sigma$ as well.
+\qed
+\end{itemize}
+\end{proof}
 
 \subsection{Monotonicity}
 
@@ -1514,25 +1382,31 @@ provides a strategy for termination analysis using rule removal.
 
 \subsection{Interpretations}
 
-We use the following interpretation of the \emph{types}:
-
-\begin{itemize}
-\item $\typeinterpret{\bot} = \nat$
-\item $\typeinterpret{\mathtt{or}(\sigma,\tau)} =
-  \typeinterpret{\sigma} \times \typeinterpret{\tau}$
-\item $\typeinterpret{\mathtt{and}(\sigma,\tau)} =
-  \typeinterpret{\sigma} \times \typeinterpret{\tau}$
-\item $\typeinterpret{\mathtt{prop}_i} = \nat$
-\item $\typeinterpret{\quant{\alpha}{\sigma}} =
-  \quant{\alpha}{\typeinterpret{\sigma}}$
-\item $\typeinterpret{\qquant{\exists}{\alpha}{\sigma}} = \sigma$
-\end{itemize}
-
-We use the following function symbol mapping:
-
-\begin{itemize}
-\item $\Termmap(\epsilon_\alpha) = $
-\end{itemize}
+We use the following type constructor mapping:
+\[
+\begin{array}{rcl}
+\Typemap(\bot) & = & \nat \\
+\Typemap(\mathtt{or}) & = & \alpha_1 \times \alpha_2 \\
+\Typemap(\mathtt{and}) & = & \alpha_1 \times \alpha_2 \\
+\Typemap(\mathtt{prop}_i) & = & \nat \\
+\Typemap(\arrtype) & = & \alpha_1 \arrtype \alpha_2 \\
+\Typemap(\forall) & = & \quant{\beta}{\alpha\langle\beta\rangle} \\
+\Typemap(\exists) & = & \quant{\beta}{\quant{\chi}{\alpha\langle\chi
+  \rangle \arrtype \beta} \arrtype \beta}
+\end{array}
+\]
+And the following function symbol mapping:
+\[
+\begin{array}{rcl}
+\Termmap(\epsilon_\alpha) & = & \abs{x:\nat}{\mathtt{lift}_\alpha(x)} \\
+\Termmap(@_{\alpha,\beta}) & = & \abs{x: \alpha \arrtype \beta,y :
+  \alpha}{\oplus_{\beta} \cdot (x \cdot y) \cdot \mathtt{lift}_\beta(1)}
+  \\
+\Termmap(\mathtt{ext}_{\alpha,\beta}) & = & \abs{x:\alpha\langle\beta
+  \rangle}{\tabs{\xi}{\abs{y:\quant{\chi}{\alpha\langle\chi\rangle
+  \arrtype \xi}}{y * \beta \cdot x}}} \\
+\end{array}
+\]
 
 \subsection{Rule orientation}
 
