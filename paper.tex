@@ -1098,7 +1098,7 @@ We have the following function symbols:
   \alpha \arrtype \xi \times \beta \arrtype \xi] \arrtype \xi\ \ \ & 
 \mathtt{let}_{\alpha,\beta} & : &
   \qquant{\exists}{\xi}{\meta{\alpha}{\xi}} \times 
-  \quant{\xi}{\xi \arrtype \beta}] \arrtype \beta \\
+  \quant{\xi}{\alpha\langle\xi\rangle \arrtype \beta}] \arrtype \beta \\
 \mathtt{ext}_{\alpha,\beta} & : & [\meta{\alpha}{\beta}] \arrtype
   \qquant{\exists}{\xi}{\meta{\alpha}{\xi}} \\
 \end{array}
@@ -1353,6 +1353,17 @@ s_k)$.  We have:
   \interpret{s_k}] : \sigma$ as well.
 \qed
 \end{itemize}
+
+TODO: I'm pretty sure that this proof is incomplete, because it assumes
+that type substitution does not do anything funny; however, a symbol
+mapping does not truly map to ``terms'': it maps to terms where some
+type denotations are instead \emph{type schemes}.  This means that a
+type scheme $\alpha\langle\beta\rangle$ might be ``instantiated'' to
+$\typeinterpret{\sigma[\alpha:=\tau]}$.  At a minimum, we will probably
+have to prove that $\typeinterpret{\sigma}[\alpha:=\typeinterpret{\tau}
+] = \typeinterpret{\sigma[\alpha:=\tau]}$.  I don't foresee any
+difficulties in this, just noting that we \emph{should} still fix this
+proof.
 \end{proof}
 
 \subsection{Monotonicity}
@@ -1361,16 +1372,44 @@ By imposing certain monotonicity requirements on the choices for
 $\Termmap$, we obtain a pair $(\succ,\succeq)$ that can be used with
 rule removal (Theorem \ref{thm:ruleremove}).
 
-\begin{lemma}
-TODO
-\end{lemma}
+IDEA: we let $s > t$ if either $\interpret{s}\downarrow\:\succ\:
+\interpret{t}\downarrow$, or $\interpret{s} \leadsto^* \interpret{s}$
+(in which case $\interpret{s}\downarrow\:=\interpret{t}\downarrow$).
+Since both $\succ$ and $\leadsto$ are terminating, this gives a
+well-founded ordering on terms.  We then just have to prove that if
+$\ell > r$ for a rule, then $s > t$ whenever $s$ reduces to $t$ by
+that rule.
 
-Thus, if $\interpret{\ell} \succ \interpret{r}$ for some rule, then
-$\interpret{s}\downarrow \succ \interpret{t}\downarrow$ whenever
-$s \arr{\Rules} t$ by that rule, and similar for $\succeq$.  This
-provides a strategy for termination analysis using rule removal.
+%\begin{lemma}
+%TODO
+%\end{lemma}
+%
+%Thus, if $\interpret{\ell} \succ \interpret{r}$ for some rule, then
+%$\interpret{s}\downarrow \succ \interpret{t}\downarrow$ whenever
+%$s \arr{\Rules} t$ by that rule, and similar for $\succeq$.  This
+%provides a strategy for termination analysis using rule removal.
 
 \section{Some useful lemmas}
+
+Some things I will need:
+
+\begin{lemma}\label{lem:substitutioninterpret}
+We have:
+\begin{enumerate}
+\item\label{lem:substitutioninterpret:types}
+  $\typeinterpret{\sigma}[\alpha:=\typeinterpret{\tau}] =
+  \typeinterpret{\sigma[\alpha:=\tau]}$
+\item\label{lem:substitutioninterpret:mixed}
+  $\interpret{s}[\alpha:=\typeinterpret{\tau}] =
+  \interpret{s[\alpha:=\tau]}$
+\item\label{lem:substitutioninterpret:terms}
+  $\interpret{s}[x:=\interpret{t}] = \interpret{s[x:=t]}$
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+TODO
+\end{proof}
 
 \subsection{Orienting $\beta$-reduction}
 
@@ -1397,18 +1436,195 @@ We use the following type constructor mapping:
 \]
 And the following function symbol mapping:
 \[
-\begin{array}{rcl}
-\Termmap(\epsilon_\alpha) & = & \abs{x:\nat}{\mathtt{lift}_\alpha(x)} \\
-\Termmap(@_{\alpha,\beta}) & = & \abs{x: \alpha \arrtype \beta,y :
-  \alpha}{\oplus_{\beta} \cdot (x \cdot y) \cdot \mathtt{lift}_\beta(1)}
-  \\
-\Termmap(\mathtt{ext}_{\alpha,\beta}) & = & \abs{x:\alpha\langle\beta
-  \rangle}{\tabs{\xi}{\abs{y:\quant{\chi}{\alpha\langle\chi\rangle
-  \arrtype \xi}}{y * \beta \cdot x}}} \\
+\begin{array}{rcll}
+\Termmap(\epsilon_\alpha) & = & \lambda x:\nat. & 
+  \mathtt{lift}_\alpha(x) \\
+\Termmap(@_{\alpha,\beta}) & = & \lambda x: \alpha \arrtype \beta,y :
+  \alpha. \quad & x \cdot y \\
+\Termmap(\mathtt{tapp}_{\alpha,\beta}) & = & \lambda x : \quant{\xi}{
+  \alpha\langle\xi\rangle}.\quad & x * \beta \\
+\Termmap(\mathtt{ext}_{\alpha,\beta}) & = & \lambda x:\alpha\langle\beta
+  \rangle. &
+  \tabs{\xi}{\abs{y:\quant{\chi}{\alpha\langle\chi\rangle
+  \arrtype \xi}}{y * \beta \cdot x}} \\
+\Termmap(\mathtt{in}^1_{\alpha,\beta}) & = & \lambda x : \alpha.\quad &
+  (x, \mathtt{lift}_\beta(1)) \\
+\Termmap(\mathtt{in}^2_{\alpha,\beta}) & = & \lambda x : \beta.\quad &
+  (\mathtt{lift}_\alpha(1), x) \\
+\Termmap(\pi^1_{\alpha,\beta}) & = & \lambda x : \alpha \times \beta.
+  \quad & \pi^1_{\alpha,\beta}(x) \\
+\Termmap(\pi^2_{\alpha,\beta}) & = & \lambda x : \alpha \times \beta.
+  \quad & \pi^2_{\alpha,\beta}(x) \\
+\Termmap(\mathtt{pair}_{\alpha,\beta}) & = & \lambda x : \alpha, y :
+  \beta.\quad & (x, y) \\
+\end{array}
+\]
+\[
+\begin{array}{rcll}
+\Termmap(\mathtt{let}_{\alpha,\beta}) & = & \lambda x : \quant{\chi}{
+  \quant{\xi}{\alpha\langle\xi\rangle \arrtype \chi} \arrtype \chi},
+  y : \quant{\xi}{\alpha\langle\chi\rangle \arrtype \beta}. \quad &
+  x * \beta \cdot y \\
+\Termmap(\mathtt{case}_{\alpha,\beta,\xi}) & = & \lambda x : (\alpha
+  \times \beta), y : (\alpha \arrtype \xi), z : (\beta \arrtype \xi).
+  \quad & ??? \text{of type}\ \xi \\
 \end{array}
 \]
 
 \subsection{Rule orientation}
 
+\begin{itemize}
+\item $@_{\sigma,\tau}(\abs{x}{s},t) \to s[x:=t]$ \\
+  We have $\interpret{@(\abs{x:\sigma}{s},t)} = (\abs{x:\typeinterpret{
+  \sigma}}{\interpret{s}}) \cdot \interpret{t} \leadsto
+  \interpret{s}[x:=\interpret{t}]$, which equals
+  $\interpret{s[x:=t]}$ by Lemma
+  \ref{lem:substitutioninterpret}.
+\item $\mathtt{tapp}_{\quant{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) \to
+  s[\alpha:=\tau]$ \\
+  We have $\interpret{\mathtt{tapp}_{\quant{\alpha}{\sigma},
+  \tau}(\tabs{\alpha}{s})} = (\tabs{\alpha}{\interpret{s}}) *
+  \typeinterpret{\tau} \leadsto \interpret{s}[\alpha:=
+  \typeinterpret{\tau}] = \interpret{s[\alpha:=\tau]}$.
+\item $\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(
+  \mathtt{ext}_{\qquant{\forall}{\alpha}{\sigma},\tau}(s),\tabs{\alpha}{
+    \abs{x:\sigma}{t}}) \to t[\alpha:=\tau][x:=s]$ \\
+  Let $u := \mathtt{ext}_{\quant{\alpha}{\sigma},\tau}(s)$ and
+  $w := \tabs{\alpha}{\abs{x}{t}}$.  Then we have:
+  \begin{itemize}
+  \item $\interpret{u} = 
+    \tabs{\xi}{\abs{y:\quant{\alpha}{\sigma \arrtype \xi}}{
+    y * \typeinterpret{\tau} \cdot \interpret{s}}}$ (which has type
+    $\quant{\xi}{\quant{\alpha}{\sigma \arrtype \xi} \arrtype \xi}$);
+  \item $\interpret{w} = \tabs{\alpha}{\abs{x:\typeinterpret{\sigma}}{
+    \interpret{t}}}$ (which has type $\quant{\alpha}{\sigma \arrtype
+    \rho}$ with $\alpha \notin \FTV(\rho)$);
+  \item $\interpret{\mathtt{let}_{\quant{\alpha}{\sigma},\rho}(u,w)} =
+    \interpret{u} * \rho \cdot \interpret{w} \leadsto
+    (\abs{y}{y * \typeinterpret{\tau} \cdot \interpret{s}}) \cdot
+    \interpret{w} \leadsto \interpret{w} * \typeinterpret{\tau} \cdot
+    \interpret{s} \leadsto (\abs{x:\typeinterpret{\sigma}[\alpha:=
+    \typeinterpret{\tau}]}{\interpret{t}[\alpha:=\typeinterpret{\tau}]})
+    \cdot \interpret{s} \leadsto \interpret{t}[\alpha:=\typeinterpret{
+    \tau}][x:=\interpret{s}]$.  By Lemma 
+    \ref{lem:substitutioninterpret} this is equal to
+    $\interpret{t[\alpha:=\tau][x:=s]}$.
+  \end{itemize}
+\end{itemize}
+
+==========================
+
+\[
+\begin{array}{rcl}
+\pi^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \to & s \\
+\pi^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \to & s \\
+\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{\sigma,\tau}(u),
+  \abs{x}{s},\abs{y}{t}) & \to & s[x:=u] \\
+\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^2_{\sigma,\tau}(u),
+  \abs{x}{s},\abs{y}{t}) & \to & t[x:=u] \\
+\end{array}
+\]
+\[
+\begin{array}{rcl}
+\epsilon_\tau(\epsilon_\bot(s)) & \to & \epsilon_\tau(s) \\
+@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) & \to &
+  \epsilon_\tau(s) \\
+\mathtt{tapp}_{\quant{\alpha}{\sigma},\tau}(
+  \epsilon_{\quant{\alpha}{\sigma}}(s)) & \to &
+  \epsilon_{\sigma[\alpha:=\tau]}(s) \\
+\pi^1_{\sigma,\tau}(\epsilon_{\mathtt{and}(\sigma,\tau)}(s)) & \to &
+  \epsilon_\sigma(s) \\
+\pi^2_{\sigma,\tau}(\epsilon_{\mathtt{and}(\sigma,\tau)}(s)) & \to &
+  \epsilon_\tau(s) \\
+\mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}(\sigma,\tau)}(
+  u),\abs{x}{s},\abs{y}{t}) & \to & \epsilon_\rho(s) \\
+\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(\epsilon_{\qquant{
+  \forall}{\alpha}{\sigma}}(s),\tabs{\alpha}{\abs{x}{t}}) & \to &
+  \epsilon_\rho(s) \\
+\end{array}
+\]
+
+\begin{itemize}
+%\[
+%\begin{array}{rcl}
+\item $
+\epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,\abs{x}{s},\abs{y}{t}))
+  %& \to &
+  \to
+  \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x}{\epsilon_\rho(s)},
+  \abs{y}{\epsilon_\rho(t)}) $%\\
+\item $
+@_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\rho \arrtype \pi}(u,
+  \abs{x}{s},\abs{y}{t}),v) %& \to &
+  \to
+  \mathtt{case}_{\sigma,\tau,\pi}(u,
+  \abs{x}{@_{\rho,\pi}(s,v)},\abs{y}{@_{\rho,\pi}(t,v)}) $%\\
+\item $
+\mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(\mathtt{case}_{\sigma,\tau,
+  \quant{\alpha}{\rho}}(u,\abs{x}{s},\abs{y}{t})) %& \to &
+  \to
+  \mathtt{case}_{\sigma,\tau,\rho[\alpha:=\pi]}(u,
+  \abs{x}{\mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(s)},\\
+  \abs{y}{\mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(t)}) $%\\
+\item $
+\pi^1_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}(\rho,\pi)}(u,
+  \abs{x}{s},\abs{y}{t})) %& \to &
+  \to
+  \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x}{\pi^1_{\rho,\pi}(s)},
+  \abs{y}{\pi^1_{\rho,\pi}(t)}) $%\\
+\item $
+\pi^2_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}(\rho,\pi)}(u,
+  \abs{x}{s},\abs{y}{t})) %& \to &
+  \to
+  \mathtt{case}_{\sigma,\tau,\pi}(u,\abs{x}{\pi^2_{\rho,\pi}(s)},
+  \abs{y}{\pi^2_{\rho,\pi}(t)}) $%\\
+\item $
+\mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,\tau,\mathtt{or}(
+  \rho,\pi)}(u,\abs{x}{s},\abs{y}{t}),\abs{z}{v},\abs{a}{w}) %& \to &
+  \to\\
+  \mathtt{case}_{\sigma,\tau,\xi}(u,
+    \abs{x}{\mathtt{case}_{\rho,\pi,\xi}(s,\abs{z}{v},\abs{a}{w})},
+    \abs{y}{\mathtt{case}_{\rho,\pi,\xi}(t,\abs{z}{v},\abs{a}{w})}) $%\\
+\item $
+\mathtt{let}_{\qquant{\forall}{\alpha}{\rho}}(
+  \mathtt{case}_{\sigma,\tau,\qquant{\forall}{\alpha}{\rho}}(
+  u,\abs{x}{s},\abs{y}{t}),v) %& \to &
+  \to\\
+  \mathtt{case}_{\sigma,\tau,\rho}(u,
+  \abs{x}{\mathtt{let}_{\qquant{\forall}{\alpha}{\rho}}(s,v)},
+  \abs{y}{\mathtt{let}_{\qquant{\forall}{\alpha}{\rho}}(t,v)})
+  $%\\
+%\end{array}
+%\]
+\end{itemize}
+\begin{itemize}
+\item $\epsilon_\tau(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
+  \bot}(s,t)) \to
+  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\tau}(s,\epsilon_\tau(t))$
+\item $@_{\tau,\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
+  \tau \arrtype \rho}(s,t),u) \to
+  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(s,@_{\tau,\rho}(t,
+  u))$
+\item $\mathtt{tapp}_{\quant{\alpha}{\tau},\rho}(
+\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\quant{\alpha}{\tau}}(s,t))
+  \to
+  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\tau[\alpha:=\rho]}(s,
+  \mathtt{tapp}_{\quant{\alpha}{\tau},\rho}(t))$
+\item $\pi^1_{\tau,\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
+  \mathtt{and}(\tau,\rho)}(s,t)) \to
+  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\tau}(s,\pi^1_{\tau,
+  \rho}(t))$
+\item $\pi^2_{\tau,\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
+  \mathtt{and}(\tau,\rho)}(s,t)) \to
+  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(s,\pi^2_{\tau,
+  \rho}(t))$
+\item $\mathtt{case}_{\tau,\rho,\pi}(
+  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\mathtt{or}(\tau,
+  \rho)}(s,t),\abs{x}{u},\abs{y}{v}) \to
+  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\pi}(s,\mathtt{case}_{
+  \tau,\rho,\pi}(t,\abs{x}{u},\abs{y}{v}))$
+\item $\mathtt{let}_{\qquant{\forall}{\beta}{\tau},\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\qquant{\forall}{\beta}{\tau}}(s,t),u) \to
+  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(s,\mathtt{let}_{\qquant{\forall}{\beta}{\tau},\rho}(t,u))$
+\end{itemize}
 \end{document}
 
