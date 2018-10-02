@@ -892,7 +892,7 @@ $\succeq$ is reflexive.
 
 Finally, they must be compatible:
 
-\begin{lemma}
+\begin{lemma}\label{lem:compatibility}
 We have $\succ \cdot \succeq\ \subseteq\ \succ$
 \end{lemma}
 
@@ -900,16 +900,85 @@ We have $\succ \cdot \succeq\ \subseteq\ \succ$
 By coinduction, analogous to the transitivity proof.\qed
 \end{proof}
 
-I think that's all that absolutely \emph{has} to be proven to make the
-argument work.  However, it would be great if we could also for
-instance obtain that always $\app{\app{\oplus}{s}}{t} \succeq s$ and
-that $\app{\app{\oplus}{s}}{(\app{\lift}{1})} \succ s$.
+\CK{Do we also have $\succeq \cdot \succ\ \subseteq\ \succ$? I'd like
+to use that.\medskip}
+
+\CK{I think that's all that absolutely \emph{has} to be proven to make
+the argument work.  However, to work with these things we will need a
+little more\dots}
+
+\begin{lemma}\label{lem:plusparts}
+For all interpretation types $\sigma$, interpretation terms $s,t$ of
+type $\sigma$ and $n > 0$ we have:
+\begin{enumerate}
+\item $\oplus_{\sigma}(s,t) \succeq s$ and
+      $\oplus_{\sigma}(s,t) \succeq t$;
+\item $\oplus_{\sigma}(s,\lift_{\sigma}(n)) \succ s$ and
+      $\oplus_{\sigma}(\lift_{\sigma}(n),t) \succ t$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+TODO
 
 \LC{I think these also hold by coinduction because they hold for
 type~$\nat$. But one needs to generalize the coinductive hypothesis to
 $\app{\app{\oplus}{s}}{t} \cdot t_1 \cdot \ldots \cdot t_n
 \succeq_\sigma s \cdot t_1 \cdot \ldots \cdot t_n$ (and with some
 additional type arguments also).}
+
+\end{proof}
+
+\begin{lemma}\label{lem:liftgreater}
+If $n \geq m$ then $\lift_\sigma(n) \succeq \lift_\sigma(m)$ for all
+types $\sigma$.
+\end{lemma}
+
+\begin{proof}
+TODO
+\end{proof}
+
+\begin{lemma}\label{lem:plustimesmonotonic}
+If $s,t,u$ are terms of type $\sigma$ and $s \succeq t$, then
+$s \oplus_\sigma u \succeq t \oplus_\sigma u$ and $s \otimes_\sigma u
+\succeq t \otimes_\sigma u$.  Moreover, if even $s \succ t$ then we
+have $s \oplus_\sigma u \succ t$, and if $u \succeq \lift_\sigma(1)$
+then also $s \otimes_\sigma u \succ t \otimes_\sigma u$.
+\end{lemma}
+
+\begin{proof}
+TODO
+\end{proof}
+
+In the following, we denote $s \approx t$ if both $s \succeq t$ and
+$t \succeq s$.  We observe that standard equality properties of
+addition and multiplication extend to interpretation terms of extended
+types:
+
+\begin{lemma}\label{lem:approxproperties}
+For all interpretation types $\sigma$ and interpretation terms $s,t,u$
+of type $\sigma$, we have:
+\begin{enumerate}
+\item\label{lem:approx:symmetry}
+  $\oplus_\sigma(s,t) \approx \oplus_\sigma(t,s)$ and
+  $\otimes_\sigma(s,t) \approx \otimes_\sigma(t,s)$;
+\item\label{lem:approx:assoc}
+  $\oplus_\sigma(s,\oplus_\sigma(t,u)) \approx \oplus_\sigma(
+    \oplus_\sigma(s,t),u)$ and
+  $\otimes_\sigma(s,\otimes_\sigma(t,u)) \approx \otimes_\sigma(
+    \otimes_\sigma(s,t),u)$;
+\item\label{lem:approx:distribution}
+  $\otimes_\sigma(s,\oplus(t,u)) \approx \oplus_\sigma(\otimes_\sigma(
+  s,t),\otimes_\sigma(s,u))$;
+\item\label{lem:approx:neutral}
+  $\oplus_\sigma(\lift_\sigma(0), s) \approx s$ and
+  $\otimes_\sigma(\lift_\sigma(1), s) \approx s$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+TODO
+\end{proof}
 
 \section{Systems of interest and their properties}\label{sec:systems}
 
@@ -1411,6 +1480,10 @@ We have:
 TODO
 \end{proof}
 
+\CK{The following might need to be moved to the section where we define
+interpretation terms, as these properties have nothing to do with
+interpretations.\medskip}
+
 \subsection{Orienting $\beta$-reduction}
 
 \subsection{Orienting type instantiation}
@@ -1418,6 +1491,12 @@ TODO
 \subsection{Other}
 
 \section{Some systems of interest -- urzy\_emb?}
+
+For easier presentation, we will denote $\oplus$ and $\otimes$ in
+\emph{infix, left-associative} notation.  Thus, $s \oplus_\sigma t
+\oplus_\sigma u$ should be read as $\oplus_\sigma(s,\oplus_\sigma(t,
+u))$.  $\oplus$ and $\otimes$ have the expected properties of symmetry
+and associativity.
 
 \subsection{Interpretations}
 
@@ -1467,7 +1546,15 @@ And the following function symbol mapping:
   x * \beta \cdot y \\
 \Termmap(\mathtt{case}_{\alpha,\beta,\xi}) & = & \lambda x : (\alpha
   \times \beta), y : (\alpha \arrtype \xi), z : (\beta \arrtype \xi).
-  \quad & ??? \text{of type}\ \xi \\
+  \quad & \\
+  & & \multicolumn{2}{r}{
+  \lift_\xi(37) \oplus_\xi (\ 
+  (\lift_\xi(\flatten_{\alpha \times \beta}(x) \oplus_\nat 1))
+  \otimes_\xi} \\
+  & & \multicolumn{2}{r}{
+  ((y \cdot \proj^1_{\alpha,\beta}(x)) \oplus_{\xi}
+   (z \cdot \proj^2_{\alpha,\beta}(x)))
+  \ )} \\
 \end{array}
 \]
 
@@ -1499,6 +1586,58 @@ And the following function symbol mapping:
   \item $\interpret{w} = \tabs{\alpha}{\abs{x:\typeinterpret{\sigma}}{
     \interpret{t}}}$ (which has type $\quant{\alpha}{\sigma \arrtype
     \rho}$ with $\alpha \notin \FTV(\rho)$);
+  \item $\pi^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) \to s$ \\
+    We have $\interpret{\pi^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(
+    s,t))} = \pi^1_{\typeinterpret{\sigma,\tau}}(\interpret{s},
+    \interpret{t}) \leadsto \interpret{s}$.
+  \item $\pi^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) \to t$ \\
+    We have $\interpret{\pi^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(
+    s,t))} = \pi^2_{\typeinterpret{\sigma,\tau}}(\interpret{s},
+    \interpret{t}) \leadsto \interpret{t}$.
+  \item $\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{\sigma,\tau}(u),
+    \abs{x}{s},\abs{y}{t}) \to s[x:=u]$ \\
+    For brevity, let $uu := \interpret{\mathtt{in}^1_{\sigma,\tau}(u)} =
+    (\interpret{u}, \lift_\tau(1))$.
+    Also denote $\varphi := \lift_\rho(\flatten_{\sigma \times \tau}(
+    uu) \oplus_{\nat} 1)$. \\
+    We have $\interpret{\mathtt{case}_{\sigma,\tau,\rho}(\dots)} =
+    \lift_\rho(37) \oplus_\rho (\varphi\,\otimes_\rho (\ (\abs{x:
+    \typeinterpret{\sigma}}{\interpret{s}}) \cdot \proj^1_{\sigma,\tau}(
+    uu) \oplus_\rho
+    (\abs{y:\typeinterpret{\tau}}{\interpret{t}}) \cdot \proj^2_{\sigma,
+    \tau}(uu)\ ))$.
+    Note that $\varphi \succeq \lift_\rho(1)$ by
+    Lemma \ref{lem:liftgreater}.  Therefore, by monotonicity of $\oplus$
+    and $\otimes$ and the distribution property (Lemmas
+    \ref{lem:plustimesmonotonic} and
+    \ref{lem:approxproperties}(\ref{lem:approx:distribution}))%
+    \footnote{\CK{Actually this is not quite accurate: as the term is
+    not in $\leadsto$-normal form, we cannot compare it by $\succeq$.
+    What I'm trying to say here is that since we can take this step
+    here, the same $\succeq$-relation will hold for its $\leadsto$-%
+    normal form.  However, to make this properly formal we will have to
+    define more exactly how interpretation terms that are not in
+    $\leadsto$-normal form may be compared.}}, this term
+    $\succeq \lift_\rho(37) \oplus_\rho (\abs{x}{\interpret{s}})
+    \cdot \proj^1_{\sigma,\tau}(uu) \oplus_\rho (\abs{y}{\interpret{t}})
+    \cdot \proj^2_{\sigma,\tau}(uu) \leadsto^* \lift_\rho(37)
+    \oplus_\rho \interpret{s}[x:=\interpret{u}] \oplus_\rho
+    \interpret{t}[y:=\interpret{u}]$.  By Lemma
+    \ref{lem:plusparts} (and Lemma
+    \ref{lem:approxproperties}(\ref{lem:approx:symmetry}) along with
+    Lemma \ref{lem:compatibility})\footnote{\CK{Since Lemma
+    \ref{lem:plusparts} only gives that $s \oplus \lift(n) \succ s$ and
+    not $\lift(n) \oplus s \succ s$, I use Lemma
+    \ref{lem:approxproperties}(\ref{lem:approx:symmetry}) to obtain
+    $\lift(n) \oplus s \succeq s \oplus \lift(n) \succ s$.  We will
+    then also need an \emph{extended version} of Lemma
+    \ref{lem:compatibility}, since as is, it does not state that
+    $\succeq \cdot \succ$ is included in $\succ$.}}, this term
+    $\succ \interpret{s}[x:=\interpret{u}] = \interpret{s[x:=u]}$ by
+    Lemma \ref{lem:substitutioninterpret}.
+  \item $\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^2_{\sigma,\tau}(u),
+    \abs{x}{s},\abs{y}{t}) \to t[x:=u]$ \\
+    Symmetric to the case above.
   \item $\interpret{\mathtt{let}_{\quant{\alpha}{\sigma},\rho}(u,w)} =
     \interpret{u} * \rho \cdot \interpret{w} \leadsto
     (\abs{y}{y * \typeinterpret{\tau} \cdot \interpret{s}}) \cdot
@@ -1514,16 +1653,6 @@ And the following function symbol mapping:
 
 ==========================
 
-\[
-\begin{array}{rcl}
-\pi^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \to & s \\
-\pi^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \to & s \\
-\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{\sigma,\tau}(u),
-  \abs{x}{s},\abs{y}{t}) & \to & s[x:=u] \\
-\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^2_{\sigma,\tau}(u),
-  \abs{x}{s},\abs{y}{t}) & \to & t[x:=u] \\
-\end{array}
-\]
 \[
 \begin{array}{rcl}
 \epsilon_\tau(\epsilon_\bot(s)) & \to & \epsilon_\tau(s) \\
