@@ -33,13 +33,17 @@
 \newcommand{\Typemap}{\mathcal{T\!M}}
 \newcommand{\Termmap}{\mathcal{J}}
 
+\newcommand{\nf}{\mathtt{nf}}
+
 \newcommand{\quant}[2]{\forall #1[#2]}
 \newcommand{\qquant}[3]{#1 #2[#3]}
 \newcommand{\typeinterpret}[1]{\text{\guillemotleft} #1\! \text{\guillemotright}}
 \newcommand{\interpret}[1]{\llparenthesis #1 \rrparenthesis}
 \newcommand{\fullinterpret}[1]{\Phi(#1)}
-\newcommand{\arr}[1]{\to_{#1}}
-\newcommand{\arrtype}{\Rightarrow}
+\newcommand{\arr}[1]{\longrightarrow_{#1}}
+\newcommand{\red}{\longrightarrow}
+\newcommand{\arrtype}{\rightarrow}
+\newcommand{\arrkind}{\Rightarrow}
 \newcommand{\abs}[2]{\lambda #1.#2}
 \newcommand{\tabs}[2]{\Lambda #1.#2}
 \newcommand{\abstraction}[2]{\backslash #1.#2}
@@ -425,8 +429,8 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
     variable~$\alpha$,
   \item $\val{\nat}{\omega,\xi}{\Gamma}$ is the set of all
     terms~$t \in \SN$ such that $\Gamma \proves t : \nat$,
-  \item $\val{\sigma \to \tau}{\omega,\xi}{\Gamma}$ is the set of all
-    terms~$t$ such that $\Gamma \proves t : \omega(\sigma \to \tau)$,
+  \item $\val{\sigma \arrtype \tau}{\omega,\xi}{\Gamma}$ is the set of all
+    terms~$t$ such that $\Gamma \proves t : \omega(\sigma \arrtype \tau)$,
     and for every~$s \in \val{\sigma}{\omega,\xi}{\Gamma}$ we have
     $\app{t}{s} \in \val{\tau}{\omega,\xi}{\Gamma}$,
   \item $\val{\forall\alpha[\sigma]}{\omega,\xi}{\Gamma}$ is the set
@@ -549,10 +553,10 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
   $\val{\nat}{\omega,\xi}{\Gamma} \in \Cb_{\nat}^\Gamma$ by
   Lemma~\ref{lem_nat_reducible}.
 
-  Assume $\sigma = \tau_1 \to \tau_2$. We check the conditions in
+  Assume $\sigma = \tau_1 \arrtype \tau_2$. We check the conditions in
   Definition~\ref{def_candidate}.
   \begin{enumerate}
-  \item Let $t \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$ and
+  \item Let $t \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$ and
     assume there is an infinite reduction
     $t \leadsto t_1 \leadsto t_2 \leadsto t_3 \leadsto \ldots$. By the
     inductive hypothesis $\val{\tau_1}{\omega,\xi}{\Gamma}$ and
@@ -562,19 +566,19 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
     $t x$~is strongly normalising. But
     $t x \leadsto t_1 x \leadsto t_2 x \leadsto t_3 x \leadsto
     \ldots$. Contradiction.
-  \item Let $t \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$ and
+  \item Let $t \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$ and
     $t \leadsto t'$. Let $u \in
     \val{\tau_1}{\omega,\xi}{\Gamma}$. Then
     $t u \in \val{\tau_2}{\omega,\xi}{\Gamma}$. By the inductive
     hypothesis $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a candidate, so
     $t' u \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Also note that
-    $\Gamma \proves t' : \omega(\tau_1 \to \tau_2)$ by the subject
+    $\Gamma \proves t' : \omega(\tau_1 \arrtype \tau_2)$ by the subject
     reduction lemma. Hence
-    $t' \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
+    $t' \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$.
   \item Let $t$ be neutral and
-    $\Gamma \proves t : \omega(\tau_1 \to \tau_2)$ and assume for
+    $\Gamma \proves t : \omega(\tau_1 \arrtype \tau_2)$ and assume for
     every~$t'$ with $t \leadsto t'$ we have
-    $t' \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$. Let
+    $t' \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$. Let
     $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$. By the inductive
     hypothesis $\val{\tau_1}{\omega,\xi}{\Gamma}$ is a candidate, so
     $u \in \SN$. By induction on~$\nu(u)$ we show that
@@ -587,7 +591,7 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
       $t u' \in \val{\tau_2}{\omega,\xi}{\Gamma}$ by the inductive
       hypothesis for~$u$.
     \item $t'' = t' u$ with $t \leadsto t'$. Then
-      $t' \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$, so
+      $t' \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$, so
       $t' u \in \val{\tau_2}{\omega,\xi}{\Gamma}$.
     \end{itemize}
     We have thus shown that if $t u \leadsto t''$ then
@@ -596,32 +600,32 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
     candidate, and $t u$ is neutral, so also
     $t u \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Since
     $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$ was arbitrary, we have
-    shown $t \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
-  \item Assume $t_1,t_2 \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
+    shown $t \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$.
+  \item Assume $t_1,t_2 \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$.
     We have already shown that this implies $t_1,t_2 \in \SN$.
-    Since $s := \circ_{\omega(\tau_1\to\tau_2)} t_1 t_2$ is neutral,
-    we have also already seen that $s \in \val{\tau_1\to\tau_2}{\omega,
-    \xi}{\Gamma}$ if $s' \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$
+    Since $s := \circ_{\omega(\tau_1\arrtype\tau_2)} t_1 t_2$ is neutral,
+    we have also already seen that $s \in \val{\tau_1\arrtype\tau_2}{\omega,
+    \xi}{\Gamma}$ if $s' \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$
     whenever $s \leadsto s'$.
     This we show by induction on $t_1,t_2$ (oriented with $\leadsto$).
-    If $s' = \circ_{\omega(\tau_1\to\tau_2)} t_1' t_2$, then note that
-    $t_1' \in \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$ because we
-    have already shown that $\val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$
+    If $s' = \circ_{\omega(\tau_1\arrtype\tau_2)} t_1' t_2$, then note that
+    $t_1' \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$ because we
+    have already shown that $\val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$
     is closed under $\leadsto$; thus, we can complete by the induction
     hypothesis.
-    If $s' = \circ_{\omega(\tau_1\to\tau_2)} t_1 t_2'$, we complete in
+    If $s' = \circ_{\omega(\tau_1\arrtype\tau_2)} t_1 t_2'$, we complete in
     the same way.
     The only alternative is that $s' = \abs{x:\omega(\tau_1)}{\circ_{
     \omega(\tau_2)} (t_1 x) (t_2 x)}$.
     Let $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$.  Since $t_1,t_2 \in
-    \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$, we have that $t_1 u$
+    \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$, we have that $t_1 u$
     and $t_2 u$ are in $\val{\tau_2}{\omega,\xi}{\Gamma}$ by
     definition.  Since, $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a
     candidate, this means that $\circ_{\omega(\tau_2)} (t_1 u) (t_2 u) =
     (\circ_{\omega(\tau_2)} (t_1 x) (t_2 x))[x:=u]$ is in
     $\val{\tau_2}{\omega,\xi}{\Gamma}$ as well.  By
     Lemma~\ref{lem_abstraction_computable}, we conclude that $s' \in
-    \val{\tau_1\to\tau_2}{\omega,\xi}{\Gamma}$.
+    \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$.
   \end{enumerate}
 
   Assume $\sigma = \forall\alpha[\tau]$. We check the conditions in
@@ -708,7 +712,7 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
 \end{proof}
 
 \begin{lemma}
-  $\circ_{\omega(\sigma)} \in \val{\sigma \to \sigma \to
+  $\circ_{\omega(\sigma)} \in \val{\sigma \arrtype \sigma \arrtype
     \sigma}{\omega,\xi}{\Gamma}$ for
   $\circ \in \{ \oplus, \otimes \}$.
 \end{lemma}
@@ -720,7 +724,7 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
 
 \begin{lemma}
   $\flatten_{\omega(\sigma)} \in
-  \val{\sigma\to\nat}{\omega,\xi}{\Gamma}$.
+  \val{\sigma\arrtype\nat}{\omega,\xi}{\Gamma}$.
 \end{lemma}
 
 \begin{proof}
@@ -729,7 +733,7 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
 
 \begin{lemma}
   $\lift_{\omega(\sigma)} \in
-  \val{\nat\to\sigma}{\omega,\xi}{\Gamma}$.
+  \val{\nat\arrtype\sigma}{\omega,\xi}{\Gamma}$.
 \end{lemma}
 
 \begin{proof}
@@ -796,7 +800,7 @@ numbers.
 
 \begin{proof}
   This is~NOT~TRUE. Consider
-  $\oplus_{\nat\to\nat} \lift_\nat \lift_\nat n$. Need to add more
+  $\oplus_{\nat\arrtype\nat} \lift_\nat \lift_\nat n$. Need to add more
   rewrite rules?
   \CK{Better now?} \LC{Yes, I think it works now.}
 \end{proof}
@@ -816,7 +820,7 @@ $s,t$, following Definition~\ref{def:succ}.
     \begin{array}{c}
     \infer={s\ R_\nat\ t}{s\da\ R\ t\da \text{ in natural
         numbers}}\quad\quad
-    \infer={s\ R_{\sigma\to\tau}\ t}{\app{s}{q}\ R_{\tau}\ \app{t}{q}
+    \infer={s\ R_{\sigma\arrtype\tau}\ t}{\app{s}{q}\ R_{\tau}\ \app{t}{q}
       \text{ for every } q \in \World_\sigma} \\ \\
     \infer={s\ R_{\forall\alpha[\sigma]}\ t}{\tapp{s}{\tau}\ R_{\sigma[\subst{\alpha}{\tau}]}\ \tapp{t}{\tau}
       \text{ for every closed type } \tau}
@@ -833,7 +837,8 @@ numbers by Lemma~\ref{lem_final_nat}.
 
 \subsection{Properties of $\succ$ and $\succeq$}
 
-We're going to at least need to see that $\succ$ is a well-founded ordering:
+We're going to at least need to see that $\succ$ is a well-founded
+ordering:
 
 \begin{lemma}
 $\succ$ is well-founded.
@@ -863,11 +868,11 @@ Both $\succ$ and $\succeq$ are transitive.
   $t_1\da \ge t_2\da \ge t_3\da$, so $t_1\da \ge t_3\da$. Thus
   $t_1 \succeq_\nat t_3$.
 
-  If $t_1 \succeq_{\sigma\to\tau}t_2\succeq_{\sigma\to\tau}t_3$ then
+  If $t_1 \succeq_{\sigma\arrtype\tau}t_2\succeq_{\sigma\arrtype\tau}t_3$ then
   $\app{t_1}{q}\succeq_{\tau}\app{t_2}{q}\succeq_\tau\app{t_3}{q}$ for
   $q \in \World_\sigma$. Hence $\app{t_1}{q}\succeq_\tau\app{t_3}{q}$
   for $q \in \World_\sigma$ by the coinductive hypothesis. Thus
-  $t_1\succeq_{\sigma\to\tau} t_3$.
+  $t_1\succeq_{\sigma\arrtype\tau} t_3$.
 
   If $t_1
   \succeq_{\forall\alpha[\sigma]}t_2\succeq_{\forall\alpha[\sigma]}t_3$
@@ -976,11 +981,10 @@ interpretation terms $s,t,u$ of type $\sigma$, we have:
 \item\label{lem:approx:assoc} $\oplus_\sigma s (\oplus_\sigma t u)
   \approx \oplus_\sigma(\oplus_\sigma s t) u$ and $\otimes_\sigma s
   (\otimes_\sigma t u) \approx \otimes_\sigma(\otimes_\sigma s t) u$;
-\item\label{lem:approx:distribution}
-  $\otimes_\sigma s (\oplus t u) \approx \oplus_\sigma(\otimes_\sigma s t) (\otimes_\sigma s u)$;
-\item\label{lem:approx:neutral}
-  $\oplus_\sigma(\lift_\sigma(0)) s \approx s$ and
-  $\otimes_\sigma(\lift_\sigma(1)) s \approx s$.
+\item\label{lem:approx:distribution} $\otimes_\sigma s (\oplus t u)
+  \approx \oplus_\sigma(\otimes_\sigma s t) (\otimes_\sigma s u)$;
+\item\label{lem:approx:neutral} $\oplus_\sigma(\lift_\sigma(0)) s
+  \approx s$ and $\otimes_\sigma(\lift_\sigma(1)) s \approx s$.
 \end{enumerate}
 \end{lemma}
 
@@ -991,134 +995,118 @@ TODO
 \section{Systems of interest and their properties}\label{sec:systems}
 
 The systems of interest are sets of terms with a rewriting relation on
-them.  Interestingly, $\Iterms$ can be seen as an instance of this general
-scheme.
-
-\subsection*{\ref{sec:systems}.0\quad Type context variables}
-
-In the following, we will use \emph{type contexts}.  A type context
-is an expression $\meta{\alpha}{\rho_1,\dots,\rho_n}$ where $\alpha$
-is a type variable and $\rho_1,\dots,\rho_n$ are types.  An
-\emph{interpretation type scheme} is generated by the clauses of
-Definition~\ref{def:itypes} and in addition:
-\[
-\meta{\alpha}{\rho_1,\dots,\rho_n} \in \ITypes'\ \text{if}\
-  \alpha \in \Typevars\ \text{and}\ \rho_1,\dots,\rho_n \in \ITypes'
-\]
-A type substitution $\gamma$ can only be applied to an interpretation
-type scheme $\sigma$ if for every occurrence $\meta{\alpha}{\rho_1,
-\dots,\rho_n}$ in $\sigma$, the type variable $\alpha$ is in the domain
-of $\gamma$ and $\gamma(\alpha)$ has the form $\tabs{\beta_1 \dots
-\beta_n}{\tau}$.  The type substitution $\sigma\gamma$ is obtained as
-follows:
-\begin{itemize}
-\item $\alpha\gamma = \gamma(\alpha)$ if $\alpha$ is in the domain of
-  $\gamma$;
-\item $\alpha\gamma = \alpha$ if $\alpha \in \Typevars$ and $\alpha$
-  is not in the domain of $\gamma$;
-\item $\meta{\alpha}{\rho_1,\dots,\rho_n}\gamma = \subst{\tau}{[
-  \beta_1:=\rho_1\gamma,\dots,\beta_n:=\rho_n\gamma]}$ if $\gamma(\alpha) =
-  \tabs{\beta_1\dots \beta_n}{\tau}$;
-\item $(\tabs{\alpha}{\tau})\gamma = \tabs{\alpha}{(\tau\gamma)}$ if
-  $\alpha$ is not in the domain of $\gamma$;
-  if $\alpha$ is in this domain, then $\alpha$-conversion can be used
-  to rename it to a fresh variable first;
-\item $(\sigma \arrtype \tau)\gamma = (\sigma\gamma) \arrtype (\tau
-  \gamma)$
-\item $(\sigma \times \tau)\gamma = (\sigma\gamma) \times (\tau\gamma)$
-\end{itemize}
-
-In this way, a type variable context $\meta{\alpha}{\rho_1,\dots,
-\rho_n}$ is essentially instantiated by a type in which $\rho_1,\dots,
-\rho_n$ may (but don't have to) occur.  This is important when the
-$\rho_i$ contain bound type variables.  For example, the
-interpretation type scheme $\tabs{\alpha}{\beta}$ can only be
-instantiated by interpretation types of the form $\tabs{\alpha}{\tau}$
-where the bound variable $\alpha$ does not occur in $\tau$, while the
-interpretation type scheme $\tabs{\alpha}{\beta[\alpha]}$ is
-instantiated by all interpretation types of the form
-$\tabs{\alpha}{\sigma}$.
+them. Interestingly, $\Iterms$ can be seen as an instance of this
+general scheme.
 
 \subsection{Systems of interest}
 
-Types are built from two sets of type constructors (first-order and
-second-order respectively) which must include the type constructors
-$\arrtype$ and $\forall$ respectively.
+We use a syntax similar to that of System $F_\omega$, see e.g.,
+Sorensen, Urzyczyn, ``Lectures on the Curry-Howard Isomorphism'',
+Section~11.7.
 
-\begin{definition}
-We assume given a fixed set $\TypeConstructors$ of \emph{type
-constructors}, each paired with an integer \emph{arity}, and a set
-$\TypeQuantifiers$ of \emph{type quantifiers}, each quantifier also
-paired with an integer arity; $\TypeConstructors$ must contain
-$\arrtype : 2$ and $\TypeQuantifiers$ must include $\forall : 1$.
-The set $\Types$ of \emph{type schemes} is given by:
-\begin{itemize}
-\item $\alpha \in \Types$ for all $\alpha \in \Typevars$
-\item $\con(\sigma_1,\dots,\sigma_n) \in \Types$ if $\con : n \in
-  \TypeConstructors$ and $\sigma_1,\dots,\sigma_n \in \Types$
-  (but we denote $\arrtype$ infix)
-\item $\qquant{?}{\alpha_1 \dots \alpha_n}{\sigma} \in \Types$ if
-  $? : n \in \TypeQuantifiers$, each $\alpha_i \in \Typevars$ and
-  $\sigma \in \Types$
-\item $\meta{\alpha}{\sigma_1,\dots,\sigma_n} \in \Types$ for all
-  $\alpha \in \Typevars$ and $\sigma_1,\dots,\sigma_n \in \Types$.
-\end{itemize}
-\emph{Types} are type schemes without occurrences of type variable
-contexts $\meta{\alpha}{\sigma_1,\dots,\sigma_n}$.
-We will not consider type schemes where type variable occurrences
-use a \emph{bound} type variable $\alpha$.
-We let $\FTV(\sigma)$ be defined in the obvious way (much like
-Definition~\ref{def:itypes}, and also including type variables at
-the head of a type variable context).
+\begin{definition}\normalfont
+  \emph{Kinds} are defined inductively:
+  \begin{itemize}
+  \item $*$ is a kind,
+  \item if $\kappa_1,\kappa_2$ are kinds then so is $\kappa_1 \arrkind
+    \kappa_2$.
+  \end{itemize}
+
+  We assume infinitely many \emph{type constructor variables} of each
+  kind. Variables of kind~$*$ are \emph{type variables}.
+
+  We assume a fixed set~$\Sigma_T$ of \emph{type constructor symbols}
+  paired with a kind, denoted $c : \kappa$. Every type constructor
+  symbol~$c$ occurs only with one kind declaration.
+
+  We define \emph{type constructors} of kind~$\kappa$ by induction.
+  Type constructors of kind~$*$ are called \emph{types}.
+  \begin{itemize}
+  \item A type constructor variable or a type constructor symbol of
+    kind~$\kappa$ is a type constructor of kind~$\kappa$.
+  \item If $\varphi$ is a type constructor of kind $\kappa_1 \arrkind
+    \kappa_2$ and $\psi$ is a type constructor of kind~$\kappa_1$ then
+    $\varphi \psi$ is a type constructor of kind~$\kappa_2$.
+  \item If $\alpha$ is a type constructor variable of kind~$\kappa_1$
+    and $\varphi$ is a type constructor of kind~$\kappa_2$, then
+    $\lambda\alpha . \varphi$ is a type constructor of kind $\kappa_1
+    \arrkind \kappa_2$.
+  \item If $\alpha$ is a type constructor variable of kind~$\kappa$
+    and~$\tau$ is a type, then $\forall \alpha[\tau]$ is a type.
+  \item If $\tau_1,\tau_2$ are types, then $\tau_1 \arrtype \tau_2$ is
+    a type.
+  \end{itemize}
+
+  We use the notation $\forall \alpha . \tau$ and $\forall \alpha
+  \tau$. When $\alpha$ is of kind $\kappa$ then we use the notations
+  $\forall \alpha : \kappa . \tau$ and $\forall (\alpha :
+  \kappa)[\tau]$.
+
+  Beta-reduction on type constructors is defined as the compatible
+  closure of the rule
+  \[
+  (\lambda\alpha.\varphi)\psi \to \varphi[\alpha := \psi]
+  \]
+  Note that type constructors are essentially simply-typed
+  lambda-terms, so beta-reduction on type constructors terminates and
+  is confluent, hence every type constructor~$\varphi$ has a unique
+  normal form. To save on notation we therefore treat type
+  constructors modulo $\beta$-conversion. More precisely, type
+  constructors could be defined as beta-equivalence classes of the
+  above terms, but for readability we work with type constructors in a
+  naive way. This is justified by the fact that all basic operations
+  on type constructors (substitution, abstraction, etc.) are invariant
+  under $\beta$-conversion. So for instance, if $\alpha,\beta$ are
+  type constructor variables, then we consider $(\alpha \tau)[\alpha
+    := \lambda \beta . \beta]$ and $\tau$ and $(\lambda \beta . \beta)
+  \tau$ to be the same.
 \end{definition}
 
-Terms are built from a set of (possibly type-indexed) function symbols,
-using abstraction and application as for interpretation terms.
+Terms are built from a set of function symbols, using abstraction and
+application as for interpretation terms.
 
 \begin{definition}
 We assume given a fixed set $\Sigma$ of \emph{function symbols}, each
-indexed with $0$ or more type variables and paired with an arity $k$
-as well as $k$ input types and one output types, denoted
-$\mathtt{f}_{\alpha_1,\dots,\alpha_n} : [\sigma_1 \times \dots \times
-\sigma_k] \arrtype \tau$; we require that $\FTV(\sigma_1) \cup \dots
-\cup \FTV(\sigma_k) \cup \FTV(\tau) \subseteq \{ \alpha_1,\dots,
-\alpha_n\}$.
-Every function symbol $\mathtt{f}$ occurs only with one type
-declaration.
+paired with a \emph{closed} type, denoted $\mathtt{f} : \tau$.  Every
+function symbol $\mathtt{f}$ occurs only with one type declaration.
 
 The set $\Terms$ of terms consists of those expressions $s$ such that
 $\Gamma \vdash s : \sigma$ can be derived for some type $\sigma$ and
 environment $\Gamma$ using the following clauses:
 \begin{itemize}
 \item $\Gamma \vdash x : \sigma$ for every $(x : \sigma) \in \Gamma$.
-\item $\Gamma \vdash \mathtt{f}_{\vec{\rho}}(s_1,\dots,s_k) :
-  \tau\gamma$ if $\mathtt{f}_{\alpha_1,\dots,\alpha_n} : [\sigma_1
-  \times \dots \times \sigma_k] \arrtype \tau \in \Sigma$ and
-  $\gamma$ is a type substitution and $\vec{\rho} =
-  [\alpha_1\gamma,\dots,\alpha_n\gamma]$ and $\Gamma \vdash s_i :
-  \sigma_i\gamma$ for $1 \leq i \leq k$
+\item $\Gamma \vdash \mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\dots,s_k)
+  : \tau[\alpha_1 := \rho_1]\ldots[\alpha_n := \rho_n]$ if
+  \[
+  \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots
+  \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
+  \sigma_k \arrtype \tau
+  \]
+  is a function symbol in~$\Sigma$, and $\rho_i$ is a type constructor
+  of kind $\kappa_i$ for $i=1,\ldots,k$, and $\Gamma \vdash s_i :
+  \sigma_i[\alpha_1 := \rho_1]\ldots[\alpha_n := \rho_n]$ for
+  $i=1,\ldots,k$.
 \item $\Gamma \vdash \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
   \in \Vars$ and $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$.
 \item $\Gamma \vdash \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
-  $\alpha \in \Typevars$ and $\Gamma \vdash s : \sigma$ and for all
-  $(x : \tau) \in \Gamma$: $\alpha \notin \FTV(\tau)$
-%\item $\Gamma \vdash \tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$ if
-%  $\Gamma \vdash s : \quant{\alpha}{\sigma}$
+  $\alpha$ is a type constructor variable and $\Gamma \vdash s :
+  \sigma$ and for all $(x : \tau) \in \Gamma$: $\alpha \notin
+  \FTV(\tau)$.
 \end{itemize}
-%Rather than using a pair $(k,\sigma_1 \arrtype \dots \arrtype \sigma_k
-%\arrtype \tau)$, we will denote the type declaration of a function
-%symbol as $[\sigma_1 \times \dots \times \sigma_k] \arrtype \tau$.
 \end{definition}
 
-Note that there is no explicit application; application can be modelled
-by including symbol $@_{\alpha,\beta} : [\alpha \arrtype \beta \times
-\alpha] \arrtype \beta$ in $\Sigma$.
-Similarly, type application is modelled through a symbol
-$\mathtt{A}_{\alpha,\beta} : [\quant{\xi}{\meta{\alpha}{\xi}} \arrtype
-\meta{\alpha}{\beta}$.
+We use the notation
+$\mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\ldots,s_k)$ to stress the fact
+that by default there is no explicit application
+available. Application can be modelled by including the symbol ${@} :
+\forall\alpha\forall\beta . (\alpha \arrtype \beta) \arrtype \alpha
+\arrtype \beta$ in $\Sigma$. Similarly, type application is modelled
+through a symbol $\mathtt{A} : \forall \alpha : * \arrkind * . \forall
+\beta . (\forall \beta [\alpha \beta]) \arrtype \alpha \beta$.
 
 The rules are simply an infinite set of term pairs, whose monotonic
-closure generates the rewrite relation.
+closure generates the rewrite relation. \LC{Now the set of rules can
+  be finite.}
 
 \begin{definition}
 We fix an infinite variable environment $\Gamma$,
@@ -1126,100 +1114,104 @@ and assume given a set $\Rules$ of term pairs $(\ell,r)$, such that:
 \begin{itemize}
 \item $\FV(r) \subseteq \FV(\ell) \subseteq \mathit{keys}(\Gamma)$;
 \item $\ell$ and $r$ have the same type under $\Gamma$;
-\item $\FTV(\ell) = \FTV(r) = \emptyset$;
-  %, and all type variables in
-  %the range of $\Gamma$ are bound;
 \item $\Rules$ is stable: if $(\ell,r) \in \Rules$ and $\gamma$ is a
-  substitution, then $(\ell\gamma,r\gamma) \in \Rules$.
+  (\LC{term substitution? this should also be required for type
+  substitutions, I think}) substitution, then $(\ell\gamma,r\gamma)
+  \in \Rules$.
 \end{itemize}
 The reduction relation $\arr{\Rules}$ is the smallest monotonic
 relation that contains $\Rules$.
 \end{definition}
 
+\LC{I removed $\FTV(\ell) = \FTV(r) = \emptyset$, because we need type
+  variables (and also higher-kinded type constructor variables) to
+  express the rules. In what we had earlier free type variables were
+  there ``implicitly'' in function symbol indexes.}
+
 \subsubsection{An example system.}
 
-For the system of urzy\_emb, we have the following type constructors
-and quantifiers:
+For the system of urzy\_emb, we have the following type constructor
+symbols:
 \[
 \begin{array}{c}
 \TypeConstructors = \{\quad
-  \bot : 0,\quad
-  \mathtt{or} : 2,\quad
-  \mathtt{and} : 2,\quad
-  \Rightarrow : 2\quad
+  \bot : *,\quad
+  \mathtt{or} : * \arrkind * \arrkind *,\quad
+  \mathtt{and} : * \arrkind * \arrkind *,\quad
+  \exists : (* \arrkind *) \arrkind *
   \}\quad \cup\quad
-  \{\quad \mathtt{prop}_i : 0 \mid i \in \mathbb{N}\quad \} \\
-\TypeQuantifiers = \{\quad
-  \forall : 1,\quad
-  \exists : 1\quad
-  \} \\
+  \{\quad \mathtt{prop}_i : * \mid i \in \mathbb{N}\quad \}
 \end{array}
 \]
+Here $\mathtt{prop}_i$ represents the $i$-th propositional variable.
 
 We have the following function symbols:
 \[
-\begin{array}{rclrcl}
-\epsilon_\alpha & : & [\bot] \arrtype \alpha &
-\pi^1_{\alpha,\beta} & : & [\mathtt{and}(\alpha,\beta)] \arrtype \alpha \\
-@_{\alpha,\beta} & : & [\alpha \arrtype \beta \times \alpha] \arrtype \beta &
-\pi^2_{\alpha,\beta} & : & [\mathtt{and}(\alpha,\beta)] \arrtype \beta \\
-\mathtt{in}^1_{\alpha,\beta} & : & [\alpha] \arrtype
-  \mathtt{or}(\alpha,\beta) &
-\mathtt{pair}_{\alpha,\beta} & : & [\alpha \times \beta] \arrtype
-  \mathtt{and}(\alpha,\beta) \\
-\mathtt{in}^2_{\alpha,\beta} & : & [\beta] \arrtype
-  \mathtt{or}(\alpha,\beta) &
-\mathtt{tapp}_{\alpha,\beta} & : &
-  [\quant{\xi}{\meta{\alpha}{\xi}}] \arrtype \meta{\alpha}{\beta} \\
-\mathtt{case}_{\alpha,\beta,\xi} & : & [\mathtt{or}(\alpha,\beta) \times
-  \alpha \arrtype \xi \times \beta \arrtype \xi] \arrtype \xi\ \ \ &
-\mathtt{let}_{\alpha,\beta} & : &
-  \qquant{\exists}{\xi}{\meta{\alpha}{\xi}} \times
-  \quant{\xi}{\alpha\langle\xi\rangle \arrtype \beta}] \arrtype \beta \\
-\mathtt{ext}_{\alpha,\beta} & : & [\meta{\alpha}{\beta}] \arrtype
-  \qquant{\exists}{\xi}{\meta{\alpha}{\xi}} \\
+\begin{array}{rcl}
+@ & : & \forall \alpha \forall \beta . (\alpha \arrtype \beta) \arrtype \alpha \arrtype \beta \\
+\mathtt{tapp} & : & \forall \alpha : * \arrkind * . \forall \beta .
+  (\forall \beta [\alpha \beta]) \arrtype \alpha \beta \\
+\epsilon & : & \forall \alpha . \bot \arrtype \alpha \\
+\mathtt{pair} & : & \forall \alpha \forall \beta . \alpha \arrtype \beta \arrtype
+  \mathtt{and}\, \alpha\, \beta \\
+\pi^1 & : & \forall \alpha \forall \beta . \mathtt{and}\, \alpha\, \beta \arrtype \alpha \\
+\pi^2 & : & \forall \alpha \forall \beta . \mathtt{and}\, \alpha\, \beta \arrtype \beta \\
+\mathtt{in}^1 & : & \forall \alpha \forall \beta . \alpha \arrtype
+  \mathtt{or}\, \alpha\, \beta \\
+\mathtt{in}^2 & : & \forall \alpha \forall \beta . \beta \arrtype
+  \mathtt{or}\, \alpha\, \beta \\
+\mathtt{case} & : & \forall \alpha \forall \beta \forall \gamma . \mathtt{or}\, \alpha\, \beta \arrtype
+  (\alpha \arrtype \gamma) \arrtype (\beta \arrtype \gamma) \arrtype \gamma \\
+\mathtt{let} & : & \forall \alpha : * \arrkind * . \forall \beta .
+  (\exists \alpha) \arrtype
+  (\forall \gamma . \alpha \gamma \arrtype \beta) \arrtype \beta \\
+\mathtt{ext} & : & \forall \alpha : * \arrkind * . \forall \beta . \alpha \beta \arrtype
+  \exists \alpha
 \end{array}
 \]
-(Note that in the $\mathtt{let}$ symbol, the definition of type
-substitution implies that in all instances $\mathtt{let}_{\sigma,\tau}$
-the type $\tau$ cannot contain the bound type variable $\xi$.)
+\LC{If we want this to work for open terms then we should also say
+  that for every variable in the original system there is a function
+  symbol. If we are satified with termination on closed terms, then we
+  don't need $\mathtt{prop}_i$}.
+
+\LC{In fact, I think it's clearer to do this for closed terms only,
+  because then termination for open terms follows by closing them with
+  lambda-abstractions.}
+
+\LC{You had some mistakes in the rules below. I think these were only
+  typos, but re-check if the interpretation still works.}
 
 And finally the rules.  These are represented as \emph{rule schemes},
-representing infinitely many rules at once.  Type substitution is also
-done on indexes of function symbols (thus giving essentially
-different symbols, but with correct types).
+representing infinitely many rules at once.
 \[
 \begin{array}{rcl}
-@_{\sigma,\tau}(\abs{x}{s},t) & \to & s[x:=t] \\
-\mathtt{tapp}_{\quant{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \to &
+@_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] \\
+\mathtt{tapp}_{\quant{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \red &
   s[\alpha:=\tau] \\
-\pi^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \to & s \\
-\pi^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \to & s \\
+\pi^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & s \\
+\pi^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & s \\
 \mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{\sigma,\tau}(u),
-  \abs{x}{s},\abs{y}{t}) & \to & s[x:=u] \\
+  \abs{x}{s},\abs{y}{t}) & \red & s[x:=u] \\
 \mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^2_{\sigma,\tau}(u),
-  \abs{x}{s},\abs{y}{t}) & \to & t[x:=u] \\
-\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(
-  \mathtt{ext}_{\qquant{\forall}{\alpha}{\sigma},\tau}(s),\tabs{\alpha}{
-    \abs{x}{t}}) & \to & t[\alpha:=\tau][x:=s] \\
+  \abs{x}{s},\abs{y}{t}) & \red & t[x:=u] \\
+\mathtt{let}_{\varphi,\rho}(\mathtt{ext}_{\varphi,\tau}(s),\tabs{\alpha}{\abs{x:\varphi \alpha}{t}}) & \red & t[\alpha:=\tau][x:=s] \\
 \end{array}
 \]
 \[
 \begin{array}{rcl}
-\epsilon_\tau(\epsilon_\bot(s)) & \to & \epsilon_\tau(s) \\
-@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) & \to &
+\epsilon_\tau(\epsilon_\bot(s)) & \red & \epsilon_\tau(s) \\
+@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) & \red &
   \epsilon_\tau(s) \\
-\mathtt{tapp}_{\quant{\alpha}{\sigma},\tau}(
-  \epsilon_{\quant{\alpha}{\sigma}}(s)) & \to &
-  \epsilon_{\sigma[\alpha:=\tau]}(s) \\
-\pi^1_{\sigma,\tau}(\epsilon_{\mathtt{and}(\sigma,\tau)}(s)) & \to &
+\mathtt{tapp}_{\varphi,\tau}(
+  \epsilon_{\quant{\alpha}{\varphi\alpha}}(s)) & \red &
+  \epsilon_{\varphi\tau}(s) \\
+\pi^1_{\sigma,\tau}(\epsilon_{\mathtt{and}\,\sigma\,\tau}(s)) & \red &
   \epsilon_\sigma(s) \\
-\pi^2_{\sigma,\tau}(\epsilon_{\mathtt{and}(\sigma,\tau)}(s)) & \to &
+\pi^2_{\sigma,\tau}(\epsilon_{\mathtt{and}\,\sigma\,\tau}(s)) & \red &
   \epsilon_\tau(s) \\
-\mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}(\sigma,\tau)}(
-  u),\abs{x}{s},\abs{y}{t}) & \to & \epsilon_\rho(s) \\
-\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(\epsilon_{\qquant{
-  \forall}{\alpha}{\sigma}}(s),\tabs{\alpha}{\abs{x}{t}}) & \to &
+\mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}\,\sigma\,\tau}(
+  u),\abs{x:\sigma}{s},\abs{y:\tau}{t}) & \red & \epsilon_\rho(u) \\
+\mathtt{let}_{\varphi,\rho}(\epsilon_{\forall\alpha[\varphi\alpha]}(s),\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}) & \red &
   \epsilon_\rho(s) \\
 \end{array}
 \]
@@ -1227,82 +1219,81 @@ different symbols, but with correct types).
 %\[
 %\begin{array}{rcl}
 \item $
-\epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,\abs{x}{s},\abs{y}{t}))
-  %& \to &
-  \to
-  \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x}{\epsilon_\rho(s)},
-  \abs{y}{\epsilon_\rho(t)}) $%\\
+\epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t}))
+  %& \red &
+  \red
+  \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x:\sigma}{\epsilon_\rho(s)},
+  \abs{y:\tau}{\epsilon_\rho(t)}) $%\\
 \item $
 @_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\rho \arrtype \pi}(u,
-  \abs{x}{s},\abs{y}{t}),v) %& \to &
-  \to
+  \abs{x:\sigma}{s},\abs{y:\tau}{t}),v) %& \red &
+  \red
   \mathtt{case}_{\sigma,\tau,\pi}(u,
-  \abs{x}{@_{\rho,\pi}(s,v)},\abs{y}{@_{\rho,\pi}(t,v)}) $%\\
+  \abs{x:\sigma}{@_{\rho,\pi}(s,v)},\abs{y:\tau}{@_{\rho,\pi}(t,v)}) $%\\
 \item $
-\mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(\mathtt{case}_{\sigma,\tau,
-  \quant{\alpha}{\rho}}(u,\abs{x}{s},\abs{y}{t})) %& \to &
-  \to
-  \mathtt{case}_{\sigma,\tau,\rho[\alpha:=\pi]}(u,
-  \abs{x}{\mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(s)},\\
-  \abs{y}{\mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(t)}) $%\\
+\mathtt{tapp}_{\varphi,\pi}(\mathtt{case}_{\sigma,\tau,
+  \quant{\alpha}{\varphi\alpha}}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t})) %& \red &
+  \red
+  \mathtt{case}_{\sigma,\tau,\varphi\pi}(u,
+  \abs{x:\sigma}{\mathtt{tapp}_{\varphi,\pi}(s)},\\
+  \abs{y:\tau}{\mathtt{tapp}_{\varphi,\pi}(t)}) $%\\
 \item $
-\pi^1_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}(\rho,\pi)}(u,
-  \abs{x}{s},\abs{y}{t})) %& \to &
-  \to
-  \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x}{\pi^1_{\rho,\pi}(s)},
-  \abs{y}{\pi^1_{\rho,\pi}(t)}) $%\\
+\pi^1_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}\,\rho\,\pi}(u,
+\abs{x:\sigma}{s},\abs{y:\tau}{t})) %& \red &
+  \red
+  \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x:\sigma}{\pi^1_{\rho,\pi}(s)},
+  \abs{y:\tau}{\pi^1_{\rho,\pi}(t)}) $%\\
 \item $
-\pi^2_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}(\rho,\pi)}(u,
-  \abs{x}{s},\abs{y}{t})) %& \to &
-  \to
-  \mathtt{case}_{\sigma,\tau,\pi}(u,\abs{x}{\pi^2_{\rho,\pi}(s)},
-  \abs{y}{\pi^2_{\rho,\pi}(t)}) $%\\
+\pi^2_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}\,\rho,\pi}(u,
+  \abs{x:\sigma}{s},\abs{y:\tau}{t})) %& \red &
+  \red
+  \mathtt{case}_{\sigma,\tau,\pi}(u,\abs{x:\sigma}{\pi^2_{\rho,\pi}(s)},
+  \abs{y:\tau}{\pi^2_{\rho,\pi}(t)}) $%\\
 \item $
-\mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,\tau,\mathtt{or}(
-  \rho,\pi)}(u,\abs{x}{s},\abs{y}{t}),\abs{z}{v},\abs{a}{w}) %& \to &
-  \to\\
+\mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,\tau,\mathtt{or}\,
+  \rho\,\pi}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t}),\abs{z:\rho}{v},\abs{a:\pi}{w}) %& \red &
+  \red\\
   \mathtt{case}_{\sigma,\tau,\xi}(u,
-    \abs{x}{\mathtt{case}_{\rho,\pi,\xi}(s,\abs{z}{v},\abs{a}{w})},
-    \abs{y}{\mathtt{case}_{\rho,\pi,\xi}(t,\abs{z}{v},\abs{a}{w})}) $%\\
+    \abs{x:\sigma}{\mathtt{case}_{\rho,\pi,\xi}(s,\abs{z:\rho}{v},\abs{a:\pi}{w})},
+    \abs{y:\tau}{\mathtt{case}_{\rho,\pi,\xi}(t,\abs{z:\rho}{v},\abs{a:\pi}{w})}) $%\\
 \item $
-\mathtt{let}_{\qquant{\forall}{\alpha}{\rho}}(
-  \mathtt{case}_{\sigma,\tau,\qquant{\forall}{\alpha}{\rho}}(
-  u,\abs{x}{s},\abs{y}{t}),v) %& \to &
-  \to\\
+    \mathtt{let}_{\varphi,\rho}(
+  \mathtt{case}_{\sigma,\tau,\exists\varphi}(
+  u,\abs{x:\sigma}{s},\abs{y:\tau}{t}),v) %& \red &
+  \red\\
   \mathtt{case}_{\sigma,\tau,\rho}(u,
-  \abs{x}{\mathtt{let}_{\qquant{\forall}{\alpha}{\rho}}(s,v)},
-  \abs{y}{\mathtt{let}_{\qquant{\forall}{\alpha}{\rho}}(t,v)})
+  \abs{x:\sigma}{\mathtt{let}_{\varphi,\rho}(s,v)},
+  \abs{y:\tau}{\mathtt{let}_{\varphi,\rho}(t,v)})
   $%\\
 %\end{array}
 %\]
 \end{itemize}
+\LC{The following rules are wrong. I'll correct this on Monday.}
 \begin{itemize}
-\item $\epsilon_\tau(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
-  \bot}(s,t)) \to
-  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\tau}(s,\epsilon_\tau(t))$
-\item $@_{\tau,\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
-  \tau \arrtype \rho}(s,t),u) \to
-  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(s,@_{\tau,\rho}(t,
-  u))$
+\item $\epsilon_\tau(\mathtt{let}_{\varphi,\bot}(s,t)) \red
+  \mathtt{let}_{\varphi,\tau}(s,\epsilon_\tau(t))$
+\item $@_{\tau,\rho}(\mathtt{let}_{\varphi, \tau \arrtype
+  \rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}),u) \red
+  \mathtt{let}_{\varphi,\rho}(s,@_{\tau,\rho}(t, u))$
 \item $\mathtt{tapp}_{\quant{\alpha}{\tau},\rho}(
 \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\quant{\alpha}{\tau}}(s,t))
-  \to
+  \red
   \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\tau[\alpha:=\rho]}(s,
   \mathtt{tapp}_{\quant{\alpha}{\tau},\rho}(t))$
 \item $\pi^1_{\tau,\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
-  \mathtt{and}(\tau,\rho)}(s,t)) \to
+  \mathtt{and}(\tau,\rho)}(s,t)) \red
   \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\tau}(s,\pi^1_{\tau,
   \rho}(t))$
 \item $\pi^2_{\tau,\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
-  \mathtt{and}(\tau,\rho)}(s,t)) \to
+  \mathtt{and}(\tau,\rho)}(s,t)) \red
   \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(s,\pi^2_{\tau,
   \rho}(t))$
 \item $\mathtt{case}_{\tau,\rho,\pi}(
   \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\mathtt{or}(\tau,
-  \rho)}(s,t),\abs{x}{u},\abs{y}{v}) \to
+  \rho)}(s,t),\abs{x}{u},\abs{y}{v}) \red
   \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\pi}(s,\mathtt{case}_{
   \tau,\rho,\pi}(t,\abs{x}{u},\abs{y}{v}))$
-\item $\mathtt{let}_{\qquant{\forall}{\beta}{\tau},\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\qquant{\forall}{\beta}{\tau}}(s,t),u) \to
+\item $\mathtt{let}_{\qquant{\forall}{\beta}{\tau},\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\qquant{\forall}{\beta}{\tau}}(s,t),u) \red
   \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(s,\mathtt{let}_{\qquant{\forall}{\beta}{\tau},\rho}(t,u))$
 \end{itemize}
 
@@ -1581,7 +1572,7 @@ And the following function symbol mapping:
 \subsection{Rule orientation}
 
 \begin{itemize}
-\item $@_{\sigma,\tau}(\abs{x}{s},t) \to s[x:=t]$ \\
+\item $@_{\sigma,\tau}(\abs{x}{s},t) \red s[x:=t]$ \\
   We have $\interpret{@(\abs{x:\sigma}{s},t)} = (\abs{x:\typeinterpret{
   \sigma}}{\interpret{s}}) \cdot \interpret{t} \oplus \lift(\flatten(
   \interpret{t}) \oplus 1) \leadsto \interpret{s}[x:=\interpret{t}]
@@ -1591,7 +1582,7 @@ And the following function symbol mapping:
   $\succ \interpret{s}[x:=\interpret{t}]$, which equals
   $\interpret{s[x:=t]}$ by Lemma \ref{lem:substitutioninterpret}.
   Thus, we can remove this rule.
-\item $\mathtt{tapp}_{\quant{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) \to
+\item $\mathtt{tapp}_{\quant{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) \red
   s[\alpha:=\tau]$ \\
   We have $\interpret{\mathtt{tapp}_{\quant{\alpha}{\sigma},
   \tau}(\tabs{\alpha}{s})} = (\tabs{\alpha}{\interpret{s}}) *
@@ -1602,7 +1593,7 @@ And the following function symbol mapping:
   Thus, we can remove this rule.
 \item $\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(
   \mathtt{ext}_{\qquant{\forall}{\alpha}{\sigma},\tau}(s),\tabs{\alpha}{
-    \abs{x:\sigma}{t}}) \to t[\alpha:=\tau][x:=s]$ \\
+    \abs{x:\sigma}{t}}) \red t[\alpha:=\tau][x:=s]$ \\
   Let $u := \mathtt{ext}_{\quant{\alpha}{\sigma},\tau}(s)$ and
   $w := \tabs{\alpha}{\abs{x}{t}}$.  Then we have:
   \begin{itemize}
@@ -1635,12 +1626,12 @@ And the following function symbol mapping:
   s,t))} = \pi^1_{\typeinterpret{\sigma,\tau}}(\interpret{s},
   \interpret{t}) \oplus \lift(1) \leadsto \interpret{s} \oplus
   \lift(1) \succ \interpret{s}$.
-\item $\pi^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) \to t$ \\
+\item $\pi^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) \red t$ \\
   We have $\interpret{\pi^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(
  s,t))} = \pi^2_{\typeinterpret{\sigma,\tau}}(\interpret{s},
   \interpret{t}) \oplus \lift(1) \leadsto \cdot \succ \interpret{t}$.
 \item $\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{\sigma,\tau}(u),
-  \abs{x}{s},\abs{y}{t}) \to s[x:=u]$ \\
+  \abs{x}{s},\abs{y}{t}) \red s[x:=u]$ \\
   For brevity, let $uu := \interpret{\mathtt{in}^1_{\sigma,\tau}(u)} =
   (\interpret{u}, \lift_\tau(1))$.
   Also denote $\varphi := \lift_\rho(\flatten_{\sigma \times \tau}(
@@ -1672,12 +1663,12 @@ And the following function symbol mapping:
   $\succ \interpret{s}[x:=\interpret{u}] = \interpret{s[x:=u]}$ by
   Lemma \ref{lem:substitutioninterpret}.
 \item $\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^2_{\sigma,\tau}(u),
-  \abs{x}{s},\abs{y}{t}) \to t[x:=u]$ \\
+  \abs{x}{s},\abs{y}{t}) \red t[x:=u]$ \\
   Symmetric to the case above.
 \item $
 \mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,\tau,\mathtt{or}(
-  \rho,\pi)}(u,\abs{x}{s},\abs{y}{t}),\abs{z}{v},\abs{a}{w}) %& \to &
-  \to\\
+  \rho,\pi)}(u,\abs{x}{s},\abs{y}{t}),\abs{z}{v},\abs{a}{w}) %& \red &
+  \red\\
   \mathtt{case}_{\sigma,\tau,\xi}(u,
     \abs{x}{\mathtt{case}_{\rho,\pi,\xi}(s,\abs{z}{v},\abs{a}{w})},
     \abs{y}{\mathtt{case}_{\rho,\pi,\xi}(t,\abs{z}{v},\abs{a}{w})}) $\\
@@ -1700,20 +1691,20 @@ And the following function symbol mapping:
 
 \[
 \begin{array}{rcl}
-\epsilon_\tau(\epsilon_\bot(s)) & \to & \epsilon_\tau(s) \\
-@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) & \to &
+\epsilon_\tau(\epsilon_\bot(s)) & \red & \epsilon_\tau(s) \\
+@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) & \red &
   \epsilon_\tau(s) \\
 \mathtt{tapp}_{\quant{\alpha}{\sigma},\tau}(
-  \epsilon_{\quant{\alpha}{\sigma}}(s)) & \to &
+  \epsilon_{\quant{\alpha}{\sigma}}(s)) & \red &
   \epsilon_{\sigma[\alpha:=\tau]}(s) \\
-\pi^1_{\sigma,\tau}(\epsilon_{\mathtt{and}(\sigma,\tau)}(s)) & \to &
+\pi^1_{\sigma,\tau}(\epsilon_{\mathtt{and}(\sigma,\tau)}(s)) & \red &
   \epsilon_\sigma(s) \\
-\pi^2_{\sigma,\tau}(\epsilon_{\mathtt{and}(\sigma,\tau)}(s)) & \to &
+\pi^2_{\sigma,\tau}(\epsilon_{\mathtt{and}(\sigma,\tau)}(s)) & \red &
   \epsilon_\tau(s) \\
 \mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}(\sigma,\tau)}(
-  u),\abs{x}{s},\abs{y}{t}) & \to & \epsilon_\rho(s) \\
+  u),\abs{x}{s},\abs{y}{t}) & \red & \epsilon_\rho(s) \\
 \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(\epsilon_{\qquant{
-  \forall}{\alpha}{\sigma}}(s),\tabs{\alpha}{\abs{x}{t}}) & \to &
+  \forall}{\alpha}{\sigma}}(s),\tabs{\alpha}{\abs{x}{t}}) & \red &
   \epsilon_\rho(s) \\
 \end{array}
 \]
@@ -1723,40 +1714,40 @@ And the following function symbol mapping:
 %\begin{array}{rcl}
 \item $
 \epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,\abs{x}{s},\abs{y}{t}))
-  %& \to &
-  \to
+  %& \red &
+  \red
   \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x}{\epsilon_\rho(s)},
   \abs{y}{\epsilon_\rho(t)}) $%\\
 \item $
 @_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\rho \arrtype \pi}(u,
-  \abs{x}{s},\abs{y}{t}),v) %& \to &
-  \to
+  \abs{x}{s},\abs{y}{t}),v) %& \red &
+  \red
   \mathtt{case}_{\sigma,\tau,\pi}(u,
   \abs{x}{@_{\rho,\pi}(s,v)},\abs{y}{@_{\rho,\pi}(t,v)}) $%\\
 \item $
 \mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(\mathtt{case}_{\sigma,\tau,
-  \quant{\alpha}{\rho}}(u,\abs{x}{s},\abs{y}{t})) %& \to &
-  \to
+  \quant{\alpha}{\rho}}(u,\abs{x}{s},\abs{y}{t})) %& \red &
+  \red
   \mathtt{case}_{\sigma,\tau,\rho[\alpha:=\pi]}(u,
   \abs{x}{\mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(s)},\\
   \abs{y}{\mathtt{tapp}_{\quant{\alpha}{\rho},\pi}(t)}) $%\\
 \item $
 \pi^1_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}(\rho,\pi)}(u,
-  \abs{x}{s},\abs{y}{t})) %& \to &
-  \to
+  \abs{x}{s},\abs{y}{t})) %& \red &
+  \red
   \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x}{\pi^1_{\rho,\pi}(s)},
   \abs{y}{\pi^1_{\rho,\pi}(t)}) $%\\
 \item $
 \pi^2_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}(\rho,\pi)}(u,
-  \abs{x}{s},\abs{y}{t})) %& \to &
-  \to
+  \abs{x}{s},\abs{y}{t})) %& \red &
+  \red
   \mathtt{case}_{\sigma,\tau,\pi}(u,\abs{x}{\pi^2_{\rho,\pi}(s)},
   \abs{y}{\pi^2_{\rho,\pi}(t)}) $%\\
 \item $
 \mathtt{let}_{\qquant{\forall}{\alpha}{\rho}}(
   \mathtt{case}_{\sigma,\tau,\qquant{\forall}{\alpha}{\rho}}(
-  u,\abs{x}{s},\abs{y}{t}),v) %& \to &
-  \to\\
+  u,\abs{x}{s},\abs{y}{t}),v) %& \red &
+  \red\\
   \mathtt{case}_{\sigma,\tau,\rho}(u,
   \abs{x}{\mathtt{let}_{\qquant{\forall}{\alpha}{\rho}}(s,v)},
   \abs{y}{\mathtt{let}_{\qquant{\forall}{\alpha}{\rho}}(t,v)})
@@ -1766,31 +1757,31 @@ And the following function symbol mapping:
 \end{itemize}
 \begin{itemize}
 \item $\epsilon_\tau(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
-  \bot}(s,t)) \to
+  \bot}(s,t)) \red
   \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\tau}(s,\epsilon_\tau(t))$
 \item $@_{\tau,\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
-  \tau \arrtype \rho}(s,t),u) \to
+  \tau \arrtype \rho}(s,t),u) \red
   \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(s,@_{\tau,\rho}(t,
   u))$
 \item $\mathtt{tapp}_{\quant{\alpha}{\tau},\rho}(
 \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\quant{\alpha}{\tau}}(s,t))
-  \to
+  \red
   \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\tau[\alpha:=\rho]}(s,
   \mathtt{tapp}_{\quant{\alpha}{\tau},\rho}(t))$
 \item $\pi^1_{\tau,\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
-  \mathtt{and}(\tau,\rho)}(s,t)) \to
+  \mathtt{and}(\tau,\rho)}(s,t)) \red
   \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\tau}(s,\pi^1_{\tau,
   \rho}(t))$
 \item $\pi^2_{\tau,\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
-  \mathtt{and}(\tau,\rho)}(s,t)) \to
+  \mathtt{and}(\tau,\rho)}(s,t)) \red
   \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(s,\pi^2_{\tau,
   \rho}(t))$
 \item $\mathtt{case}_{\tau,\rho,\pi}(
   \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\mathtt{or}(\tau,
-  \rho)}(s,t),\abs{x}{u},\abs{y}{v}) \to
+  \rho)}(s,t),\abs{x}{u},\abs{y}{v}) \red
   \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\pi}(s,\mathtt{case}_{
   \tau,\rho,\pi}(t,\abs{x}{u},\abs{y}{v}))$
-\item $\mathtt{let}_{\qquant{\forall}{\beta}{\tau},\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\qquant{\forall}{\beta}{\tau}}(s,t),u) \to
+\item $\mathtt{let}_{\qquant{\forall}{\beta}{\tau},\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\qquant{\forall}{\beta}{\tau}}(s,t),u) \red
   \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(s,\mathtt{let}_{\qquant{\forall}{\beta}{\tau},\rho}(t,u))$
 \end{itemize}
 \end{document}
