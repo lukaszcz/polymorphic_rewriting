@@ -185,13 +185,13 @@ The set $\ITypes$ of \emph{interpretation types} is given by:
   $\FTV(\alpha) = \{ \alpha \}$.
 \item $\nat \in \ITypes$, and $\FTV(\nat) = \emptyset$.
 \item $\sigma \arrtype \tau \in \ITypes$ if both $\sigma \in \ITypes$
-  and $\tau \in \ITypes$, and $\FTV(\sigma \arrtype \tau) = \FTV(\sigma)
-  \cup \FTV(\tau)$.
+  and $\tau \in \ITypes$, and $\FTV(\sigma \arrtype \tau) =
+  \FTV(\sigma) \cup \FTV(\tau)$.
 \item $\sigma \times \tau \in \ITypes$ if both $\sigma \in \ITypes$
   and $\tau \in \ITypes$, and $\FTV(\sigma \times \tau) = \FTV(\sigma)
   \cup \FTV(\tau)$.
-\item $\quant{\alpha}{\sigma} \in \ITypes$ if $\alpha \in \Typevars$ and
-  $\sigma \in \ITypes$, and $\FTV(\quant{\alpha}{\sigma}) =
+\item $\quant{\alpha}{\sigma} \in \ITypes$ if $\alpha \in \Typevars$
+  and $\sigma \in \ITypes$, and $\FTV(\quant{\alpha}{\sigma}) =
   \FTV(\sigma) \setminus \{ \alpha \}$.
 \end{itemize}
 \end{definition}
@@ -803,32 +803,33 @@ numbers.
 
 \subsection{Defining $\succ$ and $\succeq$}
 
-We will define $\succ$ and $\succeq$ on elements of $\World$, using
+We will define $\succ$ and $\succeq$ on elements of $\Iterms$, using
 coinduction: $s \succ t$ (resp.\ $s \succeq t$) if $s \succ_\sigma t$
 (resp.\ $s \succeq_\sigma t$) can be obtained for $\sigma$ the type of
 $s,t$, following Definition~\ref{def:succ}.
 
 \begin{definition}\label{def:succ}
-  Let $R \in \{ \succ,\succeq \}$. For~$s,t \in \World_\sigma$, the
+  Let $R \in \{ \succ,\succeq \}$. For~$s,t \in \Iterms_\sigma$, the
   relation $s\ R_{\sigma}\ t$ is defined coinductively by the
   following rules.
   \[
     \begin{array}{c}
-    \infer={s\ R_\nat\ t}{s\ R\ t \text{ in natural
+    \infer={s\ R_\nat\ t}{s\da\ R\ t\da \text{ in natural
         numbers}}\quad\quad
-    \infer={s\ R_{\sigma\to\tau}\ t}{\app{s}{q}\da\ R_{\tau}\ \app{t}{q}\da
+    \infer={s\ R_{\sigma\to\tau}\ t}{\app{s}{q}\ R_{\tau}\ \app{t}{q}
       \text{ for every } q \in \World_\sigma} \\ \\
-    \infer={s\ R_{\forall\alpha[\sigma]}\ t}{\tapp{s}{\tau}\da\ R_{\sigma[\subst{\alpha}{\tau}]}\ \tapp{t}{\tau}\da
+    \infer={s\ R_{\forall\alpha[\sigma]}\ t}{\tapp{s}{\tau}\ R_{\sigma[\subst{\alpha}{\tau}]}\ \tapp{t}{\tau}
       \text{ for every closed type } \tau}
     \end{array}
   \]
 \end{definition}
 
-Note that in the case for~$\nat$ the terms~$t,s$ are natural numbers
-by Lemma~\ref{lem_final_nat}.
+Note that in the case for~$\nat$ the terms~$s\da$, $t\da$ are natural
+numbers by Lemma~\ref{lem_final_nat}.
 
 \LC{This definition was incorrect before, because e.g.~$\app{s}{q}$
-  need not be in normal form.}
+  need not be in normal form. I think it's best just to define it from
+  the start for all terms in~$\Iterms$.}
 
 \subsection{Properties of $\succ$ and $\succeq$}
 
@@ -843,9 +844,9 @@ $\succ$ is well-founded.
   does not exist an infinite sequence $t_1 \succ_\tau t_2 \succ_\tau
   t_3 \succ_\tau \ldots$ For instance, if $t_1
   \succ_{\forall\alpha[\tau]} t_2 \succ_{\forall\alpha[\tau]} t_3
-  \succ_{\forall\alpha[\tau]} \ldots$ then $\tapp{t_1}{\nat}\da
-  \succ_{\tau[\subst{\alpha}{\nat}]} \tapp{t_2}{\nat}\da
-  \succ_{\tau[\subst{\alpha}{\nat}]} \tapp{t_3}{\nat}\da
+  \succ_{\forall\alpha[\tau]} \ldots$ then $\tapp{t_1}{\nat}
+  \succ_{\tau[\subst{\alpha}{\nat}]} \tapp{t_2}{\nat}
+  \succ_{\tau[\subst{\alpha}{\nat}]} \tapp{t_3}{\nat}
   \succ_{\tau[\subst{\alpha}{\nat}]} \ldots$, which is impossible by
   the inductive hypothesis.
 \end{proof}
@@ -863,18 +864,17 @@ Both $\succ$ and $\succeq$ are transitive.
   $t_1 \succeq_\nat t_3$.
 
   If $t_1 \succeq_{\sigma\to\tau}t_2\succeq_{\sigma\to\tau}t_3$ then
-  $\app{t_1}{q}\da\succeq_{\tau}\app{t_2}{q}\da\succeq_\tau\app{t_3}{q}\da$
-  for $q \in \World_\sigma$. Hence
-  $\app{t_1}{q}\da\succeq_\tau\app{t_3}{q}\da$ for $q \in
-  \World_\sigma$ by the coinductive hypothesis. Thus
+  $\app{t_1}{q}\succeq_{\tau}\app{t_2}{q}\succeq_\tau\app{t_3}{q}$ for
+  $q \in \World_\sigma$. Hence $\app{t_1}{q}\succeq_\tau\app{t_3}{q}$
+  for $q \in \World_\sigma$ by the coinductive hypothesis. Thus
   $t_1\succeq_{\sigma\to\tau} t_3$.
 
   If $t_1
   \succeq_{\forall\alpha[\sigma]}t_2\succeq_{\forall\alpha[\sigma]}t_3$
   then
-  $\tapp{t_1}{\tau}\da\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_2}{\tau}\da\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}\da$
+  $\tapp{t_1}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_2}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}$
   for any closed type~$\tau$. Hence
-  $\tapp{t_1}{\tau}\da\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}\da$
+  $\tapp{t_1}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}$
   by the coinductive hypothesis. Thus
   $t_1\succeq_{\forall\alpha[\sigma]} t_3$.\qed
 \end{proof}
@@ -900,27 +900,32 @@ By coinduction, analogous to the transitivity proof.\qed
 \end{proof}
 
 \CK{Do we also have $\succeq \cdot \succ\ \subseteq\ \succ$? I'd like
-to use that.\medskip}
+to use that.\medskip} \LC{Yes, with an analogous proof.}
 
 \CK{I think that's all that absolutely \emph{has} to be proven to make
-the argument work.  However, to work with these things we will need a
-little more\dots}
+  the argument work. However, to work with these things we will need a
+  little more\dots}
 
-In the following, we extend $\succ$ and $\succeq$ to non-final
-interpretation terms, by defining $s \succ t$ (resp. $s \succeq t$) if
-$s\downarrow \succ t$ (resp. $s\downarrow \succeq t\downarrow$).
-\CK{Note that for this we do need to prove that $\leadsto$ has unique
-normal forms, but if we don't define this, then the following lemma is
-meaningless, I think.}
+No longer needed: In the following, we extend $\succ$ and $\succeq$ to
+non-final interpretation terms, by defining $s \succ t$ (resp. $s
+\succeq t$) if $s\downarrow \succ t\da$ (resp. $s\downarrow \succeq
+t\downarrow$).  \CK{Note that for this we do need to prove that
+  $\leadsto$ has unique normal forms, but if we don't define this,
+  then the following lemma is meaningless, I think.}  \LC{I don't
+  think there is any problem with local confluence, and we have SN
+  (but this should be re-checked). Besides, this already beaks down
+  without unique normal forms with the definition for~$\World$, so I
+  changed the definition to make it work for~$\Iterms$ from the
+  start.}
 
 \begin{lemma}\label{lem:plusparts}
-For all interpretation types $\sigma$, interpretation terms $s,t$ of
-type $\sigma$ and $n > 0$ we have:
+For all \emph{closed} interpretation types $\sigma$, interpretation
+terms $s,t$ of type $\sigma$ and $n > 0$ we have:
 \begin{enumerate}
-\item $\oplus_{\sigma}(s,t) \succeq s$ and
-      $\oplus_{\sigma}(s,t) \succeq t$;
-\item $\oplus_{\sigma}(s,\lift_{\sigma}(n)) \succ s$ and
-      $\oplus_{\sigma}(\lift_{\sigma}(n),t) \succ t$.
+\item $\oplus_{\sigma} s t \succeq s$ and
+      $\oplus_{\sigma} s t \succeq t$;
+\item $\oplus_{\sigma} s (\lift_{\sigma}(n)) \succ s$ and
+      $\oplus_{\sigma} (\lift_{\sigma}(n)) t \succ t$.
 \end{enumerate}
 \end{lemma}
 
@@ -928,16 +933,15 @@ type $\sigma$ and $n > 0$ we have:
 TODO
 
 \LC{I think these also hold by coinduction because they hold for
-type~$\nat$. But one needs to generalize the coinductive hypothesis to
-$\app{\app{\oplus}{s}}{t} \cdot t_1 \cdot \ldots \cdot t_n
-\succeq_\sigma s \cdot t_1 \cdot \ldots \cdot t_n$ (and with some
-additional type arguments also).}
+  type~$\nat$. But one needs to generalize the coinductive hypothesis
+  to $\app{\app{\oplus}{s}}{t} t_1 \ldots t_n \succeq_\sigma s t_1
+  \ldots t_n$.}
 
 \end{proof}
 
 \begin{lemma}\label{lem:liftgreater}
 If $n \geq m$ then $\lift_\sigma(n) \succeq \lift_\sigma(m)$ for all
-types $\sigma$.
+\emph{closed} types $\sigma$.
 \end{lemma}
 
 \begin{proof}
@@ -945,11 +949,12 @@ TODO
 \end{proof}
 
 \begin{lemma}\label{lem:plustimesmonotonic}
-If $s,t,u$ are terms of type $\sigma$ and $s \succeq t$, then
-$s \oplus_\sigma u \succeq t \oplus_\sigma u$ and $s \otimes_\sigma u
-\succeq t \otimes_\sigma u$.  Moreover, if even $s \succ t$ then we
-have $s \oplus_\sigma u \succ t$, and if $u \succeq \lift_\sigma(1)$
-then also $s \otimes_\sigma u \succ t \otimes_\sigma u$.
+If $s,t,u$ are terms of a \emph{closed} type $\sigma$ and $s \succeq
+t$, then $s \oplus_\sigma u \succeq t \oplus_\sigma u$ and $s
+\otimes_\sigma u \succeq t \otimes_\sigma u$.  Moreover, if even $s
+\succ t$ then we have $s \oplus_\sigma u \succ t$, and if $u \succeq
+\lift_\sigma(1)$ then also $s \otimes_\sigma u \succ t \otimes_\sigma
+u$.
 \end{lemma}
 
 \begin{proof}
@@ -962,23 +967,20 @@ addition and multiplication extend to interpretation terms of extended
 types:
 
 \begin{lemma}\label{lem:approxproperties}
-For all interpretation types $\sigma$ and interpretation terms $s,t,u$
-of type $\sigma$, we have:
+For all \emph{closed} interpretation types $\sigma$ and all
+interpretation terms $s,t,u$ of type $\sigma$, we have:
 \begin{enumerate}
 \item\label{lem:approx:symmetry}
-  $\oplus_\sigma(s,t) \approx \oplus_\sigma(t,s)$ and
-  $\otimes_\sigma(s,t) \approx \otimes_\sigma(t,s)$;
-\item\label{lem:approx:assoc}
-  $\oplus_\sigma(s,\oplus_\sigma(t,u)) \approx \oplus_\sigma(
-    \oplus_\sigma(s,t),u)$ and
-  $\otimes_\sigma(s,\otimes_\sigma(t,u)) \approx \otimes_\sigma(
-    \otimes_\sigma(s,t),u)$;
+  $\oplus_\sigma s t \approx \oplus_\sigma t s$ and
+  $\otimes_\sigma s t \approx \otimes_\sigma t s$;
+\item\label{lem:approx:assoc} $\oplus_\sigma s (\oplus_\sigma t u)
+  \approx \oplus_\sigma(\oplus_\sigma s t) u$ and $\otimes_\sigma s
+  (\otimes_\sigma t u) \approx \otimes_\sigma(\otimes_\sigma s t) u$;
 \item\label{lem:approx:distribution}
-  $\otimes_\sigma(s,\oplus(t,u)) \approx \oplus_\sigma(\otimes_\sigma(
-  s,t),\otimes_\sigma(s,u))$;
+  $\otimes_\sigma s (\oplus t u) \approx \oplus_\sigma(\otimes_\sigma s t) (\otimes_\sigma s u)$;
 \item\label{lem:approx:neutral}
-  $\oplus_\sigma(\lift_\sigma(0), s) \approx s$ and
-  $\otimes_\sigma(\lift_\sigma(1), s) \approx s$.
+  $\oplus_\sigma(\lift_\sigma(0)) s \approx s$ and
+  $\otimes_\sigma(\lift_\sigma(1)) s \approx s$.
 \end{enumerate}
 \end{lemma}
 
