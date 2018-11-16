@@ -82,7 +82,7 @@
 \author{{\L}ukasz Czajka and Cynthia Kop}
 \authorrunning{{\L}. Czajka and C. Kop}
 \institute{
-Department of Computer Science, University of Copenhagen (DIKU)
+Faculty of Informatics, TU Dortmund
 \\
 Institute of Computer Science, Radboud University Nijmegen (RU)
 \\
@@ -221,8 +221,8 @@ the following clauses:
   \sigma)$ in the following set: $\{ \oplus_\sigma : \sigma \arrtype
   \sigma \arrtype \sigma,\ \otimes_\sigma : \sigma \arrtype \sigma \arrtype
   \sigma,\ \proj^1_{\sigma,\tau} : (\sigma \times \tau) \arrtype
-  \sigma,\ \proj^2_{\sigma,\tau} : (\sigma \times \tau) \arrtype \tau,\ 
-  \flatten_{\sigma} : \sigma \arrtype \nat,\ 
+  \sigma,\ \proj^2_{\sigma,\tau} : (\sigma \times \tau) \arrtype \tau,\
+  \flatten_{\sigma} : \sigma \arrtype \nat,\
   \lift_{\sigma} : \nat \arrtype \sigma
   \mid \sigma \in \ITypes \}$.
 \item $\Gamma \vdash \pair{s}{t} : \sigma \times \tau$ if $\Gamma \vdash
@@ -263,9 +263,9 @@ smallest relation for which the following properties are satisfied:
   if $s \leadsto t$ then both $\app{s}{u} \leadsto \app{t}{u}$ and
   $\tapp{s}{\sigma} \leadsto \tapp{t}{\sigma}$
 \item\label{leadsto:plus:base}
-  $\app{\app{\oplus_{\nat}}{n}}{m} \leadsto (n+m)$ 
+  $\app{\app{\oplus_{\nat}}{n}}{m} \leadsto (n+m)$
 \item\label{leadsto:times:base}
-  $\app{\app{\otimes_{\nat}}{n}}{m} \leadsto (n \cdot m)$ 
+  $\app{\app{\otimes_{\nat}}{n}}{m} \leadsto (n \cdot m)$
 \item\label{leadsto:circ:arrow}
   $\app{\app{\circ_{\sigma \arrtype \tau}}{s}}{t} \leadsto \abs{x:
   \sigma}{\app{\app{\circ_\tau}{(\app{s}{x})}}{(\app{t}{x})}}$ for
@@ -283,7 +283,7 @@ smallest relation for which the following properties are satisfied:
   \app{\flatten_{\sigma[\subst{\alpha}{\nat}]}}{(\tapp{s}{\nat})}$
 \item $\app{\lift_\nat}{s} \leadsto s$
 \item $\app{\lift_{\sigma \arrtype \tau}}{s} \leadsto
-  \abs{x:\sigma}{\app{\lift_{\tau}}{x}}$
+  \abs{x:\sigma}{\app{\lift_{\tau}}{s}}$
 \item $\app{\lift_{\quant{\alpha}{\sigma}}}{s} \leadsto
   \tabs{\alpha}{\app{\lift_{\sigma}}{s}}$
 \item\label{leadsto:beta:abs}
@@ -337,8 +337,7 @@ analysis).
 
 By~$\SN$ we denote the set of all terminating interpretation
 terms. For $t \in \SN$ by~$\nu(t)$ we denote the length of the longest
-reduction starting at~$t$. We use the notation $t u$ for either
-$\app{t}{u}$ when~$u$ is a term, or $\tapp{t}{u}$ when~$u$ is a type.
+reduction starting at~$t$.
 
 The following lemma is obvious, but worth stating explicitly.
 
@@ -350,35 +349,29 @@ in $\SN$.
 \end{lemma}
 
 \begin{proof}
-We observe that every reduct of $\abs{x}{s}$ has the form $\abs{x}{s'}$
-with $s \leadsto s'$, and similar for $\tabs{\alpha}{s}$.
-Thus, the first statement follows by induction on the length of the
-reduction $\abstraction{a}{s} \leadsto^* t$, and the second by induction
-on $s$ using $\leadsto$.
-\qed
+We observe that every reduct of $\abstraction{x}{s}$ has the form
+$\abstraction{x}{s'}$ with $s \leadsto s'$, and analogously for
+$\tabs{\alpha}{s}$.  Thus, the first statement follows by induction on
+the length of the reduction $\abstraction{a}{s} \leadsto^* t$, and the
+second statement by induction on $\nu(s)$.  \qed
 \end{proof}
 
 \begin{lemma}\label{lem_circ_sn_base}
-  If $t_1,t_2 \in \SN$ then $\circ_\nat t_1 t_2 \in \SN$ for
-  $\circ \in \{\oplus,\otimes\}$.
-  \CK{Changed this because I don't think it'll work out to do this for
-  higher types without assuming a kind of computability of $t_1,t_2$ --
-  not with the changed definition of the $\circ$ rules (it could be
-  that $t_1$ is terminating but $t_1 x$ is not).} \LC{Right, with the
-  previous rules this was a relatively simple induction on~$\tau$, now
-  it won't work.}
+  If $t_1,t_2 \in \SN$ then $\circ_\nat t_1 t_2 \in \SN$ for $\circ
+  \in \{\oplus,\otimes\}$.
 \end{lemma}
 
 \begin{proof}
-  By induction on $t_1,t_2$ oriented with $\leadsto$.
-  $\circ_\nat t_1 t_2 \in \SN$ if $s \in \SN$ for all $s$ such that
-  $\circ_\nat t_1 t_2 \in \SN \leadsto s$.  If
-  $s = \circ_\nat t_1' t_2$ or $s = \circ_\nat t_1 t_2'$ then we
-  complete by the induction hypothesis. Otherwise $s \in \mathbb{N}$
-  is obviously in $\SN$.
+  By induction on $\nu(t_1) + \nu(t_2)$. Assume $t_1,t_2 \in \SN$. To
+  prove $\circ_\nat t_1 t_2 \in \SN$ it suffices to show $s \in \SN$
+  for all~$s$ such that $\circ_\nat t_1 t_2 \leadsto s$. If $s =
+  \circ_\nat t_1' t_2$ or $s = \circ_\nat t_1 t_2'$ with $t_i \leadsto
+  t_i'$ then we complete by the induction hypothesis. Otherwise $s \in
+  \mathbb{N}$ is obviously in $\SN$.
 \end{proof}
 
 \subsubsection{Computability}
+
 In the rest of this section we adapt the Tait-Girard computability
 method to prove termination of~$\leadsto$. The proof is an adaptation
 of chapters~6 and~14 from the book ``Proofs and Types'' by Girard, and
@@ -796,7 +789,7 @@ TODO.
 \qed
 \end{proof}
 
-\begin{lemma}
+\begin{lemma}\label{lem_final_nat}
 The only final interpretation terms of type $\nat$ are the natural
 numbers.
 \end{lemma}
@@ -821,18 +814,21 @@ $s,t$, following Definition~\ref{def:succ}.
   following rules.
   \[
     \begin{array}{c}
-    \infer={s\ R_\nat\ t}{s\da\ R\ t\da \text{ in natural
+    \infer={s\ R_\nat\ t}{s\ R\ t \text{ in natural
         numbers}}\quad\quad
-    \infer={s\ R_{\sigma\to\tau}\ t}{\app{s}{q}\ R_{\tau}\ \app{t}{q}
+    \infer={s\ R_{\sigma\to\tau}\ t}{\app{s}{q}\da\ R_{\tau}\ \app{t}{q}\da
       \text{ for every } q \in \World_\sigma} \\ \\
-    \infer={s\ R_{\forall\alpha[\sigma]}\ t}{\tapp{s}{\tau}\ R_{\sigma[\subst{\alpha}{\tau}]}\ \tapp{t}{\tau}
+    \infer={s\ R_{\forall\alpha[\sigma]}\ t}{\tapp{s}{\tau}\da\ R_{\sigma[\subst{\alpha}{\tau}]}\ \tapp{t}{\tau}\da
       \text{ for every closed type } \tau}
     \end{array}
   \]
 \end{definition}
 
-\CK{Actually, by definition of ``final interpretation terms'' you
-don't need to normalise in the natural number case.}
+Note that in the case for~$\nat$ the terms~$t,s$ are natural numbers
+by Lemma~\ref{lem_final_nat}.
+
+\LC{This definition was incorrect before, because e.g.~$\app{s}{q}$
+  need not be in normal form.}
 
 \subsection{Properties of $\succ$ and $\succeq$}
 
@@ -843,14 +839,13 @@ $\succ$ is well-founded.
 \end{lemma}
 
 \begin{proof}
-  By induction on the size of the type~$\tau$ one shows that there does
-  not exist an infinite sequence
-  $t_1 \succ_\tau t_2 \succ_\tau t_3 \succ_\tau \ldots$ For instance,
-  if
-  $t_1 \succ_{\forall\alpha[\tau]} t_2 \succ_{\forall\alpha[\tau]} t_3
-  \succ_{\forall\alpha[\tau]} \ldots$ then
-  $\tapp{t_1}{\nat} \succ_{\tau[\subst{\alpha}{\nat}]}
-  \tapp{t_2}{\nat} \succ_{\tau[\subst{\alpha}{\nat}]} \tapp{t_3}{\nat}
+  By induction on the size of the type~$\tau$ one shows that there
+  does not exist an infinite sequence $t_1 \succ_\tau t_2 \succ_\tau
+  t_3 \succ_\tau \ldots$ For instance, if $t_1
+  \succ_{\forall\alpha[\tau]} t_2 \succ_{\forall\alpha[\tau]} t_3
+  \succ_{\forall\alpha[\tau]} \ldots$ then $\tapp{t_1}{\nat}\da
+  \succ_{\tau[\subst{\alpha}{\nat}]} \tapp{t_2}{\nat}\da
+  \succ_{\tau[\subst{\alpha}{\nat}]} \tapp{t_3}{\nat}\da
   \succ_{\tau[\subst{\alpha}{\nat}]} \ldots$, which is impossible by
   the inductive hypothesis.
 \end{proof}
@@ -868,16 +863,20 @@ Both $\succ$ and $\succeq$ are transitive.
   $t_1 \succeq_\nat t_3$.
 
   If $t_1 \succeq_{\sigma\to\tau}t_2\succeq_{\sigma\to\tau}t_3$ then
-  $\app{t_1}{q}\succeq_{\tau}\app{t_2}{q}\succeq_\tau\app{t_3}{q}$ for
-  $q \in \World_\sigma$. Hence $\app{t_1}{q}\succeq_\tau\app{t_3}{q}$
-  for $q \in \World_\sigma$ by the coinductive hypothesis. Thus
+  $\app{t_1}{q}\da\succeq_{\tau}\app{t_2}{q}\da\succeq_\tau\app{t_3}{q}\da$
+  for $q \in \World_\sigma$. Hence
+  $\app{t_1}{q}\da\succeq_\tau\app{t_3}{q}\da$ for $q \in
+  \World_\sigma$ by the coinductive hypothesis. Thus
   $t_1\succeq_{\sigma\to\tau} t_3$.
 
-  If $t_1 \succeq_{\forall\alpha[\sigma]}t_2\succeq_{\forall\alpha[\sigma]}t_3$ then
-  $\tapp{t_1}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_2}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}$ for
-  any closed type~$\tau$. Hence
-  $\tapp{t_1}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}$
-  by the coinductive hypothesis. Thus $t_1\succeq_{\forall\alpha[\sigma]} t_3$.\qed
+  If $t_1
+  \succeq_{\forall\alpha[\sigma]}t_2\succeq_{\forall\alpha[\sigma]}t_3$
+  then
+  $\tapp{t_1}{\tau}\da\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_2}{\tau}\da\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}\da$
+  for any closed type~$\tau$. Hence
+  $\tapp{t_1}{\tau}\da\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}\da$
+  by the coinductive hypothesis. Thus
+  $t_1\succeq_{\forall\alpha[\sigma]} t_3$.\qed
 \end{proof}
 
 And that $\succeq$ is a quasi-ordering:
@@ -1001,7 +1000,7 @@ is a type variable and $\rho_1,\dots,\rho_n$ are types.  An
 \emph{interpretation type scheme} is generated by the clauses of
 Definition~\ref{def:itypes} and in addition:
 \[
-\meta{\alpha}{\rho_1,\dots,\rho_n} \in \ITypes'\ \text{if}\ 
+\meta{\alpha}{\rho_1,\dots,\rho_n} \in \ITypes'\ \text{if}\
   \alpha \in \Typevars\ \text{and}\ \rho_1,\dots,\rho_n \in \ITypes'
 \]
 A type substitution $\gamma$ can only be applied to an interpretation
@@ -1171,9 +1170,9 @@ We have the following function symbols:
 \mathtt{tapp}_{\alpha,\beta} & : &
   [\quant{\xi}{\meta{\alpha}{\xi}}] \arrtype \meta{\alpha}{\beta} \\
 \mathtt{case}_{\alpha,\beta,\xi} & : & [\mathtt{or}(\alpha,\beta) \times
-  \alpha \arrtype \xi \times \beta \arrtype \xi] \arrtype \xi\ \ \ & 
+  \alpha \arrtype \xi \times \beta \arrtype \xi] \arrtype \xi\ \ \ &
 \mathtt{let}_{\alpha,\beta} & : &
-  \qquant{\exists}{\xi}{\meta{\alpha}{\xi}} \times 
+  \qquant{\exists}{\xi}{\meta{\alpha}{\xi}} \times
   \quant{\xi}{\alpha\langle\xi\rangle \arrtype \beta}] \arrtype \beta \\
 \mathtt{ext}_{\alpha,\beta} & : & [\meta{\alpha}{\beta}] \arrtype
   \qquant{\exists}{\xi}{\meta{\alpha}{\xi}} \\
@@ -1336,7 +1335,7 @@ A \emph{type constructor mapping} is a function $\Typemap$ whose domain
 is the set of type constructors and quantifiers, such that:
 \begin{itemize}
 \item for $\con : k \in \TypeConstructors$:
-  $\Typemap(\con)$ is a type $\sigma$ with $\FTV(\sigma) 
+  $\Typemap(\con)$ is a type $\sigma$ with $\FTV(\sigma)
   \subseteq \{\alpha_1,\dots,\alpha_k\}$;
 \item for $\mathtt{Q} : k \in \TypeQuantifiers \setminus \{\forall:1\}$:
   $\Typemap(\mathtt{Q})$ is a type scheme $\sigma$ with $\FTV(\sigma)
@@ -1534,7 +1533,7 @@ We use the following type constructor mapping:
 And the following function symbol mapping:
 \[
 \begin{array}{rcll}
-\Termmap(\epsilon_\alpha) & = & \lambda x:\nat. & 
+\Termmap(\epsilon_\alpha) & = & \lambda x:\nat. &
   \mathtt{lift}_\alpha(x) \\
 \Termmap(@_{\alpha,\beta}) & = & \lambda x: \alpha \arrtype \beta,y :
   \alpha. \quad & x \cdot y \oplus \lift_\beta(\flatten_\alpha(
@@ -1570,7 +1569,7 @@ And the following function symbol mapping:
   & & \quad
   \lift_\xi(37) \oplus (\ \lift_\xi(\flatten_{\alpha \times\beta}(
   x) \oplus 1) \otimes \\
-  & & \phantom{\quad\lift_\xi(37) \oplus a}\ 
+  & & \phantom{\quad\lift_\xi(37) \oplus a}\
   ((y \cdot \proj^1_{\alpha,\beta}(x)) \oplus
    (z \cdot \proj^2_{\alpha,\beta}(x)) \oplus \lift_\xi(1))
   \ ) \\
@@ -1605,7 +1604,7 @@ And the following function symbol mapping:
   Let $u := \mathtt{ext}_{\quant{\alpha}{\sigma},\tau}(s)$ and
   $w := \tabs{\alpha}{\abs{x}{t}}$.  Then we have:
   \begin{itemize}
-  \item $\interpret{u} = 
+  \item $\interpret{u} =
     \tabs{\xi}{\abs{y:\quant{\alpha}{\sigma \arrtype \xi}}{
     y * \typeinterpret{\tau} \cdot \interpret{s}}}$ (which has type
     $\quant{\xi}{\quant{\alpha}{\sigma \arrtype \xi} \arrtype \xi}$);
@@ -1624,7 +1623,7 @@ And the following function symbol mapping:
     \cdot \interpret{s} \leadsto (\abs{x:\typeinterpret{\sigma}[\alpha:=
     \typeinterpret{\tau}]}{\interpret{t}[\alpha:=\typeinterpret{\tau}]})
     \cdot \interpret{s} \leadsto \interpret{t}[\alpha:=\typeinterpret{
-    \tau}][x:=\interpret{s}]$.  By Lemma 
+    \tau}][x:=\interpret{s}]$.  By Lemma
     \ref{lem:substitutioninterpret} this is equal to
     $\interpret{t[\alpha:=\tau][x:=s]}$.
   \end{itemize}
@@ -1793,4 +1792,3 @@ And the following function symbol mapping:
   \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(s,\mathtt{let}_{\qquant{\forall}{\beta}{\tau},\rho}(t,u))$
 \end{itemize}
 \end{document}
-
