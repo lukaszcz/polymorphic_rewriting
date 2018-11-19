@@ -37,9 +37,9 @@
 
 \newcommand{\quant}[2]{\forall #1[#2]}
 \newcommand{\qquant}[3]{#1 #2[#3]}
-\newcommand{\typeinterpret}[1]{\text{\guillemotleft} #1\! \text{\guillemotright}}
+\newcommand{\typeinterpret}[1]{\llparenthesis #1 \rrparenthesis}
 \newcommand{\interpret}[1]{\llparenthesis #1 \rrparenthesis}
-\newcommand{\fullinterpret}[1]{\Phi(#1)}
+\newcommand{\itp}[1]{\llparenthesis #1 \rrparenthesis}
 \newcommand{\arr}[1]{\longrightarrow_{#1}}
 \newcommand{\red}{\longrightarrow}
 \newcommand{\arrtype}{\rightarrow}
@@ -1058,8 +1058,8 @@ Section~11.7.
   on type constructors (substitution, abstraction, etc.) are invariant
   under $\beta$-conversion. So for instance, if $\alpha,\beta$ are
   type constructor variables, then we consider $(\alpha \tau)[\alpha
-    := \lambda \beta . \beta]$ and $\tau$ and $(\lambda \beta . \beta)
-  \tau$ to be the same.
+    := \lambda \beta . \beta]$ (which is $(\lambda \beta . \beta)
+  \tau$) and $\tau$ to be the same.
 \end{definition}
 
 Terms are built from a set of function symbols, using abstraction and
@@ -1163,10 +1163,10 @@ We have the following function symbols:
 \mathtt{case} & : & \forall \alpha \forall \beta \forall \gamma . \mathtt{or}\, \alpha\, \beta \arrtype
   (\alpha \arrtype \gamma) \arrtype (\beta \arrtype \gamma) \arrtype \gamma \\
 \mathtt{let} & : & \forall \alpha : * \arrkind * . \forall \beta .
-  (\exists \alpha) \arrtype
+  (\exists (\alpha)) \arrtype
   (\forall \gamma . \alpha \gamma \arrtype \beta) \arrtype \beta \\
 \mathtt{ext} & : & \forall \alpha : * \arrkind * . \forall \beta . \alpha \beta \arrtype
-  \exists \alpha
+  \exists (\alpha)
 \end{array}
 \]
 \LC{If we want this to work for open terms then we should also say
@@ -1179,10 +1179,10 @@ We have the following function symbols:
   lambda-abstractions.}
 
 \LC{You had some mistakes in the rules below. I think these were only
-  typos, but re-check if the interpretation still works.}
+  typos, but re-check if the interpretation still works. Though the
+  rules in the last group were all wrong -- the types didn't match.}
 
-And finally the rules.  These are represented as \emph{rule schemes},
-representing infinitely many rules at once.
+And finally the rules.
 \[
 \begin{array}{rcl}
 @_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] \\
@@ -1268,51 +1268,46 @@ representing infinitely many rules at once.
 %\end{array}
 %\]
 \end{itemize}
-\LC{The following rules are wrong. I'll correct this on Monday.}
+\LC{The following rules were wrong. The types didn't match -- you
+  forgot the lambda-abstractions.}
 \begin{itemize}
-\item $\epsilon_\tau(\mathtt{let}_{\varphi,\bot}(s,t)) \red
-  \mathtt{let}_{\varphi,\tau}(s,\epsilon_\tau(t))$
+\item
+  $\epsilon_\tau(\mathtt{let}_{\varphi,\bot}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}))
+  \red
+  \mathtt{let}_{\varphi,\tau}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{\epsilon_\tau(t)}})$
 \item $@_{\tau,\rho}(\mathtt{let}_{\varphi, \tau \arrtype
   \rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}),u) \red
-  \mathtt{let}_{\varphi,\rho}(s,@_{\tau,\rho}(t, u))$
-\item $\mathtt{tapp}_{\quant{\alpha}{\tau},\rho}(
-\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\quant{\alpha}{\tau}}(s,t))
+  \mathtt{let}_{\varphi,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{@_{\tau,\rho}(t,
+      u)}})$
+\item
+  $\mathtt{tapp}_{\psi,\rho}(\mathtt{let}_{\varphi,\forall\beta[\psi\beta]}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}))
   \red
-  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\tau[\alpha:=\rho]}(s,
-  \mathtt{tapp}_{\quant{\alpha}{\tau},\rho}(t))$
-\item $\pi^1_{\tau,\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
-  \mathtt{and}(\tau,\rho)}(s,t)) \red
-  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\tau}(s,\pi^1_{\tau,
-  \rho}(t))$
-\item $\pi^2_{\tau,\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},
-  \mathtt{and}(\tau,\rho)}(s,t)) \red
-  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(s,\pi^2_{\tau,
-  \rho}(t))$
+  \mathtt{let}_{\varphi,\psi\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{\mathtt{tapp}_{\psi,\rho}(t)}})$
+\item
+  $\pi^1_{\tau,\rho}(\mathtt{let}_{\varphi,
+  \mathtt{and}\,\tau,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}))
+  \red
+  \mathtt{let}_{\varphi,\tau}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{\pi^1_{\tau,
+        \rho}(t)}})$
+\item
+  $\pi^2_{\tau,\rho}(\mathtt{let}_{\varphi,
+  \mathtt{and}\,\tau\,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}))
+  \red
+  \mathtt{let}_{\varphi,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{\pi^2_{\tau,\rho}(t)}})$
 \item $\mathtt{case}_{\tau,\rho,\pi}(
-  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\mathtt{or}(\tau,
-  \rho)}(s,t),\abs{x}{u},\abs{y}{v}) \red
-  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\pi}(s,\mathtt{case}_{
-  \tau,\rho,\pi}(t,\abs{x}{u},\abs{y}{v}))$
-\item $\mathtt{let}_{\qquant{\forall}{\beta}{\tau},\rho}(\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\qquant{\forall}{\beta}{\tau}}(s,t),u) \red
-  \mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(s,\mathtt{let}_{\qquant{\forall}{\beta}{\tau},\rho}(t,u))$
+  \mathtt{let}_{\varphi,\mathtt{or}\,\tau\,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}),\abs{x:\tau}{u},\abs{y:\rho}{v})
+  \red
+  \mathtt{let}_{\varphi,\pi}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{\mathtt{case}_{\tau,\rho,\pi}(t,\abs{x:\tau}{u},\abs{y:\rho}{v})}})$
+\item
+  $\mathtt{let}_{\psi,\rho}(\mathtt{let}_{\varphi,\exists\psi}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}),u)
+  \red
+  \mathtt{let}_{\varphi,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{\mathtt{let}_{\psi,\rho}(t,u)}})$
 \end{itemize}
 
-%\subsection*{General proposal}
-%
-%The following is a generalised alternative, that I think could also work.
-%However, if we don't actually get any additional systems out of it, then
-%that is probably not worth the effort of exploring.
-%
-%\begin{definition}
-%We assume given the following sets of type constructors:
-%\begin{itemize}
-%\item $\TypeConstructors_{\mathsf{func}}$: a set of \emph{function
-%  type constructors} (possibly indexed with a number of types) along
-%  with an integer arity;
-%\item $\TypeConstructors_{\mathsf{abs}}$: a set of \emph{abstraction
-%  type constructors}
-%\end{itemize}
-%\end{definition}
+\LC{To be completely precise we should define a translation $\Phi$
+  from the system urzy\_emb to the above and show that if $s \red t$
+  in urzy\_emb then $\Phi(s) \red \Phi(t)$. But this should be easy
+  once the reductions are defined correctly.}
 
 \subsection{Interpreting interesting terms}
 
@@ -1320,35 +1315,22 @@ All terms will be mapped to interpretation terms, which are compared
 using $\succ$ to hopefully obtain a decrease that can be used with
 rule removal.
 
-To start, all types must be mapped to the types of interpretation
-terms.  This we do using a \emph{type constructor mapping}:
+\LC{I think to make things simple we should base interpretation terms
+  on System~$F_\omega$ instead of System~$F$. The SN proof should be
+  easy to adapt to~$F_\omega$, we get a straightforward mapping, and
+  there are strictly more systems we can show termination of
+  (e.g. System~$F_\omega$ and extensions). Below I assume we have
+  System $F_\omega$ as the basis of our interpretation terms.}
 
 \begin{definition}
-A \emph{type constructor mapping} is a function $\Typemap$ whose domain
-is the set of type constructors and quantifiers, such that:
-\begin{itemize}
-\item for $\con : k \in \TypeConstructors$:
-  $\Typemap(\con)$ is a type $\sigma$ with $\FTV(\sigma)
-  \subseteq \{\alpha_1,\dots,\alpha_k\}$;
-\item for $\mathtt{Q} : k \in \TypeQuantifiers \setminus \{\forall:1\}$:
-  $\Typemap(\mathtt{Q})$ is a type scheme $\sigma$ with $\FTV(\sigma)
-  \subseteq \{ \alpha \}$, and where $\alpha$ may occur only in the
-  form $\alpha\langle\sigma_1,\dots,\sigma_k\rangle$;
-\item $\Typemap(\arrtype) = \alpha_1 \arrtype \alpha_2$ and
-  $\Typemap(\forall) = \quant{\beta}{\alpha\langle\beta\rangle}$
-\end{itemize}
-For a fixed type mapping $\Typemap$, we define $\typeinterpret{\sigma}$
-as follows:
-\[
-\begin{array}{rcl}
-\typeinterpret{\alpha} & = & \alpha \\
-\typeinterpret{\con(\tau_1,\dots,\tau_n)} & = &
-  \Typemap(\con)[\alpha_1:=\typeinterpret{\tau_1},\dots,\alpha_n:=
-  \typeinterpret{\tau_n}] \\
-\typeinterpret{\qquant{\mathtt{Q}}{\alpha_1 \dots \alpha_n}{\tau}} & =
-  & \Typemap(\mathtt{Q})[\alpha:=\quant{\beta_1 \dots \beta_k}{\tau}] \\
-\end{array}
-\]
+A \emph{type constructor mapping} is a function $\Typemap$ which maps
+a type constructor symbol to an interpretation type constructor of the
+same kind.
+
+A fixed type mapping $\Typemap$ is extended inductively to a function
+from type constructors to interpretation type constructors in the
+expected way. We denote the extended mapping
+by~$\typeinterpret{\sigma}$.
 \end{definition}
 
 Thus, for example $\typeinterpret{\quant{\alpha}{\sigma}} =
@@ -1360,78 +1342,69 @@ Similarly, we employ a \emph{symbol mapping} as an aid to interpret
 
 \begin{definition}
 A \emph{symbol mapping} is a function $\Termmap$ which assigns to each
-indexed function symbol $\mathtt{f}_{\alpha_1,\dots,\alpha_n} :
-[\sigma_1 \times \dots \times \sigma_k] \arrtype \tau \in \Sigma$ an
-interpretation term $\Termmap(\mathtt{f}_{\alpha_1,\dots,\alpha_n})$
-of the form $\abs{x_1 : \interpret{\sigma_1} \dots x_k : \interpret{
-\sigma_k}}{t}$ where $\{ x_1 : \interpret{\sigma_1}, \dots, x_k :
-\interpret{\sigma_k} \} \vdash t : \interpret{\tau}$.  Here, the only
-type variables that may occur in $\Termmap(\mathtt{f}_{\alpha_1,\dots,
-\alpha_n})$ are the elements of $\{\alpha_1,\dots,\alpha_n\}$.
-For a fixed symbol mapping $\Termmap$, we define $\interpret{s}$ as
-follows:
+function symbol $\mathtt{f} : \rho$ a closed interpretation term
+$\Termmap(\mathtt{f})$ of type~$\typeinterpret{\rho}$. For a fixed
+symbol mapping $\Termmap$, we define $\interpret{s}$ as follows:
 \[
 \begin{array}{rcl}
 \interpret{x} & = & x \\
 \interpret{\tabs{\alpha}{s}} & = & \tabs{\alpha}{\interpret{s}} \\
 \interpret{\abs{x:\sigma}{s}} & = & \abs{x:\typeinterpret{\sigma}}{
   \interpret{s}} \\
-\interpret{\afun_{\rho_1,\dots,\rho_n}(s_1,\dots,s_k)} & = &
-  t[x_1:=\interpret{s_1},\dots,x_k:=\interpret{s_k}] \\
-  & & \text{if}\ \Termmap(\afun_{\alpha_1,\dots,\alpha_n})[\alpha_1:=
-  \typeinterpret{\rho_1},\dots,\alpha_n:=\typeinterpret{\rho_n}] =
-  \abs{x_1 \dots x_k}{t} \\
+\interpret{f_{\rho_1,\dots,\rho_n}(s_1,\dots,s_k)} & = &
+  \Termmap(f) \typeinterpret{\rho_1} \ldots \typeinterpret{\rho_n} \interpret{s_1} \ldots \interpret{s_k}
 \end{array}
+\]
+
+Symbol mapping is extended to contexts as follows:
+\[
+\itp{\Gamma} := \{ (x : \typeinterpret{\tau}) \mid (x : \tau) \in \Gamma \}
 \]
 \end{definition}
 
 Interpretation mapping preserves typing, in a sense:
 
 \begin{lemma}
-Suppose $\Gamma \vdash s : \sigma$, and let $\Delta := \{ (x :
-\typeinterpret{\tau}) \mid (x : \tau) \in \Gamma \}$.  Then
-$\Delta \vdash \interpret{s} : \typeinterpret{\sigma}$.
+If $\Gamma \vdash s : \sigma$ then $\itp{\Gamma} \vdash \interpret{s}
+: \typeinterpret{\sigma}$.
 \end{lemma}
 
 \begin{proof}
-By induction on the form of $s$.
-The variable case is obvious.
-The case where $s$ is an abstraction $\abs{x:\tau}{s'}$ or a type
+By induction on the form of $s$.  The variable case is obvious. The
+case where $s$ is an abstraction $\abs{x:\tau}{s'}$ or a type
 abstraction $\tabs{\alpha}{s'}$ are both immediate with the induction
-hypothesis and the definition of type interpretation.
-So consider the case where $s = \afun_{\rho_1,\dots,\rho_n}(s_1,\dots,
-s_k)$.  We have:
+hypothesis and the definition of type interpretation.  So consider the
+case where $s = f_{\rho_1,\dots,\rho_n}(s_1,\dots,s_k)$. We have:
 \begin{itemize}
-\item $\afun_{\alpha_1,\dots,\alpha_n} : [\tau_1' \times \dots \times
-  \tau_k'] \arrtype \sigma' \in \Sigma$ for some $\vec{\tau'},\sigma'$;
-\item $\sigma = \sigma'[\alpha_1:=\rho_1,\dots,\alpha_n:=\rho_n]$ ;
-\item writing $\tau_i := \tau_i'[\alpha_1:=\rho_1,\dots,\alpha_n:=
-  \rho_n]$ for $1 \leq i \leq k$, we have $\Gamma \vdash s_i : \tau_i$;
-\item by the induction hypothesis, $\Delta \vdash \interpret{s_i} :
-  \interpret{\tau_i}$;
-\item we have $\Termmap(\afun_{\alpha_1,\dots,\alpha_n}) =
-  \abs{x_1 \dots x_k}{t} : \tau_1' \arrtype \dots \arrtype \tau_k'
-  \arrtype \sigma'$;
-\item therefore $\Termmap(\afun_{\alpha_1,\dots,\alpha_n})[\alpha_1:=
-  \typeinterpret{\rho_1},\dots,\alpha_n:=\typeinterpret{\rho_n}] =
-  \abs{x_1: \typeinterpret{\tau_1} \dots x_k : \typeinterpret{\tau_k}}{
-  t}$ with $\{ x_1: \typeinterpret{\tau_1} \dots x_k :
-  \typeinterpret{\tau_k} \} t : \typeinterpret{\sigma}$;
-\item hence, $\Delta \vdash t[x_1:=\interpret{s_1},\dots,x_k:=
-  \interpret{s_k}] : \sigma$ as well.
-\qed
+\item $f : \rho$ where
+  \[
+  \rho = \forall \alpha_1 \ldots \forall \alpha_n . \tau_1 \arrtype
+  \dots \arrtype \tau_k \arrtype \sigma \in \Sigma
+  \]
+  for some $\vec{\tau},\sigma$;
+\item by definition of~$\Termmap$ we have $\itp{\Gamma} \vdash
+  \Termmap(f) : \typeinterpret{\rho}$; and
+  \[
+  \typeinterpret{\rho} = \forall \alpha_1 \ldots \forall \alpha_n
+  . \typeinterpret{\tau_1} \arrtype \dots \arrtype
+  \typeinterpret{\tau_k} \arrtype \typeinterpret{\sigma} \in \Sigma
+  \]
+\item writing $\tau_i' := \tau_i[\alpha_1:=\rho_1]\dots[\alpha_n:=
+  \rho_n]$ for $1 \leq i \leq k$, we have $\Gamma \vdash s_i :
+  \tau_i'$;
+\item by the induction hypothesis, $\itp{\Gamma} \vdash
+  \interpret{s_i} : \typeinterpret{\tau_i'}$;
+\item hence $\itp{\Gamma} \vdash \interpret{s_i} :
+  \typeinterpret{\tau_i}[\alpha_1:=\typeinterpret{\rho_1}]\ldots[\alpha_n:=\typeinterpret{\rho_n}]$
+  by Lemma~\ref{lem:substitutioninterpret};
+\item we have
+  \[
+  \interpret{s} = \Termmap(f) \typeinterpret{\rho_1} \ldots
+  \typeinterpret{\rho_n} \interpret{s_1} \ldots \interpret{s_k}
+  \]
+\item hence $\itp{\Gamma} \vdash \interpret{s} :
+  \typeinterpret{\rho}$.\qed
 \end{itemize}
-
-TODO: I'm pretty sure that this proof is incomplete, because it assumes
-that type substitution does not do anything funny; however, a symbol
-mapping does not truly map to ``terms'': it maps to terms where some
-type denotations are instead \emph{type schemes}.  This means that a
-type scheme $\alpha\langle\beta\rangle$ might be ``instantiated'' to
-$\typeinterpret{\sigma[\alpha:=\tau]}$.  At a minimum, we will probably
-have to prove that $\typeinterpret{\sigma}[\alpha:=\typeinterpret{\tau}
-] = \typeinterpret{\sigma[\alpha:=\tau]}$.  I don't foresee any
-difficulties in this, just noting that we \emph{should} still fix this
-proof.
 \end{proof}
 
 \subsection{Monotonicity}
@@ -1461,6 +1434,9 @@ also have $\interpret{\ell\gamma}\downarrow \succ
 \interpret{r\gamma}\downarrow$ for all substitutions and type
 substitutions $\gamma$.  (Not sure
 about this one, as the rules already occur in instantiated form.)}
+
+\LC{It's not completely obvious to me how to do this, so I'd like to
+  see this spelled out in detail.}
 
 %\begin{lemma}
 %TODO
@@ -1504,9 +1480,9 @@ TODO
 For easier presentation, we will denote $\oplus$ and $\otimes$ in
 \emph{infix, left-associative} notation, and omit the type denotation
 where it is clear from context.  Thus, $s \oplus t \oplus u$ should be
-read as $\oplus_\sigma(s,\oplus_\sigma(t,u))$ if $s$ has type $\sigma$.
-Similarly, we will sometimes omit the type denotation from $\flatten$
-and $\lift$ when it can easily be derived from context.
+read as $\oplus_\sigma\,s\,(\oplus_\sigma\,t\,u)$ if $s$ has type
+$\sigma$. Similarly, we will sometimes omit the type denotation from
+$\flatten$ and $\lift$ when it can easily be derived from context.
 
 \subsection{Interpretations}
 
@@ -1514,50 +1490,44 @@ We use the following type constructor mapping:
 \[
 \begin{array}{rcl}
 \Typemap(\bot) & = & \nat \\
-\Typemap(\mathtt{or}) & = & \alpha_1 \times \alpha_2 \\
-\Typemap(\mathtt{and}) & = & \alpha_1 \times \alpha_2 \\
+\Typemap(\mathtt{or}) & = & \lambda\alpha_1\lambda\alpha_2 . \alpha_1 \times \alpha_2 \\
+\Typemap(\mathtt{and}) & = & \lambda\alpha_1\lambda\alpha_2 . \alpha_1 \times \alpha_2 \\
 \Typemap(\mathtt{prop}_i) & = & \nat \\
-\Typemap(\arrtype) & = & \alpha_1 \arrtype \alpha_2 \\
-\Typemap(\forall) & = & \quant{\beta}{\alpha\langle\beta\rangle} \\
-\Typemap(\exists) & = & \quant{\beta}{\quant{\chi}{\alpha\langle\chi
-  \rangle \arrtype \beta} \arrtype \beta}
+\Typemap(\exists) & = & \lambda(\alpha : * \arrkind *) . \quant{\beta}{\quant{\gamma}{\alpha\gamma \arrtype \beta} \arrtype \beta}
 \end{array}
 \]
 And the following function symbol mapping:
 \[
 \begin{array}{rcll}
-\Termmap(\epsilon_\alpha) & = & \lambda x:\nat. &
+\Termmap(\epsilon) & = & \Lambda \alpha:* . \lambda x:\nat. &
   \mathtt{lift}_\alpha(x) \\
-\Termmap(@_{\alpha,\beta}) & = & \lambda x: \alpha \arrtype \beta,y :
-  \alpha. \quad & x \cdot y \oplus \lift_\beta(\flatten_\alpha(
+\Termmap(@) & = & \Lambda\alpha\Lambda\beta\lambda x: \alpha \arrtype \beta . \lambda y :
+  \alpha . \quad & x \cdot y \oplus \lift_\beta(\flatten_\alpha(
   y) \oplus 1) \\
-\Termmap(\mathtt{tapp}_{\alpha,\beta}) & = & \lambda x : \quant{\xi}{
-  \alpha\langle\xi\rangle}.\quad & x * \beta \oplus
-  \lift_{\alpha\langle\beta\rangle}(1) \\
-\Termmap(\mathtt{ext}_{\alpha,\beta}) & = & \lambda x:\alpha\langle\beta
-  \rangle. &
-  \tabs{\xi}{\abs{y:\quant{\chi}{\alpha\langle\chi\rangle
+\Termmap(\mathtt{tapp}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta . \lambda x : \quant{\gamma}{\alpha\gamma} . \quad & x * \beta \oplus \lift_{\alpha\beta}(1) \\
+\Termmap(\mathtt{ext}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta : * . \lambda x:\alpha\beta . &
+  \tabs{\xi}{\abs{y:\quant{\chi}{\alpha\chi
   \arrtype \xi}}{y * \beta \cdot x}} \\
-\Termmap(\mathtt{in}^1_{\alpha,\beta}) & = & \lambda x : \alpha.\quad &
+\Termmap(\mathtt{in}^1) & = & \Lambda \alpha \Lambda \beta \lambda x : \alpha.\quad &
   (x, \mathtt{lift}_\beta(1)) \\
-\Termmap(\mathtt{in}^2_{\alpha,\beta}) & = & \lambda x : \beta.\quad &
+\Termmap(\mathtt{in}^2) & = & \Lambda \alpha \Lambda \beta \lambda x : \beta.\quad &
   (\mathtt{lift}_\alpha(1), x) \\
-\Termmap(\pi^1_{\alpha,\beta}) & = & \lambda x : \alpha \times \beta.
+\Termmap(\pi^1) & = & \Lambda \alpha \Lambda \beta \lambda x : \alpha \times \beta.
   \quad & \pi^1_{\alpha,\beta}(x) \oplus \lift_{\alpha}(1) \\
-\Termmap(\pi^2_{\alpha,\beta}) & = & \lambda x : \alpha \times \beta.
+\Termmap(\pi^2) & = & \Lambda \alpha \Lambda \beta \lambda x : \alpha \times \beta.
   \quad & \pi^2_{\alpha,\beta}(x) \oplus \lift_{\beta}(1) \\
-\Termmap(\mathtt{pair}_{\alpha,\beta}) & = & \lambda x : \alpha, y :
+\Termmap(\mathtt{pair}) & = & \Lambda \alpha \Lambda \beta \lambda x : \alpha, y :
   \beta.\quad & (x, y) \\
 \end{array}
 \]
 \[
 \begin{array}{rcl}
-\Termmap(\mathtt{let}_{\alpha,\beta}) & = & \lambda x : \quant{\chi}{
-  \quant{\xi}{\alpha\langle\xi\rangle \arrtype \chi} \arrtype \chi},
-  y : \quant{\xi}{\alpha\langle\chi\rangle \arrtype \beta}. \\
+\Termmap(\mathtt{let}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta : * . \lambda x : \quant{\chi}{
+  \quant{\xi}{\alpha\xi \arrtype \chi} \arrtype \chi},
+  y : \quant{\xi}{\alpha\xi \arrtype \beta}. \\
   & & \hfill x * \beta \cdot y \oplus \lift_{\beta}(\flatten(y) \oplus
   1) \\
-\Termmap(\mathtt{case}_{\alpha,\beta,\xi}) & = & \lambda x : (\alpha
+\Termmap(\mathtt{case}) & = & \Lambda \alpha,\beta,\xi . \lambda x : (\alpha
   \times \beta), y : (\alpha \arrtype \xi), z : (\beta \arrtype \xi). \\
   & & \quad
   \lift_\xi(37) \oplus (\ \lift_\xi(\flatten_{\alpha \times\beta}(
@@ -1570,6 +1540,9 @@ And the following function symbol mapping:
 \]
 
 \subsection{Rule orientation}
+
+\LC{The following should be adapted to the new notation and
+  re-checked, because some rules were incorrect.}
 
 \begin{itemize}
 \item $@_{\sigma,\tau}(\abs{x}{s},t) \red s[x:=t]$ \\
