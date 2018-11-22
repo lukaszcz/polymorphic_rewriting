@@ -54,8 +54,9 @@
 \newcommand{\subst}[2]{#1:=#2}
 \newcommand{\meta}[2]{#1\langle#2\rangle}
 
-\newcommand{\FTV}{\mathit{FTV}}
-\newcommand{\FV}{\mathit{FV}}
+\newcommand{\FTV}{\mathrm{FTV}}
+\newcommand{\FV}{\mathrm{FV}}
+\newcommand{\Tc}{\mathcal{T}}
 
 \newcommand{\nat}{\mathtt{nat}}
 \newcommand{\proj}{\pi}
@@ -181,41 +182,78 @@ If this algorithm succeeds, we have proven termination.
 \subsubsection{Interpretation terms}
 We define the set of types for interpretation terms.
 
-\begin{definition}\label{def:itypes}
-We assume given an infinite set $\Typevars$ of \emph{type variables}.
-The set $\ITypes$ of \emph{interpretation types} is given by:
-\begin{itemize}
-\item $\alpha \in \ITypes$ for all $\alpha \in \Typevars$, and
-  $\FTV(\alpha) = \{ \alpha \}$.
-\item $\nat \in \ITypes$, and $\FTV(\nat) = \emptyset$.
-\item $\sigma \arrtype \tau \in \ITypes$ if both $\sigma \in \ITypes$
-  and $\tau \in \ITypes$, and $\FTV(\sigma \arrtype \tau) =
-  \FTV(\sigma) \cup \FTV(\tau)$.
-\item $\sigma \times \tau \in \ITypes$ if both $\sigma \in \ITypes$
-  and $\tau \in \ITypes$, and $\FTV(\sigma \times \tau) = \FTV(\sigma)
-  \cup \FTV(\tau)$.
-\item $\quant{\alpha}{\sigma} \in \ITypes$ if $\alpha \in \Typevars$
-  and $\sigma \in \ITypes$, and $\FTV(\quant{\alpha}{\sigma}) =
-  \FTV(\sigma) \setminus \{ \alpha \}$.
-\end{itemize}
+Our system of interpretation terms is based on System~$F_\omega$, see
+e.g., Sorensen, Urzyczyn, ``Lectures on the Curry-Howard
+Isomorphism'', Section~11.7.
+
+\begin{definition}\label{def:itypes}\normalfont
+  \emph{Kinds} are defined inductively:
+  \begin{itemize}
+  \item $*$ is a kind,
+  \item if $\kappa_1,\kappa_2$ are kinds then so is $\kappa_1 \arrkind
+    \kappa_2$.
+  \end{itemize}
+
+  We assume infinitely many \emph{type constructor variables} of each
+  kind. Variables of kind~$*$ are \emph{type variables}.
+
+  We define \emph{type constructors} of kind~$\kappa$ by induction.
+  Type constructors of kind~$*$ are called \emph{types}.
+  \begin{itemize}
+  \item A type constructor variable of kind~$\kappa$ is a type
+    constructor of kind~$\kappa$.
+  \item If $\varphi$ is a type constructor of kind $\kappa_1 \arrkind
+    \kappa_2$ and $\psi$ is a type constructor of kind~$\kappa_1$ then
+    $\varphi \psi$ is a type constructor of kind~$\kappa_2$.
+  \item If $\alpha$ is a type constructor variable of kind~$\kappa_1$
+    and $\varphi$ is a type constructor of kind~$\kappa_2$, then
+    $\lambda\alpha . \varphi$ is a type constructor of kind $\kappa_1
+    \arrkind \kappa_2$.
+  \item If $\alpha$ is a type constructor variable of kind~$\kappa$
+    and~$\tau$ is a type, then $\forall \alpha[\tau]$ is a type.
+  \item If $\tau_1,\tau_2$ are types, then $\tau_1 \arrtype \tau_2$ is
+    a type.
+  \end{itemize}
+  The set of type constructors of kind~$\kappa$ is denoted
+  by~$\Tc_\kappa$.
+
+  We use the notation $\forall \alpha . \tau$ and $\forall \alpha
+  \tau$. When $\alpha$ is of kind $\kappa$ then we use the notations
+  $\forall \alpha : \kappa . \tau$ and $\forall (\alpha :
+  \kappa)[\tau]$.
+
+  Beta-reduction on type constructors is defined as the compatible
+  closure of the rule
+  \[
+  (\lambda\alpha.\varphi)\psi \to \varphi[\alpha := \psi]
+  \]
+  Note that type constructors are essentially simply-typed
+  lambda-terms, so beta-reduction on type constructors terminates and
+  is confluent, hence every type constructor~$\varphi$ has a unique
+  normal form.
+
+  We define $\FV(\varphi)$ -- the set of free type constructor
+  variables of the type constructor~$\varphi$ -- in an obvious way by
+  induction on the structure of~$\varphi$. A type
+  constructor~$\varphi$ is \emph{closed} if $\FV(\varphi) =
+  \emptyset$.
 \end{definition}
 
 \begin{definition}\label{def:typesubst}
-A \emph{type substitution} is a partial function $[\alpha_1:=\sigma_1,
-\dots,\alpha_n:=\sigma_n]$ mapping a finite set of type variables to
-types.  We let $\tau[\alpha_1:=\sigma_1,\dots,\alpha_n:=\sigma_n]$
-denote $\tau$ with all occurrences of some $\alpha_i$ replaced by the
-corresponding $\sigma_i$.  We use alpha-conversion to guarantee that
-substitution does not capture variables in any of the $\sigma_i$.
+A \emph{type constructor substitution} is a partial function
+$[\alpha_1:=\sigma_1, \dots,\alpha_n:=\sigma_n]$ mapping a finite set
+of type variables to types.  We let
+$\tau[\alpha_1:=\sigma_1,\dots,\alpha_n:=\sigma_n]$ denote $\tau$ with
+all occurrences of some $\alpha_i$ replaced by the corresponding
+$\sigma_i$.  We use alpha-conversion to guarantee that substitution
+does not capture variables in any of the $\sigma_i$.
 \end{definition}
 
-The set $\Iterms$ of interpretation terms is now defined as follows.
-
-\begin{definition}\label{def_typing}
+\begin{definition}\label{def_typing}\normalfont
 We assume given an infinite set $\Vars$ of variables, and let $\Gamma$
 refer to a mapping from a finite subset of $\Vars$ to the set of
-interpretation types.  The set $\Iterms$ of interpretation terms consists
-of all expressions $s$ such that $\Gamma \vdash s : \sigma$ can be
+interpretation types. The set of interpretation preterms consists of
+all expressions $s$ such that $\Gamma \vdash s : \sigma$ can be
 inferred for some interpretation type $\sigma$ and mapping $\Gamma$ by
 the following clauses:
 \begin{itemize}
@@ -223,31 +261,78 @@ the following clauses:
 \item $\Gamma \vdash x : \sigma$ for every $(x : \sigma) \in \Gamma$.
 \item $\Gamma \vdash \mathtt{f} : \sigma$ for all $(\mathtt{f} :
   \sigma)$ in the following set: $\{ \oplus_\sigma : \sigma \arrtype
-  \sigma \arrtype \sigma,\ \otimes_\sigma : \sigma \arrtype \sigma \arrtype
-  \sigma,\ \proj^1_{\sigma,\tau} : (\sigma \times \tau) \arrtype
-  \sigma,\ \proj^2_{\sigma,\tau} : (\sigma \times \tau) \arrtype \tau,\
-  \flatten_{\sigma} : \sigma \arrtype \nat,\
-  \lift_{\sigma} : \nat \arrtype \sigma
-  \mid \sigma \in \ITypes \}$.
-\item $\Gamma \vdash \pair{s}{t} : \sigma \times \tau$ if $\Gamma \vdash
-  s : \sigma$ and $\Gamma \vdash t : \tau$.
+  \sigma \arrtype \sigma,\ \otimes_\sigma : \sigma \arrtype \sigma
+  \arrtype \sigma,\ \flatten_{\sigma} : \sigma \arrtype
+  \nat,\ \lift_{\sigma} : \nat \arrtype \sigma \mid \sigma \in \ITypes
+  \}$.
 \item $\Gamma \vdash \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
   \in \Vars$ and $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$.
 \item $\Gamma \vdash \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
-  $\alpha \in \Typevars$ and $\Gamma \vdash s : \sigma$ and for all
-  $(x : \tau) \in \Gamma$: $\alpha \notin \FTV(\tau)$
-\item $\Gamma \vdash \app{s}{t} : \tau$ if $\Gamma \vdash s :
-  \sigma \arrtype \tau$ and $\Gamma \vdash t : \sigma$
+  $\alpha$ is a type constructor variable and $\Gamma \vdash s :
+  \sigma$ and for all $(x : \tau) \in \Gamma$: $\alpha \notin
+  \FV(\tau)$
+\item $\Gamma \vdash \app{s}{t} : \tau$ if $\Gamma \vdash s : \sigma
+  \arrtype \tau$ and $\Gamma \vdash t : \sigma$
 \item $\Gamma \vdash \tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$ if
-  $\Gamma \vdash s : \quant{\alpha}{\sigma}$
+  $\Gamma \vdash s : \quant{(\alpha:\kappa)}{\sigma}$ and~$\tau$ is a
+  type constructor of kind~$\kappa$,
+\item $\Gamma \vdash s : \tau$ if $\Gamma \vdash s : \tau'$ and $\tau
+  =_\beta \tau'$.
 \end{itemize}
-We say that $s$ is \emph{closed} if $\emptyset \vdash s : \sigma$.
+We say that $s$ is \emph{closed} if $\vdash s : \sigma$ for some
+closed $\sigma$ (then also $\FV(s) = \emptyset$).
 \end{definition}
 
+If $\alpha$ is a type constructor variable of kind~$\kappa$ then we
+use the notation $\tabs{\alpha:\kappa}{t}$.
+
 Note that for a given $\Gamma$, if $s$ is typable under $\Gamma$, then
-there is only one choice for the type (this is easily proved by
-induction on the form of $s$). Thus, all closed terms have a unique
-type.
+there is only one choice for the type modulo $\beta$-conversion (this
+is easily proved by induction on the form of $s$). Thus, all closed
+terms have a unique type modulo $\beta$-conversion.
+
+\begin{definition}
+  We define the type equivalence relation~$\equiv$ on preterms by
+  induction on preterm structure.
+  \begin{itemize}
+  \item $x \equiv x$, $n \equiv n$,
+  \item if $\sigma =_\beta \tau$ then $f_\sigma \equiv f_\tau$ for $f
+    \in \{\oplus,\otimes,\flatten,\lift\}$,
+  \item if $\sigma =_\beta \tau$ and $s \equiv t$ then
+    $\abs{x:\sigma}{s} \equiv \abs{x:\tau}{t}$,
+  \item if $s \equiv t$ then $\tabs{\alpha}{s} \equiv
+    \tabs{\alpha}{t}$,
+  \item if $s \equiv s'$ and $t \equiv t'$ then $s \cdot t \equiv s'
+    \cdot t'$,
+  \item if $s \equiv t$ and $\sigma =_\beta \tau$ then
+    $\tapp{s}{\sigma} \equiv \tapp{t}{\tau}$.
+  \end{itemize}
+  In other words, $s \equiv t$ iff $s$ and $t$ are identical modulo
+  $\beta$-conversion in types.
+\end{definition}
+
+Note that~$\equiv$ is an equivalence relation.
+
+\begin{lemma}
+  If $\Gamma \vdash s : \tau$ and $s \equiv t$ then $\Gamma \vdash t :
+  \tau$.
+\end{lemma}
+
+\begin{proof}
+  Induction on~$s$.
+\end{proof}
+
+The set $\Iterms$ of interpretation terms is now defined as follows.
+
+\begin{definition}
+  The set~$\Iterms$ of \emph{interpretation terms} is the set of the
+  equivalence classes of~$\equiv$.
+\end{definition}
+
+Because typing and term formation operations (abstraction,
+application, \ldots) are invariant under~$\equiv$, we may denote
+interpretation terms by their representatives and informally treat
+them interchangeably.
 
 \subsubsection{Normalising interpretation terms}
 Term equality is considered modulo $\alpha$-conversion. To define the
@@ -270,19 +355,17 @@ smallest relation for which the following properties are satisfied:
   $\app{\app{\oplus_{\nat}}{n}}{m} \leadsto (n+m)$
 \item\label{leadsto:times:base}
   $\app{\app{\otimes_{\nat}}{n}}{m} \leadsto (n \cdot m)$
-\item\label{leadsto:circ:arrow}
-  $\app{\app{\circ_{\sigma \arrtype \tau}}{s}}{t} \leadsto \abs{x:
+\item\label{leadsto:circ:arrow} $\app{\app{\circ_{\sigma \arrtype
+      \tau}}{s}}{t} \leadsto \abs{x:
   \sigma}{\app{\app{\circ_\tau}{(\app{s}{x})}}{(\app{t}{x})}}$ for
   $\circ \in \{ \oplus, \otimes \}$
 \item\label{leadsto:circ:forall}
   $\app{\app{\circ_{\quant{\alpha}{\sigma}}}{s}}{t} \leadsto
   \tabs{\alpha}{\app{\app{\circ_\sigma}{(\tapp{s}{\alpha})}}{(
-  \tapp{t}{\alpha})}}$ for $\circ \in \{ \oplus, \otimes \}$
-\item $\app{\proj^1_{\sigma,\tau}}{(s,t)} \leadsto s$
-\item $\app{\proj^2_{\sigma,\tau}}{(s,t)} \leadsto t$
+      \tapp{t}{\alpha})}}$ for $\circ \in \{ \oplus, \otimes \}$
 \item $\app{\flatten_\nat}{s} \leadsto s$
 \item $\app{\flatten_{\sigma \arrtype \tau}}{s} \leadsto
-  \app{s}{(\app{\lift_\sigma}{0})}$
+  \app{\flatten_\tau}{(\app{s}{(\app{\lift_\sigma}{0})})}$
 \item $\app{\flatten_{\quant{\alpha}{\sigma}}}{s} \leadsto
   \app{\flatten_{\sigma[\subst{\alpha}{\nat}]}}{(\tapp{s}{\nat})}$
 \item $\app{\lift_\nat}{s} \leadsto s$
@@ -290,25 +373,28 @@ smallest relation for which the following properties are satisfied:
   \abs{x:\sigma}{\app{\lift_{\tau}}{s}}$
 \item $\app{\lift_{\quant{\alpha}{\sigma}}}{s} \leadsto
   \tabs{\alpha}{\app{\lift_{\sigma}}{s}}$
-\item\label{leadsto:beta:abs}
-  $\app{(\abs{x:\sigma}{s})}{t} \leadsto s[\subst{x}{t}]$
-\item\label{leadsto:beta:tabs}
-  $\tapp{(\tabs{\alpha}{s})}{\sigma} \leadsto
-  s[\subst{\alpha}{\sigma}]$.
+\item\label{leadsto:beta:abs} $\app{(\abs{x:\sigma}{s})}{t} \leadsto
+  s[\subst{x}{t}]$
+\item\label{leadsto:beta:tabs} $\tapp{(\tabs{\alpha}{s})}{\sigma}
+  \leadsto s[\subst{\alpha}{\sigma}]$.
 \end{enumerate}
+Note that the above rules are invariant under~$\equiv$ (by confluence
+of $\beta$-reduction on types), so they correctly define a relation on
+the equivalence classes of~$\equiv$.
+
 We say that $s$ is a \emph{redex} if $s$ reduces by one of the rules
 (\ref{leadsto:plus:base})--(\ref{leadsto:beta:tabs}), and that $s$
 \emph{reduces at the head} to $t$ if the derivation of $s \leadsto t$
 does not use (\ref{leadsto:mono:abs}) or (\ref{leadsto:mono:right}).
 
 A \emph{final interpretation term} is a term $s \in \Iterms$ such that
-(a) $\FV(s) = \FTV(s) = \emptyset$, and (b) $s$ is in normal form with
-respect to $\leadsto$.  We let $\World$ be the set of all final
-interpretation terms. By~$\World_\tau$ we denote the set of all final
-interpretation terms of type~$\tau$.
+(a) $s$ is closed, and (b) $s$ is in normal form with respect to
+$\leadsto$.  We let $\World$ be the set of all final interpretation
+terms. By~$\World_\tau$ we denote the set of all final interpretation
+terms of type~$\tau$.
 \end{definition}
 
-NOTE: in the remainder of this section, we shall often speak simply of
+In the remainder of this section, we shall often speak simply of
 ``terms'' when referring to interpretation terms.
 
 \subsubsection{Key properties of $\leadsto$}
@@ -326,8 +412,7 @@ $s$ a variable, function symbol or abstraction $\abstraction{a}{s'}$
 
 \begin{proof}
 By induction on the size of interpretation terms (and a simple case
-analysis).
-\qed
+analysis).\qed
 \end{proof}
 
 \begin{lemma}[Subject reduction]
@@ -346,10 +431,9 @@ reduction starting at~$t$.
 The following lemma is obvious, but worth stating explicitly.
 
 \begin{lemma}\label{lem_reduce_abs}
-If $\abstraction{a}{s} \leadsto^* t$, then $t = \abstraction{a}{
-t}$ and $s \leadsto^* t'$.
-If $s \in \SN$ then both $\abs{x}{s}$ and $\tabs{\alpha}{s}$ are also
-in $\SN$.
+If $\abstraction{a}{s} \leadsto^* t$, then $t = \abstraction{a}{ t}$
+and $s \leadsto^* t'$.  If $s \in \SN$ then both $\abs{x}{s}$ and
+$\tabs{\alpha}{s}$ are also in $\SN$.
 \end{lemma}
 
 \begin{proof}
@@ -380,23 +464,24 @@ In the rest of this section we adapt the Tait-Girard computability
 method to prove termination of~$\leadsto$. The proof is an adaptation
 of chapters~6 and~14 from the book ``Proofs and Types'' by Girard, and
 chapters~10 and~11 from the book ``Lectures on the Curry-Howard
-Isomorphism'' by Sorensen and Urzyczyn.
+Isomorphism'' by Sorensen and Urzyczyn. An important difference with
+system~$F_\omega$ and related ones is that the rules for
+$\oplus_\tau$, $\otimes_\tau$, $\flatten_\tau$ and $\lift_\tau$
+``match'' on the type~$\tau$. This makes adapting the computability
+method a bit more difficult.
 
-NOTE: For now the proof does not take product types into account. I'm
-not sure if explicit products are necessary in the definition, because
-in contrast to the simply-typed lambda-calculus they may be encoded in
-the polymorphic lambda-calculus.
-
-NOTE: Currently, $\flatten$ and $\lift$ are not accounted for either,
-but adding them should be similar to~$\oplus$ and~$\otimes$.
-
-\begin{definition}\label{def_candidate}
+\begin{definition}\label{def_candidate}\normalfont
   A term~$t$ is \emph{neutral} if there does not exists a sequence of
   terms or types~$u_1,\ldots,u_n$ with $n \ge 1$ such that
   $t u_1 \ldots u_n$ is a redex (by~$\leadsto$).
 
-  A set~$X$ of interpretation terms of type~$\tau$ in context~$\Gamma$
-  is a \emph{candidate of type~$\tau$} when:
+  By induction on the kind~$\kappa$ of a type constructor~$\tau$ we
+  define the set~$\Cb_\tau^\Gamma$ of candidates of type
+  constructor~$\tau$ in context~$\Gamma$.
+
+  First assume $\kappa=*$, i.e., $\tau$ is a type. A set~$X$ of
+  interpretation terms of type~$\tau$ in context~$\Gamma$ is a
+  \emph{candidate of type~$\tau$} when:
   \begin{enumerate}
   \item $X \subseteq \SN$;
   \item if $t \in X$ and $t \leadsto t'$ then $t' \in X$;
@@ -404,26 +489,32 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
     have $t' \in X$, then $t \in X$;
   \item if $t_1,t_2 \in X$ then $\circ_\tau t_1 t_2 \in X$ for $\circ
     \in \{\oplus,\otimes\}$;
-  \item conditions analogous to the previous one for $\flatten$ and
-    $\lift$ \ldots
+  \item if $t \in \SN$ and $\Gamma \proves t : \nat$ then
+    $\lift_\sigma(t) \in X$.
   \end{enumerate}
   Note that item~3 above implies:
   \begin{itemize}
   \item if $t$ is neutral and in normal form then $t \in X$.
   \end{itemize}
-  The set of all candidates of type~$\tau$ in context~$\Gamma$ is
-  denoted by~$\Cb_\tau^\Gamma$.
+
+  Now assume $\kappa = \kappa_1\arrkind\kappa_2$. A function $f :
+  \Tc_{\kappa_1} \times \bigcup_\xi\Cb_\xi^\Gamma \to
+  \bigcup_\xi\Cb_\xi^\Gamma$ is a \emph{candidate of type
+    constructor~$\tau$} if for every type constructor~$\sigma$ of
+  kind~$\kappa_1$ and a candidate $X \in \Cb_\sigma^\Gamma$ we have
+  $f(\sigma,X) \in \Cb_{\tau\sigma}^\Gamma$.
 \end{definition}
 
-\begin{definition}\label{def_reducibility_valuation}
-  Let $\omega$ be a mapping from type variables to types. A
-  \emph{$\Gamma,\omega$-valuation} is a mapping~$\xi$ from type
-  variables to candidates such that $\xi(\alpha)$ is a candidate of
-  type~$\omega(\alpha)$ (in context~$\Gamma$).
+\begin{definition}\label{def_reducibility_valuation}\normalfont
+  Let $\omega$ be a mapping from type constructor variables to type
+  constructors (respecting kinds). A \emph{$\Gamma,\omega$-valuation}
+  is a mapping~$\xi$ from type constructor variables to candidates
+  such that $\xi(\alpha) \in \Cb_{\omega(\alpha)}^\Gamma$.
 
-  For each type~$\sigma$, context~$\Gamma$, mapping~$\omega$
-  and each $\Gamma,\omega$-valuation~$\xi$, the set $\val{\sigma}{\omega,\xi}{\Gamma}$ is
-  defined by induction on~$\sigma$:
+  For each type constructor~$\sigma$, context~$\Gamma$,
+  mapping~$\omega$ and each $\Gamma,\omega$-valuation~$\xi$, the set
+  $\val{\sigma}{\omega,\xi}{\Gamma}$ is defined by induction
+  on~$\sigma$:
   \begin{itemize}
   \item $\val{\alpha}{\omega,\xi}{\Gamma} = \xi(\alpha)$ for a type
     variable~$\alpha$,
@@ -433,18 +524,24 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
     terms~$t$ such that $\Gamma \proves t : \omega(\sigma \arrtype \tau)$,
     and for every~$s \in \val{\sigma}{\omega,\xi}{\Gamma}$ we have
     $\app{t}{s} \in \val{\tau}{\omega,\xi}{\Gamma}$,
-  \item $\val{\forall\alpha[\sigma]}{\omega,\xi}{\Gamma}$ is the set
-    of all terms~$t$ such that
-    $\Gamma \proves t : \omega(\forall\alpha[\sigma])$ and for every
-    type~$\tau$ and every $X \in \Cb_\tau^\Gamma$ we have
-    $\tapp{t}{\alpha} \in
-    \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$.
+  \item $\val{\forall(\alpha:\kappa)[\sigma]}{\omega,\xi}{\Gamma}$ is
+    the set of all terms~$t$ such that $\Gamma \proves t :
+    \omega(\forall(\alpha:\kappa)[\sigma])$ and for every type
+    constructor~$\tau$ of kind~$\kappa$ and every $X \in
+    \Cb_\tau^\Gamma$ we have $\tapp{t}{\alpha} \in
+    \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$,
+  \item $\val{\varphi \psi}{\omega,\xi}{\Gamma} =
+    \val{\varphi}{\omega,\xi}{\Gamma}(\val{\psi}{\omega,\xi}{\Gamma})$,
+  \item
+    $\val{\lambda(\alpha:\kappa)\varphi}{\omega,\xi}{\Gamma}(\tau,X) =
+    \val{\varphi}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$
+    for $\tau \in \Tc_\kappa$ and $X \in \Cb_\tau^\Gamma$.
   \end{itemize}
 \end{definition}
 
 \begin{lemma}\label{lem_val_typable}
-  If $t \in \val{\sigma}{\omega,\xi}{\Gamma}$ then
-  $\Gamma \proves t : \omega(\sigma)$.
+  If $\sigma$ is a type and $t \in \val{\sigma}{\omega,\xi}{\Gamma}$
+  then $\Gamma \proves t : \omega(\sigma)$.
 \end{lemma}
 
 \begin{proof}
@@ -475,6 +572,9 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
     $\Gamma \proves \circ_\nat t_1 t_2 : \nat$. Also
     $\circ_\nat t_1 t_2 \in \SN$ follows by Lemma~\ref{lem_circ_sn_base}.
     So $\circ_\nat t_1 t_2 \in \val{\nat}{\omega,\xi}{\Gamma}$.
+  \item Let $t \in \SN$ be such that $\Gamma \proves t : \nat$. Then
+    $\Gamma \proves \lift_\tau t : \nat$. It remains to show
+    $\lift_\nat t \in \SN$. \ldots
   \end{enumerate}
 \end{proof}
 
@@ -781,7 +881,7 @@ but adding them should be similar to~$\oplus$ and~$\otimes$.
 \end{proof}
 
 \begin{lemma}
-Every term $s \in \Iterms$ with $\FV(s) = \FTV(s) = \emptyset$ reduces
+Every term $s \in \Iterms$ with $\FV(s) = \emptyset$ reduces
 to a unique final interpretation term $s\downarrow$.
 \end{lemma}
 
@@ -1555,15 +1655,14 @@ And the following function symbol mapping:
   $\succ \interpret{s}[x:=\interpret{t}]$, which equals
   $\interpret{s[x:=t]}$ by Lemma \ref{lem:substitutioninterpret}.
   Thus, we can remove this rule.
-\item $\mathtt{tapp}_{\quant{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) \red
-  s[\alpha:=\tau]$ \\
-  We have $\interpret{\mathtt{tapp}_{\quant{\alpha}{\sigma},
-  \tau}(\tabs{\alpha}{s})} = (\tabs{\alpha}{\interpret{s}}) *
+\item $\mathtt{tapp}_{\quant{\alpha}{\sigma},\tau}(\tabs{\alpha}{s})
+  \red s[\alpha:=\tau]$ \\ We have
+  $\interpret{\mathtt{tapp}_{\quant{\alpha}{\sigma},
+      \tau}(\tabs{\alpha}{s})} = (\tabs{\alpha}{\interpret{s}}) *
   \typeinterpret{\tau} \oplus \lift(1) \leadsto \interpret{s}[\alpha:=
-  \typeinterpret{\tau}] \oplus \lift(1) \succ
+    \typeinterpret{\tau}] \oplus \lift(1) \succ
   \interpret{s}[\alpha:=\typeinterpret{\tau}] =
-  \interpret{s[\alpha:=\tau]}$.
-  Thus, we can remove this rule.
+  \interpret{s[\alpha:=\tau]}$.  Thus, we can remove this rule.
 \item $\mathtt{let}_{\qquant{\forall}{\alpha}{\sigma},\rho}(
   \mathtt{ext}_{\qquant{\forall}{\alpha}{\sigma},\tau}(s),\tabs{\alpha}{
     \abs{x:\sigma}{t}}) \red t[\alpha:=\tau][x:=s]$ \\
