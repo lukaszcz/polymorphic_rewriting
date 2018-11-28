@@ -1,5 +1,44 @@
 
-% A museum of no-longer-needed lemmas and such (fragments of proofs of which may however become useful later)
+% A museum of no-longer-needed lemmas and such (fragments of proofs of
+% which may however become useful later)
+
+\begin{lemma}\label{lem_reducible_type}
+  If $\tau$ is a type and $t \in \val{\tau}{\xi}{\omega}$ then
+  $t : \omega(\tau)$.
+\end{lemma}
+
+\begin{proof}
+  Let~$\varphi$ be a type constructor. By induction on the kind
+  of~$\varphi$ we define when $\val{\varphi}{\omega}{\xi}$ is
+  \emph{good}:
+  \begin{itemize}
+  \item if $\varphi$ is a type then $\val{\varphi}{\xi}{\omega}$ is
+    good when $t \in \val{\varphi}{\xi}{\omega}$ implies
+    $t : \omega(\varphi)$,
+  \item if $\varphi$ has kind~$\kappa_1\arrkind\kappa_2$ then
+    $\val{\varphi}{\xi}{\omega}$ is good when
+    $\val{\varphi}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\tau}]}$
+    is good for every $\tau \in \Tc_{\kappa_1}$ and every
+    $X \in \Cb_\tau$.
+  \end{itemize}
+  Now prove by induction on~$\varphi$
+  that~$\val{\varphi}{\omega,\xi}{}$ is good.
+
+  TODO
+\end{proof}
+
+Thus, we have:
+
+\begin{lemma}\label{lem_abusive_notation}
+  Every interpretation term has the form $s t_1 \dots t_n$ with $s$ a
+  variable, function symbol or abstraction $\abstraction{a}{s'}$ (for
+  $n \geq 0$), or $s$ a natural number and $n = 0$.
+\end{lemma}
+
+\begin{proof}
+By induction on the size of interpretation terms (and a simple case
+analysis).\qed
+\end{proof}
 
 \newcommand{\arreta}{\rightarrow_\eta}
 \newcommand{\etalong}[1]{#1\uparrow^\eta}

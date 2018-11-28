@@ -239,16 +239,6 @@ Isomorphism'', Section~11.7.
   \emptyset$.
 \end{definition}
 
-\begin{definition}\label{def:typesubst}
-A \emph{type constructor substitution} is a partial function
-$[\alpha_1:=\sigma_1, \dots,\alpha_n:=\sigma_n]$ mapping a finite set
-of type variables to types.  We let
-$\tau[\alpha_1:=\sigma_1,\dots,\alpha_n:=\sigma_n]$ denote $\tau$ with
-all occurrences of some $\alpha_i$ replaced by the corresponding
-$\sigma_i$.  We use alpha-conversion to guarantee that substitution
-does not capture variables in any of the $\sigma_i$.
-\end{definition}
-
 \begin{definition}\label{def_typing}\normalfont
 We assume given an infinite set $\Vars$ of variables, and let $\Gamma$
 refer to a mapping from a finite subset of $\Vars$ to the set of
@@ -335,63 +325,64 @@ interpretation terms by their representatives and informally treat
 them interchangeably.
 
 \subsubsection{Normalising interpretation terms}
-Term equality is considered modulo $\alpha$-conversion. To define the
-world of \emph{final interpretation terms}, we will normalise certain
-elements of $\Iterms$ using the relation $\leadsto$.
+To define the world of \emph{final interpretation terms}, we will
+normalise certain elements of $\Iterms$ using the relation $\leadsto$.
 
 \begin{definition}
-We define the relation $\leadsto$ on interpretation terms as the
-smallest relation for which the following properties are satisfied:
-\begin{enumerate}
-\item\label{leadsto:mono:abs}
-  if $s \leadsto t$ then both $\abs{x}{s} \leadsto \abs{x}{t}$ and
-  $\tabs{\alpha}{s} \leadsto \tabs{\alpha}{t}$
-\item\label{leadsto:mono:right}
-  if $s \leadsto t$ then $\app{u}{s} \leadsto \app{u}{t}$
-\item\label{leadsto:mono:left}
-  if $s \leadsto t$ then both $\app{s}{u} \leadsto \app{t}{u}$ and
-  $\tapp{s}{\sigma} \leadsto \tapp{t}{\sigma}$
-\item\label{leadsto:plus:base}
-  $\app{\app{\oplus_{\nat}}{n}}{m} \leadsto (n+m)$
-\item\label{leadsto:times:base}
-  $\app{\app{\otimes_{\nat}}{n}}{m} \leadsto (n \cdot m)$
-\item\label{leadsto:circ:arrow} $\app{\app{\circ_{\sigma \arrtype
-      \tau}}{s}}{t} \leadsto \abs{x:
-  \sigma}{\app{\app{\circ_\tau}{(\app{s}{x})}}{(\app{t}{x})}}$ for
-  $\circ \in \{ \oplus, \otimes \}$
-\item\label{leadsto:circ:forall}
-  $\app{\app{\circ_{\quant{\alpha}{\sigma}}}{s}}{t} \leadsto
-  \tabs{\alpha}{\app{\app{\circ_\sigma}{(\tapp{s}{\alpha})}}{(
-      \tapp{t}{\alpha})}}$ for $\circ \in \{ \oplus, \otimes \}$
-\item $\app{\flatten_\nat}{s} \leadsto s$
-\item $\app{\flatten_{\sigma \arrtype \tau}}{s} \leadsto
-  \app{\flatten_\tau}{(\app{s}{(\app{\lift_\sigma}{0})})}$
-\item $\app{\flatten_{\quant{\alpha}{\sigma}}}{s} \leadsto
-  \app{\flatten_{\sigma[\subst{\alpha}{\nat}]}}{(\tapp{s}{\nat})}$
-\item $\app{\lift_\nat}{s} \leadsto s$
-\item $\app{\lift_{\sigma \arrtype \tau}}{s} \leadsto
-  \abs{x:\sigma}{\app{\lift_{\tau}}{s}}$
-\item $\app{\lift_{\quant{\alpha}{\sigma}}}{s} \leadsto
-  \tabs{\alpha}{\app{\lift_{\sigma}}{s}}$
-\item\label{leadsto:beta:abs} $\app{(\abs{x:\sigma}{s})}{t} \leadsto
-  s[\subst{x}{t}]$
-\item\label{leadsto:beta:tabs} $\tapp{(\tabs{\alpha}{s})}{\sigma}
-  \leadsto s[\subst{\alpha}{\sigma}]$.
-\end{enumerate}
-Note that the above rules are invariant under~$\equiv$ (by confluence
-of $\beta$-reduction on types), so they correctly define a relation on
-the equivalence classes of~$\equiv$.
+  We define the relation $\leadsto$ on interpretation terms as the
+  smallest relation for which the following properties are satisfied:
+  \begin{enumerate}
+  \item\label{leadsto:mono:abs}
+    if $s \leadsto t$ then both $\abs{x}{s} \leadsto \abs{x}{t}$ and
+    $\tabs{\alpha}{s} \leadsto \tabs{\alpha}{t}$
+  \item\label{leadsto:mono:right}
+    if $s \leadsto t$ then $\app{u}{s} \leadsto \app{u}{t}$
+  \item\label{leadsto:mono:left}
+    if $s \leadsto t$ then both $\app{s}{u} \leadsto \app{t}{u}$ and
+    $\tapp{s}{\sigma} \leadsto \tapp{t}{\sigma}$
+  \item\label{leadsto:plus:base}
+    $\app{\app{\oplus_{\nat}}{n}}{m} \leadsto (n+m)$
+  \item\label{leadsto:times:base}
+    $\app{\app{\otimes_{\nat}}{n}}{m} \leadsto (n \cdot m)$
+  \item\label{leadsto:circ:arrow} $\app{\app{\circ_{\sigma \arrtype
+          \tau}}{s}}{t} \leadsto \abs{x:
+      \sigma}{\app{\app{\circ_\tau}{(\app{s}{x})}}{(\app{t}{x})}}$ for
+    $\circ \in \{ \oplus, \otimes \}$
+  \item\label{leadsto:circ:forall}
+    $\app{\app{\circ_{\quant{\alpha}{\sigma}}}{s}}{t} \leadsto
+    \tabs{\alpha}{\app{\app{\circ_\sigma}{(\tapp{s}{\alpha})}}{(
+        \tapp{t}{\alpha})}}$ for $\circ \in \{ \oplus, \otimes \}$
+  \item $\app{\flatten_\nat}{s} \leadsto s$
+  \item $\app{\flatten_{\sigma \arrtype \tau}}{s} \leadsto
+    \app{\flatten_\tau}{(\app{s}{(\app{\lift_\sigma}{0})})}$
+  \item $\app{\flatten_{\quant{\alpha}{\sigma}}}{s} \leadsto
+    \app{\flatten_{\sigma[\subst{\alpha}{\nat}]}}{(\tapp{s}{\nat})}$
+  \item $\app{\lift_\nat}{s} \leadsto s$
+  \item $\app{\lift_{\sigma \arrtype \tau}}{s} \leadsto
+    \abs{x:\sigma}{\app{\lift_{\tau}}{s}}$
+  \item $\app{\lift_{\quant{\alpha}{\sigma}}}{s} \leadsto
+    \tabs{\alpha}{\app{\lift_{\sigma}}{s}}$
+  \item\label{leadsto:beta:abs} $\app{(\abs{x:\sigma}{s})}{t} \leadsto
+    s[\subst{x}{t}]$
+  \item\label{leadsto:beta:tabs} $\tapp{(\tabs{\alpha}{s})}{\sigma}
+    \leadsto s[\subst{\alpha}{\sigma}]$.
+  \end{enumerate}
+  Note that the above rules are invariant under~$\equiv$ (by
+  confluence of $\beta$-reduction on types), so they correctly define
+  a relation on interpretation terms -- the equivalence classes
+  of~$\equiv$.
 
-We say that $s$ is a \emph{redex} if $s$ reduces by one of the rules
-(\ref{leadsto:plus:base})--(\ref{leadsto:beta:tabs}), and that $s$
-\emph{reduces at the head} to $t$ if the derivation of $s \leadsto t$
-does not use (\ref{leadsto:mono:abs}) or (\ref{leadsto:mono:right}).
+  We say that $s$ is a \emph{redex} if $s$ reduces by one of the rules
+  (\ref{leadsto:plus:base})--(\ref{leadsto:beta:tabs}), and that $s$
+  \emph{reduces at the head} to $t$ if the derivation of
+  $s \leadsto t$ does not use (\ref{leadsto:mono:abs}) or
+  (\ref{leadsto:mono:right}).
 
-A \emph{final interpretation term} is a term $s \in \Iterms$ such that
-(a) $s$ is closed, and (b) $s$ is in normal form with respect to
-$\leadsto$.  We let $\World$ be the set of all final interpretation
-terms. By~$\World_\tau$ we denote the set of all final interpretation
-terms of type~$\tau$.
+  A \emph{final interpretation term} is an interpretation term
+  $s \in \Iterms$ such that (a) $s$ is closed, and (b) $s$ is in
+  normal form with respect to $\leadsto$.  We let $\World$ be the set
+  of all final interpretation terms. By~$\World_\tau$ we denote the
+  set of all final interpretation terms of type~$\tau$.
 \end{definition}
 
 In the remainder of this section, we shall often speak simply of
@@ -400,20 +391,8 @@ In the remainder of this section, we shall often speak simply of
 \subsubsection{Key properties of $\leadsto$}
 In the remainder of this section, we will often abuse notation to omit
 $\cdot$ and $*$.  Thus, $s t$ can refer to both $\app{s}{t}$ and
-$\tapp{s}{t}$.  Due to typing, this notation is not ambiguous.  We will
-also denote $\abstraction{a}{s}$ for either $\abs{a}{s}$ or
-$\tabs{a}{s}$, depending on typing. Thus, we have:
-
-\begin{lemma}\label{lem_abusive_notation}
-Every interpretation term has the form $s t_1 \dots t_n$ with
-$s$ a variable, function symbol or abstraction $\abstraction{a}{s'}$
-(for $n \geq 0$).
-\end{lemma}
-
-\begin{proof}
-By induction on the size of interpretation terms (and a simple case
-analysis).\qed
-\end{proof}
+$\tapp{s}{t}$. We will also use $\abstraction{a}{s}$ for either
+$\abs{a}{s}$ or $\tabs{a}{s}$, depending on the context.
 
 \begin{lemma}[Subject reduction]
   If $\Gamma \vdash t : \tau$ and $t \leadsto t'$ then
@@ -424,24 +403,24 @@ analysis).\qed
   TODO
 \end{proof}
 
-By~$\SN$ we denote the set of all terminating interpretation
-terms. For $t \in \SN$ by~$\nu(t)$ we denote the length of the longest
-reduction starting at~$t$.
+By~$\SN$ we denote the set of all terminating pseudoterms. For
+$t \in \SN$ by~$\nu(t)$ we denote the length of the longest reduction
+starting at~$t$.
 
 The following lemma is obvious, but worth stating explicitly.
 
 \begin{lemma}\label{lem_reduce_abs}
-If $\abstraction{a}{s} \leadsto^* t$, then $t = \abstraction{a}{ t}$
-and $s \leadsto^* t'$.  If $s \in \SN$ then both $\abs{x}{s}$ and
-$\tabs{\alpha}{s}$ are also in $\SN$.
+  If $\abstraction{a}{s} \leadsto^* t$, then $t = \abstraction{a}{t'}$
+  and $s \leadsto^* t'$.  If $s \in \SN$ then both $\abs{x}{s}$ and
+  $\tabs{\alpha}{s}$ are also in $\SN$.
 \end{lemma}
 
 \begin{proof}
-We observe that every reduct of $\abstraction{x}{s}$ has the form
-$\abstraction{x}{s'}$ with $s \leadsto s'$, and analogously for
-$\tabs{\alpha}{s}$.  Thus, the first statement follows by induction on
-the length of the reduction $\abstraction{a}{s} \leadsto^* t$, and the
-second statement by induction on $\nu(s)$.  \qed
+  We observe that every reduct of $\abstraction{x}{s}$ has the form
+  $\abstraction{x}{s'}$ with $s \leadsto s'$, and analogously for
+  $\tabs{\alpha}{s}$.  Thus, the first statement follows by induction
+  on the length of the reduction $\abstraction{a}{s} \leadsto^* t$,
+  and the second statement by induction on $\nu(s)$.  \qed
 \end{proof}
 
 \begin{lemma}\label{lem_circ_sn_base}
@@ -466,9 +445,25 @@ of chapters~6 and~14 from the book ``Proofs and Types'' by Girard, and
 chapters~10 and~11 from the book ``Lectures on the Curry-Howard
 Isomorphism'' by Sorensen and Urzyczyn. An important difference with
 system~$F_\omega$ and related ones is that the rules for
-$\oplus_\tau$, $\otimes_\tau$, $\flatten_\tau$ and $\lift_\tau$
-``match'' on the type~$\tau$. This makes adapting the computability
-method a bit more difficult.
+$\oplus_\tau$, $\otimes_\tau$, $\flatten_\tau$ and $\lift_\tau$ depend
+on the type~$\tau$. This makes adapting the computability method a bit
+more difficult.
+
+For the termination proof we assume without loss of generality that
+the terms are given in orthodox Church-style, i.e., that each variable
+occurrence is annotated with a type. It suffices to prove termination
+on orthodox Church-style typed terms, because any infinite reduction
+on an interpretation term induces an infinite reduction on the
+corresponding orthodox Church-style typed term.
+
+We denote an occurrence of a variable~$x$ annotated with a type~$\tau$
+by~$x^\tau$. So now
+e.g.~$\lambda x : \tau\arrtype\sigma . x^{\tau\arrtype\sigma}y^\tau$
+is an orthodox Church-style typed term. We often omit the type
+annotations for readability. Note that now type substitution also
+needs to change the type annotations. Also, each term has a unique
+type modulo $\beta$-conversion. We write $t : \tau$ if $t$ has
+type~$\tau$.
 
 \begin{definition}\label{def_candidate}\normalfont
   A term~$t$ is \emph{neutral} if there does not exists a sequence of
@@ -476,169 +471,186 @@ method a bit more difficult.
   $t u_1 \ldots u_n$ is a redex (by~$\leadsto$).
 
   By induction on the kind~$\kappa$ of a type constructor~$\tau$ we
-  define the set~$\Cb_\tau^\Gamma$ of candidates of type
-  constructor~$\tau$ in context~$\Gamma$.
+  define the set~$\Cb_\tau$ of all candidates of type
+  constructor~$\tau$.
 
   First assume $\kappa=*$, i.e., $\tau$ is a type. A set~$X$ of
-  interpretation terms of type~$\tau$ in context~$\Gamma$ is a
-  \emph{candidate of type~$\tau$} when:
+  interpretation terms of type~$\tau$ is a \emph{candidate of
+    type~$\tau$} when:
   \begin{enumerate}
   \item $X \subseteq \SN$;
   \item if $t \in X$ and $t \leadsto t'$ then $t' \in X$;
   \item if $t$ is neutral and for every~$t'$ with $t \leadsto t'$ we
     have $t' \in X$, then $t \in X$;
-  \item if $t_1,t_2 \in X$ then $\circ_\tau t_1 t_2 \in X$ for $\circ
-    \in \{\oplus,\otimes\}$;
-  \item if $t \in \SN$ and $\Gamma \proves t : \nat$ then
-    $\lift_\sigma(t) \in X$.
+  \item if $t_1,t_2 \in X$ then $\circ_\tau t_1 t_2 \in X$ for
+    $\circ \in \{\oplus,\otimes\}$;
+  \item if $t \in \SN$ and $t : \nat$ then $\lift_\tau(t) \in X$.
   \end{enumerate}
   Note that item~3 above implies:
   \begin{itemize}
   \item if $t$ is neutral and in normal form then $t \in X$.
   \end{itemize}
 
-  Now assume $\kappa = \kappa_1\arrkind\kappa_2$. A function $f :
-  \Tc_{\kappa_1} \times \bigcup_\xi\Cb_\xi^\Gamma \to
-  \bigcup_\xi\Cb_\xi^\Gamma$ is a \emph{candidate of type
+  Now assume $\kappa = \kappa_1\arrkind\kappa_2$. A function
+  $f : \Tc_{\kappa_1} \times \bigcup_{\xi\in\Tc_{\kappa_1}}\Cb_\xi \to
+  \bigcup_{\xi\in\Tc_{\kappa_2}}\Cb_\xi$ is a \emph{candidate of type
     constructor~$\tau$} if for every type constructor~$\sigma$ of
-  kind~$\kappa_1$ and a candidate $X \in \Cb_\sigma^\Gamma$ we have
-  $f(\sigma,X) \in \Cb_{\tau\sigma}^\Gamma$.
+  kind~$\kappa_1$ and a candidate $X \in \Cb_\sigma$ we have
+  $f(\sigma,X) \in \Cb_{\tau\sigma}$.
 \end{definition}
 
-\begin{definition}\label{def_reducibility_valuation}\normalfont
-  Let $\omega$ be a mapping from type constructor variables to type
-  constructors (respecting kinds). A \emph{$\Gamma,\omega$-valuation}
-  is a mapping~$\xi$ from type constructor variables to candidates
-  such that $\xi(\alpha) \in \Cb_{\omega(\alpha)}^\Gamma$.
+Note that the elements of a candidate of type~$\tau$ are required to
+have type~$\tau$.
 
-  For each type constructor~$\sigma$, context~$\Gamma$,
-  mapping~$\omega$ and each $\Gamma,\omega$-valuation~$\xi$, the set
-  $\val{\sigma}{\omega,\xi}{\Gamma}$ is defined by induction
-  on~$\sigma$:
-  \begin{itemize}
-  \item $\val{\alpha}{\omega,\xi}{\Gamma} = \xi(\alpha)$ for a type
-    variable~$\alpha$,
-  \item $\val{\nat}{\omega,\xi}{\Gamma}$ is the set of all
-    terms~$t \in \SN$ such that $\Gamma \proves t : \nat$,
-  \item $\val{\sigma \arrtype \tau}{\omega,\xi}{\Gamma}$ is the set of all
-    terms~$t$ such that $\Gamma \proves t : \omega(\sigma \arrtype \tau)$,
-    and for every~$s \in \val{\sigma}{\omega,\xi}{\Gamma}$ we have
-    $\app{t}{s} \in \val{\tau}{\omega,\xi}{\Gamma}$,
-  \item $\val{\forall(\alpha:\kappa)[\sigma]}{\omega,\xi}{\Gamma}$ is
-    the set of all terms~$t$ such that $\Gamma \proves t :
-    \omega(\forall(\alpha:\kappa)[\sigma])$ and for every type
-    constructor~$\tau$ of kind~$\kappa$ and every $X \in
-    \Cb_\tau^\Gamma$ we have $\tapp{t}{\alpha} \in
-    \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$,
-  \item $\val{\varphi \psi}{\omega,\xi}{\Gamma} =
-    \val{\varphi}{\omega,\xi}{\Gamma}(\val{\psi}{\omega,\xi}{\Gamma})$,
-  \item
-    $\val{\lambda(\alpha:\kappa)\varphi}{\omega,\xi}{\Gamma}(\tau,X) =
-    \val{\varphi}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$
-    for $\tau \in \Tc_\kappa$ and $X \in \Cb_\tau^\Gamma$.
-  \end{itemize}
-\end{definition}
-
-\begin{lemma}\label{lem_val_typable}
-  If $\sigma$ is a type and $t \in \val{\sigma}{\omega,\xi}{\Gamma}$
-  then $\Gamma \proves t : \omega(\sigma)$.
+\begin{lemma}
+  If $\sigma =_\beta \sigma'$ then $\Cb_\sigma = \Cb_{\sigma'}$.
 \end{lemma}
 
 \begin{proof}
-  Follows from definitions.
+  Induction on the kind of~$\sigma$.
 \end{proof}
 
+\begin{definition}\label{def_reducibility_valuation}\normalfont
+  Let $\omega$ be a mapping from type constructor variables to type
+  constructors (respecting kinds). The mapping~$\omega$ extends in an
+  obvious way to a mapping from type constructors to type
+  constructors. An \emph{$\omega$-valuation} is a mapping~$\xi$ from
+  type constructor variables to candidates such that
+  $\xi(\alpha) \in \Cb_{\omega(\alpha)}$.
+
+  For each type constructor~$\sigma$, each mapping~$\omega$ and each
+  $\omega$-valuation~$\xi$, the set $\val{\sigma}{\xi}{\omega}$ is
+  defined by induction on~$\sigma$:
+  \begin{itemize}
+  \item $\val{\alpha}{\xi}{\omega} = \xi(\alpha)$ for a type
+    constructor variable~$\alpha$,
+  \item $\val{\nat}{\xi}{\omega}$ is the set of all terms~$t \in \SN$
+    such that $t : \nat$,
+  \item $\val{\sigma \arrtype \tau}{\xi}{\omega}$ is the set of all
+    terms~$t$ such that $t : \omega(\sigma\arrtype\tau)$ and for
+    every~$s \in \val{\sigma}{\xi}{\omega}$ we have
+    $\app{t}{s} \in \val{\tau}{\xi}{\omega}$,
+  \item $\val{\forall(\alpha:\kappa)[\sigma]}{\xi}{\omega}$ is
+    the set of all terms~$t$ such that
+    $t : \omega(\forall\alpha[\sigma])$ and for every type
+    constructor~$\tau$ of kind~$\kappa$ and every $X \in \Cb_\tau$ we
+    have
+    $\tapp{t}{\tau} \in
+    \val{\sigma}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\tau}]}$,
+  \item
+    $\val{\varphi \psi}{\xi}{\omega} =
+    \val{\varphi}{\xi}{\omega}(\omega(\psi),\val{\psi}{\xi}{\omega})$,
+  \item
+    $\val{\lambda(\alpha:\kappa)\varphi}{\xi}{\omega}(\tau,X) =
+    \val{\varphi}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\tau}]}$
+    for $\tau \in \Tc_\kappa$ and $X \in \Cb_\tau$.
+  \end{itemize}
+  In the last two point, if
+  e.g.~$\val{\psi}{\xi}{\omega} \notin \Cb_{\omega(\psi)}$ then
+  $\val{\varphi \psi}{\xi}{\omega}$ is undefined.
+\end{definition}
+
 \begin{lemma}\label{lem_nat_reducible}
-  $\val{\nat}{\omega,\xi}{\Gamma} \in \Cb_{\nat}^\Gamma$.
+  $\val{\nat}{\xi}{\omega} \in \Cb_{\nat}$.
 \end{lemma}
 
 \begin{proof}
   We check the conditions in Definition~\ref{def_candidate}.
   \begin{enumerate}
-  \item $\val{\nat}{\omega,\xi}{\Gamma} \subseteq \SN$ follows
+  \item $\val{\nat}{\xi}{\omega} \subseteq \SN$ follows
     directly from Definition~\ref{def_reducibility_valuation}.
-  \item Let $t \in \val{\nat}{\omega,\xi}{\Gamma}$ and
-    $t \leadsto t'$. Then $\Gamma \proves t : \nat$ and $t \in
-    \SN$. Hence $t' \in \SN$, and $\Gamma \proves t' : \nat$ by the
-    subject reduction lemma. Thus
-    $t' \in \val{\nat}{\omega,\xi}{\Gamma}$.
-  \item Let $t$ be neutral and $\Gamma \proves t : \nat$. Assume that
-    for all~$t'$ with $t \leadsto t'$ we have
-    $t' \in \val{\nat}{\omega,\xi}{\Gamma}$, so in particular
-    $t' \in \SN$. But then $t \in \SN$. Hence
-    $t \in \val{\nat}{\omega,\xi}{\Gamma}$.
-  \item Let $t_1,t_2 \in \SN$ be such that
-    $\Gamma \proves t_i : \nat$. Obviously,
-    $\Gamma \proves \circ_\nat t_1 t_2 : \nat$. Also
-    $\circ_\nat t_1 t_2 \in \SN$ follows by Lemma~\ref{lem_circ_sn_base}.
-    So $\circ_\nat t_1 t_2 \in \val{\nat}{\omega,\xi}{\Gamma}$.
-  \item Let $t \in \SN$ be such that $\Gamma \proves t : \nat$. Then
-    $\Gamma \proves \lift_\tau t : \nat$. It remains to show
-    $\lift_\nat t \in \SN$. \ldots
+  \item Let $t \in \val{\nat}{\xi}{\omega}$ and $t \leadsto t'$. Then
+    $t : \nat$ and $t \in \SN$. Hence $t' \in \SN$, and $t' : \nat$ by
+    the subject reduction lemma. Thus
+    $t' \in \val{\nat}{\xi}{\omega}$.
+  \item Let $t$ be neutral and $t : \nat$. Assume that for all~$t'$
+    with $t \leadsto t'$ we have $t' \in \val{\nat}{\xi}{\omega}$, so
+    in particular $t' \in \SN$. But then $t \in \SN$. Hence
+    $t \in \val{\nat}{\xi}{\omega}$.
+  \item Let $t_1,t_2 \in \SN$ be such that $t_i : \nat$. Obviously,
+    $\circ_\nat t_1 t_2 : \nat$. Also $\circ_\nat t_1 t_2 \in \SN$
+    follows by Lemma~\ref{lem_circ_sn_base}. So
+    $\circ_\nat t_1 t_2 \in \val{\nat}{\xi}{\omega}$.
+  \item Let $t \in \SN$ be such that $t : \nat$. Then
+    $\lift_\nat t : \nat$. It remains to show $\lift_\nat t \in
+    \SN$. Any infinite reduction from~$\lift_\nat t$ has the form
+    $\lift_\nat t \leadsto^* \lift_\nat t_0 \leadsto t_1 \leadsto t_2
+    \leadsto \ldots$ or
+    $\lift_\nat t \leadsto \lift_\nat t_0 \leadsto \lift_\nat t_1
+    \leadsto \lift_\nat t_2 \leadsto \ldots$, where $t \leadsto^* t_0$
+    and $t_i \leadsto t_{i+1}$. This contradicts $t \in \SN$.
   \end{enumerate}
 \end{proof}
 
-\LC{The following lemma is essentially just the two lemmas you
-  commented out, plus using property 2 of candidates for the other
-  direction. I corrected the statement (the statements of the
-  commented-out lemmas were also incomplete -- I forgot about the
-  typing).}
-\CK{Yeah, I realised that afterwards -- I needed them \emph{before}
-  the main proof, and hadn't realised that they were given later
-  as well.}
 \begin{lemma}\label{lem_abstraction_computable}
-  Suppose it is given that $\val{\sigma}{\omega',\xi'}{\Gamma}$ and
-  $\val{\tau}{\omega,\xi}{\Gamma}$ are candidates for all suitable
-  $\omega',\xi'$.  Then
+  Let $\sigma,\tau$ be types. Suppose
+  $\val{\tau}{\xi'}{\omega'} \in \Cb_{\omega'(\tau)}$ and
+  $\val{\sigma}{\xi'}{\omega'} \in \Cb_{\omega'(\sigma)}$ for all
+  suitable $\omega',\xi'$. Then
   \begin{itemize}
   \item
     $\abs{x:\omega(\tau)}{s} \in \val{\tau \arrtype
-      \sigma}{\omega,\xi}{ \Gamma}$ if and only if
-    $\Gamma \proves \abs{x:\omega(\tau)}{s} : \omega(\tau \arrtype
-    \sigma)$ and $s[x:=t] \in \val{\sigma}{\omega,\xi}{\Gamma}$ for
-    all $t \in \val{ \tau}{\omega,\xi}{\Gamma}$;
+      \sigma}{\xi}{\omega}$ if and only if
+    $\abs{x:\omega(\tau)}{s} : \omega(\tau \arrtype \sigma)$ and
+    $s[x:=t] \in \val{\sigma}{\xi}{\omega}$ for all
+    $t \in \val{\tau}{\omega,\xi}{}$;
   \item
-    $\tabs{\alpha}{s} \in \val{\quant{\alpha}{\sigma}}{\omega,\xi}{
-      \Gamma}$ if and only if
-    $\Gamma \proves \tabs{\alpha}{s} : \omega(\quant{\alpha}{\sigma})$
-    and for every type~$\tau$ and all $X \in \Cb_\tau^\Gamma$ we have
-    $s[\alpha:=\tau] \in
-    \val{\sigma}{\omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$.
+    $\tabs{\alpha}{s} \in
+    \val{\quant{(\alpha:\kappa)}{\sigma}}{\xi}{\omega}$ if and only if
+    $\tabs{\alpha}{s} : \omega(\quant{(\alpha:\kappa)}{\sigma})$ and
+    for every type constructor~$\varphi$ of kind~$\kappa$ and all
+    $X \in \Cb_\varphi$ we have
+    $s[\alpha:=\varphi] \in
+    \val{\sigma}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$.
   \end{itemize}
 \end{lemma}
 
 \begin{proof}
-  First suppose $\abs{x:\sigma}{s} \in \val{\sigma \arrtype \tau}{\omega,
-  \xi}{\Gamma}$.  Then for all $t \in \val{\sigma}{\omega,\xi}{\Gamma}$ we
-  have $\app{(\abs{x:\sigma}{s})}{t} \in \val{\tau}{\omega,\xi}{\Gamma}$.
+  First suppose
+  $\abs{x:\omega(\tau)}{s} \in \val{\tau \arrtype
+    \sigma}{\xi}{\omega}$. Then
+  $\abs{x:\omega(\tau)}{s} : \omega(\tau\arrtype\sigma)$ and for all
+  $t \in \val{\tau}{\xi}{\omega}$ we have
+  $\app{(\abs{x:\omega(\tau)}{s})}{t} \in \val{\sigma}{\xi}{\omega}$.
   As this set is a candidate, it is closed under $\leadsto$, so also
-  $s[x:=t] \in \val{\tau}{\omega,\xi}{\Gamma}$.
-  Similarly, if $\tabs{\alpha}{s} \in \quant{\alpha}{\sigma}$, then
-  $\tapp{(\tabs{\alpha}{s})}{\tau} \in \val{\sigma}{
-  \omega[\subst{\alpha}{\tau}],\xi[\subst{\alpha}{X}]}{\Gamma}$, and we are
-  done because $\tapp{(\tabs{\alpha}{s})}{\tau} \leadsto s[\alpha:=\tau]$.
+  $s[x:=t] \in \val{\sigma}{\xi}{\omega}$. Similarly, if
+  $\tabs{\alpha}{s} \in \val{\quant{\alpha}{\sigma}}{\xi}{\omega}$,
+  then $\tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ and
+  $\tapp{(\tabs{\alpha}{s})}{\varphi} \in
+  \val{\sigma}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$,
+  and we are done because
+  $\tapp{(\tabs{\alpha}{s})}{\tau} \leadsto s[\alpha:=\varphi]$ and
+  $\val{\sigma}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$
+  is a candidate, so it is closed under~$\leadsto$.
 
-  Now suppose (**): $s[x:=t] \in \val{\sigma}{\omega,\xi}{\Gamma}$ for all
-  $t \in \val{\tau}{\omega,\xi}{\Gamma}$.  Let $t \in \val{\tau}{\omega,
-  \xi}{\Gamma}$.  Then:
-  \begin{itemize}
-  \item $t \in \SN$ because $\val{\tau}{\omega,\xi}{\Gamma}$ is a candidate;
-  \item $s \in \SN$ because every infinite reduction in $s$ induces an
-    infinite reduction in $s[x:=t]$ ($\leadsto$ is stable);
-  \item if $s \leadsto^* s'$ and $t \leadsto^* t'$, then:
-    \begin{itemize}
-    \item $s[x:=t] \leadsto^* s'[x:=t']$ by monotonicity and stability of
-      $\leadsto$;
-    \item therefore $s'[x:=t'] \in \val{\sigma}{\omega,\xi}{\Gamma}$, because
-      $\val{\sigma}{\omega,\xi}{\Gamma}$ is a candidate and therefore closed
-      under $\leadsto$;
-    \item $\app{(\abs{x}{s'})}{t'}$ is neutral, so in
-      $\val{\sigma}{\omega,\xi}{\Gamma}$ if all its reducts are;
-    \item by induction on $s',t'$ oriented with $\leadsto$ therefore
-      $\app{(\abs{x}{s'})}{t'} \in \val{\sigma}{\omega,\xi}{\Gamma}$.
-    \end{itemize}
-  \end{itemize}
-  A similar reasoning applies to $s[\alpha:=\tau]$.
+  Now suppose $s[x:=t] \in \val{\sigma}{\xi}{\omega}$ for all
+  $t \in \val{\tau}{\xi}{\omega}$. Let
+  $t \in \val{\tau}{\xi}{\omega}$. Then $t \in \SN$ because
+  $\val{\tau}{\xi}{\omega}$ is a candidate. Also $s \in \SN$ because
+  every infinite reduction in $s$ induces an infinite reduction in
+  $s[x:=t]$ ($\leadsto$ is stable) and
+  $\val{\sigma}{\xi}{\omega} \subseteq \SN$ is a candidate. For all
+  $s',t'$ with $s \leadsto^* s'$ and $t \leadsto^* t'$, we show by
+  induction on~$\nu(s') + \nu(t')$ that
+  $\app{(\abs{x}{s'})} t' \in \val{\sigma}{\xi}{\omega}$. We have
+  $\app{(\abs{x}{s'})} t' : \omega(\sigma)$ by definition and the
+  subject reduction theorem (note that $t : \omega(\tau)$ because
+  $\val{\tau}{\xi}{\omega} \in \Cb_{\omega(\tau)}$). The set
+  $\val{\sigma}{\xi}{\omega}$ is a candidate, and
+  $\app{(\abs{x}{s'})}{t'}$ is neutral, so in
+  $\val{\sigma}{\xi}{\omega}$ if all its reducts are. Thus assume
+  $\app{(\abs{x}{s'})}{t'} \leadsto u$. If
+  $u = \app{(\abs{x}{s'})}{t''}$ with $t' \leadsto t''$ or
+  $u = \app{(\abs{x}{s''})}{t'}$ with $s' \leadsto s''$, then
+  $u \in \val{\sigma}{\xi}{\omega}$ by the inductive hypothesis. So
+  assume $u = s'[x:=t']$. We have $s[x:=t] \leadsto^* s'[x:=t']$ by
+  monotonicity and stability of $\leadsto$. Therefore
+  $u = s'[x:=t'] \in \val{\sigma}{\xi}{\omega}$, because
+  $s[x:=t] \in \val{\sigma}{\xi}{\omega}$ and
+  $\val{\sigma}{\xi}{\omega}$ is a candidate and hence closed under
+  $\leadsto$.
+
+  A similar reasoning applies to $s[\alpha:=\varphi]$.
 \end{proof}
 
 \begin{lemma}\label{lem_val_computable}
@@ -646,8 +658,10 @@ method a bit more difficult.
 \end{lemma}
 
 \begin{proof}
-  Induction on~$\sigma$. First, if $\sigma = \alpha$ for a type
-  variable~$\alpha$ then
+  By induction on~$\sigma$ we show that
+  $\val{\sigma}{\omega,\xi}{\Gamma} \in \Cb_{\omega(\sigma)}^\Gamma$
+  for all suitable $\Gamma,\omega,\xi$. First, if $\sigma = \alpha$
+  for a type constructor variable~$\alpha$ then
   $\val{\sigma}{\omega,\xi}{\Gamma} = \xi(\alpha) \in
   \Cb_{\omega(\sigma)}^\Gamma$ by definition. If $\sigma = \nat$ then
   $\val{\nat}{\omega,\xi}{\Gamma} \in \Cb_{\nat}^\Gamma$ by
@@ -658,9 +672,10 @@ method a bit more difficult.
   \begin{enumerate}
   \item Let $t \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$ and
     assume there is an infinite reduction
-    $t \leadsto t_1 \leadsto t_2 \leadsto t_3 \leadsto \ldots$. By the
-    inductive hypothesis $\val{\tau_1}{\omega,\xi}{\Gamma}$ and
-    $\val{\tau_2}{\omega,\xi}{\Gamma}$ are candidates. So
+    $t \leadsto t_1 \leadsto t_2 \leadsto t_3 \leadsto \ldots$. Let
+    $x$ be fresh and $\Gamma' = \Gamma,x:\omega(\tau_1)$. By the
+    inductive hypothesis $\val{\tau_1}{\omega,\xi}{\Gamma'}$ and
+    $\val{\tau_2}{\omega,\xi}{\Gamma'}$ are candidates. So
     $x \in \val{\tau_1}{\omega,\xi}{\Gamma}$ because it is neutral and
     normal. Then $t x \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Thus
     $t x$~is strongly normalising. But
@@ -726,6 +741,7 @@ method a bit more difficult.
     $\val{\tau_2}{\omega,\xi}{\Gamma}$ as well.  By
     Lemma~\ref{lem_abstraction_computable}, we conclude that $s' \in
     \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$.
+  \item
   \end{enumerate}
 
   Assume $\sigma = \forall\alpha[\tau]$. We check the conditions in
@@ -799,6 +815,12 @@ method a bit more difficult.
     \alpha}{\sigma}],\xi[\subst{\alpha}{X}]}{\Gamma}$ for all types
     $\sigma$, so $s' \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$
     by Lemma~\ref{lem_abstraction_computable}.
+  \end{enumerate}
+
+  Assume $\sigma = \varphi\psi$. We check the conditions in
+  Definition~\ref{def_candidate}.
+  \begin{enumerate}
+  \item
   \end{enumerate}
 \end{proof}
 
