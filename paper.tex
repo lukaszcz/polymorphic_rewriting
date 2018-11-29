@@ -314,7 +314,7 @@ Note that~$\equiv$ is an equivalence relation.
 
 The set $\Iterms$ of interpretation terms is now defined as follows.
 
-\begin{definition}
+\begin{definition}\normalfont
   The set~$\Iterms$ of \emph{interpretation terms} is the set of the
   equivalence classes of~$\equiv$.
 \end{definition}
@@ -323,6 +323,13 @@ Because typing and term formation operations (abstraction,
 application, \ldots) are invariant under~$\equiv$, we may denote
 interpretation terms by their representatives and informally treat
 them interchangeably.
+
+\begin{definition}\label{def_chi_kappa}\normalfont
+  By induction on the kind~$\kappa$ we define a closed type
+  constructor~$\chi_\kappa$. For $\kappa=*$ we take $\chi_\kappa =
+  \nat$. For $\kappa=\kappa_1\arrkind\kappa_2$ we take $\chi_\kappa =
+  \lambda \alpha:\kappa_1 . \chi_{\kappa_2}$.
+\end{definition}
 
 \subsubsection{Normalising interpretation terms}
 To define the world of \emph{final interpretation terms}, we will
@@ -355,8 +362,8 @@ normalise certain elements of $\Iterms$ using the relation $\leadsto$.
   \item $\app{\flatten_\nat}{s} \leadsto s$
   \item $\app{\flatten_{\sigma \arrtype \tau}}{s} \leadsto
     \app{\flatten_\tau}{(\app{s}{(\app{\lift_\sigma}{0})})}$
-  \item $\app{\flatten_{\quant{\alpha}{\sigma}}}{s} \leadsto
-    \app{\flatten_{\sigma[\subst{\alpha}{\nat}]}}{(\tapp{s}{\nat})}$
+  \item $\app{\flatten_{\quant{\alpha:\kappa}{\sigma}}}{s} \leadsto
+    \app{\flatten_{\sigma[\subst{\alpha}{\chi_\kappa}]}}{(\tapp{s}{\chi_\kappa})}$
   \item $\app{\lift_\nat}{s} \leadsto s$
   \item $\app{\lift_{\sigma \arrtype \tau}}{s} \leadsto
     \abs{x:\sigma}{\app{\lift_{\tau}}{s}}$
@@ -391,8 +398,9 @@ In the remainder of this section, we shall often speak simply of
 \subsubsection{Key properties of $\leadsto$}
 In the remainder of this section, we will often abuse notation to omit
 $\cdot$ and $*$.  Thus, $s t$ can refer to both $\app{s}{t}$ and
-$\tapp{s}{t}$. We will also use $\abstraction{a}{s}$ for either
-$\abs{a}{s}$ or $\tabs{a}{s}$, depending on the context.
+$\tapp{s}{t}$. This is not ambiguous due to typing. We will also use
+$\abstraction{a}{s}$ for either $\abs{a}{s}$ or $\tabs{a}{s}$,
+depending on typing.
 
 \begin{lemma}[Subject reduction]
   If $\Gamma \vdash t : \tau$ and $t \leadsto t'$ then
@@ -403,9 +411,9 @@ $\abs{a}{s}$ or $\tabs{a}{s}$, depending on the context.
   TODO
 \end{proof}
 
-By~$\SN$ we denote the set of all terminating pseudoterms. For
-$t \in \SN$ by~$\nu(t)$ we denote the length of the longest reduction
-starting at~$t$.
+By~$\SN$ we denote the set of all terminating interpretation
+terms. For $t \in \SN$ by~$\nu(t)$ we denote the length of the longest
+reduction starting at~$t$.
 
 The following lemma is obvious, but worth stating explicitly.
 
@@ -450,25 +458,28 @@ on the type~$\tau$. This makes adapting the computability method a bit
 more difficult.
 
 For the termination proof we assume without loss of generality that
-the terms are given in orthodox Church-style, i.e., that each variable
-occurrence is annotated with a type. It suffices to prove termination
-on orthodox Church-style typed terms, because any infinite reduction
-on an interpretation term induces an infinite reduction on the
-corresponding orthodox Church-style typed term.
+the terms are given in orthodox Church-style, i.e., instead of using
+contexts we assume that each variable occurrence is annotated with a
+type. It suffices to prove termination on orthodox Church-style typed
+terms, because any infinite reduction on an interpretation term
+induces an infinite reduction on a corresponding orthodox Church-style
+typed term.
 
 We denote an occurrence of a variable~$x$ annotated with a type~$\tau$
-by~$x^\tau$. So now
-e.g.~$\lambda x : \tau\arrtype\sigma . x^{\tau\arrtype\sigma}y^\tau$
-is an orthodox Church-style typed term. We often omit the type
-annotations for readability. Note that now type substitution also
-needs to change the type annotations. Also, each term has a unique
-type modulo $\beta$-conversion. We write $t : \tau$ if $t$ has
-type~$\tau$.
+by~$x^\tau$. So now e.g.~$\lambda x : \tau\arrtype\sigma
+. x^{\tau\arrtype\sigma}y^\tau$ is an orthodox Church-style typed
+term. When clear or irrelevant, we omit the type annotations for
+readability, denoting the above term by~$\lambda x :
+\tau\arrtype\sigma . x y$ or even~$\lambda x . x y$. Note that now
+type substitution also needs to change the type annotations. Also,
+each term has a unique type modulo $\beta$-conversion. We write $t :
+\tau$ if $t$ has type~$\tau$. The subject reduction lemma still holds
+for orthodox Church-style typed terms.
 
 \begin{definition}\label{def_candidate}\normalfont
   A term~$t$ is \emph{neutral} if there does not exists a sequence of
-  terms or types~$u_1,\ldots,u_n$ with $n \ge 1$ such that
-  $t u_1 \ldots u_n$ is a redex (by~$\leadsto$).
+  terms and types~$u_1,\ldots,u_n$ with $n \ge 1$ such that $t u_1
+  \ldots u_n$ is a redex (by~$\leadsto$).
 
   By induction on the kind~$\kappa$ of a type constructor~$\tau$ we
   define the set~$\Cb_\tau$ of all candidates of type
@@ -484,18 +495,19 @@ type~$\tau$.
     have $t' \in X$, then $t \in X$;
   \item if $t_1,t_2 \in X$ then $\circ_\tau t_1 t_2 \in X$ for
     $\circ \in \{\oplus,\otimes\}$;
-  \item if $t \in \SN$ and $t : \nat$ then $\lift_\tau(t) \in X$.
+  \item if $t \in \SN$ and $t : \nat$ then $\lift_\tau(t) \in X$;
+  \item if $t \in X$ then $\flatten_\tau(t) \in \SN$.
   \end{enumerate}
   Note that item~3 above implies:
   \begin{itemize}
   \item if $t$ is neutral and in normal form then $t \in X$.
   \end{itemize}
 
-  Now assume $\kappa = \kappa_1\arrkind\kappa_2$. A function
-  $f : \Tc_{\kappa_1} \times \bigcup_{\xi\in\Tc_{\kappa_1}}\Cb_\xi \to
+  Now assume $\kappa = \kappa_1\arrkind\kappa_2$. A function $f :
+  \Tc_{\kappa_1} \times \bigcup_{\xi\in\Tc_{\kappa_1}}\Cb_\xi \to
   \bigcup_{\xi\in\Tc_{\kappa_2}}\Cb_\xi$ is a \emph{candidate of type
-    constructor~$\tau$} if for every type constructor~$\sigma$ of
-  kind~$\kappa_1$ and a candidate $X \in \Cb_\sigma$ we have
+    constructor~$\tau$} if for every closed type constructor~$\sigma$
+  of kind~$\kappa_1$ and a candidate $X \in \Cb_\sigma$ we have
   $f(\sigma,X) \in \Cb_{\tau\sigma}$.
 \end{definition}
 
@@ -514,13 +526,17 @@ have type~$\tau$.
   Let $\omega$ be a mapping from type constructor variables to type
   constructors (respecting kinds). The mapping~$\omega$ extends in an
   obvious way to a mapping from type constructors to type
-  constructors. An \emph{$\omega$-valuation} is a mapping~$\xi$ from
-  type constructor variables to candidates such that
-  $\xi(\alpha) \in \Cb_{\omega(\alpha)}$.
+  constructors. A mapping~$\omega$ is \emph{closed for~$\sigma$} if
+  $\omega(\alpha)$ is closed for $\alpha \in \FV(\sigma)$ (then
+  $\omega(\sigma)$ is closed).
 
-  For each type constructor~$\sigma$, each mapping~$\omega$ and each
-  $\omega$-valuation~$\xi$, the set $\val{\sigma}{\xi}{\omega}$ is
-  defined by induction on~$\sigma$:
+  An \emph{$\omega$-valuation} is a mapping~$\xi$ from type
+  constructor variables to candidates such that $\xi(\alpha) \in
+  \Cb_{\omega(\alpha)}$.
+
+  For each type constructor~$\sigma$, each mapping~$\omega$ closed
+  for~$\sigma$, and each $\omega$-valuation~$\xi$, the set
+  $\val{\sigma}{\xi}{\omega}$ is defined by induction on~$\sigma$:
   \begin{itemize}
   \item $\val{\alpha}{\xi}{\omega} = \xi(\alpha)$ for a type
     constructor variable~$\alpha$,
@@ -528,79 +544,97 @@ have type~$\tau$.
     such that $t : \nat$,
   \item $\val{\sigma \arrtype \tau}{\xi}{\omega}$ is the set of all
     terms~$t$ such that $t : \omega(\sigma\arrtype\tau)$ and for
-    every~$s \in \val{\sigma}{\xi}{\omega}$ we have
-    $\app{t}{s} \in \val{\tau}{\xi}{\omega}$,
-  \item $\val{\forall(\alpha:\kappa)[\sigma]}{\xi}{\omega}$ is
-    the set of all terms~$t$ such that
-    $t : \omega(\forall\alpha[\sigma])$ and for every type
-    constructor~$\tau$ of kind~$\kappa$ and every $X \in \Cb_\tau$ we
-    have
-    $\tapp{t}{\tau} \in
-    \val{\sigma}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\tau}]}$,
+    every~$s \in \val{\sigma}{\xi}{\omega}$ with $s : \omega(\sigma)$
+    we have $\app{t}{s} \in \val{\tau}{\xi}{\omega}$,
+  \item $\val{\forall(\alpha:\kappa)[\sigma]}{\xi}{\omega}$ is the set
+    of all terms~$t$ such that $t : \omega(\forall\alpha[\sigma])$ and
+    for every closed type constructor~$\varphi$ of kind~$\kappa$ and
+    every $X \in \Cb_\varphi$ we have $\tapp{t}{\varphi} \in
+    \val{\sigma}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$,
   \item
     $\val{\varphi \psi}{\xi}{\omega} =
     \val{\varphi}{\xi}{\omega}(\omega(\psi),\val{\psi}{\xi}{\omega})$,
   \item
-    $\val{\lambda(\alpha:\kappa)\varphi}{\xi}{\omega}(\tau,X) =
-    \val{\varphi}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\tau}]}$
-    for $\tau \in \Tc_\kappa$ and $X \in \Cb_\tau$.
+    $\val{\lambda(\alpha:\kappa)\varphi}{\xi}{\omega}(\psi,X) =
+    \val{\varphi}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\psi}]}$
+    for closed $\psi \in \Tc_\kappa$ and $X \in \Cb_\psi$.
   \end{itemize}
-  In the last two point, if
-  e.g.~$\val{\psi}{\xi}{\omega} \notin \Cb_{\omega(\psi)}$ then
-  $\val{\varphi \psi}{\xi}{\omega}$ is undefined.
+  In the above, if e.g.~$\val{\psi}{\xi}{\omega} \notin
+  \Cb_{\omega(\psi)}$ then $\val{\varphi \psi}{\xi}{\omega}$ is
+  undefined.
 \end{definition}
 
+If~$\varphi$ is closed then $\omega,\xi$ do not affect the value
+of~$\val{\varphi}{\xi}{\omega}$, so then we simply
+write~$\val{\varphi}{}{}$.
+
 \begin{lemma}\label{lem_nat_reducible}
-  $\val{\nat}{\xi}{\omega} \in \Cb_{\nat}$.
+  $\val{\nat}{}{} \in \Cb_{\nat}$.
 \end{lemma}
 
 \begin{proof}
   We check the conditions in Definition~\ref{def_candidate}.
   \begin{enumerate}
-  \item $\val{\nat}{\xi}{\omega} \subseteq \SN$ follows
+  \item $\val{\nat}{}{} \subseteq \SN$ follows
     directly from Definition~\ref{def_reducibility_valuation}.
-  \item Let $t \in \val{\nat}{\xi}{\omega}$ and $t \leadsto t'$. Then
-    $t : \nat$ and $t \in \SN$. Hence $t' \in \SN$, and $t' : \nat$ by
-    the subject reduction lemma. Thus
-    $t' \in \val{\nat}{\xi}{\omega}$.
+  \item Let $t \in \val{\nat}{}{}$ and $t \leadsto t'$. Then $t :
+    \nat$ and $t \in \SN$. Hence $t' \in \SN$, and $t' : \nat$ by the
+    subject reduction lemma. Thus $t' \in \val{\nat}{}{}$.
   \item Let $t$ be neutral and $t : \nat$. Assume that for all~$t'$
-    with $t \leadsto t'$ we have $t' \in \val{\nat}{\xi}{\omega}$, so
-    in particular $t' \in \SN$. But then $t \in \SN$. Hence
-    $t \in \val{\nat}{\xi}{\omega}$.
+    with $t \leadsto t'$ we have $t' \in \val{\nat}{}{}$, so in
+    particular $t' \in \SN$. But then $t \in \SN$. Hence $t \in
+    \val{\nat}{}{}$.
   \item Let $t_1,t_2 \in \SN$ be such that $t_i : \nat$. Obviously,
     $\circ_\nat t_1 t_2 : \nat$. Also $\circ_\nat t_1 t_2 \in \SN$
-    follows by Lemma~\ref{lem_circ_sn_base}. So
-    $\circ_\nat t_1 t_2 \in \val{\nat}{\xi}{\omega}$.
-  \item Let $t \in \SN$ be such that $t : \nat$. Then
-    $\lift_\nat t : \nat$. It remains to show $\lift_\nat t \in
-    \SN$. Any infinite reduction from~$\lift_\nat t$ has the form
-    $\lift_\nat t \leadsto^* \lift_\nat t_0 \leadsto t_1 \leadsto t_2
-    \leadsto \ldots$ or
-    $\lift_\nat t \leadsto \lift_\nat t_0 \leadsto \lift_\nat t_1
-    \leadsto \lift_\nat t_2 \leadsto \ldots$, where $t \leadsto^* t_0$
-    and $t_i \leadsto t_{i+1}$. This contradicts $t \in \SN$.
+    follows by Lemma~\ref{lem_circ_sn_base}. So $\circ_\nat t_1 t_2
+    \in \val{\nat}{}{}$.
+  \item Let $t \in \SN$ be such that $t : \nat$. Then $\lift_\nat t :
+    \nat$. It remains to show $\lift_\nat t \in \SN$. Any infinite
+    reduction from~$\lift_\nat t$ has the form $\lift_\nat t
+    \leadsto^* \lift_\nat t_0 \leadsto t_1 \leadsto t_2 \leadsto
+    \ldots$ or $\lift_\nat t \leadsto \lift_\nat t_0 \leadsto
+    \lift_\nat t_1 \leadsto \lift_\nat t_2 \leadsto \ldots$, where $t
+    \leadsto^* t_0$ and $t_i \leadsto t_{i+1}$. This contradicts $t
+    \in \SN$.
+  \item Let $t \in \SN$ be such that $t : \nat$. The proof of
+    $\flatten_\nat t \in \SN$ is analogous to the proof of $\lift_\nat
+    t \in \SN$ above.
   \end{enumerate}
 \end{proof}
 
+\begin{lemma}\label{lem_chi_kappa_reducible}
+  $\val{\chi_\kappa}{}{} \in \Cb_{\chi_\kappa}$.
+\end{lemma}
+
+\begin{proof}
+  Induction on~$\kappa$. If $\kappa = *$ then this follows from
+  Lemma~\ref{lem_nat_reducible}. If $\kappa=\kappa_1\arrkind\kappa_2$
+  then $\chi_\kappa = \lambda \alpha : \kappa_1
+  . \chi_{\kappa_2}$. Let~$\psi$ be a closed type constructor of
+  kind~$\kappa_1$ and let $X \in \Cb_{\chi_{\kappa_1}}$. We have
+  $\val{\chi_\kappa}{}{}(\psi,X) = \val{\chi_{\kappa_2}}{}{}$ because
+  $\chi_{\kappa_2}$ is closed. By the inductive hypothesis
+  $\val{\chi_\kappa}{}{}(\psi,X) = \val{\chi_{\kappa_2}}{}{} \in
+  \Cb_{\chi_{\kappa_2}}$. This implies $\val{\chi_\kappa}{}{} \in
+  \Cb_{\chi_\kappa}$.\qed
+\end{proof}
+
 \begin{lemma}\label{lem_abstraction_computable}
-  Let $\sigma,\tau$ be types. Suppose
-  $\val{\tau}{\xi'}{\omega'} \in \Cb_{\omega'(\tau)}$ and
-  $\val{\sigma}{\xi'}{\omega'} \in \Cb_{\omega'(\sigma)}$ for all
-  suitable $\omega',\xi'$. Then
+  Let $\sigma,\tau$ be types. Suppose $\val{\tau}{\xi'}{\omega'} \in
+  \Cb_{\omega'(\tau)}$ and $\val{\sigma}{\xi'}{\omega'} \in
+  \Cb_{\omega'(\sigma)}$ for all suitable $\omega',\xi'$. Then
   \begin{itemize}
   \item
-    $\abs{x:\omega(\tau)}{s} \in \val{\tau \arrtype
-      \sigma}{\xi}{\omega}$ if and only if
-    $\abs{x:\omega(\tau)}{s} : \omega(\tau \arrtype \sigma)$ and
-    $s[x:=t] \in \val{\sigma}{\xi}{\omega}$ for all
-    $t \in \val{\tau}{\omega,\xi}{}$;
+    $\abs{x}{s} \in \val{\tau \arrtype \sigma}{\xi}{\omega}$ if and
+    only if $\abs{x}{s} : \omega(\tau \arrtype \sigma)$ and $s[x:=t]
+    \in \val{\sigma}{\xi}{\omega}$ for all $t \in
+    \val{\tau}{\omega,\xi}{}$;
   \item
     $\tabs{\alpha}{s} \in
     \val{\quant{(\alpha:\kappa)}{\sigma}}{\xi}{\omega}$ if and only if
     $\tabs{\alpha}{s} : \omega(\quant{(\alpha:\kappa)}{\sigma})$ and
-    for every type constructor~$\varphi$ of kind~$\kappa$ and all
-    $X \in \Cb_\varphi$ we have
-    $s[\alpha:=\varphi] \in
+    for every closed type constructor~$\varphi$ of kind~$\kappa$ and
+    all $X \in \Cb_\varphi$ we have $s[\alpha:=\varphi] \in
     \val{\sigma}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$.
   \end{itemize}
 \end{lemma}
@@ -650,178 +684,276 @@ have type~$\tau$.
   $\val{\sigma}{\xi}{\omega}$ is a candidate and hence closed under
   $\leadsto$.
 
-  A similar reasoning applies to $s[\alpha:=\varphi]$.
+  A similar reasoning applies to $s[\alpha:=\varphi]$.\qed
 \end{proof}
 
 \begin{lemma}\label{lem_val_computable}
-  $\val{\sigma}{\omega,\xi}{\Gamma} \in \Cb_{\omega(\sigma)}^\Gamma$.
+  If $\sigma$ is a type constructor, $\omega$ is closed for~$\sigma$
+  and $\xi$ is an $\omega$-valuation, then $\val{\sigma}{\xi}{\omega}
+  \in \Cb_{\omega(\sigma)}$.
 \end{lemma}
 
 \begin{proof}
-  By induction on~$\sigma$ we show that
-  $\val{\sigma}{\omega,\xi}{\Gamma} \in \Cb_{\omega(\sigma)}^\Gamma$
-  for all suitable $\Gamma,\omega,\xi$. First, if $\sigma = \alpha$
-  for a type constructor variable~$\alpha$ then
-  $\val{\sigma}{\omega,\xi}{\Gamma} = \xi(\alpha) \in
-  \Cb_{\omega(\sigma)}^\Gamma$ by definition. If $\sigma = \nat$ then
-  $\val{\nat}{\omega,\xi}{\Gamma} \in \Cb_{\nat}^\Gamma$ by
+  By induction on the structure of~$\sigma$ we show that
+  $\val{\sigma}{\xi}{\omega} \in \Cb_{\omega(\sigma)}$ for all
+  suitable $\omega,\xi$. First, if $\sigma = \alpha$ is a type
+  constructor variable~$\alpha$ then $\val{\sigma}{\xi}{\omega} =
+  \xi(\alpha) \in \Cb_{\omega(\sigma)}$ by definition. If $\sigma =
+  \nat$ then $\val{\nat}{\xi}{\omega} \in \Cb_{\nat}$ by
   Lemma~\ref{lem_nat_reducible}.
 
   Assume $\sigma = \tau_1 \arrtype \tau_2$. We check the conditions in
   Definition~\ref{def_candidate}.
   \begin{enumerate}
-  \item Let $t \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$ and
-    assume there is an infinite reduction
-    $t \leadsto t_1 \leadsto t_2 \leadsto t_3 \leadsto \ldots$. Let
-    $x$ be fresh and $\Gamma' = \Gamma,x:\omega(\tau_1)$. By the
-    inductive hypothesis $\val{\tau_1}{\omega,\xi}{\Gamma'}$ and
-    $\val{\tau_2}{\omega,\xi}{\Gamma'}$ are candidates. So
-    $x \in \val{\tau_1}{\omega,\xi}{\Gamma}$ because it is neutral and
-    normal. Then $t x \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Thus
-    $t x$~is strongly normalising. But
-    $t x \leadsto t_1 x \leadsto t_2 x \leadsto t_3 x \leadsto
+  \item Let $t \in \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$ and assume
+    there is an infinite reduction $t \leadsto t_1 \leadsto t_2
+    \leadsto t_3 \leadsto \ldots$. By the inductive hypothesis
+    $\val{\tau_1}{\xi}{\omega}$ and $\val{\tau_2}{\xi}{\omega}$ are
+    candidates. Let~$x$ be a fresh variable. Then $x^{\omega(\tau_1)}
+    : \omega(\tau_1)$ and $x^{\omega(\tau_1)} \in
+    \val{\tau_1}{\xi}{\omega}$ because it is neutral and normal. Thus
+    $t x \in \val{\tau_2}{\xi}{\omega} \subseteq \SN$. But $t x
+    \leadsto t_1 x \leadsto t_2 x \leadsto t_3 x \leadsto
     \ldots$. Contradiction.
-  \item Let $t \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$ and
-    $t \leadsto t'$. Let $u \in
-    \val{\tau_1}{\omega,\xi}{\Gamma}$. Then
-    $t u \in \val{\tau_2}{\omega,\xi}{\Gamma}$. By the inductive
-    hypothesis $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a candidate, so
-    $t' u \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Also note that
-    $\Gamma \proves t' : \omega(\tau_1 \arrtype \tau_2)$ by the subject
-    reduction lemma. Hence
-    $t' \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$.
-  \item Let $t$ be neutral and
-    $\Gamma \proves t : \omega(\tau_1 \arrtype \tau_2)$ and assume for
-    every~$t'$ with $t \leadsto t'$ we have
-    $t' \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$. Let
-    $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$. By the inductive
-    hypothesis $\val{\tau_1}{\omega,\xi}{\Gamma}$ is a candidate, so
-    $u \in \SN$. By induction on~$\nu(u)$ we show that
-    $t u \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Assume
-    $t u \leadsto t''$. We show
-    $t'' \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Because~$t$ is
-    neutral, $t u$ cannot be a redex. So there are two cases.
+  \item Let $t \in \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$ and $t
+    \leadsto t'$. Let $u \in \val{\tau_1}{\xi}{\omega}$ be such that
+    $u : \omega(\tau_1)$. Then $t u \in \val{\tau_2}{\xi}{\omega}$. By
+    the inductive hypothesis $\val{\tau_2}{\xi}{\omega}$ is a
+    candidate, so $t' u \in \val{\tau_2}{\xi}{\omega}$. Also note that
+    $t' : \omega(\tau_1 \arrtype \tau_2)$ by the subject reduction
+    lemma. Hence $t' \in \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$.
+  \item Let $t$ be neutral such that $t : \omega(\tau_1 \arrtype
+    \tau_2)$. Assume for every~$t'$ with $t \leadsto t'$ we have $t'
+    \in \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$. Let $u \in
+    \val{\tau_1}{\xi}{\omega}$ be such that $u : \omega(\tau_1)$. By
+    the inductive hypothesis $\val{\tau_1}{\xi}{\omega}$ is a
+    candidate, so $u \in \SN$. By induction on~$\nu(u)$ we show that
+    $t u \in \val{\tau_2}{\xi}{\omega}$. Assume $t u \leadsto t''$. We
+    show $t'' \in \val{\tau_2}{\xi}{\omega}$. Because~$t$ is neutral,
+    $t u$ cannot be a redex. So there are two cases.
     \begin{itemize}
-    \item $t'' = t u'$ with $u \leadsto u'$. Then
-      $t u' \in \val{\tau_2}{\omega,\xi}{\Gamma}$ by the inductive
-      hypothesis for~$u$.
-    \item $t'' = t' u$ with $t \leadsto t'$. Then
-      $t' \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$, so
-      $t' u \in \val{\tau_2}{\omega,\xi}{\Gamma}$.
+    \item $t'' = t u'$ with $u \leadsto u'$. Then $u' \in
+      \val{\tau_1}{\xi}{\omega}$ because~$\val{\tau_1}{\xi}{\omega}$
+      is a candidate, and~$u' : \omega(\tau_1)$ by the subject
+      reduction lemma. So $t u' \in \val{\tau_2}{\xi}{\omega}$ by the
+      inductive hypothesis for~$u$.
+    \item $t'' = t' u$ with $t \leadsto t'$. Then $t' \in
+      \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$ by point~2 above. So
+      $t' u \in \val{\tau_2}{\xi}{\omega}$.
     \end{itemize}
-    We have thus shown that if $t u \leadsto t''$ then
-    $t'' \in \val{\tau_2}{\omega,\xi}{\Gamma}$. By the (main)
-    inductive hypothesis $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a
-    candidate, and $t u$ is neutral, so also
-    $t u \in \val{\tau_2}{\omega,\xi}{\Gamma}$. Since
-    $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$ was arbitrary, we have
-    shown $t \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$.
-  \item Assume $t_1,t_2 \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$.
-    We have already shown that this implies $t_1,t_2 \in \SN$.
-    Since $s := \circ_{\omega(\tau_1\arrtype\tau_2)} t_1 t_2$ is neutral,
-    we have also already seen that $s \in \val{\tau_1\arrtype\tau_2}{\omega,
-    \xi}{\Gamma}$ if $s' \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$
-    whenever $s \leadsto s'$.
-    This we show by induction on $t_1,t_2$ (oriented with $\leadsto$).
-    If $s' = \circ_{\omega(\tau_1\arrtype\tau_2)} t_1' t_2$, then note that
-    $t_1' \in \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$ because we
-    have already shown that $\val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$
-    is closed under $\leadsto$; thus, we can complete by the induction
-    hypothesis.
-    If $s' = \circ_{\omega(\tau_1\arrtype\tau_2)} t_1 t_2'$, we complete in
-    the same way.
-    The only alternative is that $s' = \abs{x:\omega(\tau_1)}{\circ_{
-    \omega(\tau_2)} (t_1 x) (t_2 x)}$.
-    Let $u \in \val{\tau_1}{\omega,\xi}{\Gamma}$.  Since $t_1,t_2 \in
-    \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$, we have that $t_1 u$
-    and $t_2 u$ are in $\val{\tau_2}{\omega,\xi}{\Gamma}$ by
-    definition.  Since, $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a
-    candidate, this means that $\circ_{\omega(\tau_2)} (t_1 u) (t_2 u) =
-    (\circ_{\omega(\tau_2)} (t_1 x) (t_2 x))[x:=u]$ is in
-    $\val{\tau_2}{\omega,\xi}{\Gamma}$ as well.  By
-    Lemma~\ref{lem_abstraction_computable}, we conclude that $s' \in
-    \val{\tau_1\arrtype\tau_2}{\omega,\xi}{\Gamma}$.
-  \item
+    We have thus shown that if $t u \leadsto t''$ then $t'' \in
+    \val{\tau_2}{\xi}{\omega}$. By the (main) inductive hypothesis
+    $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a candidate. Because $t u$
+    is neutral, the above implies $t u \in
+    \val{\tau_2}{\xi}{\omega}$. Since $u \in
+    \val{\tau_1}{\xi}{\omega}$ was arbitrary with $u :
+    \omega(\tau_1)$, we have shown $t \in
+    \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$.
+  \item Assume $t_1,t_2 \in \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$.
+    We have already shown that this implies $t_1,t_2 \in \SN$. Let $s
+    = \circ_{\omega(\tau_1\arrtype\tau_2)} t_1 t_2$. We show $s \in
+    \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$ by induction on $\nu(t_1)
+    + \nu(t_2)$. Note that $s : \omega(\tau_1\arrtype\tau_2)$ because
+    $t_i : \omega(\tau_1\arrtype\tau_2)$. Since $s$ is neutral, we
+    have already seen in point~3 above that to prove $s \in
+    \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$ it suffices to show that
+    $s' \in \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$ whenever $s
+    \leadsto s'$. If $s' = \circ_{\omega(\tau_1\arrtype\tau_2)} t_1'
+    t_2$ with $t_1 \leadsto t_1'$, then note that $t_1' \in
+    \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$ because we have already
+    shown that $\val{\tau_1\arrtype\tau_2}{\xi}{\omega}$ is closed
+    under $\leadsto$; thus, we can complete by the induction
+    hypothesis. If $s' = \circ_{\omega(\tau_1\arrtype\tau_2)} t_1
+    t_2'$, we complete in the same way.  The only alternative is that
+    $s' = \abs{x:\omega(\tau_1)}{\circ_{\omega(\tau_2)}(t_1x)(t_2x)}$.
+    Let $u \in \val{\tau_1}{\xi}{\omega}$. Then $u : \omega(\tau_1)$
+    because $\val{\tau_1}{\xi}{\omega} \in \Cb_{\omega(\tau_1)}$ by
+    the inductive hypothesis. Since $t_1,t_2 \in
+    \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$, we have that $t_1 u$ and
+    $t_2 u$ are in $\val{\tau_2}{\xi}{\omega}$ by definition. Since
+    $\val{\tau_2}{\xi}{\omega}$ is a candidate, this means that
+    $\circ_{\omega(\tau_2)} (t_1 u) (t_2 u) = (\circ_{\omega(\tau_2)}
+    (t_1 x) (t_2 x))[x:=u]$ is in $\val{\tau_2}{\xi}{\omega}$ as well.
+    By Lemma~\ref{lem_abstraction_computable}, we conclude that $s'
+    \in \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$.
+  \item Let $t \in \SN$ satisfy $t : \nat$, and let $s =
+    \lift_{\omega(\tau_1\arrtype\tau_2)}(t)$. We show $s \in
+    \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$ by induction
+    on~$\nu(t)$. We have $s : \omega(\tau_1\arrtype\tau_2)$ because $t
+    : \nat$. Since~$s$ is neutral, we have already proved above in
+    point~3 that it suffices to show that $s' \in
+    \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$ whenever $s \leadsto
+    s'$. If $s' = \lift_{\omega(\tau_1\arrtype\tau_2)}(t')$ with $t
+    \leadsto t'$ then still $t' \in \SN$ and $t' : \nat$, so $s' \in
+    \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$ by the inductive
+    hypothesis. The only alternative is that $s' = \lambda x :
+    \omega(\tau_1) . \lift_{\omega(\tau_2)}(t)$. Let $u \in
+    \val{\tau_1}{\xi}{\omega}$ be such that $u :
+    \omega(\tau_1)$. Because $\val{\tau_2}{\xi}{\omega} \in
+    \Cb_{\omega(\tau_2)}$ by the (main) inductive hypothesis
+    for~$\sigma$, we have $\lift_{\omega(\tau_2)}(t) \in
+    \val{\tau_2}{\xi}{\omega}$. Since $\lift_{\omega(\tau_2)}(t) =
+    (\lift_{\omega(\tau_2)}x)[\subst{x}{t}]$ we obtain $s' \in
+    \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$ by
+    Lemma~\ref{lem_abstraction_computable}.
+  \item Let $t \in \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$.  We show
+    $s := \flatten_{\omega(\tau_1\arrtype\tau_2)}t \in \SN$. We have
+    already shown $t \in \SN$ in point~1 above. Thus any infinite
+    reduction starting from~$s$ must have the form $s \leadsto^*
+    \flatten_{\omega(\tau_1\arrtype\tau_2)}t' \leadsto
+    \flatten_{\omega(\tau_2)}(t' (\lift_{\omega(\tau_1)}0)) \leadsto
+    \ldots$ with $t \leadsto^* t'$. We have already shown in point~2
+    above that $\val{\tau_1\arrtype\tau_2}{\xi}{\omega}$ is closed
+    under~$\leadsto$, so $t' \in
+    \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$. By the inductive
+    hypothesis $\val{\tau_1}{\xi}{\omega} \in\Cb_{\omega(\tau_1)}$, so
+    $\lift_{\omega(\tau_1)}0 \in \val{\tau_1}{\xi}{\omega}$ by
+    property~5 of candidates. Hence $t' (\lift_{\omega(\tau_1)}0) \in
+    \val{\tau_2}{\xi}{\omega}$ by definition. But by the inductive
+    hypothesis~$\val{\tau_2}{\xi}{\omega}$ is a candidate, so
+    $\flatten_{\omega(\tau_2)}(t'(\lift_{\omega(\tau_1)}0))\in\SN$. Contradiction.
   \end{enumerate}
 
-  Assume $\sigma = \forall\alpha[\tau]$. We check the conditions in
-  Definition~\ref{def_candidate}.
+  Assume $\sigma = \forall(\alpha:\kappa)[\tau]$. We check the
+  conditions in Definition~\ref{def_candidate}.
   \begin{enumerate}
-  \item Let $t \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$ and
-    assume there is an infinite reduction
-    $t \leadsto t_1 \leadsto t_2 \leadsto t_3 \leadsto
-    \ldots$. Let~$\tau'$ be an arbitrary type and let
-    $S \in \Cb_{\tau'}^\Gamma$ (e.g.~take~$S$ to be the set of
-    terminating terms of type~$\tau'$ in context~$\Gamma$).
-    \CK{It is not guaranteed that this will work! For that we really
-    do need that $\circ s t$ is SN if $s$ and $t$ are.  However, can't
-    we just take $\tau' := \nat$?} \LC{I think $\tau' := \nat$ indeed works here.}
-    Then
-    $t \tau' \in
-    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{S}]}{\Gamma}$. By
+  \item Let $t \in \val{\forall(\alpha:\kappa)[\tau]}{\xi}{\omega}$
+    and assume there is an infinite reduction $t \leadsto t_1 \leadsto
+    t_2 \leadsto t_3 \leadsto \ldots$. Recall that~$\chi_\kappa$ from
+    Definition~\ref{def_chi_kappa} is a closed type constructor of
+    kind~$\kappa$. By Lemma~\ref{lem_chi_kappa_reducible} we have
+    $\val{\chi_{\kappa}}{}{} \in \Cb_{\chi_\kappa}$. Then $t
+    \chi_\kappa \in
+    \val{\tau}{\xi[\subst{\alpha}{\val{\chi_\kappa}{}{}}]}{\omega[\subst{\alpha}{\chi_\kappa}]}$. By
     the inductive hypothesis
-    $\val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{S}]}{\Gamma}$
-    is a candidate, so $t \tau' \in \SN$. But
-    $t \tau' \leadsto t_1 \tau' \leadsto t_2 \tau' \leadsto t_3 \tau'
-    \leadsto \ldots$. Contradiction.
-  \item Let $t \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$ and
-    $t \leadsto t'$. By the subject reduction lemma
-    $\Gamma \proves t' : \omega(\forall\alpha[\tau])$. Let~$\tau'$ be
-    a type and~$X \in \Cb_{\tau'}^\Gamma$. Then
-    $t \tau' \in
-    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$. By
+    $\val{\tau}{\xi[\subst{\alpha}{\val{\chi_\kappa}{}{}}]}{\omega[\subst{\alpha}{\chi_\kappa}]}$
+    is a candidate, so $t \chi_\kappa \in \SN$. But $t \chi_\kappa
+    \leadsto t_1 \chi_\kappa \leadsto t_2 \chi_\kappa \leadsto t_3
+    \chi_\kappa \leadsto \ldots$. Contradiction.
+  \item Let $t \in \val{\forall\alpha[\tau]}{\xi}{\omega}$ and $t
+    \leadsto t'$. By the subject reduction lemma $t' :
+    \omega(\forall\alpha[\tau])$. Let~$\varphi$ be a closed type
+    constructor of kind~$\kappa$ and~$X \in \Cb_{\varphi}$. Then $t
+    \varphi \in
+    \val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$. By
     the inductive hypothesis
-    $\val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$
-    is a candidate, so
-    $t' \tau' \in
-    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$. Therefore
-    $t' \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$.
-  \item Let $t$ be neutral and
-    $\Gamma \proves t : \omega(\forall\alpha[\tau])$ and assume for
-    every~$t'$ with $t \leadsto t'$ we have
-    $t' \in
-    \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$. Let~$\tau'$ be a
-    type and~$X \in \Cb_{\tau'}^\Gamma$. Assume
-    $t \tau' \leadsto t''$. Then $t'' = t' \tau'$ with
-    $t \leadsto t'$, because~$t$ is neutral. Hence
-    $t \tau' \leadsto t' \tau' \in
-    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$. By
+    $\val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$
+    is a candidate, so $t' \varphi \in
+    \val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$. Therefore
+    $t' \in \val{\forall\alpha[\tau]}{\xi}{\omega}$.
+  \item Let $t$ be neutral such that $t :
+    \omega(\forall\alpha[\tau])$, and assume that for every~$t'$ with
+    $t \leadsto t'$ we have $t' \in
+    \val{\forall\alpha[\tau]}{\xi}{\omega}$. Let~$\varphi$ be a closed
+    type constructor of kind~$\kappa$ and~$X \in
+    \Cb_{\varphi}$. Assume $t \varphi \leadsto t''$. Then $t'' = t'
+    \varphi$ with $t \leadsto t'$, because~$t$ is neutral. Hence $t
+    \varphi \leadsto t' \varphi \in
+    \val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$. By
     the inductive
-    hypothesis~$\val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$
-    is a candidate, and also $t \tau'$ is neutral, so
-    $t \tau' \in
-    \val{\tau}{\omega[\subst{\alpha}{\tau'}],\xi[\subst{\alpha}{X}]}{\Gamma}$. This
-    implies that
-    $t \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$.
-  \item Assume
-    $t_1,t_2 \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$. We
-    have already shown that this implies $t_1,t_2 \in \SN$, and since
-    $s := \circ_{\omega(\forall\alpha[\tau])} t_1 t_2$ is neutral, that
-    $s \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$ if $s' \in
-    \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$ whenever $s \leadsto
-    s'$.  This we show by induction on $t_1,t_2$.
-    The cases when $t_1$ or $t_2$ are reduced are immediate with the
-    induction hypotheses; the only remaining case is when $s' =
-    \tabs{\alpha}{\circ_{\omega(\tau)} (t_1 \alpha) (t_2 \alpha)}$.
-    For all types $\sigma$ and $X \in \Cb_{\sigma}^\Gamma$ we have both
-    $t_1 \sigma$ and $t_2 \sigma$ in $\val{\tau}{\omega[\subst{\alpha}{
-    \sigma}],\xi[\subst{\alpha}{X}]}{\Gamma}$ (by definition of
-    $t_1,t_2 \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$).
-    But then, because $\val{\tau}{\omega[\subst{\alpha}{\sigma}],
-    \xi[\subst{\alpha}{X}]}{\Gamma}$ is a candidate by the inductive
-    hypothesis, we have $\circ_{\omega(\tau[\subst{\alpha}{\sigma})}
-    (t_1 \sigma) (t_2\sigma) = (\circ_{\omega(\tau)} (t_1 \alpha) (t_2
-    \alpha))[\subst{\alpha}{\sigma}] \in \val{\tau}{\omega[\subst{
-    \alpha}{\sigma}],\xi[\subst{\alpha}{X}]}{\Gamma}$ for all types
-    $\sigma$, so $s' \in \val{\forall\alpha[\tau]}{\omega,\xi}{\Gamma}$
-    by Lemma~\ref{lem_abstraction_computable}.
+    hypothesis~$\val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$
+    is a candidate. Also $t \varphi$ is neutral, so $t \varphi \in
+    \val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$
+    because~$t''$ was arbitrary with $t \varphi \leadsto t''$. This
+    implies that $t \in \val{\forall\alpha[\tau]}{\xi}{\omega}$.
+  \item Assume $t_1,t_2 \in
+    \val{\forall\alpha[\tau]}{\xi}{\omega}$. We have already shown
+    that this implies $t_1,t_2 \in \SN$. We prove
+    $\circ_{\omega(\forall\alpha[\tau])} t_1 t_2 \in
+    \val{\forall\alpha['tau]}{\xi}{\omega}$ by induction on $\nu(t_1)
+    + \nu(t_2)$. Since $s := \circ_{\omega(\forall\alpha[\tau])} t_1
+    t_2$ is neutral, we have already proven that it suffices to show
+    that $s' \in \val{\forall\alpha[\tau]}{\xi}{\omega}$ whenever $s
+    \leadsto s'$. The cases when $t_1$ or $t_2$ are reduced are
+    immediate with the induction hypotheses. The only remaining case
+    is when $s'=\tabs{\alpha}{\circ_{\omega(\tau)} (t_1 \alpha) (t_2
+      \alpha)}$.  For all closed type constructors $\varphi$ of
+    kind~$\kappa$ and all $X \in \Cb_{\varphi}^\Gamma$ we have both
+    $t_1 \varphi$ and $t_2 \varphi$ in
+    $\val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$
+    (by definition of $t_1,t_2 \in
+    \val{\forall\alpha[\tau]}{\xi}{\omega}$). Let $\omega' =
+    \omega[\subst{\alpha}{\varphi}]$. By bound variable renaming, we
+    may assume $\omega(\alpha) = \alpha$ and $\alpha$ does not occur
+    in~$t_1,t_2$. Because
+    $\val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$
+    is a candidate by the inductive hypothesis for~$\sigma$, we have
+    \[
+    \circ_{\omega'(\tau)} (t_1 \varphi)
+    (t_2\varphi) = (\circ_{\omega(\tau)} (t_1 \alpha) (t_2
+    \alpha))[\subst{\alpha}{\varphi}] \in
+    \val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}.
+    \]
+    Hence $s' \in \val{\forall\alpha[\tau]}{\xi}{\omega}$ by
+    Lemma~\ref{lem_abstraction_computable}.
+  \item Let $t \in \SN$ be such that $t : \nat$. By induction
+    on~$\nu(t)$ we show $s := \lift_{\omega(\forall\alpha[\tau])}(t)
+    \in \val{\forall\alpha[\tau]}{\xi}{\omega}$. First note that $s :
+    \omega(\forall\alpha[\tau])$. Since~$s$ is neutral, by the already
+    proven point~3 above, it suffices to show that $s' \in
+    \val{\forall\alpha[\tau]}{\xi}{\omega}$ whenever $s \leadsto
+    s'$. The case when~$t$ is reduced is immediate by the inductive
+    hypothesis. The only remaining case is when $s' =
+    \tabs{\alpha}{\lift_{\omega(\tau)}(t)}$ (without loss of
+    generality assuming $\omega(\alpha) = \alpha$). Let $\varphi$ be a
+    closed type constructor of kind~$\kappa$ and let $X \in
+    \Cb_\varphi$. Because
+    $\val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$
+    is a candidate, we have
+    \[
+    \lift_{\omega[\subst{\alpha}{\varphi}](\tau)}(t) =
+    (\lift_{\omega(\tau)}(t))[\subst{\alpha}{\varphi}] \in
+    \val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}.
+    \]
+    This implies $s' \in \val{\forall\alpha[\tau]}{\xi}{\omega}$.
+  \item Let $t \in \val{\forall\alpha[\tau]}{\xi}{\omega}$. We show $s
+    := \flatten_{\omega(\forall\alpha[\tau])}t \in \SN$. We have
+    already shown $t \in \SN$ in point~1 above. Thus any infinite
+    reduction starting from~$s$ must have the form $s \leadsto^*
+    \flatten_{\omega(\forall\alpha[\tau])}t' \leadsto
+    \flatten_{\omega(\tau)[\subst{\alpha}{\chi_\kappa}]}(t'
+    \chi_\kappa) \leadsto \ldots$ with $t \leadsto^* t'$ (assuming
+    $\omega(\alpha) = \alpha$ without loss of generality). We have
+    already shown in point~2 above that
+    $\val{\forall\alpha[\tau]}{\xi}{\omega}$ is closed
+    under~$\leadsto$, so $t' \in
+    \val{\forall\alpha[\tau]}{\xi}{\omega}$. We have
+    $\val{\chi_\kappa}{}{} \in \Cb_{\chi_\kappa}$ by
+    Lemma~\ref{lem_chi_kappa_reducible}. Since~$\chi_\kappa$ is also
+    closed, we have $t' \chi_\kappa \in
+    \val{\tau}{\xi[\subst{\alpha}{\val{\chi_\kappa}{}{}}]}{\omega[\subst{\alpha}{\chi_\kappa}]}$
+    by definition of $\val{\forall\alpha[\tau]}{\xi}{\omega}$. By the
+    inductive hypothesis
+    $\val{\tau}{\xi[\subst{\alpha}{\val{\chi_\kappa}{}{}}]}{\omega[\subst{\alpha}{\chi_\kappa}]}
+    \in \Cb_{\omega[\subst{\alpha}{\chi_\kappa}](\tau)}$. Hence
+    $\flatten_{\omega[\subst{\alpha}{\chi_\kappa}](\tau)}(t'\chi_\kappa)\in\SN$. But
+    $\omega[\subst{\alpha}{\chi_\kappa}](\tau) =
+    \omega(\tau)[\subst{\alpha}{\chi_\kappa}]$ because~$\chi_\kappa$
+    is closed and $\omega(\alpha) = \alpha$. Contradiction.
   \end{enumerate}
 
-  Assume $\sigma = \varphi\psi$. We check the conditions in
-  Definition~\ref{def_candidate}.
-  \begin{enumerate}
-  \item
-  \end{enumerate}
+  Assume $\sigma = \varphi\psi$, with $\psi$ of kind~$\kappa_1$ and
+  $\varphi$ of kind~$\kappa_1\arrkind\kappa_2$. By the inductive
+  hypothesis $\val{\psi}{\xi}{\omega} \in \Cb_{\omega(\psi)}$ and
+  $\val{\varphi}{\xi}{\omega} \in \Cb_{\omega(\varphi)}$. Because
+  applying~$\omega$ does not change kinds, we have
+  $\val{\varphi\psi}{\xi}{\omega} =
+  \val{\varphi}{\xi}{\omega}(\omega(\psi), \val{\psi}{\xi}{\omega})
+  \in \Cb_{\omega(\varphi\psi)}$, by the definition of candidates of a
+  type constructor with kind~$\kappa_1\arrkind\kappa_2$ (note that
+  $\omega(\psi)$ is closed, because $\omega$ is closed for~$\sigma$).
+
+  Finally, assume $\sigma = \lambda(\alpha:\kappa)\varphi$. Let $\psi$
+  be a closed type constructor of kind~$\kappa$ and $X \in
+  \Cb_{\psi}$. By the inductive hypothesis
+  $\val{\lambda(\alpha:\kappa)\varphi}{\xi}{\omega}(\psi,X) =
+  \val{\varphi}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\psi}]}
+  \in \Cb_{\omega[\subst{\alpha}{\psi}](\varphi)}$. Because $\psi$ is
+  closed we have $\omega[\subst{\alpha}{\psi}](\varphi) =
+  \omega(\varphi[\subst{\alpha}{\psi}]) =
+  \omega((\lambda\alpha.\varphi)\psi) = \omega(\sigma\psi) =
+  \omega(\sigma)\psi$. This implies that $\val{\sigma}{\xi}{\omega}
+  \in \Cb_{\omega(\sigma)}$.
 \end{proof}
 
 \begin{lemma}\label{lem_val_subst}
