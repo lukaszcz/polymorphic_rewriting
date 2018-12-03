@@ -1126,7 +1126,7 @@ write~$\val{\varphi}{}{}$.
 
 A mapping~$\omega$ on type constructors is extended in the obvious way
 to a mapping on terms. Note that $\omega$ also acts on the type
-annotations of variable occurences, e.g.~$\omega(\lambda x : \alpha
+annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
 . x^\alpha) = \lambda x : \omega(\alpha) . x^{\omega(\alpha)}$.
 
 \begin{lemma}\label{lem_typable_computable}
@@ -1446,12 +1446,12 @@ interpreatation terms.
   like in Definition~\ref{def:itypes} with the following
   modification. We assume a fixed set~$\Sigma_T$ of \emph{type
     constructor symbols} paired with a kind, denoted $c :
-  \kappa$. Every type constructor symbol~$c$ occurs only with one kind
+  \kappa$. Every type constructor symbol~$c$ occurs with only one kind
   declaration. Then the definition of type constructors contains the
   following additional clause:
   \begin{itemize}
-  \item A type symbol of kind~$\kappa$ is a type constructor of
-    kind~$\kappa$.
+  \item A type constructor symbol of kind~$\kappa$ is a type
+    constructor of kind~$\kappa$.
   \end{itemize}
   We use the notations of Definition~\ref{def:itypes}, and define
   $\beta$-reduction on type constructors as in
