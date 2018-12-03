@@ -33,13 +33,11 @@
 \newcommand{\Typemap}{\mathcal{T\!M}}
 \newcommand{\Termmap}{\mathcal{J}}
 
-\newcommand{\nf}{\mathtt{nf}}
-
 \newcommand{\quant}[2]{\forall #1[#2]}
 \newcommand{\qquant}[3]{#1 #2[#3]}
-\newcommand{\typeinterpret}[1]{\llparenthesis #1 \rrparenthesis}
-\newcommand{\interpret}[1]{\llparenthesis #1 \rrparenthesis}
-\newcommand{\itp}[1]{\llparenthesis #1 \rrparenthesis}
+\newcommand{\typeinterpret}[1]{\llbracket #1 \rrbracket}
+\newcommand{\interpret}[1]{\llbracket #1 \rrbracket}
+\newcommand{\itp}[1]{\llbracket #1 \rrbracket}
 \newcommand{\arr}[1]{\longrightarrow_{#1}}
 \newcommand{\red}{\longrightarrow}
 \newcommand{\arrtype}{\rightarrow}
@@ -177,7 +175,7 @@ If this algorithm succeeds, we have proven termination.
 
 \section{Defining a world}
 
-\subsection{Defining the set $\World$}
+\subsection{Defining the set $\World$}\label{sec_world}
 
 \subsubsection{Interpretation terms}
 We define the set of types for interpretation terms.
@@ -217,10 +215,9 @@ Isomorphism'', Section~11.7.
   The set of type constructors of kind~$\kappa$ is denoted
   by~$\Tc_\kappa$.
 
-  We use the notation $\forall \alpha . \tau$ and $\forall \alpha
-  \tau$. When $\alpha$ is of kind $\kappa$ then we use the notations
-  $\forall \alpha : \kappa . \tau$ and $\forall (\alpha :
-  \kappa)[\tau]$.
+  We use the notation $\forall \alpha . \tau$. When $\alpha$ is of
+  kind $\kappa$ then we use the notations $\forall \alpha : \kappa
+  . \tau$ and $\forall (\alpha : \kappa)[\tau]$.
 
   Beta-reduction on type constructors is defined as the compatible
   closure of the rule
@@ -230,7 +227,7 @@ Isomorphism'', Section~11.7.
   Note that type constructors are essentially simply-typed
   lambda-terms, so beta-reduction on type constructors terminates and
   is confluent, hence every type constructor~$\varphi$ has a unique
-  normal form~$\nf(\varphi)$.
+  normal form.
 
   We define $\FV(\varphi)$ -- the set of free type constructor
   variables of the type constructor~$\varphi$ -- in an obvious way by
@@ -283,7 +280,7 @@ there is only one choice for the type modulo $\beta$-conversion (this
 is easily proved by induction on the form of $s$). Thus, all closed
 terms have a unique type modulo $\beta$-conversion.
 
-\begin{definition}
+\begin{definition}\label{def_type_equiv}
   We define the type equivalence relation~$\equiv$ on preterms by
   induction on preterm structure.
   \begin{itemize}
@@ -1359,12 +1356,10 @@ non-final interpretation terms, by defining $s \succ t$ (resp. $s
 \succeq t$) if $s\downarrow \succ t\da$ (resp. $s\downarrow \succeq
 t\downarrow$).  \CK{Note that for this we do need to prove that
   $\leadsto$ has unique normal forms, but if we don't define this,
-  then the following lemma is meaningless, I think.}  \LC{I don't
-  think there is any problem with local confluence, and we have SN
-  (but this should be re-checked). Besides, this already beaks down
-  without unique normal forms with the definition for~$\World$, so I
-  changed the definition to make it work for~$\Iterms$ from the
-  start.}
+  then the following lemma is meaningless, I think.}  \LC{This already
+  beaks down without unique normal forms with the definition
+  for~$\World$, so I changed the definition to make it work
+  for~$\Iterms$ from the start.}
 
 \begin{lemma}\label{lem:plusparts}
 For all \emph{closed} interpretation types $\sigma$, interpretation
@@ -1443,78 +1438,36 @@ general scheme.
 
 \subsection{Systems of interest}
 
-We use a syntax similar to that of System $F_\omega$, see e.g.,
-Sorensen, Urzyczyn, ``Lectures on the Curry-Howard Isomorphism'',
-Section~11.7.
+We use a syntax based on system $F_\omega$, similar to that of
+interpreatation terms.
 
 \begin{definition}\normalfont
-  \emph{Kinds} are defined inductively:
+  \emph{Kinds}, \emph{type constructors} and \emph{types} are defined
+  like in Definition~\ref{def:itypes} with the following
+  modification. We assume a fixed set~$\Sigma_T$ of \emph{type
+    constructor symbols} paired with a kind, denoted $c :
+  \kappa$. Every type constructor symbol~$c$ occurs only with one kind
+  declaration. Then the definition of type constructors contains the
+  following additional clause:
   \begin{itemize}
-  \item $*$ is a kind,
-  \item if $\kappa_1,\kappa_2$ are kinds then so is $\kappa_1 \arrkind
-    \kappa_2$.
+  \item A type symbol of kind~$\kappa$ is a type constructor of
+    kind~$\kappa$.
   \end{itemize}
-
-  We assume infinitely many \emph{type constructor variables} of each
-  kind. Variables of kind~$*$ are \emph{type variables}.
-
-  We assume a fixed set~$\Sigma_T$ of \emph{type constructor symbols}
-  paired with a kind, denoted $c : \kappa$. Every type constructor
-  symbol~$c$ occurs only with one kind declaration.
-
-  We define \emph{type constructors} of kind~$\kappa$ by induction.
-  Type constructors of kind~$*$ are called \emph{types}.
-  \begin{itemize}
-  \item A type constructor variable or a type constructor symbol of
-    kind~$\kappa$ is a type constructor of kind~$\kappa$.
-  \item If $\varphi$ is a type constructor of kind $\kappa_1 \arrkind
-    \kappa_2$ and $\psi$ is a type constructor of kind~$\kappa_1$ then
-    $\varphi \psi$ is a type constructor of kind~$\kappa_2$.
-  \item If $\alpha$ is a type constructor variable of kind~$\kappa_1$
-    and $\varphi$ is a type constructor of kind~$\kappa_2$, then
-    $\lambda\alpha . \varphi$ is a type constructor of kind $\kappa_1
-    \arrkind \kappa_2$.
-  \item If $\alpha$ is a type constructor variable of kind~$\kappa$
-    and~$\tau$ is a type, then $\forall \alpha[\tau]$ is a type.
-  \item If $\tau_1,\tau_2$ are types, then $\tau_1 \arrtype \tau_2$ is
-    a type.
-  \end{itemize}
-
-  We use the notation $\forall \alpha . \tau$ and $\forall \alpha
-  \tau$. When $\alpha$ is of kind $\kappa$ then we use the notations
-  $\forall \alpha : \kappa . \tau$ and $\forall (\alpha :
-  \kappa)[\tau]$.
-
-  Beta-reduction on type constructors is defined as the compatible
-  closure of the rule
-  \[
-  (\lambda\alpha.\varphi)\psi \to \varphi[\alpha := \psi]
-  \]
-  Note that type constructors are essentially simply-typed
-  lambda-terms, so beta-reduction on type constructors terminates and
-  is confluent, hence every type constructor~$\varphi$ has a unique
-  normal form. To save on notation we therefore treat type
-  constructors modulo $\beta$-conversion. More precisely, type
-  constructors could be defined as beta-equivalence classes of the
-  above terms, but for readability we work with type constructors in a
-  naive way. This is justified by the fact that all basic operations
-  on type constructors (substitution, abstraction, etc.) are invariant
-  under $\beta$-conversion. So for instance, if $\alpha,\beta$ are
-  type constructor variables, then we consider $(\alpha \tau)[\alpha
-    := \lambda \beta . \beta]$ (which is $(\lambda \beta . \beta)
-  \tau$) and $\tau$ to be the same.
+  We use the notations of Definition~\ref{def:itypes}, and define
+  $\beta$-reduction on type constructors as in
+  Definition~\ref{def:itypes}.
 \end{definition}
 
 Terms are built from a set of function symbols, using abstraction and
 application as for interpretation terms.
 
-\begin{definition}
+\begin{definition}\normalfont
 We assume given a fixed set $\Sigma$ of \emph{function symbols}, each
 paired with a \emph{closed} type, denoted $\mathtt{f} : \tau$.  Every
 function symbol $\mathtt{f}$ occurs only with one type declaration.
 
-The set $\Terms$ of terms consists of those expressions $s$ such that
-$\Gamma \vdash s : \sigma$ can be derived for some type $\sigma$ and
+The set of preterms consists of those expressions $s$ such that
+$\Gamma \proves s : \sigma$ can be derived for some type $\sigma$ and
 environment $\Gamma$ using the following clauses:
 \begin{itemize}
 \item $\Gamma \vdash x : \sigma$ for every $(x : \sigma) \in \Gamma$.
@@ -1526,16 +1479,21 @@ environment $\Gamma$ using the following clauses:
   \sigma_k \arrtype \tau
   \]
   is a function symbol in~$\Sigma$, and $\rho_i$ is a type constructor
-  of kind $\kappa_i$ for $i=1,\ldots,k$, and $\Gamma \vdash s_i :
+  of kind $\kappa_i$ for $i=1,\ldots,k$, and $\Gamma \proves s_i :
   \sigma_i[\alpha_1 := \rho_1]\ldots[\alpha_n := \rho_n]$ for
   $i=1,\ldots,k$.
-\item $\Gamma \vdash \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
+\item $\Gamma \proves \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
   \in \Vars$ and $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$.
-\item $\Gamma \vdash \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
+\item $\Gamma \proves \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
   $\alpha$ is a type constructor variable and $\Gamma \vdash s :
   \sigma$ and for all $(x : \tau) \in \Gamma$: $\alpha \notin
   \FTV(\tau)$.
+\item $\Gamma \proves t : \sigma$ if $\sigma =_\beta \sigma'$ and
+  $\Gamma \proves t : \sigma'$.
 \end{itemize}
+The relation~$\equiv$ of \emph{type equivalence} is defined
+analogously to Definition~\ref{def_type_equiv}. The set of
+\emph{terms} is the set of the equivalence classes of~$\equiv$.
 \end{definition}
 
 We use the notation
@@ -1547,11 +1505,17 @@ available. Application can be modelled by including the symbol ${@} :
 through a symbol $\mathtt{A} : \forall \alpha : * \arrkind * . \forall
 \beta . (\forall \beta [\alpha \beta]) \arrtype \alpha \beta$.
 
+We use the notations and terminology of Section~\ref{sec_world}. To
+avoid confusion, the terms, types, type constructors, etc.~in the
+interpretation (those defined in Section~\ref{sec_world}) are referred
+to as interpretation terms, interpretation types, interpretation type
+constructors, etc.
+
 The rules are simply an infinite set of term pairs, whose monotonic
 closure generates the rewrite relation. \LC{Now the set of rules can
   be finite.}
 
-\begin{definition}
+\begin{definition}\normalfont
 We fix an infinite variable environment $\Gamma$,
 and assume given a set $\Rules$ of term pairs $(\ell,r)$, such that:
 \begin{itemize}
@@ -1765,7 +1729,7 @@ rule removal.
   (e.g. System~$F_\omega$ and extensions). Below I assume we have
   System $F_\omega$ as the basis of our interpretation terms.}
 
-\begin{definition}
+\begin{definition}\normalfont
 A \emph{type constructor mapping} is a function $\Typemap$ which maps
 a type constructor symbol to an interpretation type constructor of the
 same kind.
@@ -1783,7 +1747,7 @@ Thus, for example $\typeinterpret{\quant{\alpha}{\sigma}} =
 Similarly, we employ a \emph{symbol mapping} as an aid to interpret
 \emph{terms}.
 
-\begin{definition}
+\begin{definition}\normalfont
 A \emph{symbol mapping} is a function $\Termmap$ which assigns to each
 function symbol $\mathtt{f} : \rho$ a closed interpretation term
 $\Termmap(\mathtt{f})$ of type~$\typeinterpret{\rho}$. For a fixed
