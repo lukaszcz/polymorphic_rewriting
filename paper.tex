@@ -1235,7 +1235,17 @@ annotations of variable occurences, e.g.~$\omega(\lambda x : \alpha
 \end{lemma}
 
 \begin{proof}
-  TODO
+  We show by induction on~$t$ that if $t$ is a final interpretation
+  term of type~$\nat$ then $t$ is a natural number. Because~$t$ is
+  closed and in normal form, if it is not a natural number then it
+  must have the form $\mathtt{f}_\sigma t_1 \ldots t_n$ for a function
+  symbol $\mathtt{f}$. For concreteness assume $\mathtt{f} =
+  \oplus$. Then $n \ge 2$. Because~$t$ is closed, $\sigma$ cannot be a
+  type variable. It also cannot be an arrow or a $\forall$-type,
+  because then $t$ would contain a redex. So $\sigma=\nat$. Then
+  $t_1,t_2$ are final interpretation terms of type~$\nat$, hence
+  natural numbers by the inductive hypothesis. But then $t$ contains a
+  redex. Contradiction.
 \end{proof}
 
 \subsection{Defining $\succ$ and $\succeq$}
