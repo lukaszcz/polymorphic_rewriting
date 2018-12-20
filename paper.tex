@@ -102,6 +102,11 @@ The remainder is meant for filling in the TODOs with what we already have.
 The hope is that the end result is something useful. :)
 \end{abstract}
 
+\CK{I wonder whether this structure of a TODO list is still relevant;
+it was useful when setting out to know what we wanted to do, but I
+think we have a pretty good grasp on that and it would be better to go
+for a proper structure now.}
+
 \section*{THE LIST}
 
 \renewcommand{\theenumii}{\arabic{enumi}.\arabic{enumii}}
@@ -180,6 +185,11 @@ If this algorithm succeeds, we have proven termination.
 \subsubsection{Interpretation terms}
 We define the set of types for interpretation terms.
 
+\CK{For an example of the previous comment: the following is not too
+relevant for the set of interpretation terms. Structurally, I could
+imagine that we want this as general preliminaries and then instantiate
+the notion to get our set $\World$.}
+
 Our system of interpretation terms is based on System~$F_\omega$, see
 e.g., Sorensen, Urzyczyn, ``Lectures on the Curry-Howard
 Isomorphism'', Section~11.7.
@@ -209,15 +219,27 @@ Isomorphism'', Section~11.7.
     \arrkind \kappa_2$.
   \item If $\alpha$ is a type constructor variable of kind~$\kappa$
     and~$\tau$ is a type, then $\forall \alpha[\tau]$ is a type.
+    \CK{With $\kappa$ arbitrary, and not limited to *? What are we
+    using that for? We do not have substitution of type constructor
+    variables that are not type variables.}
   \item If $\tau_1,\tau_2$ are types, then $\tau_1 \arrtype \tau_2$ is
     a type.
   \end{itemize}
   The set of type constructors of kind~$\kappa$ is denoted
   by~$\Tc_\kappa$.
 
+  \CK{But then type constructors are entirely build from variables?
+  Should there not be a set of constants given as well? For the set
+  $\World$, I am particularly thinking of constants ``nat'' and
+  ``pair''; I can imagine that ``pair'' can be defined as an arrow
+  type, but what would ``nat'' be?}
+
   We use the notation $\forall \alpha . \tau$. When $\alpha$ is of
   kind $\kappa$ then we use the notations $\forall \alpha : \kappa
   . \tau$ and $\forall (\alpha : \kappa)[\tau]$.
+
+  \CK{Are both just alternative ways to denote $\forall \alpha[\tau]$,
+  or are there differences?}
 
   Beta-reduction on type constructors is defined as the compatible
   closure of the rule
@@ -228,13 +250,22 @@ Isomorphism'', Section~11.7.
   lambda-terms, so beta-reduction on type constructors terminates and
   is confluent, hence every type constructor~$\varphi$ has a unique
   normal form.
+  \CK{Except that the $\forall \alpha[\tau]$ is a type constructor but
+  not really a simply-typed lambda-term, which does have some
+  consequences on what binding means, I think. What does
+  $(\lambda \alpha.\forall \alpha.\alpha)\tau$ reduce to?}
 
   We define $\FV(\varphi)$ -- the set of free type constructor
   variables of the type constructor~$\varphi$ -- in an obvious way by
   induction on the structure of~$\varphi$. A type
   constructor~$\varphi$ is \emph{closed} if $\FV(\varphi) =
   \emptyset$.
+  \CK{Obvious way: do both $\forall$ and $\lambda$ bind the variable,
+  or only one of them?}
 \end{definition}
+
+\CK{Here there is a disconnect between what was discussed before and
+what is discussed afterwards: what is an interpretation type?}
 
 \begin{definition}\label{def_typing}\normalfont
 We assume given an infinite set $\Vars$ of variables, and let $\Gamma$
@@ -298,6 +329,7 @@ terms have a unique type modulo $\beta$-conversion.
   \end{itemize}
   In other words, $s \equiv t$ iff $s$ and $t$ are identical modulo
   $\beta$-conversion in types.
+  \CK{And $\alpha$-conversion implicitly as well, I assume?}
 \end{definition}
 
 Note that~$\equiv$ is an equivalence relation.
@@ -318,7 +350,7 @@ The set $\Iterms$ of interpretation terms is now defined as follows.
   equivalence classes of~$\equiv$.
 \end{definition}
 
-Because $\beta$-reduction on types is confluent and termination, every
+Because $\beta$-reduction on types is confluent and terminating, every
 interpretation term has a canonical preterm representative -- the one
 with all types occurring in it $\beta$-normalized. We say that a term
 is \emph{closed} if its canonical representative is. We define
@@ -355,6 +387,10 @@ informally treat them interchangeably.
     \rho[\subst{\alpha}{\tau}]$ and $\Gamma \vdash s :
     \quant{(\alpha:\kappa)}{\rho}$ and~$\tau$ is a type constructor of
     kind~$\kappa$.
+    \CK{I don't think that this will always give you a $\beta$-normal
+    type, depending on what $\tau$ is. The lemma does not \emph{state}
+    that $\sigma'$ is in $\beta$-normal form, but this is suggested by
+    the surrounding text.}
   \end{itemize}
 \end{lemma}
 
