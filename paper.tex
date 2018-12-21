@@ -190,6 +190,8 @@ relevant for the set of interpretation terms. Structurally, I could
 imagine that we want this as general preliminaries and then instantiate
 the notion to get our set $\World$.}
 
+\LC{Yes, I think it's a good idea.}
+
 Our system of interpretation terms is based on System~$F_\omega$, see
 e.g., Sorensen, Urzyczyn, ``Lectures on the Curry-Howard
 Isomorphism'', Section~11.7.
@@ -220,8 +222,13 @@ Isomorphism'', Section~11.7.
   \item If $\alpha$ is a type constructor variable of kind~$\kappa$
     and~$\tau$ is a type, then $\forall \alpha[\tau]$ is a type.
     \CK{With $\kappa$ arbitrary, and not limited to *? What are we
-    using that for? We do not have substitution of type constructor
-    variables that are not type variables.}
+      using that for? We do not have substitution of type constructor
+      variables that are not type variables.}
+    \LC{Yes, $\kappa$ arbitrary. See Section 2 for an example. I don't
+      understand the last sentence here. Why do you think we don't
+      have this kind of substitution? We can substitute a type
+      constructor variable~$\alpha$ of kind~$\kappa$ with a type
+      constructor of kind~$\kappa$. Maybe this should be defined explicitly.}
   \item If $\tau_1,\tau_2$ are types, then $\tau_1 \arrtype \tau_2$ is
     a type.
   \end{itemize}
@@ -234,12 +241,22 @@ Isomorphism'', Section~11.7.
   ``pair''; I can imagine that ``pair'' can be defined as an arrow
   type, but what would ``nat'' be?}
 
+  \LC{Oh yes, you're right about the nat. The type constants are in the
+    syntax (Section 2), but I thought for a while you can avoid them
+    in the interpretation -- forgot about nat.}
+
   We use the notation $\forall \alpha . \tau$. When $\alpha$ is of
   kind $\kappa$ then we use the notations $\forall \alpha : \kappa
   . \tau$ and $\forall (\alpha : \kappa)[\tau]$.
 
   \CK{Are both just alternative ways to denote $\forall \alpha[\tau]$,
   or are there differences?}
+
+  \LC{Just a different notation -- I use all of them when
+    convenient, especially during the SN proof where sometimes you
+    need to know what kind $\alpha$ has and sometimes it's irrelevant
+    and too cumbersome to write each time. Maybe we should cut down on
+  alternative notations to two (with and without $\kappa$)?}
 
   Beta-reduction on type constructors is defined as the compatible
   closure of the rule
@@ -255,6 +272,13 @@ Isomorphism'', Section~11.7.
   consequences on what binding means, I think. What does
   $(\lambda \alpha.\forall \alpha.\alpha)\tau$ reduce to?}
 
+  \LC{Well, true, you need to treat this modulo $\alpha$-equivalence
+    and rename implicitly. $(\lambda \alpha.\forall \alpha.\alpha)\tau
+    \to \forall \alpha.\alpha$. I don't think this has any
+    consequences on confluence or termination -- say we just have a
+    constant $\forall$ and $\forall \alpha . \tau$ is really $\forall
+    (\lambda \alpha . \tau)$}
+
   We define $\FV(\varphi)$ -- the set of free type constructor
   variables of the type constructor~$\varphi$ -- in an obvious way by
   induction on the structure of~$\varphi$. A type
@@ -262,10 +286,15 @@ Isomorphism'', Section~11.7.
   \emptyset$.
   \CK{Obvious way: do both $\forall$ and $\lambda$ bind the variable,
   or only one of them?}
+  \LC{Yes, $\forall$ binds variables, renaming is assumed. I did leave this implicit.}
 \end{definition}
 
 \CK{Here there is a disconnect between what was discussed before and
 what is discussed afterwards: what is an interpretation type?}
+
+\LC{interpretation type = type, i.e., a type in our system we use to
+  define $\World$. This terminology is left over from the previous
+  version -- should we change this somehow?}
 
 \begin{definition}\label{def_typing}\normalfont
 We assume given an infinite set $\Vars$ of variables, and let $\Gamma$
@@ -330,6 +359,7 @@ terms have a unique type modulo $\beta$-conversion.
   In other words, $s \equiv t$ iff $s$ and $t$ are identical modulo
   $\beta$-conversion in types.
   \CK{And $\alpha$-conversion implicitly as well, I assume?}
+  \LC{Yes, of course.}
 \end{definition}
 
 Note that~$\equiv$ is an equivalence relation.
@@ -382,7 +412,7 @@ informally treat them interchangeably.
     \quant{\alpha}{\tau}$ and $\Gamma \vdash s : \tau$ and for all $(x
     : \rho) \in \Gamma$: $\alpha \notin \FV(\rho)$.
   \item $t \equiv \app{t_1}{t_2}$ and $\Gamma \vdash t_1 :
-    \sigma' \arrtype \tau$ and $\Gamma \vdash t_2 : \sigma'$.
+    \tau \arrtype \sigma'$ and $\Gamma \vdash t_2 : \tau$.
   \item $t \equiv \tapp{s}{\tau}$ and $\sigma' =
     \rho[\subst{\alpha}{\tau}]$ and $\Gamma \vdash s :
     \quant{(\alpha:\kappa)}{\rho}$ and~$\tau$ is a type constructor of
@@ -391,6 +421,16 @@ informally treat them interchangeably.
     type, depending on what $\tau$ is. The lemma does not \emph{state}
     that $\sigma'$ is in $\beta$-normal form, but this is suggested by
     the surrounding text.}
+    \LC{Yes, you're right this case doesn't work, but I didn't have
+      normalizing in mind -- just taking a common reduct. The
+      point is that now before applying a rule you can do
+      beta-conversion on the type and you want to ensure that you can
+      in fact choose a type in the rule so that no ``stupid'' new
+      variables appear, e.g., by an expansion like $(\lambda \alpha
+      . \tau) \alpha \to \tau$ where
+      $\alpha \notin \FV(\tau)$. That's a pesky technicality, but I think this can be made
+      to work here anyway -- I'll look into this later. In fact, it
+      suffices here if $\FV(\sigma') \subseteq \FV(\sigma) \cup \FTV(t)$}
   \end{itemize}
 \end{lemma}
 
