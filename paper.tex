@@ -72,6 +72,7 @@
 \newcommand{\proves}{\vdash}
 
 \newcommand{\CK}[1]{\textcolor{blue}{CK: #1}}
+\newcommand{\CKchange}[1]{\textcolor{blue}{#1}}
 \newcommand{\LC}[1]{\textcolor{purple}{LC: #1}}
 
 \begin{document}
@@ -521,7 +522,7 @@ The following lemma is obvious, but worth stating explicitly.
   for all~$s$ such that $\circ_\nat t_1 t_2 \leadsto s$. If $s =
   \circ_\nat t_1' t_2$ or $s = \circ_\nat t_1 t_2'$ with $t_i \leadsto
   t_i'$ then we complete by the induction hypothesis. Otherwise $s \in
-  \mathbb{N}$ is obviously in $\SN$.
+  \mathbb{N}$ is obviously in $\SN$.  \qed
 \end{proof}
 
 \subsubsection{Computability}
@@ -557,7 +558,7 @@ each term has a unique type modulo $\beta$-conversion. We write $t :
 lemmas still holds for orthodox Church-style typed terms.
 
 \begin{definition}\label{def_candidate}\normalfont
-  A term~$t$ is \emph{neutral} if there does not exists a sequence of
+  A term~$t$ is \emph{neutral} if there does not exist a sequence of
   terms and types~$u_1,\ldots,u_n$ with $n \ge 1$ such that $t u_1
   \ldots u_n$ is a redex (by~$\leadsto$).
 
@@ -575,8 +576,9 @@ lemmas still holds for orthodox Church-style typed terms.
     have $t' \in X$, then $t \in X$;
   \item if $t_1,t_2 \in X$ then $\circ_\tau t_1 t_2 \in X$ for
     $\circ \in \{\oplus,\otimes\}$;
-  \item if $t \in \SN$ and $t : \nat$ then $\lift_\tau(t) \in X$;
-  \item if $t \in X$ then $\flatten_\tau(t) \in \SN$.
+  \item if $t \in \SN$ and $t : \nat$ then $\CKchange{\lift_\tau t}
+    \in X$;
+  \item if $t \in X$ then $\CKchange{\flatten_\tau t} \in \SN$.
   \end{enumerate}
   Note that item~3 above implies:
   \begin{itemize}
@@ -772,6 +774,9 @@ write~$\val{\varphi}{}{}$.
   and $\xi$ is an $\omega$-valuation, then $\val{\sigma}{\xi}{\omega}
   \in \Cb_{\omega(\sigma)}$.
 \end{lemma}
+
+\CK{I still see $\flatten_\sigma(s)$ and $\lift_\sigma(s)$ used in
+this proof. Has it been fully updated to the new definitions?}
 
 \begin{proof}
   By induction on the structure of~$\sigma$ we show that
@@ -1278,7 +1283,7 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
   because then $t$ would contain a redex. So $\sigma=\nat$. Then
   $t_1,t_2$ are final interpretation terms of type~$\nat$, hence
   natural numbers by the inductive hypothesis. But then $t$ contains a
-  redex. Contradiction.
+  redex. Contradiction.  \qed
 \end{proof}
 
 \subsection{Defining $\succ$ and $\succeq$}
@@ -1310,6 +1315,10 @@ numbers by Lemma~\ref{lem_final_nat}.
 \LC{This definition was incorrect before, because e.g.~$\app{s}{q}$
   need not be in normal form. I think it's best just to define it from
   the start for all terms in~$\Iterms$.}
+\CK{Agreed; it also makes it easier to apply, since I think we will
+  often want to compare non-normalised terms. However, the last
+  one still needs rephrasing: $\tau$ should be a type constructor of
+  the same kind as $\alpha$, not a type.}
 
 \subsection{Properties of $\succ$ and $\succeq$}
 
@@ -1330,6 +1339,10 @@ $\succ$ is well-founded.
   \succ_{\tau[\subst{\alpha}{\nat}]} \tapp{t_3}{\nat}
   \succ_{\tau[\subst{\alpha}{\nat}]} \ldots$, which is impossible by
   the inductive hypothesis.
+
+\CK{Note that the example above does not work if $\alpha$ has a
+different kind than *; it will require the construction of a type
+constructor of arbitrary given kind.}
 \end{proof}
 
 \begin{lemma}
@@ -1358,6 +1371,9 @@ Both $\succ$ and $\succeq$ are transitive.
   $\tapp{t_1}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}$
   by the coinductive hypothesis. Thus
   $t_1\succeq_{\forall\alpha[\sigma]} t_3$.\qed
+
+\CK{Correction: not closed type, but whatever the requirement ends up
+becoming.}
 \end{proof}
 
 And that $\succeq$ is a quasi-ordering:
@@ -1374,28 +1390,12 @@ Finally, they must be compatible:
 
 \begin{lemma}\label{lem:compatibility}
 We have $\succ \cdot \succeq\ \subseteq\ \succ$
+\CKchange{and $\succeq \cdot \succ\ \subseteq\ \succ$}.
 \end{lemma}
 
 \begin{proof}
 By coinduction, analogous to the transitivity proof.\qed
 \end{proof}
-
-\CK{Do we also have $\succeq \cdot \succ\ \subseteq\ \succ$? I'd like
-to use that.\medskip} \LC{Yes, with an analogous proof.}
-
-\CK{I think that's all that absolutely \emph{has} to be proven to make
-  the argument work. However, to work with these things we will need a
-  little more\dots}
-
-No longer needed: In the following, we extend $\succ$ and $\succeq$ to
-non-final interpretation terms, by defining $s \succ t$ (resp. $s
-\succeq t$) if $s\downarrow \succ t\da$ (resp. $s\downarrow \succeq
-t\downarrow$).  \CK{Note that for this we do need to prove that
-  $\leadsto$ has unique normal forms, but if we don't define this,
-  then the following lemma is meaningless, I think.}  \LC{This already
-  beaks down without unique normal forms with the definition
-  for~$\World$, so I changed the definition to make it work
-  for~$\Iterms$ from the start.}
 
 \begin{lemma}\label{lem:plusparts}
 For all \emph{closed} interpretation types $\sigma$, interpretation
@@ -1427,11 +1427,16 @@ If $n \geq m$ then $\lift_\sigma(n) \succeq \lift_\sigma(m)$ for all
 TODO
 \end{proof}
 
+\CK{Pondering: do we also have that $\lift_\sigma(n+m) = \oplus_\sigma
+(\lift_\sigma n)\ (\lift_\sigma n)$? Could be useful. (But let's first
+see whether it's needed for anything.)}
+
 \begin{lemma}\label{lem:plustimesmonotonic}
 If $s,t,u$ are terms of a \emph{closed} type $\sigma$ and $s \succeq
 t$, then $s \oplus_\sigma u \succeq t \oplus_\sigma u$ and $s
 \otimes_\sigma u \succeq t \otimes_\sigma u$.  Moreover, if even $s
-\succ t$ then we have $s \oplus_\sigma u \succ t$, and if $u \succeq
+\succ t$ then we have $s \oplus_\sigma u \succ t \CKchange{\oplus_\sigma
+u}$, and if $u \succeq
 \lift_\sigma(1)$ then also $s \otimes_\sigma u \succ t \otimes_\sigma
 u$.
 \end{lemma}
@@ -1457,14 +1462,18 @@ interpretation terms $s,t,u$ of type $\sigma$, we have:
   (\otimes_\sigma t u) \approx \otimes_\sigma(\otimes_\sigma s t) u$;
 \item\label{lem:approx:distribution} $\otimes_\sigma s (\oplus t u)
   \approx \oplus_\sigma(\otimes_\sigma s t) (\otimes_\sigma s u)$;
-\item\label{lem:approx:neutral} $\oplus_\sigma(\lift_\sigma(0)) s
-  \approx s$ and $\otimes_\sigma(\lift_\sigma(1)) s \approx s$.
+\item\label{lem:approx:neutral} $\oplus_\sigma(\CKchange{\lift_\sigma 0}) s
+  \approx s$ and $\otimes_\sigma(\CKchange{\lift_\sigma 1})) s \approx s$.
 \end{enumerate}
 \end{lemma}
 
 \begin{proof}
 TODO
 \end{proof}
+
+\CK{I think another useful property we could think about adding here is
+that $\succ$ and $\succeq$ are preserved under $\leadsto$ -- so, say,
+$s\ R\ t$ if and only if $s\downarrow\ R\ t\downarrow$.  (Is that true?)}
 
 \section{Systems of interest and their properties}\label{sec:systems}
 
