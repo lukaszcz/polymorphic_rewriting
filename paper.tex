@@ -55,6 +55,7 @@
 \newcommand{\FTV}{\mathrm{FTV}}
 \newcommand{\FV}{\mathrm{FV}}
 \newcommand{\Tc}{\mathcal{T}}
+\newcommand{\Vc}{\mathcal{V}}
 
 \newcommand{\nat}{\mathtt{nat}}
 \newcommand{\proj}{\pi}
@@ -403,10 +404,34 @@ application, \ldots) are invariant under~$\equiv$, we may denote
 interpretation terms by their (canonical) representatives and
 informally treat them interchangeably.
 
+\begin{definition}\label{def_chi_kappa}\normalfont
+  By induction on the kind~$\kappa$ we define a closed type
+  constructor~$\chi_\kappa$. For $\kappa=*$ we take $\chi_\kappa =
+  \nat$. For $\kappa=\kappa_1\arrkind\kappa_2$ we take $\chi_\kappa =
+  \lambda \alpha:\kappa_1 . \chi_{\kappa_2}$.
+\end{definition}
+
+\begin{lemma}[Substitution lemma]
+  \begin{enumerate}
+  \item If $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$ and
+    $\Gamma \proves t : \sigma$ then
+    $\Gamma \proves s[\subst{x}{t}] : \tau$.
+  \item If $\Gamma \proves t : \sigma$ and~$\tau$ is a type
+    constructor of the same kind as the variable~$\alpha$ then
+    $\Gamma[\subst{\alpha}{\tau}] \proves t[\subst{\alpha}{\tau}] :
+    \sigma[\subst{\alpha}{\tau}]$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  Induction on the typing derivation.
+\end{proof}
+
 \begin{lemma}[Generation lemma]
-  Assume $\Gamma \proves t : \sigma$. Then there is a type~$\sigma'$
-  such that $\sigma' =_\beta \sigma$ and $\FV(\sigma') \subseteq
-  \FV(\sigma)$ and one of the following holds.
+  Assume $\Gamma \proves t : \sigma$ and let
+  $\Vc = \FV(\sigma) \cup \FTV(t) \cup \FTV(\Gamma)$. Then there is a
+  type~$\sigma'$ such that $\sigma' =_\beta \sigma$ and
+  $\FV(\sigma') \subseteq \Vc$ and one of the following holds.
   \begin{itemize}
   \item $t$ is a natural number and $\sigma' = \nat$.
   \item $t \equiv x$ is a variable and $(x : \tau) \in \Gamma$ and $\tau
@@ -419,46 +444,27 @@ informally treat them interchangeably.
   \item $t \equiv \abs{x:\tau_1}{s}$ and
     $\sigma'=\tau_1\arrtype\tau_2$ and $\Gamma \uplus \{ x : \tau_1 \}
     \vdash s : \tau_2$.
-  \item $t \equiv \tabs{\alpha}{s}$ and $\sigma' =
-    \quant{\alpha}{\tau}$ and $\Gamma \vdash s : \tau$ and for all $(x
-    : \rho) \in \Gamma$: $\alpha \notin \FV(\rho)$.
-  \item $t \equiv \app{t_1}{t_2}$ and $\Gamma \vdash t_1 :
-    \tau \arrtype \sigma'$ and $\Gamma \vdash t_2 : \tau$.
-  \item $t \equiv \tapp{s}{\tau}$ and $\sigma' =
-    \rho[\subst{\alpha}{\tau}]$ and $\Gamma \vdash s :
-    \quant{(\alpha:\kappa)}{\rho}$ and~$\tau$ is a type constructor of
-    kind~$\kappa$.
-    \CK{I don't think that this will always give you a $\beta$-normal
-    type, depending on what $\tau$ is. The lemma does not \emph{state}
-    that $\sigma'$ is in $\beta$-normal form, but this is suggested by
-    the surrounding text.}
-    \LC{Yes, you're right this case doesn't work, but I didn't have
-      normalizing in mind -- just taking a common reduct. The
-      point is that now before applying a rule you can do
-      beta-conversion on the type and you want to ensure that you can
-      in fact choose a type in the rule so that no ``stupid'' new
-      variables appear, e.g., by an expansion like $(\lambda \alpha
-      . \tau) \alpha \to \tau$ where
-      $\alpha \notin \FV(\tau)$. That's a pesky technicality, but I think this can be made
-      to work here anyway -- I'll look into this later. In fact, it
-      suffices here if $\FV(\sigma') \subseteq \FV(\sigma) \cup \FTV(t)$}
+  \item $t \equiv \tabs{\alpha}{s}$ and
+    $\sigma' = \quant{\alpha}{\tau}$ and $\Gamma \vdash s : \tau$ and
+    for all $(x : \rho) \in \Gamma$: $\alpha \notin \FV(\rho)$.
+  \item $t \equiv \app{t_1}{t_2}$ and
+    $\Gamma \vdash t_1 : \tau \arrtype \sigma'$ and
+    $\Gamma \vdash t_2 : \tau$ and $\FV(\tau) \subseteq \Vc$.
+  \item $t \equiv \tapp{s}{\tau}$ and
+    $\sigma' = \rho[\subst{\alpha}{\tau}]$ and
+    $\Gamma \vdash s : \quant{(\alpha:\kappa)}{\rho}$ and~$\tau$ is a
+    type constructor of kind~$\kappa$.
   \end{itemize}
 \end{lemma}
 
 \begin{proof}
   By induction on the derivation $\Gamma \proves t : \sigma$, using
-  confluence of $\beta$-reduction in types and the stability of the
-  typing relation under $\beta$-reduction in types (note that if
-  $\sigma \to^*_\beta \sigma'$ then $\FV(\sigma') \subseteq
-  \FV(\sigma)$).
+  the substitution lemma. Note that if $\alpha \notin \Vc$ is of
+  kind~$\kappa$ and e.g.~$\Gamma \proves s : \sigma'$ with~$s$ a
+  subterm of~$t$, then
+  $\Gamma \proves s : \sigma'[\subst{\alpha}{\chi_\kappa}]$ by the
+  substitution lemma (see Definition~\ref{def_chi_kappa}).
 \end{proof}
-
-\begin{definition}\label{def_chi_kappa}\normalfont
-  By induction on the kind~$\kappa$ we define a closed type
-  constructor~$\chi_\kappa$. For $\kappa=*$ we take $\chi_\kappa =
-  \nat$. For $\kappa=\kappa_1\arrkind\kappa_2$ we take $\chi_\kappa =
-  \lambda \alpha:\kappa_1 . \chi_{\kappa_2}$.
-\end{definition}
 
 \subsubsection{Normalising interpretation terms}
 To define the world of \emph{final interpretation terms}, we will
@@ -538,7 +544,7 @@ depending on typing.
 
 \begin{proof}
   By induction on the definition of $t \leadsto t'$, using the
-  generation lemma.
+  generation and substitution lemmas.
 \end{proof}
 
 By~$\SN$ we denote the set of all terminating interpretation
@@ -827,6 +833,9 @@ write~$\val{\varphi}{}{}$.
 
 \CK{I still see $\flatten_\sigma(s)$ and $\lift_\sigma(s)$ used in
 this proof. Has it been fully updated to the new definitions?}
+
+\LC{??? I don't understand what you're talking about here. We need
+  $\flatten$ and $\lift$ -- they are in our interpretation terms?}
 
 \begin{proof}
   By induction on the structure of~$\sigma$ we show that
