@@ -230,6 +230,10 @@ Isomorphism'', Section~11.7.
       have this kind of substitution? We can substitute a type
       constructor variable~$\alpha$ of kind~$\kappa$ with a type
       constructor of kind~$\kappa$. Maybe this should be defined explicitly.}
+    \CK{Ah, I think I wrote this early and then later saw the usage as
+      I saw that substitution was also extended (I think I wrote this
+      in an earlier version, before you removed the definition of type
+      substitution). You can disregard.}
   \item If $\tau_1,\tau_2$ are types, then $\tau_1 \arrtype \tau_2$ is
     a type.
   \end{itemize}
@@ -252,12 +256,13 @@ Isomorphism'', Section~11.7.
 
   \CK{Are both just alternative ways to denote $\forall \alpha[\tau]$,
   or are there differences?}
-
   \LC{Just a different notation -- I use all of them when
     convenient, especially during the SN proof where sometimes you
     need to know what kind $\alpha$ has and sometimes it's irrelevant
     and too cumbersome to write each time. Maybe we should cut down on
   alternative notations to two (with and without $\kappa$)?}
+  \CK{I don't think it matters much, but if we have just two it would
+    be easy to use a macro.}
 
   Beta-reduction on type constructors is defined as the compatible
   closure of the rule
@@ -296,6 +301,11 @@ what is discussed afterwards: what is an interpretation type?}
 \LC{interpretation type = type, i.e., a type in our system we use to
   define $\World$. This terminology is left over from the previous
   version -- should we change this somehow?}
+
+\CK{Well, if we do the restructuring thing, then I would guess this
+  is very easily done: we first introduce the general framework, and
+  then introduce \emph{interpretation} types as this specific instance
+  of the general framework.}
 
 \begin{definition}\label{def_typing}\normalfont
 We assume given an infinite set $\Vars$ of variables, and let $\Gamma$
@@ -1412,8 +1422,8 @@ Both $\succ$ and $\succeq$ are transitive.
   by the coinductive hypothesis. Thus
   $t_1\succeq_{\forall\alpha[\sigma]} t_3$.\qed
 
-\CK{Correction: not closed type, but whatever the requirement ends up
-becoming.}
+\CK{Correction: not closed type, but whatever the requirement in
+Definition \ref{def:succ} ends up becoming.}
 \end{proof}
 
 And that $\succeq$ is a quasi-ordering:
