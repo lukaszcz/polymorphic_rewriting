@@ -65,7 +65,7 @@
 \newcommand{\afun}{\mathtt{f}}
 
 \newcommand{\ur}{\upharpoonright}
-\newcommand{\da}{\downarrow}
+\newcommand{\da}{\mathord{\downarrow}}
 \newcommand{\SN}{\mathrm{SN}}
 \newcommand{\Cb}{\mathbb{C}}
 \newcommand{\Nbb}{\mathbb{N}}
@@ -1255,9 +1255,11 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
   $\omega^*(t) : \omega(\sigma)$.
 
   By the generation lemma for $t : \sigma$ there is a type~$\sigma'$
-  such that $\sigma' =_\beta \sigma$ and $\FV(\sigma') \subseteq
-  \FV(\sigma)$ (so~$\sigma'$ is closed for~$\omega$) and one of the
-  cases below holds. By Lemma~\ref{lem_beta_val} it suffices to show
+  such that $\sigma' =_\beta \sigma$ and
+  $\FV(\sigma') \subseteq \FV(\sigma) \cup \FTV(t)$ and one of the
+  cases below holds. Note that~$\omega$ is closed for~$\sigma'$
+  because it is closed for~$\sigma$ and $\FTV(\omega(t)) =
+  \emptyset$. By Lemma~\ref{lem_beta_val} it suffices to show
   $\omega^*(t) \in \val{\sigma'}{\xi}{\omega}$.
   \begin{itemize}
   \item If $t = x_1^{\tau_1}$ and $\tau_1 =_\beta \sigma'$ then
@@ -1270,9 +1272,10 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
   \item If $t$ is a function symbol then the claim follows from
     Lemma~\ref{lem_circ}, Lemma~\ref{lem_lift} or
     Lemma~\ref{lem_flatten}.
-  \item If $t = \abs{x:\sigma_1}{s}$ then $\sigma' =
-    \sigma_1\arrtype\sigma_2$ and $s : \sigma_2$. Let $u \in
-    \val{\sigma_1}{\xi}{\omega}$. By the inductive hypothesis
+  \item If $t = \abs{x:\sigma_1}{s}$ then
+    $\sigma' = \sigma_1\arrtype\sigma_2$ and $s : \sigma_2$. Hence
+    $\omega$ is closed for~$\sigma_2$. Let
+    $u \in \val{\sigma_1}{\xi}{\omega}$. By the inductive hypothesis
     $\omega^*(s)[\subst{x}{u}] \in \val{\sigma_2}{\xi}{\omega}$. Hence
     $\omega^*(t) \in \val{\sigma'}{\xi}{\omega}$ by
     Lemma~\ref{lem_abstraction_computable}.
@@ -1287,12 +1290,15 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
     $\alpha$ chosen fresh such that $\omega(\alpha) = \alpha$). Hence
     $\omega^*(t) \in \val{\tau}{\xi}{\omega}$ by
     Lemma~\ref{lem_abstraction_computable}.
-  \item If $t = t_1 t_2$ then $t_1 : \tau\arrtype\sigma'$ and $t_2 :
-    \tau$. By the inductive hypothesis $\omega^*(t_1) \in
-    \val{\tau\arrtype\sigma'}{\xi}{\omega}$ and $\omega^*(t_2) \in
-    \val{\tau}{\xi}{\omega}$. We have $\omega^*(t_2) :
-    \omega(\tau)$. Then by definition $\omega^*(t) =
-    (\omega^*(t_1))(\omega^*(t_2)) \in \val{\sigma'}{\xi}{\omega}$.
+  \item If $t = t_1 t_2$ then $t_1 : \tau\arrtype\sigma'$ and
+    $t_2 : \tau$ and $\FV(\tau) \subseteq \FV(\sigma) \cup
+    \FTV(t)$. Hence~$\omega$ is closed for~$\tau$ and
+    for~$\tau\arrtype\sigma'$. By the inductive hypothesis
+    $\omega^*(t_1) \in \val{\tau\arrtype\sigma'}{\xi}{\omega}$ and
+    $\omega^*(t_2) \in \val{\tau}{\xi}{\omega}$. We have
+    $\omega^*(t_2) : \omega(\tau)$. Then by definition
+    $\omega^*(t) = (\omega^*(t_1))(\omega^*(t_2)) \in
+    \val{\sigma'}{\xi}{\omega}$.
   \item If $t = s \psi$ then $s : \forall\alpha[\tau]$ and $\sigma' =
     \tau[\subst{\alpha}{\psi}]$. By the inductive hypothesis
     $\omega^*(s) \in \val{\forall\alpha[\tau]}{\xi}{\omega}$. Because
@@ -1311,13 +1317,14 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
   For closed terms~$t$ and closed types~$\sigma$ this follows from
   Lemma~\ref{lem_typable_computable}, Lemma~\ref{lem_val_computable}
   and property~1 of candidates (Definition~\ref{def_candidate}). For
-  arbitrary terms and types, this follows by closing them with an
-  appropriate number of abstractions.\qed
+  arbitrary terms and types, this follows by closing the terms with an
+  appropriate number of abstractions, and the types with corresponding
+  $\forall$-quantifiers.\qed
 \end{proof}
 
 \begin{lemma}\label{lem_unique_final}
   Every term $s \in \Iterms$ reduces to a unique final interpretation
-  term $s\downarrow$.
+  term $s\da$.
 \end{lemma}
 
 \begin{proof}
@@ -1342,7 +1349,7 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
   because then $t$ would contain a redex. So $\sigma=\nat$. Then
   $t_1,t_2$ are final interpretation terms of type~$\nat$, hence
   natural numbers by the inductive hypothesis. But then $t$ contains a
-  redex. Contradiction.  \qed
+  redex. Contradiction.\qed
 \end{proof}
 
 \subsection{Defining $\succ$ and $\succeq$}
@@ -1362,8 +1369,9 @@ $s,t$, following Definition~\ref{def:succ}.
         numbers}}\quad\quad
     \infer={s\ R_{\sigma\arrtype\tau}\ t}{\app{s}{q}\ R_{\tau}\ \app{t}{q}
       \text{ for every } q \in \World_\sigma} \\ \\
-    \infer={s\ R_{\forall\alpha[\sigma]}\ t}{\tapp{s}{\tau}\ R_{\sigma[\subst{\alpha}{\tau}]}\ \tapp{t}{\tau}
-      \text{ for every closed type } \tau}
+    \infer={s\ R_{\forall(\alpha:\kappa)[\sigma]}\ t}{\tapp{s}{\tau}\ R_{\sigma[\subst{\alpha}{\tau}]}\ \tapp{t}{\tau}
+      \text{ for every closed type constructor } \tau \text{ of kind }
+      \kappa}
     \end{array}
   \]
 \end{definition}
@@ -1371,13 +1379,17 @@ $s,t$, following Definition~\ref{def:succ}.
 Note that in the case for~$\nat$ the terms~$s\da$, $t\da$ are natural
 numbers by Lemma~\ref{lem_final_nat}.
 
-\LC{This definition was incorrect before, because e.g.~$\app{s}{q}$
-  need not be in normal form. I think it's best just to define it from
-  the start for all terms in~$\Iterms$.}
-\CK{Agreed; it also makes it easier to apply, since I think we will
-  often want to compare non-normalised terms. However, the last
-  one still needs rephrasing: $\tau$ should be a type constructor of
-  the same kind as $\alpha$, not a type.}
+Intuitively, the above definition means that e.g. $s \succ t$ iff
+there exists a possibly infinite derivation tree using the above
+rules. In such a derivation tree all leaves must witness
+$s\da >_\nat t\da$ in natural numbers. However, this also allows for
+infinite branches, which solves the problem of repeating types due to
+impredicative polymorphism. If e.g.
+$s \succ_{\forall \alpha . \alpha} t$ then one of the premises will be
+$\tapp{s}{\forall\alpha.\alpha} \succ_{\forall \alpha . \alpha}
+\tapp{t}{\forall\alpha.\alpha}$, which forces an infinite branch in
+the derivation tree. According to our definition any infinite branch
+may essentially be ignored.
 
 \subsection{Properties of $\succ$ and $\succeq$}
 
@@ -1390,18 +1402,16 @@ $\succ$ is well-founded.
 
 \begin{proof}
   By induction on the size of the type~$\tau$ one shows that there
-  does not exist an infinite sequence $t_1 \succ_\tau t_2 \succ_\tau
-  t_3 \succ_\tau \ldots$ For instance, if $t_1
-  \succ_{\forall\alpha[\tau]} t_2 \succ_{\forall\alpha[\tau]} t_3
-  \succ_{\forall\alpha[\tau]} \ldots$ then $\tapp{t_1}{\nat}
-  \succ_{\tau[\subst{\alpha}{\nat}]} \tapp{t_2}{\nat}
-  \succ_{\tau[\subst{\alpha}{\nat}]} \tapp{t_3}{\nat}
-  \succ_{\tau[\subst{\alpha}{\nat}]} \ldots$, which is impossible by
-  the inductive hypothesis.
-
-\CK{Note that the example above does not work if $\alpha$ has a
-different kind than *; it will require the construction of a type
-constructor of arbitrary given kind.}
+  does not exist an infinite sequence
+  $t_1 \succ_\tau t_2 \succ_\tau t_3 \succ_\tau \ldots$ For instance,
+  if $\alpha$ has kind~$\kappa$ and
+  $t_1 \succ_{\forall\alpha[\tau]} t_2 \succ_{\forall\alpha[\tau]} t_3
+  \succ_{\forall\alpha[\tau]} \ldots$ then
+  $\tapp{t_1}{\chi_\kappa} \succ_{\tau[\subst{\alpha}{\chi_\kappa}]}
+  \tapp{t_2}{\chi_\kappa} \succ_{\tau[\subst{\alpha}{\chi_\kappa}]}
+  \tapp{t_3}{\chi_\kappa} \succ_{\tau[\subst{\alpha}{\chi_\kappa}]}
+  \ldots$, which is impossible by the inductive hypothesis (see
+  Definition~\ref{def_chi_kappa} for the definition of~$\chi_\kappa$).
 \end{proof}
 
 \begin{lemma}
@@ -1426,13 +1436,10 @@ Both $\succ$ and $\succeq$ are transitive.
   \succeq_{\forall\alpha[\sigma]}t_2\succeq_{\forall\alpha[\sigma]}t_3$
   then
   $\tapp{t_1}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_2}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}$
-  for any closed type~$\tau$. Hence
+  for any closed type constructor~$\tau$ of the appropriate kind. Hence
   $\tapp{t_1}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}$
   by the coinductive hypothesis. Thus
   $t_1\succeq_{\forall\alpha[\sigma]} t_3$.\qed
-
-\CK{Correction: not closed type, but whatever the requirement in
-Definition \ref{def:succ} ends up becoming.}
 \end{proof}
 
 And that $\succeq$ is a quasi-ordering:
@@ -1456,14 +1463,21 @@ We have $\succ \cdot \succeq\ \subseteq\ \succ$
 By coinduction, analogous to the transitivity proof.\qed
 \end{proof}
 
+For easier presentation, we will denote $\oplus$ and $\otimes$ in
+\emph{infix, left-associative} notation, and omit the type denotation
+where it is clear from context.  Thus, $s \oplus t \oplus u$ should be
+read as $\oplus_\sigma\,s\,(\oplus_\sigma\,t\,u)$ if $s$ has type
+$\sigma$. Similarly, we will sometimes omit the type denotation from
+$\flatten$ and $\lift$ when it can easily be derived from context.
+
 \begin{lemma}\label{lem:plusparts}
 For all \emph{closed} interpretation types $\sigma$, interpretation
 terms $s,t$ of type $\sigma$ and $n > 0$ we have:
 \begin{enumerate}
-\item $\oplus_{\sigma} s t \succeq s$ and
-      $\oplus_{\sigma} s t \succeq t$;
-\item $\oplus_{\sigma} s (\lift_{\sigma}(n)) \succ s$ and
-      $\oplus_{\sigma} (\lift_{\sigma}(n)) t \succ t$.
+\item $s \oplus_{\sigma} t \succeq s$ and
+      $s \oplus_{\sigma} t \succeq t$;
+\item $s \oplus_{\sigma} \lift_{\sigma}(n) \succ s$ and
+      $\lift_{\sigma}(n) \oplus_{\sigma}  t \succ t$.
 \end{enumerate}
 \end{lemma}
 
@@ -1486,9 +1500,13 @@ If $n \geq m$ then $\lift_\sigma(n) \succeq \lift_\sigma(m)$ for all
 TODO
 \end{proof}
 
-\CK{Pondering: do we also have that $\lift_\sigma(n+m) = \oplus_\sigma
-(\lift_\sigma n)\ (\lift_\sigma n)$? Could be useful. (But let's first
-see whether it's needed for anything.)}
+\CK{Pondering: do we also have that
+  $\lift_\sigma(n+m) = (\lift_\sigma n) \oplus_\sigma (\lift_\sigma
+  n)$? Could be useful. (But let's first see whether it's needed for
+  anything.)}
+
+\LC{If $=$ here is the reflexive-symmetric-transitive closure
+  of~$\leadsto$ then yes, this follows by induction on~$\sigma$.}
 
 \begin{lemma}\label{lem:plustimesmonotonic}
 If $s,t,u$ are terms of a \emph{closed} type $\sigma$ and $s \succeq
@@ -1514,15 +1532,15 @@ For all \emph{closed} interpretation types $\sigma$ and all
 interpretation terms $s,t,u$ of type $\sigma$, we have:
 \begin{enumerate}
 \item\label{lem:approx:symmetry}
-  $\oplus_\sigma s t \approx \oplus_\sigma t s$ and
-  $\otimes_\sigma s t \approx \otimes_\sigma t s$;
-\item\label{lem:approx:assoc} $\oplus_\sigma s (\oplus_\sigma t u)
-  \approx \oplus_\sigma(\oplus_\sigma s t) u$ and $\otimes_\sigma s
-  (\otimes_\sigma t u) \approx \otimes_\sigma(\otimes_\sigma s t) u$;
-\item\label{lem:approx:distribution} $\otimes_\sigma s (\oplus t u)
-  \approx \oplus_\sigma(\otimes_\sigma s t) (\otimes_\sigma s u)$;
-\item\label{lem:approx:neutral} $\oplus_\sigma(\CKchange{\lift_\sigma 0}) s
-  \approx s$ and $\otimes_\sigma(\CKchange{\lift_\sigma 1})) s \approx s$.
+  $s \oplus_\sigma t \approx t \oplus_\sigma s$ and
+  $s \otimes_\sigma t \approx t \otimes_\sigma s$;
+\item\label{lem:approx:assoc} $s \oplus_\sigma (t \oplus_\sigma u)
+  \approx (s \oplus_\sigma t) \oplus_\sigma u$ and $s
+  \otimes_\sigma (t \otimes_\sigma u) \approx (s \otimes_\sigma t) \otimes_\sigma u$;
+\item\label{lem:approx:distribution} $s \otimes_\sigma (t \oplus_\sigma u)
+  \approx (s \otimes_\sigma t) \oplus_\sigma (s \otimes_\sigma u)$;
+\item\label{lem:approx:neutral} $(\CKchange{\lift_\sigma 0}) \oplus_\sigma s
+  \approx s$ and $(\CKchange{\lift_\sigma 1})) \otimes_\sigma s \approx s$.
 \end{enumerate}
 \end{lemma}
 
@@ -1530,9 +1548,40 @@ interpretation terms $s,t,u$ of type $\sigma$, we have:
 TODO
 \end{proof}
 
-\CK{I think another useful property we could think about adding here is
-that $\succ$ and $\succeq$ are preserved under $\leadsto$ -- so, say,
-$s\ R\ t$ if and only if $s\downarrow\ R\ t\downarrow$.  (Is that true?)}
+\begin{lemma}
+  Assume $t \succ s$ (resp.~$t \succeq s$).
+  \begin{enumerate}
+  \item If $t \leadsto t'$ or $t' \leadsto t$ then $t' \succ s$ (resp.~$t' \succeq s$).
+  \item If $s \leadsto s'$ or $s' \leadsto s$ then $t \succ s'$
+    (resp.~$t \succeq s'$).
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  We show the first point assuming $t \leadsto t'$, other cases being
+  analogous. We proceed by coinduction. If $t \succ_\nat s$ then
+  $t\da = t'\da$ and the claim holds.
+
+  If $t \succ_{\sigma\arrtype\tau} s$ then for every
+  $q \in \World_\sigma$ we have $\app{t}{q} \succ_\tau \app{s}{q}$. We
+  have $\app{t}{q} \leadsto \app{t'}{q}$. Hence
+  $\app{t'}{q} \succ_\tau \app{s}{q}$ by the coinductive
+  hypothesis. Thus $t' \succ_{\sigma\arrtype\tau} s$.
+
+  If $t \succ_{\forall(\alpha:\kappa)\sigma} s$ then for every closed
+  type constructor~$\tau$ of kind~$\kappa$ we have
+  $\tapp{t}{\tau} \succ_{\sigma[\subst{\alpha}{\tau}]}
+  \tapp{s}{\tau}$. We have $\tapp{t}{\tau} \leadsto
+  \tapp{t'}{\tau}$. Hence
+  $\tapp{t'}{\tau} \succ_{\sigma[\subst{\alpha}{\tau}]}
+  \tapp{s}{\tau}$ by the coinductive hypothesis. Thus
+  $t' \succ_{\forall(\alpha:\kappa)\sigma} s$.
+\end{proof}
+
+\begin{corollary}
+  For $R \in \{\succ,\succeq\}$: $s\ R\ t$ if and only if
+  $s\downarrow\ R\ t\downarrow$
+\end{corollary}
 
 \section{Systems of interest and their properties}\label{sec:systems}
 
@@ -1987,13 +2036,6 @@ TODO
 \subsection{Other}
 
 \section{Some systems of interest -- urzy\_emb?}
-
-For easier presentation, we will denote $\oplus$ and $\otimes$ in
-\emph{infix, left-associative} notation, and omit the type denotation
-where it is clear from context.  Thus, $s \oplus t \oplus u$ should be
-read as $\oplus_\sigma\,s\,(\oplus_\sigma\,t\,u)$ if $s$ has type
-$\sigma$. Similarly, we will sometimes omit the type denotation from
-$\flatten$ and $\lift$ when it can easily be derived from context.
 
 \subsection{Interpretations}
 
