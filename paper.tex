@@ -12,10 +12,9 @@
 \usepackage{xspace}
 \usepackage{booktabs}
 \usepackage{mathtools}
-\usepackage{enumitem}
 \usepackage{stmaryrd}
 \usepackage{microtype}
-\usepackage{bussproofs}
+\usepackage{enumitem}
 \usepackage{multirow}
 \usepackage{proof}
 \usepackage[T1]{fontenc}
@@ -80,9 +79,7 @@
 
 \mainmatter
 
-\title{TODO list
-  \thanks{The authors are supported by lots of people.}}
-\subtitle{What we need to do to get where we want to be}
+\title{Polymorphic Higher-Order Termination}
 
 \author{{\L}ukasz Czajka and Cynthia Kop}
 \authorrunning{{\L}. Czajka and C. Kop}
@@ -99,106 +96,20 @@ Institute of Computer Science, Radboud University Nijmegen (RU)
 \maketitle
 
 \begin{abstract}
-The introduction of this paper is a TODO list.
-The remainder is meant for filling in the TODOs with what we already have.
-The hope is that the end result is something useful. :)
 \end{abstract}
 
-\CK{I wonder whether this structure of a TODO list is still relevant;
-it was useful when setting out to know what we wanted to do, but I
-think we have a pretty good grasp on that and it would be better to go
-for a proper structure now.}
+\section{Introduction}
 
-\section*{THE LIST}
+\section{Preliminaries}
 
-\renewcommand{\theenumii}{\arabic{enumi}.\arabic{enumii}}
+In this section we introduce the System~$F_\omega$ (see e.g.,
+Sorensen, Urzyczyn, ``Lectures on the Curry-Howard Isomorphism'',
+Section~11.7.), which will form a basis both of our interpretations
+and of a general syntax for the investigated systems.
 
-Here's what we need to do:
-\begin{enumerate}
-\item Define a world $\World$ and a well-founded ordering $\succ$ on
-  $\World$:
-  \begin{enumerate}
-  \item Define a set of terms $\World$ typed under some variation of
-    System F-$\omega$.
-  \item Define relations $\succ$ and $\succeq$ on the elements of $\World$.
-  \item Prove that $\succ$ is a well-founded ordering relation and that
-    $\succeq$ is a compatible quasi-ordering.
-  \end{enumerate}
-\item Specify what systems we are interested in analysing, and prove
-  standard results which will make their analysis doable.
-  \begin{enumerate}
-  \item Specify a form of system which includes all the systems of interest.
-  \item Specify a default way of interpreting terms in these systems.
-  \item Prove that in all such systems, using our way of interpreting
-    terms: if $\interpret{\ell} \succ \interpret{r}$ (resp.\ $\interpret{
-    \ell} \succeq \interpret{r}$) for a rule  $\ell \to r$, then
-    $\interpret{s} \succ \interpret{t}$ whenever $s \arr{\Rules} t$ by
-    this rule (resp.\ $\interpret{s} \succeq \interpret{t}$).
-  \end{enumerate}
-\item Obtain useful lemmas regarding these defaults.
-  \begin{enumerate}
-  \item $\interpret{s[x:=t]} = \interpret{s}[x:=\interpret{t}]$.
-  \item $\interpret{s\sigma} = \interpret{s}\sigma$.
-  \item \dots?
-  \end{enumerate}
-\item For some system of interest, prove its termination:
-  \begin{enumerate}
-  \item Present the system and give interpretations (following the
-    default scheme) for all ways of constructing terms.
-  \item Show that $\ell \succ r$ or $\ell \succeq r$ for all rules.
-    Remove the rules which are oriented using $\succ$ and repeat,
-    until all rules have been removed.
-  \end{enumerate}
-\end{enumerate}
+First, we define the set of types.
 
-\renewcommand{\theenumii}{\alph{enumii}}
-
-We use \emph{rule removal}:
-
-\begin{theorem}\label{thm:ruleremove}
-Let $\Rules = \Rules_1 \cup \Rules_2$, and suppose that $\arr{\Rules_1}\:
-\subseteq\:\succ$ and $\arr{\Rules_2}\:\subseteq\:\succeq$ for a
-well-founded ordering $\succ$ and a compatible quasi-ordering $\succeq$.
-Then $\arr{\Rules}$ is terminating if and only if $\arr{\Rules_2}$ is
-(which is certainly the case if $\Rules_2 = \emptyset$).
-\end{theorem}
-
-\begin{proof}
-By well-foundedness of $\succ$, every infinite decreasing $\arr{\Rules}$
-sequence can only use finitely many steps using $\arr{\Rules_1}$.
-\qed
-\end{proof}
-
-This gives rise to the following algorithm:
-\begin{enumerate}
-\item While $\Rules$ is non-empty:
-  \begin{enumerate}
-  \item Orient all rules in $\Rules$ using $\succeq$ or $\succ$; at least
-    one of them must be oriented using $\succ$.
-  \item Remove all rules ordered by $\succ$ from $\Rules$.
-  \end{enumerate}
-\end{enumerate}
-If this algorithm succeeds, we have proven termination.
-
-\section{Defining a world}
-
-\subsection{Defining the set $\World$}\label{sec_world}
-
-\subsubsection{Interpretation terms}
-We define the set of types for interpretation terms.
-
-\CK{For an example of the previous comment: the following is not too
-relevant for the set of interpretation terms. Structurally, I could
-imagine that we want this as general preliminaries and then instantiate
-the notion to get our set $\World$.}
-
-\LC{Yes, I think it's a good idea.}
-
-Our system of interpretation terms is based on System~$F_\omega$, see
-e.g., Sorensen, Urzyczyn, ``Lectures on the Curry-Howard
-Isomorphism'', Section~11.7.
-
-\begin{definition}\label{def:itypes}\normalfont
+\begin{definition}\label{def_types}\normalfont
   \emph{Kinds} are defined inductively:
   \begin{itemize}
   \item $*$ is a kind,
@@ -209,10 +120,16 @@ Isomorphism'', Section~11.7.
   We assume infinitely many \emph{type constructor variables} of each
   kind. Variables of kind~$*$ are \emph{type variables}.
 
+  We assume a fixed set~$\Sigma_T$ of \emph{type constructor symbols}
+  paired with a kind, denoted $c : \kappa$. Every type constructor
+  symbol~$c$ occurs with only one kind declaration.
+
   We define \emph{type constructors} of kind~$\kappa$ by induction.
   Type constructors of kind~$*$ are called \emph{types}.
   \begin{itemize}
   \item A type constructor variable of kind~$\kappa$ is a type
+    constructor of kind~$\kappa$.
+  \item A type constructor symbol of kind~$\kappa$ is a type
     constructor of kind~$\kappa$.
   \item If $\varphi$ is a type constructor of kind $\kappa_1 \arrkind
     \kappa_2$ and $\psi$ is a type constructor of kind~$\kappa_1$ then
@@ -223,47 +140,20 @@ Isomorphism'', Section~11.7.
     \arrkind \kappa_2$.
   \item If $\alpha$ is a type constructor variable of kind~$\kappa$
     and~$\tau$ is a type, then $\forall \alpha[\tau]$ is a type.
-    \CK{With $\kappa$ arbitrary, and not limited to *? What are we
-      using that for? We do not have substitution of type constructor
-      variables that are not type variables.}
-    \LC{Yes, $\kappa$ arbitrary. See Section 2 for an example. I don't
-      understand the last sentence here. Why do you think we don't
-      have this kind of substitution? We can substitute a type
-      constructor variable~$\alpha$ of kind~$\kappa$ with a type
-      constructor of kind~$\kappa$. Maybe this should be defined explicitly.}
-    \CK{Ah, I think I wrote this early and then later saw the usage as
-      I saw that substitution was also extended (I think I wrote this
-      in an earlier version, before you removed the definition of type
-      substitution). You can disregard.}
   \item If $\tau_1,\tau_2$ are types, then $\tau_1 \arrtype \tau_2$ is
     a type.
   \end{itemize}
   The set of type constructors of kind~$\kappa$ is denoted
   by~$\Tc_\kappa$.
 
-  \CK{But then type constructors are entirely build from variables?
-  Should there not be a set of constants given as well? For the set
-  $\World$, I am particularly thinking of constants ``nat'' and
-  ``pair''; I can imagine that ``pair'' can be defined as an arrow
-  type, but what would ``nat'' be?}
-
-  \LC{Oh yes, you're right about the nat. The type constants are in the
-    syntax (Section 2), but I thought for a while you can avoid them
-    in the interpretation -- forgot about nat.}
-
   We use the notation $\forall \alpha . \tau$. When $\alpha$ is of
-  kind $\kappa$ then we use the notations $\forall \alpha : \kappa
-  . \tau$ and $\forall (\alpha : \kappa)[\tau]$.
+  kind $\kappa$ then we use the notations
+  $\forall \alpha : \kappa . \tau$ and
+  $\forall (\alpha : \kappa)[\tau]$. These are all just different
+  notations used for convenience.
 
-  \CK{Are both just alternative ways to denote $\forall \alpha[\tau]$,
-  or are there differences?}
-  \LC{Just a different notation -- I use all of them when
-    convenient, especially during the SN proof where sometimes you
-    need to know what kind $\alpha$ has and sometimes it's irrelevant
-    and too cumbersome to write each time. Maybe we should cut down on
-  alternative notations to two (with and without $\kappa$)?}
-  \CK{I don't think it matters much, but if we have just two it would
-    be easy to use a macro.}
+  We treat type constructors up to $\alpha$-conversion. Note
+  that~$\forall$ binds variables.
 
   Beta-reduction on type constructors is defined as the compatible
   closure of the rule
@@ -272,76 +162,53 @@ Isomorphism'', Section~11.7.
   \]
   Note that type constructors are essentially simply-typed
   lambda-terms, so beta-reduction on type constructors terminates and
-  is confluent, hence every type constructor~$\varphi$ has a unique
-  normal form.
-  \CK{Except that the $\forall \alpha[\tau]$ is a type constructor but
-  not really a simply-typed lambda-term, which does have some
-  consequences on what binding means, I think. What does
-  $(\lambda \alpha.\forall \alpha.\alpha)\tau$ reduce to?}
-
-  \LC{Well, true, you need to treat this modulo $\alpha$-equivalence
-    and rename implicitly. $(\lambda \alpha.\forall \alpha.\alpha)\tau
-    \to \forall \alpha.\alpha$. I don't think this has any
-    consequences on confluence or termination -- say we just have a
-    constant $\forall$ and $\forall \alpha . \tau$ is really $\forall
-    (\lambda \alpha . \tau)$}
+  is confluent, hence every type constructor has a unique normal form.
 
   We define $\FV(\varphi)$ -- the set of free type constructor
   variables of the type constructor~$\varphi$ -- in an obvious way by
   induction on the structure of~$\varphi$. A type
-  constructor~$\varphi$ is \emph{closed} if $\FV(\varphi) =
-  \emptyset$.
-  \CK{Obvious way: do both $\forall$ and $\lambda$ bind the variable,
-  or only one of them?}
-  \LC{Yes, $\forall$ binds variables, renaming is assumed. I did leave this implicit.}
+  constructor~$\varphi$ is \emph{closed} if
+  $\FV(\varphi) = \emptyset$.
 \end{definition}
 
-\CK{Here there is a disconnect between what was discussed before and
-what is discussed afterwards: what is an interpretation type?}
+Terms are built from a set of function symbols, using abstraction and
+application.
 
-\LC{interpretation type = type, i.e., a type in our system we use to
-  define $\World$. This terminology is left over from the previous
-  version -- should we change this somehow?}
+\begin{definition}\label{def_preterms}\normalfont
+  We assume given an infinite set $\Vars$ of variables, and let
+  $\Gamma$ refer to a mapping from a finite subset of $\Vars$ to the
+  set of types.
 
-\CK{Well, if we do the restructuring thing, then I would guess this
-  is very easily done: we first introduce the general framework, and
-  then introduce \emph{interpretation} types as this specific instance
-  of the general framework.}
+  We assume given a fixed set $\Sigma$ of \emph{function symbols},
+  each paired with a type, denoted $\mathtt{f} : \tau$.  Every
+  function symbol $\mathtt{f}$ occurs only with one type declaration.
 
-\begin{definition}\label{def_typing}\normalfont
-We assume given an infinite set $\Vars$ of variables, and let $\Gamma$
-refer to a mapping from a finite subset of $\Vars$ to the set of
-interpretation types. The set of interpretation preterms consists of
-all expressions $s$ such that $\Gamma \vdash s : \sigma$ can be
-inferred for some interpretation type $\sigma$ and mapping $\Gamma$ by
-the following clauses:
-\begin{itemize}
-\item $\Gamma \vdash n : \nat$ for every natural number $n$.
-\item $\Gamma \vdash x : \sigma$ for every $(x : \sigma) \in \Gamma$.
-\item $\Gamma \vdash \mathtt{f} : \sigma$ for all $(\mathtt{f} :
-  \sigma)$ in the following set: $\{ \oplus_\sigma : \sigma \arrtype
-  \sigma \arrtype \sigma,\ \otimes_\sigma : \sigma \arrtype \sigma
-  \arrtype \sigma,\ \flatten_{\sigma} : \sigma \arrtype
-  \nat,\ \lift_{\sigma} : \nat \arrtype \sigma \mid \sigma \in \ITypes
-  \}$.
-\item $\Gamma \vdash \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
-  \in \Vars$ and $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$.
-\item $\Gamma \vdash \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
-  $\alpha$ is a type constructor variable and $\Gamma \vdash s :
-  \sigma$ and for all $(x : \tau) \in \Gamma$: $\alpha \notin
-  \FV(\tau)$
-\item $\Gamma \vdash \app{s}{t} : \tau$ if $\Gamma \vdash s : \sigma
-  \arrtype \tau$ and $\Gamma \vdash t : \sigma$
-\item $\Gamma \vdash \tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$ if
-  $\Gamma \vdash s : \quant{(\alpha:\kappa)}{\sigma}$ and~$\tau$ is a
-  type constructor of kind~$\kappa$,
-\item $\Gamma \vdash s : \tau$ if $\Gamma \vdash s : \tau'$ and $\tau
-  =_\beta \tau'$.
-\end{itemize}
-The set of free variables of a preterm~$t$, denoted $\FV(t)$, is
-defined in the expected way. Analogously, we define the set~$\FTV(t)$
-of type constructor variables occurring free in~$t$. We say that $t$
-is \emph{closed} if $\FV(t) = \emptyset$ and $\FTV(t) = \emptyset$.
+  The set of preterms consists of all expressions $s$ such that
+  $\Gamma \vdash s : \sigma$ can be inferred for some type $\sigma$
+  and mapping $\Gamma$ by the following clauses:
+  \begin{itemize}
+  \item $\Gamma \vdash n : \nat$ for every natural number $n$.
+  \item $\Gamma \vdash x : \sigma$ for every $(x : \sigma) \in \Gamma$.
+  \item $\Gamma \vdash \mathtt{f} : \sigma$ for all
+    $(\mathtt{f} : \sigma) \in \Sigma$.
+  \item $\Gamma \vdash \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
+    \in \Vars$ and $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$.
+  \item $\Gamma \vdash \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
+    $\alpha$ is a type constructor variable and $\Gamma \vdash s :
+    \sigma$ and for all $(x : \tau) \in \Gamma$: $\alpha \notin
+    \FV(\tau)$
+  \item $\Gamma \vdash \app{s}{t} : \tau$ if $\Gamma \vdash s : \sigma
+    \arrtype \tau$ and $\Gamma \vdash t : \sigma$
+  \item $\Gamma \vdash \tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$ if
+    $\Gamma \vdash s : \quant{(\alpha:\kappa)}{\sigma}$ and~$\tau$ is a
+    type constructor of kind~$\kappa$,
+  \item $\Gamma \vdash s : \tau$ if $\Gamma \vdash s : \tau'$ and $\tau
+    =_\beta \tau'$.
+  \end{itemize}
+  The set of free variables of a preterm~$t$, denoted $\FV(t)$, is
+  defined in the expected way. Analogously, we define the set~$\FTV(t)$
+  of type constructor variables occurring free in~$t$. We say that $t$
+  is \emph{closed} if $\FV(t) = \emptyset$ and $\FTV(t) = \emptyset$.
 \end{definition}
 
 If $\alpha$ is a type constructor variable of kind~$\kappa$ then we
@@ -350,15 +217,15 @@ use the notation $\tabs{\alpha:\kappa}{t}$.
 Note that for a given $\Gamma$, if $s$ is typable under $\Gamma$, then
 there is only one choice for the type modulo $\beta$-conversion (this
 is easily proved by induction on the form of $s$). Thus, all closed
-terms have a unique type modulo $\beta$-conversion.
+preterms have a unique type modulo $\beta$-conversion.
 
 \begin{definition}\label{def_type_equiv}
   We define the type equivalence relation~$\equiv$ on preterms by
   induction on preterm structure.
   \begin{itemize}
   \item $x \equiv x$, $n \equiv n$,
-  \item if $\sigma =_\beta \tau$ then $f_\sigma \equiv f_\tau$ for $f
-    \in \{\oplus,\otimes,\flatten,\lift\}$,
+  \item if $\sigma =_\beta \tau$ then $f_\sigma \equiv f_\tau$ for
+    $f \in \Sigma$,
   \item if $\sigma =_\beta \tau$ and $s \equiv t$ then
     $\abs{x:\sigma}{s} \equiv \abs{x:\tau}{t}$,
   \item if $s \equiv t$ then $\tabs{\alpha}{s} \equiv
@@ -385,24 +252,28 @@ Note that~$\equiv$ is an equivalence relation.
   Induction on~$s$.
 \end{proof}
 
-The set $\Iterms$ of interpretation terms is now defined as follows.
+The set of terms is now defined as follows.
 
-\begin{definition}\normalfont
-  The set~$\Iterms$ of \emph{interpretation terms} is the set of the
-  equivalence classes of~$\equiv$.
+\begin{definition}\label{def_terms}\normalfont
+  The set of \emph{terms} is the set of the equivalence classes
+  of~$\equiv$.
 \end{definition}
 
 Because $\beta$-reduction on types is confluent and terminating, every
-interpretation term has a canonical preterm representative -- the one
-with all types occurring in it $\beta$-normalized. We say that a term
-is \emph{closed} if its canonical representative is. We define
-$\FTV(t)$ as the value of~$\FTV$ on the canonical representative
-of~$t$.
+term has a canonical preterm representative -- the one with all types
+occurring in it $\beta$-normalized. We say that a term is
+\emph{closed} if its canonical representative is. We define $\FTV(t)$
+as the value of~$\FTV$ on the canonical representative of~$t$.
 
 Because typing and term formation operations (abstraction,
-application, \ldots) are invariant under~$\equiv$, we may denote
-interpretation terms by their (canonical) representatives and
-informally treat them interchangeably.
+application, \ldots) are invariant under~$\equiv$, we may denote terms
+by their (canonical) representatives and informally treat them
+interchangeably.
+
+We will often abuse notation to omit $\cdot$ and $*$. Thus, $s t$ can
+refer to both $\app{s}{t}$ and $\tapp{s}{t}$. This is not ambiguous
+due to typing. We will also use $\abstraction{a}{s}$ for either
+$\abs{a}{s}$ or $\tabs{a}{s}$, depending on typing.
 
 \begin{definition}\label{def_chi_kappa}\normalfont
   By induction on the kind~$\kappa$ we define a closed type
@@ -466,7 +337,36 @@ informally treat them interchangeably.
   substitution lemma (see Definition~\ref{def_chi_kappa}).
 \end{proof}
 
-\subsubsection{Normalising interpretation terms}
+\section{Interpretations}
+
+In this section we define the set~$\World$ of final interpretation
+terms, and the relations~$\succ$ and~$\succeq$ on~$\World$.
+
+\subsection{Defining the set $\World$}\label{sec_world}
+
+\subsubsection{Interpretation terms}
+
+\begin{definition}\label{def_iterms}\normalfont
+  The set~$\ITypes$ of \emph{interpretation types} is the set of types
+  as in Definition~\ref{def_types} with $\Sigma_T = \{ \nat : * \}$,
+  i.e., there is a single type constant~$\nat$.
+
+  The set~$\Iterms$ of \emph{interpretation terms} is the set of terms
+  from Definition~\ref{def_terms} (see also
+  Definition~\ref{def_preterms}) where as types we take the
+  interpretation types and as the set~$\Sigma$ of function symbols we
+  take:
+  \[
+    \begin{array}{rcl}
+      \Sigma &=& \{ \oplus_\sigma : \sigma \arrtype
+                 \sigma \arrtype \sigma,\\ & & \otimes_\sigma : \sigma \arrtype \sigma
+                 \arrtype \sigma,\\ & & \flatten_{\sigma} : \sigma \arrtype
+                 \nat,\\ & & \lift_{\sigma} : \nat \arrtype \sigma \mid \sigma \in \ITypes
+                 \}
+    \end{array}
+  \]
+\end{definition}
+
 To define the world of \emph{final interpretation terms}, we will
 normalise certain elements of $\Iterms$ using the relation $\leadsto$.
 
@@ -524,18 +424,14 @@ normalise certain elements of $\Iterms$ using the relation $\leadsto$.
   $s \in \Iterms$ such that (a) $s$ is closed, and (b) $s$ is in
   normal form with respect to $\leadsto$.  We let $\World$ be the set
   of all final interpretation terms. By~$\World_\tau$ we denote the
-  set of all final interpretation terms of type~$\tau$.
+  set of all final interpretation terms of interpretation type~$\tau$.
 \end{definition}
 
 In the remainder of this section, we shall often speak simply of
-``terms'' when referring to interpretation terms.
+``terms'' and ``types'' when referring to interpretation terms and
+interpretation types.
 
 \subsubsection{Key properties of $\leadsto$}
-In the remainder of this section, we will often abuse notation to omit
-$\cdot$ and $*$.  Thus, $s t$ can refer to both $\app{s}{t}$ and
-$\tapp{s}{t}$. This is not ambiguous due to typing. We will also use
-$\abstraction{a}{s}$ for either $\abs{a}{s}$ or $\tabs{a}{s}$,
-depending on typing.
 
 \begin{lemma}[Subject reduction]
   If $\Gamma \vdash t : \tau$ and $t \leadsto t'$ then
@@ -1591,82 +1487,57 @@ general scheme.
 
 \subsection{Systems of interest}
 
-We use a syntax based on system $F_\omega$, similar to that of
-interpreatation terms.
+We use a syntax based on system $F_\omega$, basing on
+Section~\ref{sec_preliminaries}.
 
 \begin{definition}\normalfont
   \emph{Kinds}, \emph{type constructors} and \emph{types} are defined
-  like in Definition~\ref{def:itypes} with the following
-  modification. We assume a fixed set~$\Sigma_T$ of \emph{type
-    constructor symbols} paired with a kind, denoted $c :
-  \kappa$. Every type constructor symbol~$c$ occurs with only one kind
-  declaration. Then the definition of type constructors contains the
-  following additional clause:
+  like in Definition~\ref{def_types}, parameterised by a fixed
+  set~$\Sigma_T$ of type constructor symbols.
+
+  Given a fixed set~$\Sigma$ of function symbols, we define
+  \emph{terms} like in Definition~\ref{def_terms} (based on
+  Definition~\ref{def_preterms}) with the following restrictions:
   \begin{itemize}
-  \item A type constructor symbol of kind~$\kappa$ is a type
-    constructor of kind~$\kappa$.
+  \item if $\mathtt{f} : \sigma \in \Sigma$ then $\sigma$ is closed,
+  \item for any subterm $t_1 t_2$ of a term~$t$, the subterm $t_1$ is
+    a term or type application, or a function symbol.
   \end{itemize}
-  We use the notations of Definition~\ref{def:itypes}, and define
-  $\beta$-reduction on type constructors as in
-  Definition~\ref{def:itypes}.
-\end{definition}
-
-Terms are built from a set of function symbols, using abstraction and
-application as for interpretation terms.
-
-\begin{definition}\normalfont
-We assume given a fixed set $\Sigma$ of \emph{function symbols}, each
-paired with a \emph{closed} type, denoted $\mathtt{f} : \tau$.  Every
-function symbol $\mathtt{f}$ occurs only with one type declaration.
-
-The set of preterms consists of those expressions $s$ such that
-$\Gamma \proves s : \sigma$ can be derived for some type $\sigma$ and
-environment $\Gamma$ using the following clauses:
-\begin{itemize}
-\item $\Gamma \vdash x : \sigma$ for every $(x : \sigma) \in \Gamma$.
-\item $\Gamma \vdash \mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\dots,s_k)
-  : \tau[\alpha_1 := \rho_1]\ldots[\alpha_n := \rho_n]$ if
-  \[
-  \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots
-  \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
-  \sigma_k \arrtype \tau
-  \]
-  is a function symbol in~$\Sigma$, and $\rho_i$ is a type constructor
-  of kind $\kappa_i$ for $i=1,\ldots,k$, and $\Gamma \proves s_i :
-  \sigma_i[\alpha_1 := \rho_1]\ldots[\alpha_n := \rho_n]$ for
-  $i=1,\ldots,k$.
-\item $\Gamma \proves \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
-  \in \Vars$ and $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$.
-\item $\Gamma \proves \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
-  $\alpha$ is a type constructor variable and $\Gamma \vdash s :
-  \sigma$ and for all $(x : \tau) \in \Gamma$: $\alpha \notin
-  \FTV(\tau)$.
-\item $\Gamma \proves t : \sigma$ if $\sigma =_\beta \sigma'$ and
-  $\Gamma \proves t : \sigma'$.
-\end{itemize}
-The relation~$\equiv$ of \emph{type equivalence} is defined
-analogously to Definition~\ref{def_type_equiv}. The set of
-\emph{terms} is the set of the equivalence classes of~$\equiv$.
 \end{definition}
 
 We use the notation
-$\mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\ldots,s_k)$ to stress the fact
-that by default there is no explicit application
-available. Application can be modelled by including the symbol ${@} :
-\forall\alpha\forall\beta . (\alpha \arrtype \beta) \arrtype \alpha
-\arrtype \beta$ in $\Sigma$. Similarly, type application is modelled
-through a symbol $\mathtt{A} : \forall \alpha : * \arrkind * . \forall
-\beta . (\forall \beta [\alpha \beta]) \arrtype \alpha \beta$.
+$\mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\ldots,s_k)$ for
+$\mathtt{f} \rho_1 \ldots \rho_n s_1 \ldots s_k$ when
+\[
+  \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots
+  \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
+  \sigma_k \arrtype \tau
+\]
+is a function symbol in~$\Sigma$ with~$k$ maximal, and $\rho_i$ is a
+type constructor of kind $\kappa_i$ for $i=1,\ldots,k$, and
+$\Gamma \proves s_i : \sigma_i[\alpha_1 := \rho_1]\ldots[\alpha_n :=
+\rho_n]$ for $i=1,\ldots,k$, for an appropriate~$\Gamma$. We use this
+notation to stress the fact that by default there is no explicit
+application available. The application in the syntax of terms is used
+just as convenient syntax, but does not correspond to the usual
+application operator since only applications of the form
+$\mathtt{f} u_1 \ldots u_n$ are allowed. True application can be
+modelled by including the symbol
+${@} : \forall\alpha\forall\beta . (\alpha \arrtype \beta) \arrtype
+\alpha \arrtype \beta$ in $\Sigma$. Similarly, type application is
+modelled through a symbol
+$\mathtt{A} : \forall \alpha : * \arrkind * . \forall \beta . (\forall
+\beta [\alpha \beta]) \arrtype \alpha \beta$.
 
 We use the notations and terminology of Section~\ref{sec_world}. To
 avoid confusion, the terms, types, type constructors, etc.~in the
-interpretation (those defined in Section~\ref{sec_world}) are referred
-to as interpretation terms, interpretation types, interpretation type
-constructors, etc.
+interpretation (those defined in Section~\ref{sec_world}) are always
+referred to as interpretation terms, interpretation types,
+interpretation type constructors, etc.
 
-The rules are simply an infinite set of term pairs, whose monotonic
-closure generates the rewrite relation. \LC{Now the set of rules can
-  be finite.}
+The rules are simply a set of term pairs, whose monotonic closure
+generates the rewrite relation. \LC{Now the set of rules can be
+  finite.}
 
 \begin{definition}\normalfont
 We fix an infinite variable environment $\Gamma$,
@@ -1699,11 +1570,9 @@ symbols:
   \mathtt{or} : * \arrkind * \arrkind *,\quad
   \mathtt{and} : * \arrkind * \arrkind *,\quad
   \exists : (* \arrkind *) \arrkind *
-  \}\quad \cup\quad
-  \{\quad \mathtt{prop}_i : * \mid i \in \mathbb{N}\quad \}
+  \}
 \end{array}
 \]
-Here $\mathtt{prop}_i$ represents the $i$-th propositional variable.
 
 We have the following function symbols:
 \[
@@ -1729,12 +1598,8 @@ We have the following function symbols:
   \exists (\alpha)
 \end{array}
 \]
-\LC{If we want this to work for open terms then we should also say
-  that for every variable in the original system there is a function
-  symbol. If we are satified with termination on closed terms, then we
-  don't need $\mathtt{prop}_i$}.
 
-\LC{In fact, I think it's clearer to do this for closed terms only,
+\LC{I think it's clearer to do this for closed terms only,
   because then termination for open terms follows by closing them with
   lambda-abstractions.}
 
@@ -1875,21 +1740,14 @@ All terms will be mapped to interpretation terms, which are compared
 using $\succ$ to hopefully obtain a decrease that can be used with
 rule removal.
 
-\LC{I think to make things simple we should base interpretation terms
-  on System~$F_\omega$ instead of System~$F$. The SN proof should be
-  easy to adapt to~$F_\omega$, we get a straightforward mapping, and
-  there are strictly more systems we can show termination of
-  (e.g. System~$F_\omega$ and extensions). Below I assume we have
-  System $F_\omega$ as the basis of our interpretation terms.}
-
 \begin{definition}\normalfont
 A \emph{type constructor mapping} is a function $\Typemap$ which maps
 a type constructor symbol to an interpretation type constructor of the
 same kind.
 
-A fixed type mapping $\Typemap$ is extended inductively to a function
-from type constructors to interpretation type constructors in the
-expected way. We denote the extended mapping
+A fixed type constructor mapping $\Typemap$ is extended inductively to
+a function from type constructors to interpretation type constructors
+in the expected way. We denote the extended mapping
 by~$\typeinterpret{\sigma}$.
 \end{definition}
 
@@ -1901,35 +1759,37 @@ Similarly, we employ a \emph{symbol mapping} as an aid to interpret
 \emph{terms}.
 
 \begin{definition}\normalfont
-A \emph{symbol mapping} is a function $\Termmap$ which assigns to each
-function symbol $\mathtt{f} : \rho$ a closed interpretation term
-$\Termmap(\mathtt{f})$ of type~$\typeinterpret{\rho}$. For a fixed
-symbol mapping $\Termmap$, we define $\interpret{s}$ as follows:
-\[
-\begin{array}{rcl}
-\interpret{x} & = & x \\
-\interpret{\tabs{\alpha}{s}} & = & \tabs{\alpha}{\interpret{s}} \\
-\interpret{\abs{x:\sigma}{s}} & = & \abs{x:\typeinterpret{\sigma}}{
-  \interpret{s}} \\
-\interpret{f_{\rho_1,\dots,\rho_n}(s_1,\dots,s_k)} & = &
-  \Termmap(f) \typeinterpret{\rho_1} \ldots \typeinterpret{\rho_n} \interpret{s_1} \ldots \interpret{s_k}
-\end{array}
-\]
+  A \emph{symbol mapping} is a function $\Termmap$ which assigns to
+  each function symbol $\mathtt{f} : \rho$ a closed interpretation
+  term $\Termmap(\mathtt{f})$ of type~$\typeinterpret{\rho}$. For a
+  fixed symbol mapping $\Termmap$, we define $\interpret{s}$
+  inductively:
+  \[
+    \begin{array}{rcl}
+      \interpret{x} & = & x \\
+      \interpret{\tabs{\alpha}{s}} & = & \tabs{\alpha}{\interpret{s}} \\
+      \interpret{\abs{x:\sigma}{s}} & = & \abs{x:\typeinterpret{\sigma}}{
+                                          \interpret{s}} \\
+      \interpret{\mathtt{f}} &=& \Termmap(f) \\
+      \interpret{\app{t_1}{t_2}} &=& \app{\interpret{t_1}}{\interpret{t_2}} \\
+      \interpret{\tapp{t}{\tau}} &=& \tapp{\interpret{t}}{\typeinterpret{\tau}}
+    \end{array}
+  \]
 
-Symbol mapping is extended to contexts as follows:
-\[
-\itp{\Gamma} := \{ (x : \typeinterpret{\tau}) \mid (x : \tau) \in \Gamma \}
-\]
+  Symbol mapping is extended to contexts as follows:
+  \[
+    \itp{\Gamma} := \{ (x : \typeinterpret{\tau}) \mid (x : \tau) \in \Gamma \}
+  \]
 \end{definition}
 
-Interpretation mapping preserves typing, in a sense:
+Interpretation mapping preserves typing:
 
 \begin{lemma}
 If $\Gamma \vdash s : \sigma$ then $\itp{\Gamma} \vdash \interpret{s}
 : \typeinterpret{\sigma}$.
 \end{lemma}
 
-\begin{proof}
+\begin{proof} TODO
 By induction on the form of $s$.  The variable case is obvious. The
 case where $s$ is an abstraction $\abs{x:\tau}{s'}$ or a type
 abstraction $\tabs{\alpha}{s'}$ are both immediate with the induction
@@ -1966,6 +1826,35 @@ case where $s = f_{\rho_1,\dots,\rho_n}(s_1,\dots,s_k)$. We have:
   \typeinterpret{\rho}$.\qed
 \end{itemize}
 \end{proof}
+
+\subsection{Rule removal}
+
+We use \emph{rule removal}:
+
+\begin{theorem}\label{thm:ruleremove}
+Let $\Rules = \Rules_1 \cup \Rules_2$, and suppose that $\arr{\Rules_1}\:
+\subseteq\:\succ$ and $\arr{\Rules_2}\:\subseteq\:\succeq$ for a
+well-founded ordering $\succ$ and a compatible quasi-ordering $\succeq$.
+Then $\arr{\Rules}$ is terminating if and only if $\arr{\Rules_2}$ is
+(which is certainly the case if $\Rules_2 = \emptyset$).
+\end{theorem}
+
+\begin{proof}
+By well-foundedness of $\succ$, every infinite decreasing $\arr{\Rules}$
+sequence can only use finitely many steps using $\arr{\Rules_1}$.
+\qed
+\end{proof}
+
+This gives rise to the following algorithm:
+\begin{enumerate}
+\item While $\Rules$ is non-empty:
+  \begin{enumerate}
+  \item Orient all rules in $\Rules$ using $\succeq$ or $\succ$; at least
+    one of them must be oriented using $\succ$.
+  \item Remove all rules ordered by $\succ$ from $\Rules$.
+  \end{enumerate}
+\end{enumerate}
+If this algorithm succeeds, we have proven termination.
 
 \subsection{Monotonicity}
 
