@@ -31,6 +31,8 @@
 \newcommand{\TypeQuantifiers}{\mathcal{Q}}
 \newcommand{\Typemap}{\mathcal{T\!M}}
 \newcommand{\Termmap}{\mathcal{J}}
+\newcommand{\succinterpret}{\succ^{\llbracket\rrbracket}}
+\newcommand{\succeqinterpret}{\succeq^{\llbracket\rrbracket}}
 
 \newcommand{\quant}[2]{\forall #1[#2]}
 \newcommand{\qquant}[3]{#1 #2[#3]}
@@ -1796,7 +1798,7 @@ If $\Gamma \vdash s : \sigma$ then $\itp{\Gamma} \vdash \interpret{s}
 : \typeinterpret{\sigma}$.
 \end{lemma}
 
-\begin{proof} TODO
+\begin{proof} %TODO   Seems like this is already done.
 By induction on the form of $s$.  The variable case is obvious. The
 case where $s$ is an abstraction $\abs{x:\tau}{s'}$ or a type
 abstraction $\tabs{\alpha}{s'}$ are both immediate with the induction
@@ -1852,7 +1854,9 @@ sequence can only use finitely many steps using $\arr{\Rules_1}$.
 \qed
 \end{proof}
 
-This gives rise to the following algorithm:
+\CK{If $\succ$ and $\succeq$ are \emph{monotonic} (i.e., if $s \succ t$
+(resp.\ $s \succeq t$) then $C[s] \succ C[t]$ (resp.\ $C[s] \succeq C[t]$)
+for all contexts $C$), this} gives rise to the following algorithm:
 \begin{enumerate}
 \item While $\Rules$ is non-empty:
   \begin{enumerate}
@@ -1865,43 +1869,55 @@ If this algorithm succeeds, we have proven termination.
 
 \subsection{Monotonicity}
 
-By imposing certain monotonicity requirements on the choices for
-$\Termmap$, we obtain a pair $(\succ,\succeq)$ that can be used with
-rule removal (Theorem \ref{thm:ruleremove}).
+We propose using a pair $(\succinterpret,\succeqinterpret)$ defined as
+follows: $s \succinterpret t$ if $\interpret{s} \succ \interpret{t}$ and
+$s \succeqinterpret t$ if $\interpret{s} \succeq \interpret{t}$ (for a
+fixed type constructor mapping $\Typemap$ and symbol mapping $\Termmap$).
+To use this pair to prove termination of $\arr{\Rules}$ with rule removal,
+two things must be proved:
 
-\CK{%
-The idea is that if $s \arr{\Rules} t$ then $\interpret{s}\downarrow\:
-\succ\:\interpret{t}\downarrow$ must hold (or $\interpret{s}\downarrow\:
-\succeq\:\interpret{t}\downarrow$, but in that case the rule cannot be
-removed).  This will likely require that every component of a function
-symbol is represented; for instance a requirement such as: if
-$\Termmap(\mathtt{f}) = \abs{x_1 \dots x_n}{s}$, then $s = s_1 \oplus
-\dots \oplus s_n + t$ where for $i$: if $x_i$ increases strictly,
-then also $s_i$ increases.
-(This would perhaps be simpler with interpretations to $\mathbb{N}
-\setminus \{ 0 \}$, as then a component $\lift(\flatten(x_1)) \otimes
-x_2$ would be strict in both $x_1$ and $x_2$, rather than in neither.)
-Note that the restrictions should at least allow for the current
-definition of $\Termmap(\mathtt{ext})$.}
+\begin{itemize}
+\item all rules in $\Rules$ can be oriented with $\succeqinterpret$ or
+  $\succinterpret$ and at least one with $\succinterpret$;
+\item $\succinterpret$ and $\succeqinterpret$ are both monotonic.
+\end{itemize}
 
-\CK{In addition, we might need stability: if I can prove that
-$\interpret{\ell} \downarrow \succ \interpret{r}\downarrow$ we should
-also have $\interpret{\ell\gamma}\downarrow \succ
-\interpret{r\gamma}\downarrow$ for all substitutions and type
-substitutions $\gamma$.  (Not sure
-about this one, as the rules already occur in instantiated form.)}
+The former requirement has to be verified for every individual rule.
+For the latter requirement, we can provide some sufficient criteria that
+guarantee monotonicity of both $\succinterpret$ and $\succeqinterpret$.
+
+\begin{lemma}
+Suppose that for all symbols
+$\afun : \forall (\alpha_1 : \kappa_1) \ldots
+  \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
+  \sigma_k \arrtype \tau$ we have:
+$\Termmap(\afun) = \tabs{\alpha_1 \dots \alpha_n}{\abs{x_1 \dots x_k}{
+  s_1 \oplus_{\interpret{\tau}} \dots \oplus_{\interpret{\tau}} s_m}}$
+  such that for all $1 \leq i \leq k$ there exists $1 \leq j \leq m$
+  such that $s_j$ has one of the forms:
+  \begin{itemize}
+  \item $x_i \cdots$ (so $x_i$ or an application with $x_i$ at the head);
+  \item $\lift_{\interpret{\tau}}(\flatten_{\interpret{\sigma_i}}(x_i) +
+    n)$ for some $n$ (in the case of $0$, the addition may be omitted);
+  \end{itemize}
+Then both $\succinterpret$ and $\succeqinterpret$ are monotonic.
+\end{lemma}
+
+\begin{proof}
+TODO
+\end{proof}
+
+\CK{Note: I am not entirely sure what to do with pairing, since we
+currently do not \emph{have} pairing.  With some luck it will work
+out with the two cases above, but will have to investigate how I should
+adapt the interpretations that currently use pairing.}
+
+\CK{\dots snipped rambling \dots}
 
 \LC{It's not completely obvious to me how to do this, so I'd like to
   see this spelled out in detail.}
 
-%\begin{lemma}
-%TODO
-%\end{lemma}
-%
-%Thus, if $\interpret{\ell} \succ \interpret{r}$ for some rule, then
-%$\interpret{s}\downarrow \succ \interpret{t}\downarrow$ whenever
-%$s \arr{\Rules} t$ by that rule, and similar for $\succeq$.  This
-%provides a strategy for termination analysis using rule removal.
+\CK{Is it more clear now?}
 
 \section{Some useful lemmas}
 
