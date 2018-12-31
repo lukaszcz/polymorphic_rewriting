@@ -733,6 +733,11 @@ this proof. Has it been fully updated to the new definitions?}
 \LC{??? I don't understand what you're talking about here. We need
   $\flatten$ and $\lift$ -- they are in our interpretation terms?}
 
+\CK{I'm referring to the functional notation: we need
+$\flatten_\sigma s$, not $\flatten_\sigma(s)$.  Since you replaced
+it in most other places, I wondered whether this proof had been
+updated.}
+
 \begin{proof}
   By induction on the structure of~$\sigma$ we show that
   $\val{\sigma}{\xi}{\omega} \in \Cb_{\omega(\sigma)}$ for all
@@ -1403,6 +1408,8 @@ TODO
 
 \LC{If $=$ here is the reflexive-symmetric-transitive closure
   of~$\leadsto$ then yes, this follows by induction on~$\sigma$.}
+
+\CK{What I mean is: $\succeq \cap \preceq$, so I guess that's covered.}
 
 \begin{lemma}\label{lem:plustimesmonotonic}
 If $s,t,u$ are terms of a \emph{closed} type $\sigma$ and $s \succeq
