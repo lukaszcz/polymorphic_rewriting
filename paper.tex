@@ -239,8 +239,6 @@ preterms have a unique type modulo $\beta$-conversion.
   \end{itemize}
   In other words, $s \equiv t$ iff $s$ and $t$ are identical modulo
   $\beta$-conversion in types.
-  \CK{And $\alpha$-conversion implicitly as well, I assume?}
-  \LC{Yes, of course.}
 \end{definition}
 
 Note that~$\equiv$ is an equivalence relation.
@@ -488,8 +486,11 @@ chapters~10 and~11 from the book ``Lectures on the Curry-Howard
 Isomorphism'' by Sorensen and Urzyczyn. An important difference with
 system~$F_\omega$ and related ones is that the rules for
 $\oplus_\tau$, $\otimes_\tau$, $\flatten_\tau$ and $\lift_\tau$ depend
-on the type~$\tau$. This makes adapting the computability method a bit
-more difficult.
+on the type~$\tau$. In particular, type substitution in terms may
+create redexes. For instance, if $\alpha$ is a type variable then
+$\oplus_\alpha t_1 t_2$ is not a redex, but
+$\oplus_{\sigma\arrtype\tau} t_1 t_2$ is. This makes adapting the
+computability method a bit more difficult.
 
 For the termination proof we assume without loss of generality that
 the terms are given in orthodox Church-style, i.e., instead of using
@@ -530,9 +531,8 @@ lemmas still holds for orthodox Church-style typed terms.
     have $t' \in X$, then $t \in X$;
   \item if $t_1,t_2 \in X$ then $\circ_\tau t_1 t_2 \in X$ for
     $\circ \in \{\oplus,\otimes\}$;
-  \item if $t \in \SN$ and $t : \nat$ then $\CKchange{\lift_\tau t}
-    \in X$;
-  \item if $t \in X$ then $\CKchange{\flatten_\tau t} \in \SN$.
+  \item if $t \in \SN$ and $t : \nat$ then $\lift_\tau t \in X$;
+  \item if $t \in X$ then $\flatten_\tau t \in \SN$.
   \end{enumerate}
   Note that item~3 above implies:
   \begin{itemize}
@@ -739,6 +739,9 @@ this proof. Has it been fully updated to the new definitions?}
 $\flatten_\sigma s$, not $\flatten_\sigma(s)$.  Since you replaced
 it in most other places, I wondered whether this proof had been
 updated.}
+
+\LC{Oh, I just treat $\flatten_\sigma(s)$ and $\flatten_\sigma s$
+  interchangeably, the parentheses being superfluous.}
 
 \begin{proof}
   By induction on the structure of~$\sigma$ we show that
@@ -1358,8 +1361,8 @@ $\succeq$ is reflexive.
 Finally, they must be compatible:
 
 \begin{lemma}\label{lem:compatibility}
-We have $\succ \cdot \succeq\ \subseteq\ \succ$
-\CKchange{and $\succeq \cdot \succ\ \subseteq\ \succ$}.
+We have $\succ \cdot \succeq\ \subseteq\ \succ$ and $\succeq \cdot
+\succ\ \subseteq\ \succ$.
 \end{lemma}
 
 \begin{proof}
@@ -1417,10 +1420,9 @@ TODO
 If $s,t,u$ are terms of a \emph{closed} type $\sigma$ and $s \succeq
 t$, then $s \oplus_\sigma u \succeq t \oplus_\sigma u$ and $s
 \otimes_\sigma u \succeq t \otimes_\sigma u$.  Moreover, if even $s
-\succ t$ then we have $s \oplus_\sigma u \succ t \CKchange{\oplus_\sigma
-u}$, and if $u \succeq
-\lift_\sigma(1)$ then also $s \otimes_\sigma u \succ t \otimes_\sigma
-u$.
+\succ t$ then we have $s \oplus_\sigma u \succ t \oplus_\sigma u$, and
+if $u \succeq \lift_\sigma(1)$ then also $s \otimes_\sigma u \succ t
+\otimes_\sigma u$.
 \end{lemma}
 
 \begin{proof}
@@ -1444,8 +1446,8 @@ interpretation terms $s,t,u$ of type $\sigma$, we have:
   \otimes_\sigma (t \otimes_\sigma u) \approx (s \otimes_\sigma t) \otimes_\sigma u$;
 \item\label{lem:approx:distribution} $s \otimes_\sigma (t \oplus_\sigma u)
   \approx (s \otimes_\sigma t) \oplus_\sigma (s \otimes_\sigma u)$;
-\item\label{lem:approx:neutral} $(\CKchange{\lift_\sigma 0}) \oplus_\sigma s
-  \approx s$ and $(\CKchange{\lift_\sigma 1})) \otimes_\sigma s \approx s$.
+\item\label{lem:approx:neutral} $(\lift_\sigma 0) \oplus_\sigma s
+  \approx s$ and $(\lift_\sigma 1)) \otimes_\sigma s \approx s$.
 \end{enumerate}
 \end{lemma}
 
@@ -1757,12 +1759,12 @@ same kind.
 A fixed type constructor mapping $\Typemap$ is extended inductively to
 a function from type constructors to interpretation type constructors
 in the expected way. We denote the extended mapping
-by~$\typeinterpret{\sigma}$.
-\end{definition}
-
-Thus, for example $\typeinterpret{\quant{\alpha}{\sigma}} =
+by~$\typeinterpret{\sigma}$. Thus, for example
+$\typeinterpret{\quant{\alpha}{\sigma}} =
 \quant{\alpha}{\typeinterpret{\sigma}}$ and $\typeinterpret{\sigma
-\arrtype \tau} = \typeinterpret{\sigma} \arrtype \typeinterpret{\tau}$.
+  \arrtype \tau} = \typeinterpret{\sigma} \arrtype
+\typeinterpret{\tau}$.
+\end{definition}
 
 Similarly, we employ a \emph{symbol mapping} as an aid to interpret
 \emph{terms}.
@@ -1779,9 +1781,9 @@ Similarly, we employ a \emph{symbol mapping} as an aid to interpret
       \interpret{\tabs{\alpha}{s}} & = & \tabs{\alpha}{\interpret{s}} \\
       \interpret{\abs{x:\sigma}{s}} & = & \abs{x:\typeinterpret{\sigma}}{
                                           \interpret{s}} \\
-      \interpret{\mathtt{f}} &=& \Termmap(f) \\
       \interpret{\app{t_1}{t_2}} &=& \app{\interpret{t_1}}{\interpret{t_2}} \\
-      \interpret{\tapp{t}{\tau}} &=& \tapp{\interpret{t}}{\typeinterpret{\tau}}
+      \interpret{\tapp{t}{\tau}} &=& \tapp{\interpret{t}}{\typeinterpret{\tau}} \\
+      \interpret{\mathtt{f}} &=& \Termmap(\mathtt{f})
     \end{array}
   \]
 
@@ -1798,42 +1800,8 @@ If $\Gamma \vdash s : \sigma$ then $\itp{\Gamma} \vdash \interpret{s}
 : \typeinterpret{\sigma}$.
 \end{lemma}
 
-\begin{proof} %TODO   Seems like this is already done.
-By induction on the form of $s$.  The variable case is obvious. The
-case where $s$ is an abstraction $\abs{x:\tau}{s'}$ or a type
-abstraction $\tabs{\alpha}{s'}$ are both immediate with the induction
-hypothesis and the definition of type interpretation.  So consider the
-case where $s = f_{\rho_1,\dots,\rho_n}(s_1,\dots,s_k)$. We have:
-\begin{itemize}
-\item $f : \rho$ where
-  \[
-  \rho = \forall \alpha_1 \ldots \forall \alpha_n . \tau_1 \arrtype
-  \dots \arrtype \tau_k \arrtype \sigma \in \Sigma
-  \]
-  for some $\vec{\tau},\sigma$;
-\item by definition of~$\Termmap$ we have $\itp{\Gamma} \vdash
-  \Termmap(f) : \typeinterpret{\rho}$; and
-  \[
-  \typeinterpret{\rho} = \forall \alpha_1 \ldots \forall \alpha_n
-  . \typeinterpret{\tau_1} \arrtype \dots \arrtype
-  \typeinterpret{\tau_k} \arrtype \typeinterpret{\sigma} \in \Sigma
-  \]
-\item writing $\tau_i' := \tau_i[\alpha_1:=\rho_1]\dots[\alpha_n:=
-  \rho_n]$ for $1 \leq i \leq k$, we have $\Gamma \vdash s_i :
-  \tau_i'$;
-\item by the induction hypothesis, $\itp{\Gamma} \vdash
-  \interpret{s_i} : \typeinterpret{\tau_i'}$;
-\item hence $\itp{\Gamma} \vdash \interpret{s_i} :
-  \typeinterpret{\tau_i}[\alpha_1:=\typeinterpret{\rho_1}]\ldots[\alpha_n:=\typeinterpret{\rho_n}]$
-  by Lemma~\ref{lem:substitutioninterpret};
-\item we have
-  \[
-  \interpret{s} = \Termmap(f) \typeinterpret{\rho_1} \ldots
-  \typeinterpret{\rho_n} \interpret{s_1} \ldots \interpret{s_k}
-  \]
-\item hence $\itp{\Gamma} \vdash \interpret{s} :
-  \typeinterpret{\rho}$.\qed
-\end{itemize}
+\begin{proof} % Now this is straightforward with the new definitions
+  By induction on the form of $s$.\qed
 \end{proof}
 
 \subsection{Rule removal}
@@ -1841,10 +1809,11 @@ case where $s = f_{\rho_1,\dots,\rho_n}(s_1,\dots,s_k)$. We have:
 We use \emph{rule removal}:
 
 \begin{theorem}\label{thm:ruleremove}
-Let $\Rules = \Rules_1 \cup \Rules_2$, and suppose that $\arr{\Rules_1}\:
-\subseteq\:\succ$ and $\arr{\Rules_2}\:\subseteq\:\succeq$ for a
-well-founded ordering $\succ$ and a compatible quasi-ordering $\succeq$.
-Then $\arr{\Rules}$ is terminating if and only if $\arr{\Rules_2}$ is
+Let $\Rules = \Rules_1 \cup \Rules_2$, and suppose that
+$\arr{\Rules_1}\: \subseteq\:\succ$ and
+$\arr{\Rules_2}\:\subseteq\:\succeq$ for a well-founded ordering
+$\succ$ and a compatible quasi-ordering $\succeq$.  Then
+$\arr{\Rules}$ is terminating if and only if $\arr{\Rules_2}$ is
 (which is certainly the case if $\Rules_2 = \emptyset$).
 \end{theorem}
 
@@ -1912,12 +1881,26 @@ currently do not \emph{have} pairing.  With some luck it will work
 out with the two cases above, but will have to investigate how I should
 adapt the interpretations that currently use pairing.}
 
+\LC{We \emph{do} have pairing for all practical purposes, definable in
+  System~$F_\omega$ with the right reduction behaviour. We can treat
+  it explicitly here, if that's needed. But if $m$ can be $0$ above,
+  then we have the encodings of covered. In general, we have the
+  encodings of all inductive data types with one constructor
+  covered. But not the encodings of lists or any inductive data type
+  with more than one constructor, because then the encodings of
+  constructors erase all but one argument. I think we should invent
+  something to have all encodings covered, maybe use
+  $\lift_{\interpret{\tau}}(\flatten_{\interpret{\sigma_i}}(x_i))$
+  inside the encodings to add the erased arguments.}
+
 \CK{\dots snipped rambling \dots}
 
 \LC{It's not completely obvious to me how to do this, so I'd like to
   see this spelled out in detail.}
 
 \CK{Is it more clear now?}
+
+\LC{Yes, but I'm not sure if the lemma is true as stated.}
 
 \section{Some useful lemmas}
 
