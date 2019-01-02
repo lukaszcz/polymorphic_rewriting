@@ -1412,7 +1412,8 @@ TODO
   anything.)}
 
 \LC{If $=$ here is the reflexive-symmetric-transitive closure
-  of~$\leadsto$ then yes, this follows by induction on~$\sigma$.}
+  of~$\leadsto$ \emph{and $\sigma$ is closed} then yes, this follows
+  by induction on~$\sigma$.}
 
 \CK{What I mean is: $\succeq \cap \preceq$, so I guess that's covered.}
 
@@ -1998,8 +1999,8 @@ And the following function symbol mapping:
   \sigma}}{\interpret{s}}) \cdot \interpret{t} \oplus \lift(\flatten(
   \interpret{t}) \oplus 1) \leadsto \interpret{s}[x:=\interpret{t}]
   \oplus \lift(\flatten(\interpret{t}) \oplus 1)$.  Since, by Lemma
-  \ref{lem:liftgreater} we have $\lift(\flatten(\interpret{t}) \oplus
-  1) \succeq \lift(1)$, by Lemma \ref{lem:plustimesmonotonic} this term
+  \ref{lem:liftgreater} we have \LC{(We do \emph{not} have this if~$\tau$ is not closed, e.g., a type variable!!)} $\lift(\flatten(\interpret{t}) \oplus
+  1) \succeq \lift(1)$, by Lemma \ref{lem:plustimesmonotonic} \LC{(Again, this doesn't work if $\sigma,\tau$ are not closed)} this term
   $\succ \interpret{s}[x:=\interpret{t}]$, which equals
   $\interpret{s[x:=t]}$ by Lemma \ref{lem:substitutioninterpret}.
   Thus, we can remove this rule.
