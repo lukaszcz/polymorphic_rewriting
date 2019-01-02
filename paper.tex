@@ -12,10 +12,9 @@
 \usepackage{xspace}
 \usepackage{booktabs}
 \usepackage{mathtools}
-\usepackage{enumitem}
 \usepackage{stmaryrd}
 \usepackage{microtype}
-\usepackage{bussproofs}
+\usepackage{enumitem}
 \usepackage{multirow}
 \usepackage{proof}
 \usepackage[T1]{fontenc}
@@ -32,6 +31,8 @@
 \newcommand{\TypeQuantifiers}{\mathcal{Q}}
 \newcommand{\Typemap}{\mathcal{T\!M}}
 \newcommand{\Termmap}{\mathcal{J}}
+\newcommand{\succinterpret}{\succ^{\llbracket\rrbracket}}
+\newcommand{\succeqinterpret}{\succeq^{\llbracket\rrbracket}}
 
 \newcommand{\quant}[2]{\forall #1[#2]}
 \newcommand{\qquant}[3]{#1 #2[#3]}
@@ -55,6 +56,7 @@
 \newcommand{\FTV}{\mathrm{FTV}}
 \newcommand{\FV}{\mathrm{FV}}
 \newcommand{\Tc}{\mathcal{T}}
+\newcommand{\Vc}{\mathcal{V}}
 
 \newcommand{\nat}{\mathtt{nat}}
 \newcommand{\proj}{\pi}
@@ -64,7 +66,7 @@
 \newcommand{\afun}{\mathtt{f}}
 
 \newcommand{\ur}{\upharpoonright}
-\newcommand{\da}{\downarrow}
+\newcommand{\da}{\mathord{\downarrow}}
 \newcommand{\SN}{\mathrm{SN}}
 \newcommand{\Cb}{\mathbb{C}}
 \newcommand{\Nbb}{\mathbb{N}}
@@ -72,15 +74,14 @@
 \newcommand{\proves}{\vdash}
 
 \newcommand{\CK}[1]{\textcolor{blue}{CK: #1}}
+\newcommand{\CKchange}[1]{\textcolor{blue}{#1}}
 \newcommand{\LC}[1]{\textcolor{purple}{LC: #1}}
 
 \begin{document}
 
 \mainmatter
 
-\title{TODO list
-  \thanks{The authors are supported by lots of people.}}
-\subtitle{What we need to do to get where we want to be}
+\title{Polymorphic Higher-Order Termination}
 
 \author{{\L}ukasz Czajka and Cynthia Kop}
 \authorrunning{{\L}. Czajka and C. Kop}
@@ -97,94 +98,20 @@ Institute of Computer Science, Radboud University Nijmegen (RU)
 \maketitle
 
 \begin{abstract}
-The introduction of this paper is a TODO list.
-The remainder is meant for filling in the TODOs with what we already have.
-The hope is that the end result is something useful. :)
 \end{abstract}
 
-\section*{THE LIST}
+\section{Introduction}
 
-\renewcommand{\theenumii}{\arabic{enumi}.\arabic{enumii}}
+\section{Preliminaries}
 
-Here's what we need to do:
-\begin{enumerate}
-\item Define a world $\World$ and a well-founded ordering $\succ$ on
-  $\World$:
-  \begin{enumerate}
-  \item Define a set of terms $\World$ typed under some variation of
-    System F-$\omega$.
-  \item Define relations $\succ$ and $\succeq$ on the elements of $\World$.
-  \item Prove that $\succ$ is a well-founded ordering relation and that
-    $\succeq$ is a compatible quasi-ordering.
-  \end{enumerate}
-\item Specify what systems we are interested in analysing, and prove
-  standard results which will make their analysis doable.
-  \begin{enumerate}
-  \item Specify a form of system which includes all the systems of interest.
-  \item Specify a default way of interpreting terms in these systems.
-  \item Prove that in all such systems, using our way of interpreting
-    terms: if $\interpret{\ell} \succ \interpret{r}$ (resp.\ $\interpret{
-    \ell} \succeq \interpret{r}$) for a rule  $\ell \to r$, then
-    $\interpret{s} \succ \interpret{t}$ whenever $s \arr{\Rules} t$ by
-    this rule (resp.\ $\interpret{s} \succeq \interpret{t}$).
-  \end{enumerate}
-\item Obtain useful lemmas regarding these defaults.
-  \begin{enumerate}
-  \item $\interpret{s[x:=t]} = \interpret{s}[x:=\interpret{t}]$.
-  \item $\interpret{s\sigma} = \interpret{s}\sigma$.
-  \item \dots?
-  \end{enumerate}
-\item For some system of interest, prove its termination:
-  \begin{enumerate}
-  \item Present the system and give interpretations (following the
-    default scheme) for all ways of constructing terms.
-  \item Show that $\ell \succ r$ or $\ell \succeq r$ for all rules.
-    Remove the rules which are oriented using $\succ$ and repeat,
-    until all rules have been removed.
-  \end{enumerate}
-\end{enumerate}
+In this section we introduce the System~$F_\omega$ (see e.g.,
+Sorensen, Urzyczyn, ``Lectures on the Curry-Howard Isomorphism'',
+Section~11.7.), which will form a basis both of our interpretations
+and of a general syntax for the investigated systems.
 
-\renewcommand{\theenumii}{\alph{enumii}}
+First, we define the set of types.
 
-We use \emph{rule removal}:
-
-\begin{theorem}\label{thm:ruleremove}
-Let $\Rules = \Rules_1 \cup \Rules_2$, and suppose that $\arr{\Rules_1}\:
-\subseteq\:\succ$ and $\arr{\Rules_2}\:\subseteq\:\succeq$ for a
-well-founded ordering $\succ$ and a compatible quasi-ordering $\succeq$.
-Then $\arr{\Rules}$ is terminating if and only if $\arr{\Rules_2}$ is
-(which is certainly the case if $\Rules_2 = \emptyset$).
-\end{theorem}
-
-\begin{proof}
-By well-foundedness of $\succ$, every infinite decreasing $\arr{\Rules}$
-sequence can only use finitely many steps using $\arr{\Rules_1}$.
-\qed
-\end{proof}
-
-This gives rise to the following algorithm:
-\begin{enumerate}
-\item While $\Rules$ is non-empty:
-  \begin{enumerate}
-  \item Orient all rules in $\Rules$ using $\succeq$ or $\succ$; at least
-    one of them must be oriented using $\succ$.
-  \item Remove all rules ordered by $\succ$ from $\Rules$.
-  \end{enumerate}
-\end{enumerate}
-If this algorithm succeeds, we have proven termination.
-
-\section{Defining a world}
-
-\subsection{Defining the set $\World$}\label{sec_world}
-
-\subsubsection{Interpretation terms}
-We define the set of types for interpretation terms.
-
-Our system of interpretation terms is based on System~$F_\omega$, see
-e.g., Sorensen, Urzyczyn, ``Lectures on the Curry-Howard
-Isomorphism'', Section~11.7.
-
-\begin{definition}\label{def:itypes}\normalfont
+\begin{definition}\label{def_types}\normalfont
   \emph{Kinds} are defined inductively:
   \begin{itemize}
   \item $*$ is a kind,
@@ -195,10 +122,16 @@ Isomorphism'', Section~11.7.
   We assume infinitely many \emph{type constructor variables} of each
   kind. Variables of kind~$*$ are \emph{type variables}.
 
+  We assume a fixed set~$\Sigma_T$ of \emph{type constructor symbols}
+  paired with a kind, denoted $c : \kappa$. Every type constructor
+  symbol~$c$ occurs with only one kind declaration.
+
   We define \emph{type constructors} of kind~$\kappa$ by induction.
   Type constructors of kind~$*$ are called \emph{types}.
   \begin{itemize}
   \item A type constructor variable of kind~$\kappa$ is a type
+    constructor of kind~$\kappa$.
+  \item A type constructor symbol of kind~$\kappa$ is a type
     constructor of kind~$\kappa$.
   \item If $\varphi$ is a type constructor of kind $\kappa_1 \arrkind
     \kappa_2$ and $\psi$ is a type constructor of kind~$\kappa_1$ then
@@ -216,8 +149,13 @@ Isomorphism'', Section~11.7.
   by~$\Tc_\kappa$.
 
   We use the notation $\forall \alpha . \tau$. When $\alpha$ is of
-  kind $\kappa$ then we use the notations $\forall \alpha : \kappa
-  . \tau$ and $\forall (\alpha : \kappa)[\tau]$.
+  kind $\kappa$ then we use the notations
+  $\forall \alpha : \kappa . \tau$ and
+  $\forall (\alpha : \kappa)[\tau]$. These are all just different
+  notations used for convenience.
+
+  We treat type constructors up to $\alpha$-conversion. Note
+  that~$\forall$ binds variables.
 
   Beta-reduction on type constructors is defined as the compatible
   closure of the rule
@@ -226,50 +164,53 @@ Isomorphism'', Section~11.7.
   \]
   Note that type constructors are essentially simply-typed
   lambda-terms, so beta-reduction on type constructors terminates and
-  is confluent, hence every type constructor~$\varphi$ has a unique
-  normal form.
+  is confluent, hence every type constructor has a unique normal form.
 
   We define $\FV(\varphi)$ -- the set of free type constructor
   variables of the type constructor~$\varphi$ -- in an obvious way by
   induction on the structure of~$\varphi$. A type
-  constructor~$\varphi$ is \emph{closed} if $\FV(\varphi) =
-  \emptyset$.
+  constructor~$\varphi$ is \emph{closed} if
+  $\FV(\varphi) = \emptyset$.
 \end{definition}
 
-\begin{definition}\label{def_typing}\normalfont
-We assume given an infinite set $\Vars$ of variables, and let $\Gamma$
-refer to a mapping from a finite subset of $\Vars$ to the set of
-interpretation types. The set of interpretation preterms consists of
-all expressions $s$ such that $\Gamma \vdash s : \sigma$ can be
-inferred for some interpretation type $\sigma$ and mapping $\Gamma$ by
-the following clauses:
-\begin{itemize}
-\item $\Gamma \vdash n : \nat$ for every natural number $n$.
-\item $\Gamma \vdash x : \sigma$ for every $(x : \sigma) \in \Gamma$.
-\item $\Gamma \vdash \mathtt{f} : \sigma$ for all $(\mathtt{f} :
-  \sigma)$ in the following set: $\{ \oplus_\sigma : \sigma \arrtype
-  \sigma \arrtype \sigma,\ \otimes_\sigma : \sigma \arrtype \sigma
-  \arrtype \sigma,\ \flatten_{\sigma} : \sigma \arrtype
-  \nat,\ \lift_{\sigma} : \nat \arrtype \sigma \mid \sigma \in \ITypes
-  \}$.
-\item $\Gamma \vdash \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
-  \in \Vars$ and $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$.
-\item $\Gamma \vdash \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
-  $\alpha$ is a type constructor variable and $\Gamma \vdash s :
-  \sigma$ and for all $(x : \tau) \in \Gamma$: $\alpha \notin
-  \FV(\tau)$
-\item $\Gamma \vdash \app{s}{t} : \tau$ if $\Gamma \vdash s : \sigma
-  \arrtype \tau$ and $\Gamma \vdash t : \sigma$
-\item $\Gamma \vdash \tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$ if
-  $\Gamma \vdash s : \quant{(\alpha:\kappa)}{\sigma}$ and~$\tau$ is a
-  type constructor of kind~$\kappa$,
-\item $\Gamma \vdash s : \tau$ if $\Gamma \vdash s : \tau'$ and $\tau
-  =_\beta \tau'$.
-\end{itemize}
-The set of free variables of a preterm~$t$, denoted $\FV(t)$, is
-defined in the expected way. Analogously, we define the set~$\FTV(t)$
-of type constructor variables occurring free in~$t$. We say that $t$
-is \emph{closed} if $\FV(t) = \emptyset$ and $\FTV(t) = \emptyset$.
+Terms are built from a set of function symbols, using abstraction and
+application.
+
+\begin{definition}\label{def_preterms}\normalfont
+  We assume given an infinite set $\Vars$ of variables, and let
+  $\Gamma$ refer to a mapping from a finite subset of $\Vars$ to the
+  set of types.
+
+  We assume given a fixed set $\Sigma$ of \emph{function symbols},
+  each paired with a type, denoted $\mathtt{f} : \tau$.  Every
+  function symbol $\mathtt{f}$ occurs only with one type declaration.
+
+  The set of preterms consists of all expressions $s$ such that
+  $\Gamma \vdash s : \sigma$ can be inferred for some type $\sigma$
+  and mapping $\Gamma$ by the following clauses:
+  \begin{itemize}
+  \item $\Gamma \vdash n : \nat$ for every natural number $n$.
+  \item $\Gamma \vdash x : \sigma$ for every $(x : \sigma) \in \Gamma$.
+  \item $\Gamma \vdash \mathtt{f} : \sigma$ for all
+    $(\mathtt{f} : \sigma) \in \Sigma$.
+  \item $\Gamma \vdash \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
+    \in \Vars$ and $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$.
+  \item $\Gamma \vdash \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
+    $\alpha$ is a type constructor variable and $\Gamma \vdash s :
+    \sigma$ and for all $(x : \tau) \in \Gamma$: $\alpha \notin
+    \FV(\tau)$
+  \item $\Gamma \vdash \app{s}{t} : \tau$ if $\Gamma \vdash s : \sigma
+    \arrtype \tau$ and $\Gamma \vdash t : \sigma$
+  \item $\Gamma \vdash \tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$ if
+    $\Gamma \vdash s : \quant{(\alpha:\kappa)}{\sigma}$ and~$\tau$ is a
+    type constructor of kind~$\kappa$,
+  \item $\Gamma \vdash s : \tau$ if $\Gamma \vdash s : \tau'$ and $\tau
+    =_\beta \tau'$.
+  \end{itemize}
+  The set of free variables of a preterm~$t$, denoted $\FV(t)$, is
+  defined in the expected way. Analogously, we define the set~$\FTV(t)$
+  of type constructor variables occurring free in~$t$. We say that $t$
+  is \emph{closed} if $\FV(t) = \emptyset$ and $\FTV(t) = \emptyset$.
 \end{definition}
 
 If $\alpha$ is a type constructor variable of kind~$\kappa$ then we
@@ -278,15 +219,15 @@ use the notation $\tabs{\alpha:\kappa}{t}$.
 Note that for a given $\Gamma$, if $s$ is typable under $\Gamma$, then
 there is only one choice for the type modulo $\beta$-conversion (this
 is easily proved by induction on the form of $s$). Thus, all closed
-terms have a unique type modulo $\beta$-conversion.
+preterms have a unique type modulo $\beta$-conversion.
 
 \begin{definition}\label{def_type_equiv}
   We define the type equivalence relation~$\equiv$ on preterms by
   induction on preterm structure.
   \begin{itemize}
   \item $x \equiv x$, $n \equiv n$,
-  \item if $\sigma =_\beta \tau$ then $f_\sigma \equiv f_\tau$ for $f
-    \in \{\oplus,\otimes,\flatten,\lift\}$,
+  \item if $\sigma =_\beta \tau$ then $f_\sigma \equiv f_\tau$ for
+    $f \in \Sigma$,
   \item if $\sigma =_\beta \tau$ and $s \equiv t$ then
     $\abs{x:\sigma}{s} \equiv \abs{x:\tau}{t}$,
   \item if $s \equiv t$ then $\tabs{\alpha}{s} \equiv
@@ -298,6 +239,8 @@ terms have a unique type modulo $\beta$-conversion.
   \end{itemize}
   In other words, $s \equiv t$ iff $s$ and $t$ are identical modulo
   $\beta$-conversion in types.
+  \CK{And $\alpha$-conversion implicitly as well, I assume?}
+  \LC{Yes, of course.}
 \end{definition}
 
 Note that~$\equiv$ is an equivalence relation.
@@ -311,29 +254,57 @@ Note that~$\equiv$ is an equivalence relation.
   Induction on~$s$.
 \end{proof}
 
-The set $\Iterms$ of interpretation terms is now defined as follows.
+The set of terms is now defined as follows.
 
-\begin{definition}\normalfont
-  The set~$\Iterms$ of \emph{interpretation terms} is the set of the
-  equivalence classes of~$\equiv$.
+\begin{definition}\label{def_terms}\normalfont
+  The set of \emph{terms} is the set of the equivalence classes
+  of~$\equiv$.
 \end{definition}
 
-Because $\beta$-reduction on types is confluent and termination, every
-interpretation term has a canonical preterm representative -- the one
-with all types occurring in it $\beta$-normalized. We say that a term
-is \emph{closed} if its canonical representative is. We define
-$\FTV(t)$ as the value of~$\FTV$ on the canonical representative
-of~$t$.
+Because $\beta$-reduction on types is confluent and terminating, every
+term has a canonical preterm representative -- the one with all types
+occurring in it $\beta$-normalized. We say that a term is
+\emph{closed} if its canonical representative is. We define $\FTV(t)$
+as the value of~$\FTV$ on the canonical representative of~$t$.
 
 Because typing and term formation operations (abstraction,
-application, \ldots) are invariant under~$\equiv$, we may denote
-interpretation terms by their (canonical) representatives and
-informally treat them interchangeably.
+application, \ldots) are invariant under~$\equiv$, we may denote terms
+by their (canonical) representatives and informally treat them
+interchangeably.
+
+We will often abuse notation to omit $\cdot$ and $*$. Thus, $s t$ can
+refer to both $\app{s}{t}$ and $\tapp{s}{t}$. This is not ambiguous
+due to typing. We will also use $\abstraction{a}{s}$ for either
+$\abs{a}{s}$ or $\tabs{a}{s}$, depending on typing.
+
+\begin{definition}\label{def_chi_kappa}\normalfont
+  By induction on the kind~$\kappa$ we define a closed type
+  constructor~$\chi_\kappa$. For $\kappa=*$ we take $\chi_\kappa =
+  \nat$. For $\kappa=\kappa_1\arrkind\kappa_2$ we take $\chi_\kappa =
+  \lambda \alpha:\kappa_1 . \chi_{\kappa_2}$.
+\end{definition}
+
+\begin{lemma}[Substitution lemma]
+  \begin{enumerate}
+  \item If $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$ and
+    $\Gamma \proves t : \sigma$ then
+    $\Gamma \proves s[\subst{x}{t}] : \tau$.
+  \item If $\Gamma \proves t : \sigma$ and~$\tau$ is a type
+    constructor of the same kind as the variable~$\alpha$ then
+    $\Gamma[\subst{\alpha}{\tau}] \proves t[\subst{\alpha}{\tau}] :
+    \sigma[\subst{\alpha}{\tau}]$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  Induction on the typing derivation.
+\end{proof}
 
 \begin{lemma}[Generation lemma]
-  Assume $\Gamma \proves t : \sigma$. Then there is a type~$\sigma'$
-  such that $\sigma' =_\beta \sigma$ and $\FV(\sigma') \subseteq
-  \FV(\sigma)$ and one of the following holds.
+  Assume $\Gamma \proves t : \sigma$ and let
+  $\Vc = \FV(\sigma) \cup \FTV(t) \cup \FTV(\Gamma)$. Then there is a
+  type~$\sigma'$ such that $\sigma' =_\beta \sigma$ and
+  $\FV(\sigma') \subseteq \Vc$ and one of the following holds.
   \begin{itemize}
   \item $t$ is a natural number and $\sigma' = \nat$.
   \item $t \equiv x$ is a variable and $(x : \tau) \in \Gamma$ and $\tau
@@ -346,34 +317,58 @@ informally treat them interchangeably.
   \item $t \equiv \abs{x:\tau_1}{s}$ and
     $\sigma'=\tau_1\arrtype\tau_2$ and $\Gamma \uplus \{ x : \tau_1 \}
     \vdash s : \tau_2$.
-  \item $t \equiv \tabs{\alpha}{s}$ and $\sigma' =
-    \quant{\alpha}{\tau}$ and $\Gamma \vdash s : \tau$ and for all $(x
-    : \rho) \in \Gamma$: $\alpha \notin \FV(\rho)$.
-  \item $t \equiv \app{t_1}{t_2}$ and $\Gamma \vdash t_1 :
-    \sigma' \arrtype \tau$ and $\Gamma \vdash t_2 : \sigma'$.
-  \item $t \equiv \tapp{s}{\tau}$ and $\sigma' =
-    \rho[\subst{\alpha}{\tau}]$ and $\Gamma \vdash s :
-    \quant{(\alpha:\kappa)}{\rho}$ and~$\tau$ is a type constructor of
-    kind~$\kappa$.
+  \item $t \equiv \tabs{\alpha}{s}$ and
+    $\sigma' = \quant{\alpha}{\tau}$ and $\Gamma \vdash s : \tau$ and
+    for all $(x : \rho) \in \Gamma$: $\alpha \notin \FV(\rho)$.
+  \item $t \equiv \app{t_1}{t_2}$ and
+    $\Gamma \vdash t_1 : \tau \arrtype \sigma'$ and
+    $\Gamma \vdash t_2 : \tau$ and $\FV(\tau) \subseteq \Vc$.
+  \item $t \equiv \tapp{s}{\tau}$ and
+    $\sigma' = \rho[\subst{\alpha}{\tau}]$ and
+    $\Gamma \vdash s : \quant{(\alpha:\kappa)}{\rho}$ and~$\tau$ is a
+    type constructor of kind~$\kappa$.
   \end{itemize}
 \end{lemma}
 
 \begin{proof}
   By induction on the derivation $\Gamma \proves t : \sigma$, using
-  confluence of $\beta$-reduction in types and the stability of the
-  typing relation under $\beta$-reduction in types (note that if
-  $\sigma \to^*_\beta \sigma'$ then $\FV(\sigma') \subseteq
-  \FV(\sigma)$).
+  the substitution lemma. Note that if $\alpha \notin \Vc$ is of
+  kind~$\kappa$ and e.g.~$\Gamma \proves s : \sigma'$ with~$s$ a
+  subterm of~$t$, then
+  $\Gamma \proves s : \sigma'[\subst{\alpha}{\chi_\kappa}]$ by the
+  substitution lemma (see Definition~\ref{def_chi_kappa}).
 \end{proof}
 
-\begin{definition}\label{def_chi_kappa}\normalfont
-  By induction on the kind~$\kappa$ we define a closed type
-  constructor~$\chi_\kappa$. For $\kappa=*$ we take $\chi_\kappa =
-  \nat$. For $\kappa=\kappa_1\arrkind\kappa_2$ we take $\chi_\kappa =
-  \lambda \alpha:\kappa_1 . \chi_{\kappa_2}$.
+\section{Interpretations}
+
+In this section we define the set~$\World$ of final interpretation
+terms, and the relations~$\succ$ and~$\succeq$ on~$\World$.
+
+\subsection{Defining the set $\World$}\label{sec_world}
+
+\subsubsection{Interpretation terms}
+
+\begin{definition}\label{def_iterms}\normalfont
+  The set~$\ITypes$ of \emph{interpretation types} is the set of types
+  as in Definition~\ref{def_types} with $\Sigma_T = \{ \nat : * \}$,
+  i.e., there is a single type constant~$\nat$.
+
+  The set~$\Iterms$ of \emph{interpretation terms} is the set of terms
+  from Definition~\ref{def_terms} (see also
+  Definition~\ref{def_preterms}) where as types we take the
+  interpretation types and as the set~$\Sigma$ of function symbols we
+  take:
+  \[
+    \begin{array}{rcl}
+      \Sigma &=& \{ \oplus_\sigma : \sigma \arrtype
+                 \sigma \arrtype \sigma,\\ & & \otimes_\sigma : \sigma \arrtype \sigma
+                 \arrtype \sigma,\\ & & \flatten_{\sigma} : \sigma \arrtype
+                 \nat,\\ & & \lift_{\sigma} : \nat \arrtype \sigma \mid \sigma \in \ITypes
+                 \}
+    \end{array}
+  \]
 \end{definition}
 
-\subsubsection{Normalising interpretation terms}
 To define the world of \emph{final interpretation terms}, we will
 normalise certain elements of $\Iterms$ using the relation $\leadsto$.
 
@@ -431,18 +426,14 @@ normalise certain elements of $\Iterms$ using the relation $\leadsto$.
   $s \in \Iterms$ such that (a) $s$ is closed, and (b) $s$ is in
   normal form with respect to $\leadsto$.  We let $\World$ be the set
   of all final interpretation terms. By~$\World_\tau$ we denote the
-  set of all final interpretation terms of type~$\tau$.
+  set of all final interpretation terms of interpretation type~$\tau$.
 \end{definition}
 
 In the remainder of this section, we shall often speak simply of
-``terms'' when referring to interpretation terms.
+``terms'' and ``types'' when referring to interpretation terms and
+interpretation types.
 
 \subsubsection{Key properties of $\leadsto$}
-In the remainder of this section, we will often abuse notation to omit
-$\cdot$ and $*$.  Thus, $s t$ can refer to both $\app{s}{t}$ and
-$\tapp{s}{t}$. This is not ambiguous due to typing. We will also use
-$\abstraction{a}{s}$ for either $\abs{a}{s}$ or $\tabs{a}{s}$,
-depending on typing.
 
 \begin{lemma}[Subject reduction]
   If $\Gamma \vdash t : \tau$ and $t \leadsto t'$ then
@@ -451,7 +442,7 @@ depending on typing.
 
 \begin{proof}
   By induction on the definition of $t \leadsto t'$, using the
-  generation lemma.
+  generation and substitution lemmas.
 \end{proof}
 
 By~$\SN$ we denote the set of all terminating interpretation
@@ -485,7 +476,7 @@ The following lemma is obvious, but worth stating explicitly.
   for all~$s$ such that $\circ_\nat t_1 t_2 \leadsto s$. If $s =
   \circ_\nat t_1' t_2$ or $s = \circ_\nat t_1 t_2'$ with $t_i \leadsto
   t_i'$ then we complete by the induction hypothesis. Otherwise $s \in
-  \mathbb{N}$ is obviously in $\SN$.
+  \mathbb{N}$ is obviously in $\SN$.  \qed
 \end{proof}
 
 \subsubsection{Computability}
@@ -521,7 +512,7 @@ each term has a unique type modulo $\beta$-conversion. We write $t :
 lemmas still holds for orthodox Church-style typed terms.
 
 \begin{definition}\label{def_candidate}\normalfont
-  A term~$t$ is \emph{neutral} if there does not exists a sequence of
+  A term~$t$ is \emph{neutral} if there does not exist a sequence of
   terms and types~$u_1,\ldots,u_n$ with $n \ge 1$ such that $t u_1
   \ldots u_n$ is a redex (by~$\leadsto$).
 
@@ -539,8 +530,9 @@ lemmas still holds for orthodox Church-style typed terms.
     have $t' \in X$, then $t \in X$;
   \item if $t_1,t_2 \in X$ then $\circ_\tau t_1 t_2 \in X$ for
     $\circ \in \{\oplus,\otimes\}$;
-  \item if $t \in \SN$ and $t : \nat$ then $\lift_\tau(t) \in X$;
-  \item if $t \in X$ then $\flatten_\tau(t) \in \SN$.
+  \item if $t \in \SN$ and $t : \nat$ then $\CKchange{\lift_\tau t}
+    \in X$;
+  \item if $t \in X$ then $\CKchange{\flatten_\tau t} \in \SN$.
   \end{enumerate}
   Note that item~3 above implies:
   \begin{itemize}
@@ -736,6 +728,17 @@ write~$\val{\varphi}{}{}$.
   and $\xi$ is an $\omega$-valuation, then $\val{\sigma}{\xi}{\omega}
   \in \Cb_{\omega(\sigma)}$.
 \end{lemma}
+
+\CK{I still see $\flatten_\sigma(s)$ and $\lift_\sigma(s)$ used in
+this proof. Has it been fully updated to the new definitions?}
+
+\LC{??? I don't understand what you're talking about here. We need
+  $\flatten$ and $\lift$ -- they are in our interpretation terms?}
+
+\CK{I'm referring to the functional notation: we need
+$\flatten_\sigma s$, not $\flatten_\sigma(s)$.  Since you replaced
+it in most other places, I wondered whether this proof had been
+updated.}
 
 \begin{proof}
   By induction on the structure of~$\sigma$ we show that
@@ -1155,9 +1158,11 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
   $\omega^*(t) : \omega(\sigma)$.
 
   By the generation lemma for $t : \sigma$ there is a type~$\sigma'$
-  such that $\sigma' =_\beta \sigma$ and $\FV(\sigma') \subseteq
-  \FV(\sigma)$ (so~$\sigma'$ is closed for~$\omega$) and one of the
-  cases below holds. By Lemma~\ref{lem_beta_val} it suffices to show
+  such that $\sigma' =_\beta \sigma$ and
+  $\FV(\sigma') \subseteq \FV(\sigma) \cup \FTV(t)$ and one of the
+  cases below holds. Note that~$\omega$ is closed for~$\sigma'$
+  because it is closed for~$\sigma$ and $\FTV(\omega(t)) =
+  \emptyset$. By Lemma~\ref{lem_beta_val} it suffices to show
   $\omega^*(t) \in \val{\sigma'}{\xi}{\omega}$.
   \begin{itemize}
   \item If $t = x_1^{\tau_1}$ and $\tau_1 =_\beta \sigma'$ then
@@ -1170,9 +1175,10 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
   \item If $t$ is a function symbol then the claim follows from
     Lemma~\ref{lem_circ}, Lemma~\ref{lem_lift} or
     Lemma~\ref{lem_flatten}.
-  \item If $t = \abs{x:\sigma_1}{s}$ then $\sigma' =
-    \sigma_1\arrtype\sigma_2$ and $s : \sigma_2$. Let $u \in
-    \val{\sigma_1}{\xi}{\omega}$. By the inductive hypothesis
+  \item If $t = \abs{x:\sigma_1}{s}$ then
+    $\sigma' = \sigma_1\arrtype\sigma_2$ and $s : \sigma_2$. Hence
+    $\omega$ is closed for~$\sigma_2$. Let
+    $u \in \val{\sigma_1}{\xi}{\omega}$. By the inductive hypothesis
     $\omega^*(s)[\subst{x}{u}] \in \val{\sigma_2}{\xi}{\omega}$. Hence
     $\omega^*(t) \in \val{\sigma'}{\xi}{\omega}$ by
     Lemma~\ref{lem_abstraction_computable}.
@@ -1187,12 +1193,15 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
     $\alpha$ chosen fresh such that $\omega(\alpha) = \alpha$). Hence
     $\omega^*(t) \in \val{\tau}{\xi}{\omega}$ by
     Lemma~\ref{lem_abstraction_computable}.
-  \item If $t = t_1 t_2$ then $t_1 : \tau\arrtype\sigma'$ and $t_2 :
-    \tau$. By the inductive hypothesis $\omega^*(t_1) \in
-    \val{\tau\arrtype\sigma'}{\xi}{\omega}$ and $\omega^*(t_2) \in
-    \val{\tau}{\xi}{\omega}$. We have $\omega^*(t_2) :
-    \omega(\tau)$. Then by definition $\omega^*(t) =
-    (\omega^*(t_1))(\omega^*(t_2)) \in \val{\sigma'}{\xi}{\omega}$.
+  \item If $t = t_1 t_2$ then $t_1 : \tau\arrtype\sigma'$ and
+    $t_2 : \tau$ and $\FV(\tau) \subseteq \FV(\sigma) \cup
+    \FTV(t)$. Hence~$\omega$ is closed for~$\tau$ and
+    for~$\tau\arrtype\sigma'$. By the inductive hypothesis
+    $\omega^*(t_1) \in \val{\tau\arrtype\sigma'}{\xi}{\omega}$ and
+    $\omega^*(t_2) \in \val{\tau}{\xi}{\omega}$. We have
+    $\omega^*(t_2) : \omega(\tau)$. Then by definition
+    $\omega^*(t) = (\omega^*(t_1))(\omega^*(t_2)) \in
+    \val{\sigma'}{\xi}{\omega}$.
   \item If $t = s \psi$ then $s : \forall\alpha[\tau]$ and $\sigma' =
     \tau[\subst{\alpha}{\psi}]$. By the inductive hypothesis
     $\omega^*(s) \in \val{\forall\alpha[\tau]}{\xi}{\omega}$. Because
@@ -1211,13 +1220,14 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
   For closed terms~$t$ and closed types~$\sigma$ this follows from
   Lemma~\ref{lem_typable_computable}, Lemma~\ref{lem_val_computable}
   and property~1 of candidates (Definition~\ref{def_candidate}). For
-  arbitrary terms and types, this follows by closing them with an
-  appropriate number of abstractions.\qed
+  arbitrary terms and types, this follows by closing the terms with an
+  appropriate number of abstractions, and the types with corresponding
+  $\forall$-quantifiers.\qed
 \end{proof}
 
 \begin{lemma}\label{lem_unique_final}
   Every term $s \in \Iterms$ reduces to a unique final interpretation
-  term $s\downarrow$.
+  term $s\da$.
 \end{lemma}
 
 \begin{proof}
@@ -1242,7 +1252,7 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
   because then $t$ would contain a redex. So $\sigma=\nat$. Then
   $t_1,t_2$ are final interpretation terms of type~$\nat$, hence
   natural numbers by the inductive hypothesis. But then $t$ contains a
-  redex. Contradiction.
+  redex. Contradiction.\qed
 \end{proof}
 
 \subsection{Defining $\succ$ and $\succeq$}
@@ -1262,8 +1272,9 @@ $s,t$, following Definition~\ref{def:succ}.
         numbers}}\quad\quad
     \infer={s\ R_{\sigma\arrtype\tau}\ t}{\app{s}{q}\ R_{\tau}\ \app{t}{q}
       \text{ for every } q \in \World_\sigma} \\ \\
-    \infer={s\ R_{\forall\alpha[\sigma]}\ t}{\tapp{s}{\tau}\ R_{\sigma[\subst{\alpha}{\tau}]}\ \tapp{t}{\tau}
-      \text{ for every closed type } \tau}
+    \infer={s\ R_{\forall(\alpha:\kappa)[\sigma]}\ t}{\tapp{s}{\tau}\ R_{\sigma[\subst{\alpha}{\tau}]}\ \tapp{t}{\tau}
+      \text{ for every closed type constructor } \tau \text{ of kind }
+      \kappa}
     \end{array}
   \]
 \end{definition}
@@ -1271,9 +1282,17 @@ $s,t$, following Definition~\ref{def:succ}.
 Note that in the case for~$\nat$ the terms~$s\da$, $t\da$ are natural
 numbers by Lemma~\ref{lem_final_nat}.
 
-\LC{This definition was incorrect before, because e.g.~$\app{s}{q}$
-  need not be in normal form. I think it's best just to define it from
-  the start for all terms in~$\Iterms$.}
+Intuitively, the above definition means that e.g. $s \succ t$ iff
+there exists a possibly infinite derivation tree using the above
+rules. In such a derivation tree all leaves must witness
+$s\da >_\nat t\da$ in natural numbers. However, this also allows for
+infinite branches, which solves the problem of repeating types due to
+impredicative polymorphism. If e.g.
+$s \succ_{\forall \alpha . \alpha} t$ then one of the premises will be
+$\tapp{s}{\forall\alpha.\alpha} \succ_{\forall \alpha . \alpha}
+\tapp{t}{\forall\alpha.\alpha}$, which forces an infinite branch in
+the derivation tree. According to our definition any infinite branch
+may essentially be ignored.
 
 \subsection{Properties of $\succ$ and $\succeq$}
 
@@ -1286,14 +1305,16 @@ $\succ$ is well-founded.
 
 \begin{proof}
   By induction on the size of the type~$\tau$ one shows that there
-  does not exist an infinite sequence $t_1 \succ_\tau t_2 \succ_\tau
-  t_3 \succ_\tau \ldots$ For instance, if $t_1
-  \succ_{\forall\alpha[\tau]} t_2 \succ_{\forall\alpha[\tau]} t_3
-  \succ_{\forall\alpha[\tau]} \ldots$ then $\tapp{t_1}{\nat}
-  \succ_{\tau[\subst{\alpha}{\nat}]} \tapp{t_2}{\nat}
-  \succ_{\tau[\subst{\alpha}{\nat}]} \tapp{t_3}{\nat}
-  \succ_{\tau[\subst{\alpha}{\nat}]} \ldots$, which is impossible by
-  the inductive hypothesis.
+  does not exist an infinite sequence
+  $t_1 \succ_\tau t_2 \succ_\tau t_3 \succ_\tau \ldots$ For instance,
+  if $\alpha$ has kind~$\kappa$ and
+  $t_1 \succ_{\forall\alpha[\tau]} t_2 \succ_{\forall\alpha[\tau]} t_3
+  \succ_{\forall\alpha[\tau]} \ldots$ then
+  $\tapp{t_1}{\chi_\kappa} \succ_{\tau[\subst{\alpha}{\chi_\kappa}]}
+  \tapp{t_2}{\chi_\kappa} \succ_{\tau[\subst{\alpha}{\chi_\kappa}]}
+  \tapp{t_3}{\chi_\kappa} \succ_{\tau[\subst{\alpha}{\chi_\kappa}]}
+  \ldots$, which is impossible by the inductive hypothesis (see
+  Definition~\ref{def_chi_kappa} for the definition of~$\chi_\kappa$).
 \end{proof}
 
 \begin{lemma}
@@ -1318,7 +1339,7 @@ Both $\succ$ and $\succeq$ are transitive.
   \succeq_{\forall\alpha[\sigma]}t_2\succeq_{\forall\alpha[\sigma]}t_3$
   then
   $\tapp{t_1}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_2}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}$
-  for any closed type~$\tau$. Hence
+  for any closed type constructor~$\tau$ of the appropriate kind. Hence
   $\tapp{t_1}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}$
   by the coinductive hypothesis. Thus
   $t_1\succeq_{\forall\alpha[\sigma]} t_3$.\qed
@@ -1338,37 +1359,28 @@ Finally, they must be compatible:
 
 \begin{lemma}\label{lem:compatibility}
 We have $\succ \cdot \succeq\ \subseteq\ \succ$
+\CKchange{and $\succeq \cdot \succ\ \subseteq\ \succ$}.
 \end{lemma}
 
 \begin{proof}
 By coinduction, analogous to the transitivity proof.\qed
 \end{proof}
 
-\CK{Do we also have $\succeq \cdot \succ\ \subseteq\ \succ$? I'd like
-to use that.\medskip} \LC{Yes, with an analogous proof.}
-
-\CK{I think that's all that absolutely \emph{has} to be proven to make
-  the argument work. However, to work with these things we will need a
-  little more\dots}
-
-No longer needed: In the following, we extend $\succ$ and $\succeq$ to
-non-final interpretation terms, by defining $s \succ t$ (resp. $s
-\succeq t$) if $s\downarrow \succ t\da$ (resp. $s\downarrow \succeq
-t\downarrow$).  \CK{Note that for this we do need to prove that
-  $\leadsto$ has unique normal forms, but if we don't define this,
-  then the following lemma is meaningless, I think.}  \LC{This already
-  beaks down without unique normal forms with the definition
-  for~$\World$, so I changed the definition to make it work
-  for~$\Iterms$ from the start.}
+For easier presentation, we will denote $\oplus$ and $\otimes$ in
+\emph{infix, left-associative} notation, and omit the type denotation
+where it is clear from context.  Thus, $s \oplus t \oplus u$ should be
+read as $\oplus_\sigma\,s\,(\oplus_\sigma\,t\,u)$ if $s$ has type
+$\sigma$. Similarly, we will sometimes omit the type denotation from
+$\flatten$ and $\lift$ when it can easily be derived from context.
 
 \begin{lemma}\label{lem:plusparts}
 For all \emph{closed} interpretation types $\sigma$, interpretation
 terms $s,t$ of type $\sigma$ and $n > 0$ we have:
 \begin{enumerate}
-\item $\oplus_{\sigma} s t \succeq s$ and
-      $\oplus_{\sigma} s t \succeq t$;
-\item $\oplus_{\sigma} s (\lift_{\sigma}(n)) \succ s$ and
-      $\oplus_{\sigma} (\lift_{\sigma}(n)) t \succ t$.
+\item $s \oplus_{\sigma} t \succeq s$ and
+      $s \oplus_{\sigma} t \succeq t$;
+\item $s \oplus_{\sigma} \lift_{\sigma}(n) \succ s$ and
+      $\lift_{\sigma}(n) \oplus_{\sigma}  t \succ t$.
 \end{enumerate}
 \end{lemma}
 
@@ -1391,11 +1403,22 @@ If $n \geq m$ then $\lift_\sigma(n) \succeq \lift_\sigma(m)$ for all
 TODO
 \end{proof}
 
+\CK{Pondering: do we also have that
+  $\lift_\sigma(n+m) = (\lift_\sigma n) \oplus_\sigma (\lift_\sigma
+  n)$? Could be useful. (But let's first see whether it's needed for
+  anything.)}
+
+\LC{If $=$ here is the reflexive-symmetric-transitive closure
+  of~$\leadsto$ then yes, this follows by induction on~$\sigma$.}
+
+\CK{What I mean is: $\succeq \cap \preceq$, so I guess that's covered.}
+
 \begin{lemma}\label{lem:plustimesmonotonic}
 If $s,t,u$ are terms of a \emph{closed} type $\sigma$ and $s \succeq
 t$, then $s \oplus_\sigma u \succeq t \oplus_\sigma u$ and $s
 \otimes_\sigma u \succeq t \otimes_\sigma u$.  Moreover, if even $s
-\succ t$ then we have $s \oplus_\sigma u \succ t$, and if $u \succeq
+\succ t$ then we have $s \oplus_\sigma u \succ t \CKchange{\oplus_\sigma
+u}$, and if $u \succeq
 \lift_\sigma(1)$ then also $s \otimes_\sigma u \succ t \otimes_\sigma
 u$.
 \end{lemma}
@@ -1414,21 +1437,56 @@ For all \emph{closed} interpretation types $\sigma$ and all
 interpretation terms $s,t,u$ of type $\sigma$, we have:
 \begin{enumerate}
 \item\label{lem:approx:symmetry}
-  $\oplus_\sigma s t \approx \oplus_\sigma t s$ and
-  $\otimes_\sigma s t \approx \otimes_\sigma t s$;
-\item\label{lem:approx:assoc} $\oplus_\sigma s (\oplus_\sigma t u)
-  \approx \oplus_\sigma(\oplus_\sigma s t) u$ and $\otimes_\sigma s
-  (\otimes_\sigma t u) \approx \otimes_\sigma(\otimes_\sigma s t) u$;
-\item\label{lem:approx:distribution} $\otimes_\sigma s (\oplus t u)
-  \approx \oplus_\sigma(\otimes_\sigma s t) (\otimes_\sigma s u)$;
-\item\label{lem:approx:neutral} $\oplus_\sigma(\lift_\sigma(0)) s
-  \approx s$ and $\otimes_\sigma(\lift_\sigma(1)) s \approx s$.
+  $s \oplus_\sigma t \approx t \oplus_\sigma s$ and
+  $s \otimes_\sigma t \approx t \otimes_\sigma s$;
+\item\label{lem:approx:assoc} $s \oplus_\sigma (t \oplus_\sigma u)
+  \approx (s \oplus_\sigma t) \oplus_\sigma u$ and $s
+  \otimes_\sigma (t \otimes_\sigma u) \approx (s \otimes_\sigma t) \otimes_\sigma u$;
+\item\label{lem:approx:distribution} $s \otimes_\sigma (t \oplus_\sigma u)
+  \approx (s \otimes_\sigma t) \oplus_\sigma (s \otimes_\sigma u)$;
+\item\label{lem:approx:neutral} $(\CKchange{\lift_\sigma 0}) \oplus_\sigma s
+  \approx s$ and $(\CKchange{\lift_\sigma 1})) \otimes_\sigma s \approx s$.
 \end{enumerate}
 \end{lemma}
 
 \begin{proof}
 TODO
 \end{proof}
+
+\begin{lemma}
+  Assume $t \succ s$ (resp.~$t \succeq s$).
+  \begin{enumerate}
+  \item If $t \leadsto t'$ or $t' \leadsto t$ then $t' \succ s$ (resp.~$t' \succeq s$).
+  \item If $s \leadsto s'$ or $s' \leadsto s$ then $t \succ s'$
+    (resp.~$t \succeq s'$).
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  We show the first point assuming $t \leadsto t'$, other cases being
+  analogous. We proceed by coinduction. If $t \succ_\nat s$ then
+  $t\da = t'\da$ and the claim holds.
+
+  If $t \succ_{\sigma\arrtype\tau} s$ then for every
+  $q \in \World_\sigma$ we have $\app{t}{q} \succ_\tau \app{s}{q}$. We
+  have $\app{t}{q} \leadsto \app{t'}{q}$. Hence
+  $\app{t'}{q} \succ_\tau \app{s}{q}$ by the coinductive
+  hypothesis. Thus $t' \succ_{\sigma\arrtype\tau} s$.
+
+  If $t \succ_{\forall(\alpha:\kappa)\sigma} s$ then for every closed
+  type constructor~$\tau$ of kind~$\kappa$ we have
+  $\tapp{t}{\tau} \succ_{\sigma[\subst{\alpha}{\tau}]}
+  \tapp{s}{\tau}$. We have $\tapp{t}{\tau} \leadsto
+  \tapp{t'}{\tau}$. Hence
+  $\tapp{t'}{\tau} \succ_{\sigma[\subst{\alpha}{\tau}]}
+  \tapp{s}{\tau}$ by the coinductive hypothesis. Thus
+  $t' \succ_{\forall(\alpha:\kappa)\sigma} s$.
+\end{proof}
+
+\begin{corollary}
+  For $R \in \{\succ,\succeq\}$: $s\ R\ t$ if and only if
+  $s\downarrow\ R\ t\downarrow$
+\end{corollary}
 
 \section{Systems of interest and their properties}\label{sec:systems}
 
@@ -1438,82 +1496,57 @@ general scheme.
 
 \subsection{Systems of interest}
 
-We use a syntax based on system $F_\omega$, similar to that of
-interpretation terms.
+We use a syntax based on system $F_\omega$, basing on
+Section~\ref{sec_preliminaries}.
 
 \begin{definition}\normalfont
   \emph{Kinds}, \emph{type constructors} and \emph{types} are defined
-  like in Definition~\ref{def:itypes} with the following
-  modification. We assume a fixed set~$\Sigma_T$ of \emph{type
-    constructor symbols} paired with a kind, denoted $c :
-  \kappa$. Every type constructor symbol~$c$ occurs with only one kind
-  declaration. Then the definition of type constructors contains the
-  following additional clause:
+  like in Definition~\ref{def_types}, parameterised by a fixed
+  set~$\Sigma_T$ of type constructor symbols.
+
+  Given a fixed set~$\Sigma$ of function symbols, we define
+  \emph{terms} like in Definition~\ref{def_terms} (based on
+  Definition~\ref{def_preterms}) with the following restrictions:
   \begin{itemize}
-  \item A type constructor symbol of kind~$\kappa$ is a type
-    constructor of kind~$\kappa$.
+  \item if $\mathtt{f} : \sigma \in \Sigma$ then $\sigma$ is closed,
+  \item for any subterm $t_1 t_2$ of a term~$t$, the subterm $t_1$ is
+    a term or type application, or a function symbol.
   \end{itemize}
-  We use the notations of Definition~\ref{def:itypes}, and define
-  $\beta$-reduction on type constructors as in
-  Definition~\ref{def:itypes}.
-\end{definition}
-
-Terms are built from a set of function symbols, using abstraction and
-application as for interpretation terms.
-
-\begin{definition}\normalfont
-We assume given a fixed set $\Sigma$ of \emph{function symbols}, each
-paired with a \emph{closed} type, denoted $\mathtt{f} : \tau$.  Every
-function symbol $\mathtt{f}$ occurs only with one type declaration.
-
-The set of preterms consists of those expressions $s$ such that
-$\Gamma \proves s : \sigma$ can be derived for some type $\sigma$ and
-environment $\Gamma$ using the following clauses:
-\begin{itemize}
-\item $\Gamma \vdash x : \sigma$ for every $(x : \sigma) \in \Gamma$.
-\item $\Gamma \vdash \mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\dots,s_k)
-  : \tau[\alpha_1 := \rho_1]\ldots[\alpha_n := \rho_n]$ if
-  \[
-  \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots
-  \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
-  \sigma_k \arrtype \tau
-  \]
-  is a function symbol in~$\Sigma$, and $\rho_i$ is a type constructor
-  of kind $\kappa_i$ for $i=1,\ldots,k$, and $\Gamma \proves s_i :
-  \sigma_i[\alpha_1 := \rho_1]\ldots[\alpha_n := \rho_n]$ for
-  $i=1,\ldots,k$.
-\item $\Gamma \proves \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
-  \in \Vars$ and $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$.
-\item $\Gamma \proves \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
-  $\alpha$ is a type constructor variable and $\Gamma \vdash s :
-  \sigma$ and for all $(x : \tau) \in \Gamma$: $\alpha \notin
-  \FTV(\tau)$.
-\item $\Gamma \proves t : \sigma$ if $\sigma =_\beta \sigma'$ and
-  $\Gamma \proves t : \sigma'$.
-\end{itemize}
-The relation~$\equiv$ of \emph{type equivalence} is defined
-analogously to Definition~\ref{def_type_equiv}. The set of
-\emph{terms} is the set of the equivalence classes of~$\equiv$.
 \end{definition}
 
 We use the notation
-$\mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\ldots,s_k)$ to stress the fact
-that by default there is no explicit application
-available. Application can be modelled by including the symbol ${@} :
-\forall\alpha\forall\beta . (\alpha \arrtype \beta) \arrtype \alpha
-\arrtype \beta$ in $\Sigma$. Similarly, type application is modelled
-through a symbol $\mathtt{A} : \forall \alpha : * \arrkind * . \forall
-\beta . (\forall \beta [\alpha \beta]) \arrtype \alpha \beta$.
+$\mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\ldots,s_k)$ for
+$\mathtt{f} \rho_1 \ldots \rho_n s_1 \ldots s_k$ when
+\[
+  \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots
+  \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
+  \sigma_k \arrtype \tau
+\]
+is a function symbol in~$\Sigma$ with~$k$ maximal, and $\rho_i$ is a
+type constructor of kind $\kappa_i$ for $i=1,\ldots,k$, and
+$\Gamma \proves s_i : \sigma_i[\alpha_1 := \rho_1]\ldots[\alpha_n :=
+\rho_n]$ for $i=1,\ldots,k$, for an appropriate~$\Gamma$. We use this
+notation to stress the fact that by default there is no explicit
+application available. The application in the syntax of terms is used
+just as convenient syntax, but does not correspond to the usual
+application operator since only applications of the form
+$\mathtt{f} u_1 \ldots u_n$ are allowed. True application can be
+modelled by including the symbol
+${@} : \forall\alpha\forall\beta . (\alpha \arrtype \beta) \arrtype
+\alpha \arrtype \beta$ in $\Sigma$. Similarly, type application is
+modelled through a symbol
+$\mathtt{A} : \forall \alpha : * \arrkind * . \forall \beta . (\forall
+\beta [\alpha \beta]) \arrtype \alpha \beta$.
 
 We use the notations and terminology of Section~\ref{sec_world}. To
 avoid confusion, the terms, types, type constructors, etc.~in the
-interpretation (those defined in Section~\ref{sec_world}) are referred
-to as interpretation terms, interpretation types, interpretation type
-constructors, etc.
+interpretation (those defined in Section~\ref{sec_world}) are always
+referred to as interpretation terms, interpretation types,
+interpretation type constructors, etc.
 
-The rules are simply an infinite set of term pairs, whose monotonic
-closure generates the rewrite relation. \LC{Now the set of rules can
-  be finite.}
+The rules are simply a set of term pairs, whose monotonic closure
+generates the rewrite relation. \LC{Now the set of rules can be
+  finite.}
 
 \begin{definition}\normalfont
 We fix an infinite variable environment $\Gamma$,
@@ -1546,11 +1579,9 @@ symbols:
   \mathtt{or} : * \arrkind * \arrkind *,\quad
   \mathtt{and} : * \arrkind * \arrkind *,\quad
   \exists : (* \arrkind *) \arrkind *
-  \}\quad \cup\quad
-  \{\quad \mathtt{prop}_i : * \mid i \in \mathbb{N}\quad \}
+  \}
 \end{array}
 \]
-Here $\mathtt{prop}_i$ represents the $i$-th propositional variable.
 
 We have the following function symbols:
 \[
@@ -1576,12 +1607,8 @@ We have the following function symbols:
   \exists (\alpha)
 \end{array}
 \]
-\LC{If we want this to work for open terms then we should also say
-  that for every variable in the original system there is a function
-  symbol. If we are satified with termination on closed terms, then we
-  don't need $\mathtt{prop}_i$}.
 
-\LC{In fact, I think it's clearer to do this for closed terms only,
+\LC{I think it's clearer to do this for closed terms only,
   because then termination for open terms follows by closing them with
   lambda-abstractions.}
 
@@ -1722,21 +1749,14 @@ All terms will be mapped to interpretation terms, which are compared
 using $\succ$ to hopefully obtain a decrease that can be used with
 rule removal.
 
-\LC{I think to make things simple we should base interpretation terms
-  on System~$F_\omega$ instead of System~$F$. The SN proof should be
-  easy to adapt to~$F_\omega$, we get a straightforward mapping, and
-  there are strictly more systems we can show termination of
-  (e.g. System~$F_\omega$ and extensions). Below I assume we have
-  System $F_\omega$ as the basis of our interpretation terms.}
-
 \begin{definition}\normalfont
 A \emph{type constructor mapping} is a function $\Typemap$ which maps
 a type constructor symbol to an interpretation type constructor of the
 same kind.
 
-A fixed type mapping $\Typemap$ is extended inductively to a function
-from type constructors to interpretation type constructors in the
-expected way. We denote the extended mapping
+A fixed type constructor mapping $\Typemap$ is extended inductively to
+a function from type constructors to interpretation type constructors
+in the expected way. We denote the extended mapping
 by~$\typeinterpret{\sigma}$.
 \end{definition}
 
@@ -1748,35 +1768,37 @@ Similarly, we employ a \emph{symbol mapping} as an aid to interpret
 \emph{terms}.
 
 \begin{definition}\normalfont
-A \emph{symbol mapping} is a function $\Termmap$ which assigns to each
-function symbol $\mathtt{f} : \rho$ a closed interpretation term
-$\Termmap(\mathtt{f})$ of type~$\typeinterpret{\rho}$. For a fixed
-symbol mapping $\Termmap$, we define $\interpret{s}$ as follows:
-\[
-\begin{array}{rcl}
-\interpret{x} & = & x \\
-\interpret{\tabs{\alpha}{s}} & = & \tabs{\alpha}{\interpret{s}} \\
-\interpret{\abs{x:\sigma}{s}} & = & \abs{x:\typeinterpret{\sigma}}{
-  \interpret{s}} \\
-\interpret{f_{\rho_1,\dots,\rho_n}(s_1,\dots,s_k)} & = &
-  \Termmap(f) \typeinterpret{\rho_1} \ldots \typeinterpret{\rho_n} \interpret{s_1} \ldots \interpret{s_k}
-\end{array}
-\]
+  A \emph{symbol mapping} is a function $\Termmap$ which assigns to
+  each function symbol $\mathtt{f} : \rho$ a closed interpretation
+  term $\Termmap(\mathtt{f})$ of type~$\typeinterpret{\rho}$. For a
+  fixed symbol mapping $\Termmap$, we define $\interpret{s}$
+  inductively:
+  \[
+    \begin{array}{rcl}
+      \interpret{x} & = & x \\
+      \interpret{\tabs{\alpha}{s}} & = & \tabs{\alpha}{\interpret{s}} \\
+      \interpret{\abs{x:\sigma}{s}} & = & \abs{x:\typeinterpret{\sigma}}{
+                                          \interpret{s}} \\
+      \interpret{\mathtt{f}} &=& \Termmap(f) \\
+      \interpret{\app{t_1}{t_2}} &=& \app{\interpret{t_1}}{\interpret{t_2}} \\
+      \interpret{\tapp{t}{\tau}} &=& \tapp{\interpret{t}}{\typeinterpret{\tau}}
+    \end{array}
+  \]
 
-Symbol mapping is extended to contexts as follows:
-\[
-\itp{\Gamma} := \{ (x : \typeinterpret{\tau}) \mid (x : \tau) \in \Gamma \}
-\]
+  Symbol mapping is extended to contexts as follows:
+  \[
+    \itp{\Gamma} := \{ (x : \typeinterpret{\tau}) \mid (x : \tau) \in \Gamma \}
+  \]
 \end{definition}
 
-Interpretation mapping preserves typing, in a sense:
+Interpretation mapping preserves typing:
 
 \begin{lemma}
 If $\Gamma \vdash s : \sigma$ then $\itp{\Gamma} \vdash \interpret{s}
 : \typeinterpret{\sigma}$.
 \end{lemma}
 
-\begin{proof}
+\begin{proof} %TODO   Seems like this is already done.
 By induction on the form of $s$.  The variable case is obvious. The
 case where $s$ is an abstraction $\abs{x:\tau}{s'}$ or a type
 abstraction $\tabs{\alpha}{s'}$ are both immediate with the induction
@@ -1814,45 +1836,88 @@ case where $s = f_{\rho_1,\dots,\rho_n}(s_1,\dots,s_k)$. We have:
 \end{itemize}
 \end{proof}
 
+\subsection{Rule removal}
+
+We use \emph{rule removal}:
+
+\begin{theorem}\label{thm:ruleremove}
+Let $\Rules = \Rules_1 \cup \Rules_2$, and suppose that $\arr{\Rules_1}\:
+\subseteq\:\succ$ and $\arr{\Rules_2}\:\subseteq\:\succeq$ for a
+well-founded ordering $\succ$ and a compatible quasi-ordering $\succeq$.
+Then $\arr{\Rules}$ is terminating if and only if $\arr{\Rules_2}$ is
+(which is certainly the case if $\Rules_2 = \emptyset$).
+\end{theorem}
+
+\begin{proof}
+By well-foundedness of $\succ$, every infinite decreasing $\arr{\Rules}$
+sequence can only use finitely many steps using $\arr{\Rules_1}$.
+\qed
+\end{proof}
+
+\CK{If $\succ$ and $\succeq$ are \emph{monotonic} (i.e., if $s \succ t$
+(resp.\ $s \succeq t$) then $C[s] \succ C[t]$ (resp.\ $C[s] \succeq C[t]$)
+for all contexts $C$), this} gives rise to the following algorithm:
+\begin{enumerate}
+\item While $\Rules$ is non-empty:
+  \begin{enumerate}
+  \item Orient all rules in $\Rules$ using $\succeq$ or $\succ$; at least
+    one of them must be oriented using $\succ$.
+  \item Remove all rules ordered by $\succ$ from $\Rules$.
+  \end{enumerate}
+\end{enumerate}
+If this algorithm succeeds, we have proven termination.
+
 \subsection{Monotonicity}
 
-By imposing certain monotonicity requirements on the choices for
-$\Termmap$, we obtain a pair $(\succ,\succeq)$ that can be used with
-rule removal (Theorem \ref{thm:ruleremove}).
+We propose using a pair $(\succinterpret,\succeqinterpret)$ defined as
+follows: $s \succinterpret t$ if $\interpret{s} \succ \interpret{t}$ and
+$s \succeqinterpret t$ if $\interpret{s} \succeq \interpret{t}$ (for a
+fixed type constructor mapping $\Typemap$ and symbol mapping $\Termmap$).
+To use this pair to prove termination of $\arr{\Rules}$ with rule removal,
+two things must be proved:
 
-\CK{%
-The idea is that if $s \arr{\Rules} t$ then $\interpret{s}\downarrow\:
-\succ\:\interpret{t}\downarrow$ must hold (or $\interpret{s}\downarrow\:
-\succeq\:\interpret{t}\downarrow$, but in that case the rule cannot be
-removed).  This will likely require that every component of a function
-symbol is represented; for instance a requirement such as: if
-$\Termmap(\mathtt{f}) = \abs{x_1 \dots x_n}{s}$, then $s = s_1 \oplus
-\dots \oplus s_n + t$ where for $i$: if $x_i$ increases strictly,
-then also $s_i$ increases.
-(This would perhaps be simpler with interpretations to $\mathbb{N}
-\setminus \{ 0 \}$, as then a component $\lift(\flatten(x_1)) \otimes
-x_2$ would be strict in both $x_1$ and $x_2$, rather than in neither.)
-Note that the restrictions should at least allow for the current
-definition of $\Termmap(\mathtt{ext})$.}
+\begin{itemize}
+\item all rules in $\Rules$ can be oriented with $\succeqinterpret$ or
+  $\succinterpret$ and at least one with $\succinterpret$;
+\item $\succinterpret$ and $\succeqinterpret$ are both monotonic.
+\end{itemize}
 
-\CK{In addition, we might need stability: if I can prove that
-$\interpret{\ell} \downarrow \succ \interpret{r}\downarrow$ we should
-also have $\interpret{\ell\gamma}\downarrow \succ
-\interpret{r\gamma}\downarrow$ for all substitutions and type
-substitutions $\gamma$.  (Not sure
-about this one, as the rules already occur in instantiated form.)}
+The former requirement has to be verified for every individual rule.
+For the latter requirement, we can provide some sufficient criteria that
+guarantee monotonicity of both $\succinterpret$ and $\succeqinterpret$.
+
+\begin{lemma}
+Suppose that for all symbols
+$\afun : \forall (\alpha_1 : \kappa_1) \ldots
+  \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
+  \sigma_k \arrtype \tau$ we have:
+$\Termmap(\afun) = \tabs{\alpha_1 \dots \alpha_n}{\abs{x_1 \dots x_k}{
+  s_1 \oplus_{\interpret{\tau}} \dots \oplus_{\interpret{\tau}} s_m}}$
+  such that for all $1 \leq i \leq k$ there exists $1 \leq j \leq m$
+  such that $s_j$ has one of the forms:
+  \begin{itemize}
+  \item $x_i \cdots$ (so $x_i$ or an application with $x_i$ at the head);
+  \item $\lift_{\interpret{\tau}}(\flatten_{\interpret{\sigma_i}}(x_i) +
+    n)$ for some $n$ (in the case of $0$, the addition may be omitted);
+  \end{itemize}
+Then both $\succinterpret$ and $\succeqinterpret$ are monotonic.
+\end{lemma}
+
+\begin{proof}
+TODO
+\end{proof}
+
+\CK{Note: I am not entirely sure what to do with pairing, since we
+currently do not \emph{have} pairing.  With some luck it will work
+out with the two cases above, but will have to investigate how I should
+adapt the interpretations that currently use pairing.}
+
+\CK{\dots snipped rambling \dots}
 
 \LC{It's not completely obvious to me how to do this, so I'd like to
   see this spelled out in detail.}
 
-%\begin{lemma}
-%TODO
-%\end{lemma}
-%
-%Thus, if $\interpret{\ell} \succ \interpret{r}$ for some rule, then
-%$\interpret{s}\downarrow \succ \interpret{t}\downarrow$ whenever
-%$s \arr{\Rules} t$ by that rule, and similar for $\succeq$.  This
-%provides a strategy for termination analysis using rule removal.
+\CK{Is it more clear now?}
 
 \section{Some useful lemmas}
 
@@ -1883,13 +1948,6 @@ TODO
 \subsection{Other}
 
 \section{Some systems of interest -- urzy\_emb?}
-
-For easier presentation, we will denote $\oplus$ and $\otimes$ in
-\emph{infix, left-associative} notation, and omit the type denotation
-where it is clear from context.  Thus, $s \oplus t \oplus u$ should be
-read as $\oplus_\sigma\,s\,(\oplus_\sigma\,t\,u)$ if $s$ has type
-$\sigma$. Similarly, we will sometimes omit the type denotation from
-$\flatten$ and $\lift$ when it can easily be derived from context.
 
 \subsection{Interpretations}
 
