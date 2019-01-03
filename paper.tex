@@ -34,6 +34,10 @@
 \newcommand{\succinterpret}{\succ^{\llbracket\rrbracket}}
 \newcommand{\succeqinterpret}{\succeq^{\llbracket\rrbracket}}
 
+\newcommand{\cl}{\mathcal{C}}
+\newcommand{\dom}{\mathrm{dom}}
+\newcommand{\nf}{\mathrm{nf}}
+
 \newcommand{\quant}[2]{\forall #1[#2]}
 \newcommand{\qquant}[3]{#1 #2[#3]}
 \newcommand{\typeinterpret}[1]{\llbracket #1 \rrbracket}
@@ -164,7 +168,8 @@ First, we define the set of types.
   \]
   Note that type constructors are essentially simply-typed
   lambda-terms, so beta-reduction on type constructors terminates and
-  is confluent, hence every type constructor has a unique normal form.
+  is confluent, hence every type constructor~$\tau$ has a unique
+  beta-normal form~$\nf_\beta(\tau)$.
 
   We define $\FV(\varphi)$ -- the set of free type constructor
   variables of the type constructor~$\varphi$ -- in an obvious way by
@@ -201,16 +206,17 @@ application.
     \FV(\tau)$
   \item $\Gamma \vdash \app{s}{t} : \tau$ if $\Gamma \vdash s : \sigma
     \arrtype \tau$ and $\Gamma \vdash t : \sigma$
-  \item $\Gamma \vdash \tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$ if
-    $\Gamma \vdash s : \quant{(\alpha:\kappa)}{\sigma}$ and~$\tau$ is a
-    type constructor of kind~$\kappa$,
-  \item $\Gamma \vdash s : \tau$ if $\Gamma \vdash s : \tau'$ and $\tau
-    =_\beta \tau'$.
+  \item $\Gamma \vdash \tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$
+    if $\Gamma \vdash s : \quant{(\alpha:\kappa)}{\sigma}$ and~$\tau$
+    is a type constructor of kind~$\kappa$,
+  \item $\Gamma \vdash s : \tau$ if $\Gamma \vdash s : \tau'$ and
+    $\tau =_\beta \tau'$.
   \end{itemize}
   The set of free variables of a preterm~$t$, denoted $\FV(t)$, is
-  defined in the expected way. Analogously, we define the set~$\FTV(t)$
-  of type constructor variables occurring free in~$t$. We say that $t$
-  is \emph{closed} if $\FV(t) = \emptyset$ and $\FTV(t) = \emptyset$.
+  defined in the expected way. Analogously, we define the
+  set~$\FTV(t)$ of type constructor variables occurring free
+  in~$t$. We say that $t$ is \emph{closed} if $\FV(t) = \emptyset$ and
+  $\FTV(t) = \emptyset$.
 \end{definition}
 
 If $\alpha$ is a type constructor variable of kind~$\kappa$ then we
@@ -382,6 +388,10 @@ normalise certain elements of $\Iterms$ using the relation $\leadsto$.
   \item\label{leadsto:mono:left}
     if $s \leadsto t$ then both $\app{s}{u} \leadsto \app{t}{u}$ and
     $\tapp{s}{\sigma} \leadsto \tapp{t}{\sigma}$
+  \item\label{leadsto:beta:abs} $\app{(\abs{x:\sigma}{s})}{t} \leadsto
+    s[\subst{x}{t}]$
+  \item\label{leadsto:beta:tabs} $\tapp{(\tabs{\alpha}{s})}{\sigma}
+    \leadsto s[\subst{\alpha}{\sigma}]$.
   \item\label{leadsto:plus:base}
     $\app{\app{\oplus_{\nat}}{n}}{m} \leadsto (n+m)$
   \item\label{leadsto:times:base} $\app{\app{\otimes_{\nat}}{n}}{m}
@@ -404,10 +414,6 @@ normalise certain elements of $\Iterms$ using the relation $\leadsto$.
     \abs{x:\sigma}{\app{\lift_{\tau}}{s}}$
   \item $\app{\lift_{\quant{\alpha}{\sigma}}}{s} \leadsto
     \tabs{\alpha}{\app{\lift_{\sigma}}{s}}$
-  \item\label{leadsto:beta:abs} $\app{(\abs{x:\sigma}{s})}{t} \leadsto
-    s[\subst{x}{t}]$
-  \item\label{leadsto:beta:tabs} $\tapp{(\tabs{\alpha}{s})}{\sigma}
-    \leadsto s[\subst{\alpha}{\sigma}]$.
   \end{enumerate}
   Note that the above rules are invariant under~$\equiv$ (by
   confluence of $\beta$-reduction on types), so they correctly define
@@ -415,10 +421,7 @@ normalise certain elements of $\Iterms$ using the relation $\leadsto$.
   of~$\equiv$.
 
   We say that $s$ is a \emph{redex} if $s$ reduces by one of the rules
-  (\ref{leadsto:plus:base})--(\ref{leadsto:beta:tabs}), and that $s$
-  \emph{reduces at the head} to $t$ if the derivation of
-  $s \leadsto t$ does not use (\ref{leadsto:mono:abs}) or
-  (\ref{leadsto:mono:right}).
+  (\ref{leadsto:plus:base}).
 
   A \emph{final interpretation term} is an interpretation term
   $s \in \Iterms$ such that (a) $s$ is closed, and (b) $s$ is in
@@ -1161,12 +1164,12 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
   $\omega^*(t) : \omega(\sigma)$.
 
   By the generation lemma for $t : \sigma$ there is a type~$\sigma'$
-  such that $\sigma' =_\beta \sigma$ and
-  $\FV(\sigma') \subseteq \FV(\sigma) \cup \FTV(t)$ and one of the
-  cases below holds. Note that~$\omega$ is closed for~$\sigma'$
-  because it is closed for~$\sigma$ and $\FTV(\omega(t)) =
-  \emptyset$. By Lemma~\ref{lem_beta_val} it suffices to show
-  $\omega^*(t) \in \val{\sigma'}{\xi}{\omega}$.
+  such that $\sigma' =_\beta \sigma$ and $\FV(\sigma') \subseteq
+  \FV(\sigma) \cup \FTV(t)$ and one of the cases below holds. Note
+  that~$\omega$ is closed for~$\sigma'$ because it is closed
+  for~$\sigma$ and $\FTV(\omega(t)) = \emptyset$. By
+  Lemma~\ref{lem_beta_val} it suffices to show $\omega^*(t) \in
+  \val{\sigma'}{\xi}{\omega}$.
   \begin{itemize}
   \item If $t = x_1^{\tau_1}$ and $\tau_1 =_\beta \sigma'$ then
     $\omega(t)[\subst{x_1}{u_1}] =
@@ -1229,8 +1232,8 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
 \end{proof}
 
 \begin{lemma}\label{lem_unique_final}
-  Every term $s \in \Iterms$ reduces to a unique final interpretation
-  term $s\da$.
+  Every term $s \in \Iterms$ has a unique normal form~$s\da$. If~$s$
+  is closed then so is~$s\da$.
 \end{lemma}
 
 \begin{proof}
@@ -1260,38 +1263,60 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
 
 \subsection{Defining $\succ$ and $\succeq$}
 
-We will define $\succ$ and $\succeq$ on elements of $\Iterms$, using
-coinduction: $s \succ t$ (resp.\ $s \succeq t$) if $s \succ_\sigma t$
-(resp.\ $s \succeq_\sigma t$) can be obtained for $\sigma$ the type of
-$s,t$, following Definition~\ref{def:succ}.
+In what follows we assume a fixed implicit environment~$\Gamma$ under
+which all considered terms are typable.
 
-\begin{definition}\label{def:succ}
-  Let $R \in \{ \succ,\succeq \}$. For~$s,t \in \Iterms_\sigma$, the
-  relation $s\ R_{\sigma}\ t$ is defined coinductively by the
-  following rules.
+\begin{definition}\label{def_closure}\normalfont
+  A \emph{closure} is a function $\cl = \gamma \circ \omega$
+  satisfying:
+  \begin{enumerate}
+  \item $\omega$ is a type constructor substitution such that
+    $\omega(\alpha)$ is closed for every type constructor
+    variable~$\alpha$,
+  \item $\gamma$ is a term substitution such that $\gamma(x)$ is
+    closed and $\proves \gamma(x) : \omega(\Gamma(x))$ for every
+    variable $x \in \dom(\Gamma)$.
+  \end{enumerate}
+  For~$\tau$ a type constructor, we use $\cl(\tau)$ to denote
+  $\omega(\tau)$.
+\end{definition}
+
+Note that if $t \in \Iterms$ and $\Gamma \proves t : \tau$ then
+$\cl(t)$ and $\cl(\tau)$ are closed and $\proves \cl(t) : \cl(\tau)$.
+
+\begin{definition}\label{def:succ}\normalfont
+  Let $R \in \{ \succ,\succeq \}$. For closed~$s,t\in\Iterms_\sigma$
+  and closed~$\sigma$ in $\beta$-normal form, the relation
+  $s\ R_{\sigma}\ t$ is defined coinductively by the following rules.
   \[
-    \begin{array}{c}
-    \infer={s\ R_\nat\ t}{s\da\ R\ t\da \text{ in natural
-        numbers}}\quad\quad
-    \infer={s\ R_{\sigma\arrtype\tau}\ t}{\app{s}{q}\ R_{\tau}\ \app{t}{q}
-      \text{ for every } q \in \World_\sigma} \\ \\
-    \infer={s\ R_{\forall(\alpha:\kappa)[\sigma]}\ t}{\tapp{s}{\tau}\ R_{\sigma[\subst{\alpha}{\tau}]}\ \tapp{t}{\tau}
-      \text{ for every closed type constructor } \tau \text{ of kind }
-      \kappa}
-    \end{array}
+  \begin{array}{cc}
+    \infer={s\ R_\nat\ t}{s\da\ R\ t\da \text{ in natural numbers}} \quad&\quad
+    \infer={s\ R_{\sigma\arrtype\tau}\ t}{\app{s}{q}\ R_{\tau}\ \app{t}{q} \text{ for all } q \in \World_\sigma} \\ \\
+    \multicolumn{2}{c}{
+    \infer={s\ R_{\forall(\alpha:\kappa)[\sigma]}\ t}{\tapp{s}{\tau}\ R_{\nf_\beta(\sigma[\subst{\alpha}{\tau}])}\ \tapp{t}{\tau} \text{ for all closed } \tau \in \Tc_{\kappa}}}
+  \end{array}
   \]
+  We define $s \approx_\sigma t$ if both $s \succeq_\sigma t$ and $t
+  \succeq_\sigma s$.
+
+  For arbitrary types~$\sigma$ and arbitrary terms $s,t \in \Iterms$
+  we define $s \succ_\sigma t$ if for every closure~$\cl$ we can
+  obtain $\cl(s) \succ_{\nf_\beta(\cl(\sigma))} \cl(t)$ coinductively
+  with the above rules. The relations $\succeq_\sigma$ and
+  $\approx_\sigma$ are extended analogously. We drop the type
+  subscripts when clear or irrelevant.
 \end{definition}
 
 Note that in the case for~$\nat$ the terms~$s\da$, $t\da$ are natural
-numbers by Lemma~\ref{lem_final_nat}.
+numbers by Lemma~\ref{lem_final_nat} ($s\da,t\da$ are closed and in
+normal form, so they are final interpretation terms).
 
 Intuitively, the above definition means that e.g. $s \succ t$ iff
 there exists a possibly infinite derivation tree using the above
-rules. In such a derivation tree all leaves must witness
-$s\da >_\nat t\da$ in natural numbers. However, this also allows for
-infinite branches, which solves the problem of repeating types due to
-impredicative polymorphism. If e.g.
-$s \succ_{\forall \alpha . \alpha} t$ then one of the premises will be
+rules. In such a derivation tree all leaves must witness $s\da > t\da$
+in natural numbers. However, this also allows for infinite branches,
+which solves the problem of repeating types due to impredicative
+polymorphism. If e.g.  $s \succ_{\forall \alpha . \alpha} t$ then
 $\tapp{s}{\forall\alpha.\alpha} \succ_{\forall \alpha . \alpha}
 \tapp{t}{\forall\alpha.\alpha}$, which forces an infinite branch in
 the derivation tree. According to our definition any infinite branch
@@ -1299,164 +1324,103 @@ may essentially be ignored.
 
 \subsection{Properties of $\succ$ and $\succeq$}
 
-We're going to at least need to see that $\succ$ is a well-founded
-ordering:
+First we state a simple lemma that will be used implicitly in what
+follows.
 
 \begin{lemma}
-$\succ$ is well-founded.
+  If~$\tau$ is a closed interpretation type in $\beta$-normal form the
+  one of the following holds:
+  \begin{enumerate}
+  \item $\tau = \nat$, or
+  \item $\tau = \tau_1\arrtype\tau_2$, or
+  \item $\tau = \forall\alpha\sigma$.
+  \end{enumerate}
+\end{lemma}
+
+We're going to at least need to see that $\succ$ is a well-founded
+ordering.
+
+\begin{lemma}
+  $\succ$ is well-founded.
 \end{lemma}
 
 \begin{proof}
-  By induction on the size of the type~$\tau$ one shows that there
-  does not exist an infinite sequence
-  $t_1 \succ_\tau t_2 \succ_\tau t_3 \succ_\tau \ldots$ For instance,
-  if $\alpha$ has kind~$\kappa$ and
+  It suffices to show this for closed terms and closed types in
+  $\beta$-normal form, because any infinite sequence $t_1 \succ_\tau
+  t_2 \succ_\tau t_3 \succ_\tau \ldots$ induces an infinite sequence
+  $\cl(t_1) \succ_{\nf_\beta(\cl(\tau))} \cl(t_2)
+  \succ_{\nf_\beta(\cl(\tau))} \cl(t_3) \succ_{\nf_\beta(\cl(\tau))}
+  \ldots$ for any closure~$\cl$. By induction on the size of a
+  $\beta$-normal type~$\tau$ (with size measured as the number of the
+  occurrences of~$\forall$ and~$\arrtype$) one proves that there does
+  not exist an infinite sequence $t_1 \succ_\tau t_2 \succ_\tau t_3
+  \succ_\tau \ldots$ For instance, if $\alpha$ has kind~$\kappa$ and
   $t_1 \succ_{\forall\alpha[\tau]} t_2 \succ_{\forall\alpha[\tau]} t_3
-  \succ_{\forall\alpha[\tau]} \ldots$ then
-  $\tapp{t_1}{\chi_\kappa} \succ_{\tau[\subst{\alpha}{\chi_\kappa}]}
-  \tapp{t_2}{\chi_\kappa} \succ_{\tau[\subst{\alpha}{\chi_\kappa}]}
-  \tapp{t_3}{\chi_\kappa} \succ_{\tau[\subst{\alpha}{\chi_\kappa}]}
-  \ldots$, which is impossible by the inductive hypothesis (see
-  Definition~\ref{def_chi_kappa} for the definition of~$\chi_\kappa$).
+  \succ_{\forall\alpha[\tau]} \ldots$ then $\tapp{t_1}{\chi_\kappa}
+  \succ_{\tau'} \tapp{t_2}{\chi_\kappa} \succ_{\tau'}
+  \tapp{t_3}{\chi_\kappa} \succ_{\tau'} \ldots$, where
+  $\tau'=\nf_\beta(\tau[\subst{\alpha}{\chi_\kappa}])$. Because $\tau$
+  is in $\beta$-normal form, all redexes in
+  $\tau[\subst{\alpha}{\chi_\kappa}]$ are created by the substitution
+  and must have the form $\chi_\kappa u$. Hence, by the definition
+  of~$\chi_\kappa$ (see Definition~\ref{def_chi_kappa}) the
+  type~$\tau'$ is smaller than~$\tau$. This is impossible by the
+  inductive hypothesis.
 \end{proof}
 
 \begin{lemma}
-Both $\succ$ and $\succeq$ are transitive.
+  Both $\succ$ and $\succeq$ are transitive.
 \end{lemma}
 
 \begin{proof}
-  We show this for~$\succeq$, the proof for~$\succ$ being
-  analogous. We proceed by coinduction.
+  We show this for~$\succ$, the proof for~$\succeq$ being
+  analogous. Again, it suffices to prove this for closed terms and
+  closed types in $\beta$-normal form. We proceed by coinduction.
 
-  If $t_1 \succeq_\nat t_2 \succeq_\nat t_3$ then
-  $t_1\da \ge t_2\da \ge t_3\da$, so $t_1\da \ge t_3\da$. Thus
-  $t_1 \succeq_\nat t_3$.
+  If $t_1 \succ_\nat t_2 \succ_\nat t_3$ then $t_1\da > t_2\da >
+  t_3\da$, so $t_1\da > t_3\da$. Thus $t_1 \succ_\nat t_3$.
 
-  If $t_1 \succeq_{\sigma\arrtype\tau}t_2\succeq_{\sigma\arrtype\tau}t_3$ then
-  $\app{t_1}{q}\succeq_{\tau}\app{t_2}{q}\succeq_\tau\app{t_3}{q}$ for
-  $q \in \World_\sigma$. Hence $\app{t_1}{q}\succeq_\tau\app{t_3}{q}$
-  for $q \in \World_\sigma$ by the coinductive hypothesis. Thus
-  $t_1\succeq_{\sigma\arrtype\tau} t_3$.
+  If $t_1 \succ_{\sigma\arrtype\tau}t_2\succ_{\sigma\arrtype\tau}t_3$
+  then $\app{t_1}{q}\succ_{\tau}\app{t_2}{q}\succ_\tau\app{t_3}{q}$
+  for $q \in \World_\sigma$. Hence
+  $\app{t_1}{q}\succ_\tau\app{t_3}{q}$ for $q \in \World_\sigma$ by
+  the coinductive hypothesis. Thus $t_1\succ_{\sigma\arrtype\tau}
+  t_3$.
 
   If $t_1
-  \succeq_{\forall\alpha[\sigma]}t_2\succeq_{\forall\alpha[\sigma]}t_3$
+  \succeq_{\forall(\alpha:\kappa)[\sigma]}t_2\succ_{\forall(\alpha:\kappa)[\sigma]}t_3$
   then
-  $\tapp{t_1}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_2}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}$
-  for any closed type constructor~$\tau$ of the appropriate kind. Hence
-  $\tapp{t_1}{\tau}\succeq_{\sigma[\subst{\alpha}{\tau}]}\tapp{t_3}{\tau}$
-  by the coinductive hypothesis. Thus
-  $t_1\succeq_{\forall\alpha[\sigma]} t_3$.\qed
+  $\tapp{t_1}{\tau}\succ_{\sigma'}\tapp{t_2}{\tau}\succ_{\sigma'}\tapp{t_3}{\tau}$
+  for any closed type constructor~$\tau$ of kind~$\kappa$, where
+  $\sigma' = \nf_\beta(\sigma[\subst{\alpha}{\tau}])$. Hence
+  $\tapp{t_1}{\tau}\succ_{\sigma'}\tapp{t_3}{\tau}$ by the coinductive
+  hypothesis. Thus $t_1\succeq_{\forall\alpha[\sigma]} t_3$.\qed
 \end{proof}
 
 And that $\succeq$ is a quasi-ordering:
 
 \begin{lemma}
-$\succeq$ is reflexive.
+  $\succeq$ is reflexive.
 \end{lemma}
 
 \begin{proof}
-  By coinduction.\qed
+  By coinduction one shows that $\succeq_\sigma$ is reflexive on
+  closed terms for closed $\beta$-normal~$\sigma$. The general case is
+  then immediate from definitions.\qed
 \end{proof}
 
 Finally, they must be compatible:
 
 \begin{lemma}\label{lem:compatibility}
-We have $\succ \cdot \succeq\ \subseteq\ \succ$ and $\succeq \cdot
-\succ\ \subseteq\ \succ$.
+  We have $\succ \cdot \succeq\ \subseteq\ \succ$ and $\succeq \cdot
+  \succ\ \subseteq\ \succ$.
 \end{lemma}
 
 \begin{proof}
-By coinduction, analogous to the transitivity proof.\qed
+  By coinduction, analogous to the transitivity proof.\qed
 \end{proof}
 
-For easier presentation, we will denote $\oplus$ and $\otimes$ in
-\emph{infix, left-associative} notation, and omit the type denotation
-where it is clear from context.  Thus, $s \oplus t \oplus u$ should be
-read as $\oplus_\sigma\,s\,(\oplus_\sigma\,t\,u)$ if $s$ has type
-$\sigma$. Similarly, we will sometimes omit the type denotation from
-$\flatten$ and $\lift$ when it can easily be derived from context.
-
-\begin{lemma}\label{lem:plusparts}
-For all \emph{closed} interpretation types $\sigma$, interpretation
-terms $s,t$ of type $\sigma$ and $n > 0$ we have:
-\begin{enumerate}
-\item $s \oplus_{\sigma} t \succeq s$ and
-      $s \oplus_{\sigma} t \succeq t$;
-\item $s \oplus_{\sigma} \lift_{\sigma}(n) \succ s$ and
-      $\lift_{\sigma}(n) \oplus_{\sigma}  t \succ t$.
-\end{enumerate}
-\end{lemma}
-
-\begin{proof}
-TODO
-
-\LC{I think these also hold by coinduction because they hold for
-  type~$\nat$. But one needs to generalize the coinductive hypothesis
-  to $\app{\app{\oplus}{s}}{t} t_1 \ldots t_n \succeq_\sigma s t_1
-  \ldots t_n$.}
-
-\end{proof}
-
-\begin{lemma}\label{lem:liftgreater}
-If $n \geq m$ then $\lift_\sigma(n) \succeq \lift_\sigma(m)$ for all
-\emph{closed} types $\sigma$.
-\end{lemma}
-
-\begin{proof}
-TODO
-\end{proof}
-
-\CK{Pondering: do we also have that
-  $\lift_\sigma(n+m) = (\lift_\sigma n) \oplus_\sigma (\lift_\sigma
-  n)$? Could be useful. (But let's first see whether it's needed for
-  anything.)}
-
-\LC{If $=$ here is the reflexive-symmetric-transitive closure
-  of~$\leadsto$ \emph{and $\sigma$ is closed} then yes, this follows
-  by induction on~$\sigma$.}
-
-\CK{What I mean is: $\succeq \cap \preceq$, so I guess that's covered.}
-
-\begin{lemma}\label{lem:plustimesmonotonic}
-If $s,t,u$ are terms of a \emph{closed} type $\sigma$ and $s \succeq
-t$, then $s \oplus_\sigma u \succeq t \oplus_\sigma u$ and $s
-\otimes_\sigma u \succeq t \otimes_\sigma u$.  Moreover, if even $s
-\succ t$ then we have $s \oplus_\sigma u \succ t \oplus_\sigma u$, and
-if $u \succeq \lift_\sigma(1)$ then also $s \otimes_\sigma u \succ t
-\otimes_\sigma u$.
-\end{lemma}
-
-\begin{proof}
-TODO
-\end{proof}
-
-In the following, we denote $s \approx t$ if both $s \succeq t$ and
-$t \succeq s$.  We observe that standard equality properties of
-addition and multiplication extend to interpretation terms of extended
-types:
-
-\begin{lemma}\label{lem:approxproperties}
-For all \emph{closed} interpretation types $\sigma$ and all
-interpretation terms $s,t,u$ of type $\sigma$, we have:
-\begin{enumerate}
-\item\label{lem:approx:symmetry}
-  $s \oplus_\sigma t \approx t \oplus_\sigma s$ and
-  $s \otimes_\sigma t \approx t \otimes_\sigma s$;
-\item\label{lem:approx:assoc} $s \oplus_\sigma (t \oplus_\sigma u)
-  \approx (s \oplus_\sigma t) \oplus_\sigma u$ and $s
-  \otimes_\sigma (t \otimes_\sigma u) \approx (s \otimes_\sigma t) \otimes_\sigma u$;
-\item\label{lem:approx:distribution} $s \otimes_\sigma (t \oplus_\sigma u)
-  \approx (s \otimes_\sigma t) \oplus_\sigma (s \otimes_\sigma u)$;
-\item\label{lem:approx:neutral} $(\lift_\sigma 0) \oplus_\sigma s
-  \approx s$ and $(\lift_\sigma 1)) \otimes_\sigma s \approx s$.
-\end{enumerate}
-\end{lemma}
-
-\begin{proof}
-TODO
-\end{proof}
-
-\begin{lemma}
+\begin{lemma}\label{lem_succ_red}
   Assume $t \succ s$ (resp.~$t \succeq s$).
   \begin{enumerate}
   \item If $t \leadsto t'$ or $t' \leadsto t$ then $t' \succ s$ (resp.~$t' \succeq s$).
@@ -1467,29 +1431,167 @@ TODO
 
 \begin{proof}
   We show the first point assuming $t \leadsto t'$, other cases being
-  analogous. We proceed by coinduction. If $t \succ_\nat s$ then
-  $t\da = t'\da$ and the claim holds.
+  analogous. It suffices to show this for closed $t,t',s$ and the type
+  closed and in $\beta$-normal form, because $t \leadsto t'$ implies
+  $\cl(t) \leadsto \cl(t')$ for any closure~$\cl$.
 
-  If $t \succ_{\sigma\arrtype\tau} s$ then for every
-  $q \in \World_\sigma$ we have $\app{t}{q} \succ_\tau \app{s}{q}$. We
-  have $\app{t}{q} \leadsto \app{t'}{q}$. Hence
-  $\app{t'}{q} \succ_\tau \app{s}{q}$ by the coinductive
-  hypothesis. Thus $t' \succ_{\sigma\arrtype\tau} s$.
+  We proceed by coinduction. If $t \succ_\nat s$ then $t\da = t'\da$
+  and the claim holds.
+
+  If $t \succ_{\sigma\arrtype\tau} s$ then for every $q \in
+  \World_\sigma$ we have $\app{t}{q} \succ_\tau \app{s}{q}$. We have
+  $\app{t}{q} \leadsto \app{t'}{q}$. Hence $\app{t'}{q} \succ_\tau
+  \app{s}{q}$ by the coinductive hypothesis. Thus $t'
+  \succ_{\sigma\arrtype\tau} s$.
 
   If $t \succ_{\forall(\alpha:\kappa)\sigma} s$ then for every closed
-  type constructor~$\tau$ of kind~$\kappa$ we have
-  $\tapp{t}{\tau} \succ_{\sigma[\subst{\alpha}{\tau}]}
-  \tapp{s}{\tau}$. We have $\tapp{t}{\tau} \leadsto
-  \tapp{t'}{\tau}$. Hence
-  $\tapp{t'}{\tau} \succ_{\sigma[\subst{\alpha}{\tau}]}
-  \tapp{s}{\tau}$ by the coinductive hypothesis. Thus
-  $t' \succ_{\forall(\alpha:\kappa)\sigma} s$.
+  type constructor~$\tau$ of kind~$\kappa$ we have $\tapp{t}{\tau}
+  \succ_{\sigma'} \tapp{s}{\tau}$ where $\sigma' =
+  \nf_\beta(\sigma[\subst{\alpha}{\tau}])$. We have $\tapp{t}{\tau}
+  \leadsto \tapp{t'}{\tau}$. Hence $\tapp{t'}{\tau} \succ_{\sigma'}
+  \tapp{s}{\tau}$ by the coinductive hypothesis. Thus $t'
+  \succ_{\forall(\alpha:\kappa)\sigma} s$.
 \end{proof}
 
-\begin{corollary}
-  For $R \in \{\succ,\succeq\}$: $s\ R\ t$ if and only if
+\begin{corollary}\label{cor_succ_da}
+  For $R \in \{\succ,\succeq,\approx\}$: $s\ R\ t$ if and only if
   $s\downarrow\ R\ t\downarrow$
 \end{corollary}
+
+For easier presentation, we will denote $\oplus$ and $\otimes$ in
+\emph{infix, left-associative} notation, and omit the type denotation
+where it is clear from context. Thus, $s \oplus t \oplus u$ should be
+read as $\oplus_\sigma\,s\,(\oplus_\sigma\,t\,u)$ if $s$ has type
+$\sigma$. Similarly, we will sometimes omit the type denotation from
+$\flatten$ and $\lift$ when clear or irrelevant.
+
+\begin{lemma}\label{lem:plusparts}
+For all types $\sigma$, terms $s,t$ of type $\sigma$ and natural
+numbers $n > 0$ we have:
+\begin{enumerate}
+\item $s \oplus_{\sigma} t \succeq s$ and $s \oplus_{\sigma} t \succeq
+  t$;
+\item $s \oplus_{\sigma} (\lift_{\sigma} n) \succ s$ and
+  $(\lift_{\sigma} n) \oplus_{\sigma} t \succ t$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  It suffices to prove this for closed $s,t$ and closed $\sigma$ in
+  $\beta$-normal form.
+  \begin{enumerate}
+  \item By coinduction we show $(s \oplus t) u_1 \ldots u_m
+    \succeq_\sigma s u_1 \ldots u_m$ for closed $u_1,\ldots,u_m$. The
+    second case is similar.
+
+    First note that $(s \oplus t) u_1 \ldots u_m \leadsto^* s u_1
+    \ldots u_m \oplus t u_1 \ldots u_m$.
+
+    If $\sigma = \nat$ then $((s \oplus t) u_1 \ldots u_m)\da = (s u_1
+    \ldots u_m)\da + (t u_1 \ldots u_m)\da \ge (s u_1 \ldots
+    u_m)\da$. Hence $(s \oplus t) u_1 \ldots u_m) \succeq_\nat s u_1
+    \ldots u_m$.
+
+    If $\sigma = \tau_1\arrtype\tau_2$ then by the coinductive
+    hypothesis $(s \oplus t) u_1 \ldots u_m q \succeq_{\tau_2} s u_1
+    \ldots u_m q$ for any $q \in \World_{\tau_1}$. Hence $(s \oplus t)
+    u_1 \ldots u_m \succeq_\sigma s u_1 \ldots u_m$.
+
+    If $\sigma = \forall(\alpha:\kappa)[\tau]$ then by the coinductive
+    hypothesis $(s \oplus t) u_1 \ldots u_m \xi \succeq_{\sigma'} s
+    u_1 \ldots u_m \xi$ for any closed $\xi \in \Tc_\kappa$, where
+    $\sigma' = \tau[\subst{\alpha}{\xi}]$. Hence $(s \oplus t) u_1
+    \ldots u_m \succeq_\sigma s u_1 \ldots u_m$.
+  \item By coinduction we show $(s \oplus (\lift n)) u_1 \ldots u_m
+    \succeq_\sigma s u_1 \ldots u_m$ for closed $u_1,\ldots,u_m$. The
+    second case is similar.
+
+    Note that $(s \oplus (\lift n)) u_1 \ldots u_m \leadsto^* s u_1
+    \ldots u_m \oplus n$. From this the base case $\sigma=\nat$
+    follows. The other cases follow from the induction hypothesis,
+    like in the first point above.
+  \end{enumerate}
+\end{proof}
+
+\begin{lemma}\label{lem:liftgreater}
+  If $n \geq m$ (resp.~$n > m$) then $\lift_\sigma n \succeq
+  \lift_\sigma m$ (resp.~$\lift_\sigma n \succ \lift_\sigma m$) for
+  all types $\sigma$.
+\end{lemma}
+
+\begin{proof}
+  Without loss of generality we may assume $\sigma$ closed and in
+  $\beta$-normal form. By coinduction one shows $\lift(n) u_1 \ldots
+  u_k \succeq \lift(m) u_1 \ldots u_k$ for closed
+  $u_1,\ldots,u_k$. This is similar to the proof of
+  Lemma~\ref{lem:plusparts}.
+\end{proof}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item $\lift_\sigma(n+m) \approx_\sigma (\lift_\sigma n)
+    \oplus_\sigma (\lift_\sigma n)$.
+  \item $\lift_\sigma(n m) \approx_\sigma (\lift_\sigma n)
+    \otimes_\sigma (\lift_\sigma n)$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  It suffices to show this for closed~$\sigma$ in $\beta$-normal
+  form. Then one proves by induction on~$\sigma$ that
+  $(\lift_\sigma(n+m))\da = (\lift_\sigma n \oplus_\sigma \lift_\sigma
+  n)\da$ (analogously for multiplication). This suffices by
+  Corollary~\ref{cor_succ_da} and the reflexivity of~$\approx$.
+\end{proof}
+
+\begin{lemma}\label{lem:plustimesmonotonic}
+  Let $s,t,u$ be terms of type $\sigma$.
+  \begin{enumerate}
+  \item If $s \succeq t$ then $s \oplus_\sigma u \succeq t
+    \oplus_\sigma u$ and $s \otimes_\sigma u \succeq t \otimes_\sigma
+    u$.
+  \item If $s \succ t$ then $s \oplus_\sigma u \succ t \oplus_\sigma
+    u$. Moreover, if additionally $u \succeq \lift_\sigma(1)$ then
+    also $s \otimes_\sigma u \succ t \otimes_\sigma u$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  It suffices to prove this for closed $s,t,u$ and closed $\sigma$ in
+  $\beta$-normal form. The proof is similar to the proof of
+  Lemma~\ref{lem:plusparts}. For instance, we show by coinduction that
+  for closed $w_1,\ldots,w_n$ if $s w_1 \ldots w_n \succ t w_1 \ldots
+  w_n$ and $u w_1 \ldots w_n \succeq \lift(1) w_1 \ldots w_n$ then $(s
+  \otimes u) w_1 \ldots w_n \succ (t \otimes u) w_1 \ldots w_n$.
+\end{proof}
+
+We observe that standard equality properties of addition and
+multiplication extend to interpretation terms of other types:
+
+\begin{lemma}\label{lem:approxproperties}
+For all types $\sigma$ and all terms $s,t,u$ of type $\sigma$, we
+have:
+\begin{enumerate}
+\item\label{lem:approx:symmetry}
+  $s \oplus_\sigma t \approx t \oplus_\sigma s$ and
+  $s \otimes_\sigma t \approx t \otimes_\sigma s$;
+\item\label{lem:approx:assoc} $s \oplus_\sigma (t \oplus_\sigma u)
+  \approx (s \oplus_\sigma t) \oplus_\sigma u$ and $s
+  \otimes_\sigma (t \otimes_\sigma u) \approx (s \otimes_\sigma t) \otimes_\sigma u$;
+\item\label{lem:approx:distribution} $s \otimes_\sigma (t \oplus_\sigma u)
+  \approx (s \otimes_\sigma t) \oplus_\sigma (s \otimes_\sigma u)$;
+\item\label{lem:approx:neutral} $(\lift_\sigma 0) \oplus_\sigma s
+  \approx s$ and $(\lift_\sigma 1) \otimes_\sigma s \approx s$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  The proof is again analogous to the proof of
+  Lemma~\ref{lem:plusparts}. For instance, for closed $s,t$ and closed
+  $\sigma$ in $\beta$-normal form, we show by coinduction that $(s
+  \oplus t) w_1 \ldots w_n \succeq (t \oplus s) w_1 \ldots w_n$ for
+  closed $w_1,\ldots,w_n$ (and then the same with $\preceq$).
+\end{proof}
 
 \section{Systems of interest and their properties}\label{sec:systems}
 
@@ -1885,11 +1987,11 @@ adapt the interpretations that currently use pairing.}
 \LC{We \emph{do} have pairing for all practical purposes, definable in
   System~$F_\omega$ with the right reduction behaviour. We can treat
   it explicitly here, if that's needed. But if $m$ can be $0$ above,
-  then we have the encodings of covered. In general, we have the
-  encodings of all inductive data types with one constructor
-  covered. But not the encodings of lists or any inductive data type
-  with more than one constructor, because then the encodings of
-  constructors erase all but one argument. I think we should invent
+  then we have the encodings of pairing and existential covered. In
+  general, we have the encodings of all inductive data types with one
+  constructor covered. But not the encodings of lists or any inductive
+  data type with more than one constructor, because then the encodings
+  of constructors erase all but one argument. I think we should invent
   something to have all encodings covered, maybe use
   $\lift_{\interpret{\tau}}(\flatten_{\interpret{\sigma_i}}(x_i))$
   inside the encodings to add the erased arguments.}
@@ -1994,16 +2096,17 @@ And the following function symbol mapping:
   re-checked, because some rules were incorrect.}
 
 \begin{itemize}
-\item $@_{\sigma,\tau}(\abs{x}{s},t) \red s[x:=t]$ \\
-  We have $\interpret{@(\abs{x:\sigma}{s},t)} = (\abs{x:\typeinterpret{
-  \sigma}}{\interpret{s}}) \cdot \interpret{t} \oplus \lift(\flatten(
-  \interpret{t}) \oplus 1) \leadsto \interpret{s}[x:=\interpret{t}]
-  \oplus \lift(\flatten(\interpret{t}) \oplus 1)$.  Since, by Lemma
-  \ref{lem:liftgreater} we have \LC{(We do \emph{not} have this if~$\tau$ is not closed, e.g., a type variable!!)} $\lift(\flatten(\interpret{t}) \oplus
-  1) \succeq \lift(1)$, by Lemma \ref{lem:plustimesmonotonic} \LC{(Again, this doesn't work if $\sigma,\tau$ are not closed)} this term
-  $\succ \interpret{s}[x:=\interpret{t}]$, which equals
-  $\interpret{s[x:=t]}$ by Lemma \ref{lem:substitutioninterpret}.
-  Thus, we can remove this rule.
+\item $@_{\sigma,\tau}(\abs{x}{s},t) \red s[x:=t]$ \\ We have
+  $\interpret{@(\abs{x:\sigma}{s},t)} = (\abs{x:\typeinterpret{
+    \sigma}}{\interpret{s}}) \cdot \interpret{t} \oplus
+  \lift(\flatten( \interpret{t}) \oplus 1) \leadsto
+  \interpret{s}[x:=\interpret{t}] \oplus \lift(\flatten(\interpret{t})
+  \oplus 1)$.  Since, by Lemma \ref{lem:liftgreater} we have
+  $\lift(\flatten(\interpret{t}) \oplus 1) \succeq \lift(1)$, by Lemma
+  \ref{lem:plustimesmonotonic} this term $\succ
+  \interpret{s}[x:=\interpret{t}]$, which equals $\interpret{s[x:=t]}$
+  by Lemma \ref{lem:substitutioninterpret}.  Thus, we can remove this
+  rule.
 \item $\mathtt{tapp}_{\quant{\alpha}{\sigma},\tau}(\tabs{\alpha}{s})
   \red s[\alpha:=\tau]$ \\ We have
   $\interpret{\mathtt{tapp}_{\quant{\alpha}{\sigma},

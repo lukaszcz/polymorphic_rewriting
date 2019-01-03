@@ -1,6 +1,39 @@
-
 % A museum of no-longer-needed lemmas and such (fragments of proofs of
 % which may however become useful later)
+
+  \begin{enumerate}
+  \item By coinduction we show $(s \oplus t) u_1 \ldots u_m
+    \succeq_\sigma s u_1 \ldots u_m$ for closed $u_1,\ldots,u_m$. The
+    second case is similar.
+
+    First note that $(s \oplus t) u_1 \ldots u_m \leadsto^* s u_1
+    \ldots u_m \oplus t u_1 \ldots u_m$.
+
+    If $\sigma = \nat$ then $((s \oplus t) u_1 \ldots u_m)\da = (s u_1
+    \ldots u_m)\da + (t u_1 \ldots u_m)\da \ge (s u_1 \ldots
+    u_m)\da$. Hence $(s \oplus t) u_1 \ldots u_m) \succeq_\nat s u_1
+    \ldots u_m$.
+
+    If $\sigma = \tau_1\arrtype\tau_2$ then by the coinductive
+    hypothesis $(s \oplus t) u_1 \ldots u_m q \succeq_{\tau_2} s u_1
+    \ldots u_m q$ for any $q \in \World_{\tau_1}$. Hence $(s \oplus t)
+    u_1 \ldots u_m \succeq_\sigma s u_1 \ldots u_m$.
+
+    If $\sigma = \forall(\alpha:\kappa)[\tau]$ then by the coinductive
+    hypothesis $(s \oplus t) u_1 \ldots u_m \xi \succeq_{\sigma'} s
+    u_1 \ldots u_m \xi$ for any closed $\xi \in \Tc_\kappa$, where
+    $\sigma' = \tau[\subst{\alpha}{\xi}]$. Hence $(s \oplus t) u_1
+    \ldots u_m \succeq_\sigma s u_1 \ldots u_m$.
+  \item By coinduction we show $(s \oplus (\lift n)) u_1 \ldots u_m
+    \succeq_\sigma s u_1 \ldots u_m$ for closed $u_1,\ldots,u_m$. The
+    second case is similar.
+
+    Note that $(s \oplus (\lift n)) u_1 \ldots u_m \leadsto^* s u_1
+    \ldots u_m \oplus n$. From this the base case $\sigma=\nat$
+    follows. The other cases follow from the induction hypothesis,
+    like in the first point above.
+  \end{enumerate}
+
 
 $\{ \oplus_\sigma : \sigma \arrtype
   \sigma \arrtype \sigma,\ \otimes_\sigma : \sigma \arrtype \sigma
