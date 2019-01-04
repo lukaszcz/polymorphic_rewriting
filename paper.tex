@@ -19,6 +19,8 @@
 \usepackage{proof}
 \usepackage[T1]{fontenc}
 
+\newcommand{\Fomega}{\mathtt{F}_\omega}
+
 \newcommand{\Iterms}{\mathcal{I}}
 \newcommand{\World}{\mathcal{W}}
 \newcommand{\Rules}{\mathcal{R}}
@@ -106,9 +108,9 @@ Institute of Computer Science, Radboud University Nijmegen (RU)
 
 \section{Introduction}
 
-\section{Preliminaries}
+\section{Preliminaries}\label{sec_preliminaries}
 
-In this section we introduce the System~$F_\omega$ (see e.g.,
+In this section we introduce the System~$\Fomega$ (see e.g.,
 Sorensen, Urzyczyn, ``Lectures on the Curry-Howard Isomorphism'',
 Section~11.7.), which will form a basis both of our interpretations
 and of a general syntax for the investigated systems.
@@ -169,7 +171,9 @@ First, we define the set of types.
   Note that type constructors are essentially simply-typed
   lambda-terms, so beta-reduction on type constructors terminates and
   is confluent, hence every type constructor~$\tau$ has a unique
-  beta-normal form~$\nf_\beta(\tau)$.
+  beta-normal form~$\nf_\beta(\tau)$. A \emph{type atom} is a type in
+  $\beta$-normal form which is not an arrow $\tau_1\arrtype\tau_2$ or
+  a quantification $\forall\alpha\tau$.
 
   We define $\FV(\varphi)$ -- the set of free type constructor
   variables of the type constructor~$\varphi$ -- in an obvious way by
@@ -345,10 +349,12 @@ $\abs{a}{s}$ or $\tabs{a}{s}$, depending on typing.
 
 \section{Interpretations}
 
-In this section we define the set~$\World$ of final interpretation
-terms, and the relations~$\succ$ and~$\succeq$ on~$\World$.
+In this section we define the set~$\Iterms$ of interpretation terms,
+and the relations~$\succ$ and~$\succeq$ on~$\Iterms$. We also define
+the set~$\World$ of final interpretation terms as the setall closed
+interpretation terms normalized with a certain reduction relation.
 
-\subsection{Defining the set $\World$}\label{sec_world}
+\subsection{Defining the sets~$\Iterms$ and~$\World$}\label{sec_world}
 
 \subsubsection{Interpretation terms}
 
@@ -487,7 +493,7 @@ method to prove termination of~$\leadsto$. The proof is an adaptation
 of chapters~6 and~14 from the book ``Proofs and Types'' by Girard, and
 chapters~10 and~11 from the book ``Lectures on the Curry-Howard
 Isomorphism'' by Sorensen and Urzyczyn. An important difference with
-system~$F_\omega$ and related ones is that the rules for
+system~$\Fomega$ and related ones is that the rules for
 $\oplus_\tau$, $\otimes_\tau$, $\flatten_\tau$ and $\lift_\tau$ depend
 on the type~$\tau$. In particular, type substitution in terms may
 create redexes. For instance, if $\alpha$ is a type variable then
@@ -1601,7 +1607,7 @@ general scheme.
 
 \subsection{Systems of interest}
 
-We use a syntax based on system $F_\omega$, basing on
+We use a syntax based on system~$\Fomega$, specialising
 Section~\ref{sec_preliminaries}.
 
 \begin{definition}\normalfont
@@ -1613,9 +1619,14 @@ Section~\ref{sec_preliminaries}.
   \emph{terms} like in Definition~\ref{def_terms} (based on
   Definition~\ref{def_preterms}) with the following restrictions:
   \begin{itemize}
-  \item if $\mathtt{f} : \sigma \in \Sigma$ then $\sigma$ is closed,
-  \item for any subterm $t_1 t_2$ of a term~$t$, the subterm $t_1$ is
-    a term or type application, or a function symbol.
+  \item if $\mathtt{f} : \sigma \in \Sigma$ then $\sigma$ is closed and
+    \[
+    \sigma = \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n : \kappa_n)
+    . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype \tau
+    \]
+    with~$\tau$ a type atom,
+  \item for any subterm $t_1 t_2$ of a term~$t$, the subterm~$t_1$ is
+    not a variable or an abstraction.
   \end{itemize}
 \end{definition}
 
@@ -1627,19 +1638,18 @@ $\mathtt{f} \rho_1 \ldots \rho_n s_1 \ldots s_k$ when
   \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
   \sigma_k \arrtype \tau
 \]
-is a function symbol in~$\Sigma$ with~$k$ maximal, and $\rho_i$ is a
-type constructor of kind $\kappa_i$ for $i=1,\ldots,k$, and
+is a function symbol in~$\Sigma$ with~$\tau$ a type atom, and $\rho_i$
+is a type constructor of kind $\kappa_i$ for $i=1,\ldots,k$, and
 $\Gamma \proves s_i : \sigma_i[\alpha_1 := \rho_1]\ldots[\alpha_n :=
-\rho_n]$ for $i=1,\ldots,k$, for an appropriate~$\Gamma$. We use this
-notation to stress the fact that by default there is no explicit
+  \rho_n]$ for $i=1,\ldots,k$, for an appropriate~$\Gamma$. We use
+this notation to stress the fact that by default there is no explicit
 application available. The application in the syntax of terms is used
-just as convenient syntax, but does not correspond to the usual
-application operator since only applications of the form
-$\mathtt{f} u_1 \ldots u_n$ are allowed. True application can be
-modelled by including the symbol
-${@} : \forall\alpha\forall\beta . (\alpha \arrtype \beta) \arrtype
-\alpha \arrtype \beta$ in $\Sigma$. Similarly, type application is
-modelled through a symbol
+just as a convenient syntax, but does not correspond to the usual
+application operator since only applications of the form $\mathtt{f}
+u_1 \ldots u_n$ are allowed. True application can be modelled by
+including the symbol ${@} : \forall\alpha\forall\beta . (\alpha
+\arrtype \beta) \arrtype \alpha \arrtype \beta$ in
+$\Sigma$. Similarly, type application is modelled through a symbol
 $\mathtt{A} : \forall \alpha : * \arrkind * . \forall \beta . (\forall
 \beta [\alpha \beta]) \arrtype \alpha \beta$.
 
@@ -1650,28 +1660,22 @@ referred to as interpretation terms, interpretation types,
 interpretation type constructors, etc.
 
 The rules are simply a set of term pairs, whose monotonic closure
-generates the rewrite relation. \LC{Now the set of rules can be
-  finite.}
+generates the rewrite relation.
 
 \begin{definition}\normalfont
-We fix an infinite variable environment $\Gamma$,
-and assume given a set $\Rules$ of term pairs $(\ell,r)$, such that:
+We fix a variable environment $\Gamma$, and assume given a set
+$\Rules$ of term pairs $(\ell,r)$, such that:
 \begin{itemize}
 \item $\FV(r) \subseteq \FV(\ell) \subseteq \mathit{keys}(\Gamma)$;
 \item $\ell$ and $r$ have the same type under $\Gamma$;
-\item $\Rules$ is stable: if $(\ell,r) \in \Rules$ and $\gamma$ is a
-  (\LC{term substitution? this should also be required for type
-  substitutions, I think}) substitution, then $(\ell\gamma,r\gamma)
-  \in \Rules$.
+\item $\Rules$ is stable: if $(\ell,r) \in \Rules$ and $\omega$ is a
+  type constructor substitution and $\gamma$ is a term substitution
+  such that $\omega(\Gamma) \proves \gamma(x) : \omega(\Gamma(x))$,
+  then $(\gamma(\omega(\ell)),\gamma(\omega(r))) \in \Rules$.
 \end{itemize}
 The reduction relation $\arr{\Rules}$ is the smallest monotonic
 relation that contains $\Rules$.
 \end{definition}
-
-\LC{I removed $\FTV(\ell) = \FTV(r) = \emptyset$, because we need type
-  variables (and also higher-kinded type constructor variables) to
-  express the rules. In what we had earlier free type variables were
-  there ``implicitly'' in function symbol indexes.}
 
 \subsubsection{An example system.}
 
@@ -1907,7 +1911,18 @@ If $\Gamma \vdash s : \sigma$ then $\itp{\Gamma} \vdash \interpret{s}
   By induction on the form of $s$.\qed
 \end{proof}
 
-\subsection{Rule removal}
+\subsection{Monotonicity and rule removal}
+
+\begin{definition}
+  A \emph{$\sigma$-context}~$C_\sigma$ is a term with a fresh function
+  symbol $\Box_\sigma \notin \Sigma$ of type~$\sigma$ occurring
+  exactly once. By~$C_\sigma[t]$ we denote a term obtained
+  from~$C_\sigma$ by substituting~$t$ for~$\Box_\sigma$. We drop the
+  $\sigma$ subscripts when clear or irrelevant.
+
+  A relation~$R$ on terms of type~$\sigma$ is \emph{monotonic} if
+  $R(s, t)$ implies $R(C[s], C[t])$ for every $\sigma$-context~$C$.
+\end{definition}
 
 We use \emph{rule removal}:
 
@@ -1926,9 +1941,8 @@ sequence can only use finitely many steps using $\arr{\Rules_1}$.
 \qed
 \end{proof}
 
-\CK{If $\succ$ and $\succeq$ are \emph{monotonic} (i.e., if $s \succ t$
-(resp.\ $s \succeq t$) then $C[s] \succ C[t]$ (resp.\ $C[s] \succeq C[t]$)
-for all contexts $C$), this} gives rise to the following algorithm:
+If $\succ$ and $\succeq$ are monotonic, this gives rise to the
+following algorithm:
 \begin{enumerate}
 \item While $\Rules$ is non-empty:
   \begin{enumerate}
@@ -1938,8 +1952,6 @@ for all contexts $C$), this} gives rise to the following algorithm:
   \end{enumerate}
 \end{enumerate}
 If this algorithm succeeds, we have proven termination.
-
-\subsection{Monotonicity}
 
 We propose using a pair $(\succinterpret,\succeqinterpret)$ defined as
 follows: $s \succinterpret t$ if $\interpret{s} \succ \interpret{t}$ and
@@ -1958,25 +1970,49 @@ The former requirement has to be verified for every individual rule.
 For the latter requirement, we can provide some sufficient criteria that
 guarantee monotonicity of both $\succinterpret$ and $\succeqinterpret$.
 
-\begin{lemma}
-Suppose that for all symbols
-$\afun : \forall (\alpha_1 : \kappa_1) \ldots
-  \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
-  \sigma_k \arrtype \tau$ we have:
-$\Termmap(\afun) = \tabs{\alpha_1 \dots \alpha_n}{\abs{x_1 \dots x_k}{
-  s_1 \oplus_{\interpret{\tau}} \dots \oplus_{\interpret{\tau}} s_m}}$
-  such that for all $1 \leq i \leq k$ there exists $1 \leq j \leq m$
-  such that $s_j$ has one of the forms:
+\begin{definition}
+  An interpretation term~$t$ is \emph{safe for~$x$} if one of the
+  following holds:
   \begin{itemize}
-  \item $x_i \cdots$ (so $x_i$ or an application with $x_i$ at the head);
-  \item $\lift_{\interpret{\tau}}(\flatten_{\interpret{\sigma_i}}(x_i) +
-    n)$ for some $n$ (in the case of $0$, the addition may be omitted);
+  \item $t = x u_1 \ldots u_m$,
+  \item $t = \lift(t')$ and $t'$ is safe for~$x$,
+  \item $t = \flatten(t')$ and $t'$ is safe for~$x$,
+  \item $t = s_1 \oplus s_2$ and either $s_1$ is safe for~$x$ or $s_2$
+    is safe for~$x$,
+  \item $t = s_1 \otimes s_2$ and either:
+    \begin{itemize}
+    \item $s_1$ is safe for~$x$ and $s_2 \succeq \lift(1)$, or
+    \item $s_2$ is safe for~$x$ and $s_1 \succeq \lift(1)$,
+    \end{itemize}
+  \item $t = \tabs{\alpha}{t'}$ and $t'$ is safe for~$x$,
+  \item $t = \abs{y}{t'}$ and $t'$ is safe for~$x$.
   \end{itemize}
-Then both $\succinterpret$ and $\succeqinterpret$ are monotonic.
+  A symbol mapping~$\Termmap$ is \emph{safe} if for all symbols $\afun
+  : \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n : \kappa_n)
+  . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype \tau$
+  with~$\tau$ a type atom we have: $\Termmap(\afun) = \tabs{\alpha_1
+    \dots \alpha_n}{\abs{x_1 \dots x_k}{t}}$ with $t$ safe for
+  each~$x_i$.
+\end{definition}
+
+\begin{lemma}
+  If~$t$ is safe for~$x$ and $s \succ s'$ (resp.~$s \succeq s'$) then
+  $t[\subst{x}{s}] \succ t[\subst{x}{s'}]$ (resp.~$t[\subst{x}{s}]
+  \succeq t[\subst{x}{s'}]$)
+\end{lemma}
+
+\begin{lemma}
+  If $t$ is safe for~$x$ and $y \ne x$, then $t[\subst{y}{s}]$ is
+  still safe for~$x$.
+\end{lemma}
+
+\begin{lemma}
+  If~$\Termmap$ is safe then both $\succinterpret$ and
+  $\succeqinterpret$ are monotonic.
 \end{lemma}
 
 \begin{proof}
-TODO
+  TODO
 \end{proof}
 
 \CK{Note: I am not entirely sure what to do with pairing, since we
@@ -1985,7 +2021,7 @@ out with the two cases above, but will have to investigate how I should
 adapt the interpretations that currently use pairing.}
 
 \LC{We \emph{do} have pairing for all practical purposes, definable in
-  System~$F_\omega$ with the right reduction behaviour. We can treat
+  System~$\Fomega$ with the right reduction behaviour. We can treat
   it explicitly here, if that's needed. But if $m$ can be $0$ above,
   then we have the encodings of pairing and existential covered. In
   general, we have the encodings of all inductive data types with one
