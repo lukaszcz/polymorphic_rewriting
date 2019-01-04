@@ -1427,6 +1427,14 @@ Finally, they must be compatible:
   By coinduction, analogous to the transitivity proof.\qed
 \end{proof}
 
+\begin{lemma}\label{lem_succ_to_succeq}
+  If $t \succ s$ then $t \succeq s$.
+\end{lemma}
+
+\begin{proof}
+  By coinduction.
+\end{proof}
+
 \begin{lemma}\label{lem_succ_red}
   Assume $t \succ s$ (resp.~$t \succeq s$).
   \begin{enumerate}
@@ -1462,7 +1470,7 @@ Finally, they must be compatible:
 
 \begin{corollary}\label{cor_succ_da}
   For $R \in \{\succ,\succeq,\approx\}$: $s\ R\ t$ if and only if
-  $s\downarrow\ R\ t\downarrow$
+  $s\downarrow\ R\ t\downarrow$.
 \end{corollary}
 
 For easier presentation, we will denote $\oplus$ and $\otimes$ in
@@ -1566,23 +1574,6 @@ numbers $n > 0$:
   \cl(\abs{x}{s})$. The proof for the second part is analogous.
 \end{proof}
 
-\begin{lemma}
-  \begin{enumerate}
-  \item $\lift_\sigma(n+m) \approx_\sigma (\lift_\sigma n)
-    \oplus_\sigma (\lift_\sigma n)$.
-  \item $\lift_\sigma(n m) \approx_\sigma (\lift_\sigma n)
-    \otimes_\sigma (\lift_\sigma n)$.
-  \end{enumerate}
-\end{lemma}
-
-\begin{proof}
-  It suffices to show this for closed~$\sigma$ in $\beta$-normal
-  form. Then one proves by induction on~$\sigma$ that
-  $(\lift_\sigma(n+m))\da = (\lift_\sigma n \oplus_\sigma \lift_\sigma
-  n)\da$ (analogously for multiplication). This suffices by
-  Corollary~\ref{cor_succ_da} and the reflexivity of~$\approx$.
-\end{proof}
-
 \begin{lemma}\label{lem:plustimesmonotonic}
   Let $s,t,u$ be terms of type $\sigma$.
   \begin{enumerate}
@@ -1602,6 +1593,16 @@ numbers $n > 0$:
   for closed $w_1,\ldots,w_n$ if $s w_1 \ldots w_n \succ t w_1 \ldots
   w_n$ and $u w_1 \ldots w_n \succeq \lift(1) w_1 \ldots w_n$ then $(s
   \otimes u) w_1 \ldots w_n \succ (t \otimes u) w_1 \ldots w_n$.
+\end{proof}
+
+\begin{lemma}\label{lem_succeq_subst}
+  If $s \succ s'$ or $s \succeq s'$ then $t[\subst{x}{s}] \succeq
+  t[\subst{x}{s'}]$.
+\end{lemma}
+
+\begin{proof}
+  Induction on the size of~$t$. If $t = x$ then this follows from
+  Lemma~\ref{lem_succ_to_succeq}. TODO
 \end{proof}
 
 We observe that standard equality properties of addition and
@@ -1631,6 +1632,26 @@ have:
   \oplus t) w_1 \ldots w_n \succeq (t \oplus s) w_1 \ldots w_n$ for
   closed $w_1,\ldots,w_n$ (and then the same with $\preceq$).
 \end{proof}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item $\lift_\sigma(n+m) \approx_\sigma (\lift_\sigma n)
+    \oplus_\sigma (\lift_\sigma n)$.
+  \item $\lift_\sigma(n m) \approx_\sigma (\lift_\sigma n)
+    \otimes_\sigma (\lift_\sigma n)$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  It suffices to show this for closed~$\sigma$ in $\beta$-normal
+  form. Then one proves by induction on~$\sigma$ that
+  $(\lift_\sigma(n+m))\da = (\lift_\sigma n \oplus_\sigma \lift_\sigma
+  n)\da$ (analogously for multiplication). This suffices by
+  Corollary~\ref{cor_succ_da} and the reflexivity of~$\approx$.
+\end{proof}
+
+\subsection{Encodings of inductive types}\label{sec_encodings}
+
 
 \section{Systems of interest and their properties}\label{sec:systems}
 
@@ -2034,10 +2055,18 @@ guarantee monotonicity of both $\succinterpret$ and $\succeqinterpret$.
   \succeq t[\subst{x}{s'}]$).
 \end{lemma}
 
+\begin{proof}
+  Induction on the structure of~$t$. If $t = x u_1 \ldots u_m$ then
+  TODO.
+\end{proof}
+
 \begin{lemma}
   If $t$ is safe for~$x$ and $y \ne x$, then $t[\subst{y}{s}]$ is
   still safe for~$x$.
 \end{lemma}
+
+\begin{proof}
+\end{proof}
 
 \begin{lemma}
   If~$\Termmap$ is safe then both $\succinterpret$ and
