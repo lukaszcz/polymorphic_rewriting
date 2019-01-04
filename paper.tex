@@ -1284,7 +1284,8 @@ which all considered terms are typable.
     variable $x \in \dom(\Gamma)$.
   \end{enumerate}
   For~$\tau$ a type constructor, we use $\cl(\tau)$ to denote
-  $\omega(\tau)$.
+  $\omega(\tau)$. We use the notation $\cl[\subst{x}{t}] =
+  \gamma[\subst{x}{t}] \circ \omega$.
 \end{definition}
 
 Note that if $t \in \Iterms$ and $\Gamma \proves t : \tau$ then
@@ -1473,7 +1474,7 @@ $\flatten$ and $\lift$ when clear or irrelevant.
 
 \begin{lemma}\label{lem:plusparts}
 For all types $\sigma$, terms $s,t$ of type $\sigma$ and natural
-numbers $n > 0$ we have:
+numbers $n > 0$:
 \begin{enumerate}
 \item $s \oplus_{\sigma} t \succeq s$ and $s \oplus_{\sigma} t \succeq
   t$;
@@ -1531,6 +1532,38 @@ numbers $n > 0$ we have:
   u_k \succeq \lift(m) u_1 \ldots u_k$ for closed
   $u_1,\ldots,u_k$. This is similar to the proof of
   Lemma~\ref{lem:plusparts}.
+\end{proof}
+
+\begin{lemma}\label{lem_flatten_succ}
+  If $t \succ_\sigma s$ then $\flatten_\sigma t \succ_\nat
+  \flatten_\sigma s$ for all types $\sigma$.
+\end{lemma}
+
+\begin{proof}
+  Without loss of generality we may assume~$\sigma$ is closed and in
+  $\beta$-normal form. Using Lemma~\ref{lem_succ_red}, one shows by
+  induction on~$\sigma$ that if $t \succ_\sigma s$ then
+  $\flatten_\sigma t \succ_\nat (\flatten_\sigma s)$ (the proof
+  for~$\succeq$ is analogous). The same holds with~$\succeq$ instead
+  of~$\succ$.
+\end{proof}
+
+\begin{lemma}\label{lem_abs_succ}
+  If $t \succ s$ then $\abs{x}{t} \succ \abs{x}{s}$ and
+  $\tabs{\alpha}{t} \succ \tabs{\alpha}{s}$. The same holds
+  with~$\succeq$ instead of~$\succ$.
+\end{lemma}
+
+\begin{proof}
+  Assume $t \succ_\tau s$ and $\Gamma \proves x : \sigma$. Let~$\cl$
+  be a closure. We need to show $\cl(\abs{x}{t})
+  \succ_{\cl(\sigma\arrtype\tau)} \cl(\abs{x}{s})$. Let $u \in
+  \World_{\cl(\sigma)}$. Then $\cl' = \cl[\subst{x}{u}]$ is a closure
+  and $\cl'(t) \succ_{\cl(\tau)} \cl'(s)$. Hence $\cl(t)[\subst{x}{u}]
+  \succ_{\cl(\tau)} \cl(s)[\subst{x}{u}]$. By Lemma~\ref{lem_succ_red}
+  this implies $\cl(\abs{x}{t}) u \succ_{\cl(\tau)} \cl(\abs{x}{s})
+  u$. Therefore $\cl(\abs{x}{t}) \succ_{\cl(\sigma\arrtype\tau)}
+  \cl(\abs{x}{s})$. The proof for the second part is analogous.
 \end{proof}
 
 \begin{lemma}
@@ -1913,7 +1946,7 @@ If $\Gamma \vdash s : \sigma$ then $\itp{\Gamma} \vdash \interpret{s}
 
 \subsection{Monotonicity and rule removal}
 
-\begin{definition}
+\begin{definition}\normalfont
   A \emph{$\sigma$-context}~$C_\sigma$ is a term with a fresh function
   symbol $\Box_\sigma \notin \Sigma$ of type~$\sigma$ occurring
   exactly once. By~$C_\sigma[t]$ we denote a term obtained
@@ -1970,7 +2003,7 @@ The former requirement has to be verified for every individual rule.
 For the latter requirement, we can provide some sufficient criteria that
 guarantee monotonicity of both $\succinterpret$ and $\succeqinterpret$.
 
-\begin{definition}
+\begin{definition}\normalfont
   An interpretation term~$t$ is \emph{safe for~$x$} if one of the
   following holds:
   \begin{itemize}
@@ -1998,7 +2031,7 @@ guarantee monotonicity of both $\succinterpret$ and $\succeqinterpret$.
 \begin{lemma}
   If~$t$ is safe for~$x$ and $s \succ s'$ (resp.~$s \succeq s'$) then
   $t[\subst{x}{s}] \succ t[\subst{x}{s'}]$ (resp.~$t[\subst{x}{s}]
-  \succeq t[\subst{x}{s'}]$)
+  \succeq t[\subst{x}{s'}]$).
 \end{lemma}
 
 \begin{lemma}
@@ -2014,32 +2047,6 @@ guarantee monotonicity of both $\succinterpret$ and $\succeqinterpret$.
 \begin{proof}
   TODO
 \end{proof}
-
-\CK{Note: I am not entirely sure what to do with pairing, since we
-currently do not \emph{have} pairing.  With some luck it will work
-out with the two cases above, but will have to investigate how I should
-adapt the interpretations that currently use pairing.}
-
-\LC{We \emph{do} have pairing for all practical purposes, definable in
-  System~$\Fomega$ with the right reduction behaviour. We can treat
-  it explicitly here, if that's needed. But if $m$ can be $0$ above,
-  then we have the encodings of pairing and existential covered. In
-  general, we have the encodings of all inductive data types with one
-  constructor covered. But not the encodings of lists or any inductive
-  data type with more than one constructor, because then the encodings
-  of constructors erase all but one argument. I think we should invent
-  something to have all encodings covered, maybe use
-  $\lift_{\interpret{\tau}}(\flatten_{\interpret{\sigma_i}}(x_i))$
-  inside the encodings to add the erased arguments.}
-
-\CK{\dots snipped rambling \dots}
-
-\LC{It's not completely obvious to me how to do this, so I'd like to
-  see this spelled out in detail.}
-
-\CK{Is it more clear now?}
-
-\LC{Yes, but I'm not sure if the lemma is true as stated.}
 
 \section{Some useful lemmas}
 
