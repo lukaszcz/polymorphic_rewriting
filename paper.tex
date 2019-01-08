@@ -1913,17 +1913,24 @@ And finally the rules.
 \subsection{Interpreting interesting terms}
 
 All terms will be mapped to interpretation terms, which are compared
-using $\succ$ to hopefully obtain a decrease that can be used with
-rule removal.
+using $\succ$ to obtain a decrease that can be used with
+rule removal. \CK{Not too important at this stage, but eventually this
+paragraph will need changing as rule removal has not yet been
+introduced.}
 
 \begin{definition}\normalfont
 A \emph{type constructor mapping} is a function $\Typemap$ which maps
-a type constructor symbol to an interpretation type constructor of the
-same kind.
+a type constructor symbol to a \CKchange{closed} interpretation type
+constructor of the same kind.
 
 A fixed type constructor mapping $\Typemap$ is extended inductively to
-a function from type constructors to interpretation type constructors
-in the expected way. We denote the extended mapping
+a function from type constructors to closed interpretation type
+constructors in the expected way.
+\CK{Is this still the right thing to say? Currently, it's basically a
+substitution: type constructors $c$ are replaced by $\Typemap(c)$, and
+everything else stays the same (only we implicitly $\beta$-normalise as
+we do all the time).}
+We denote the extended mapping
 by~$\typeinterpret{\sigma}$. Thus, for example
 $\typeinterpret{\quant{\alpha}{\sigma}} =
 \quant{\alpha}{\typeinterpret{\sigma}}$ and $\typeinterpret{\sigma
