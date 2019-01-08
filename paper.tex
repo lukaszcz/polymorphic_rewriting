@@ -1877,14 +1877,17 @@ We have the following function symbols:
   typos, but re-check if the interpretation still works. Though the
   rules in the last group were all wrong -- the types didn't match.}
 
+\CK{With the ability to have type variables of a kind $* \arrkind *$
+  these feel \emph{much} more natural.  This should work out. :)}
+
 And finally the rules.
 \[
 \begin{array}{rcl}
 @_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] \\
-\mathtt{tapp}_{\quant{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \red &
+\mathtt{tapp}_{\abs{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \red &
   s[\alpha:=\tau] \\
 \pi^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & s \\
-\pi^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & s \\
+\pi^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & t \\
 \mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{\sigma,\tau}(u),
   \abs{x}{s},\abs{y}{t}) & \red & s[x:=u] \\
 \mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^2_{\sigma,\tau}(u),
@@ -1906,7 +1909,7 @@ And finally the rules.
   \epsilon_\tau(s) \\
 \mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}\,\sigma\,\tau}(
   u),\abs{x:\sigma}{s},\abs{y:\tau}{t}) & \red & \epsilon_\rho(u) \\
-\mathtt{let}_{\varphi,\rho}(\epsilon_{\forall\alpha[\varphi\alpha]}(s),\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}) & \red &
+\mathtt{let}_{\varphi,\rho}(\epsilon_{\exists(\varphi)}(s),\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}) & \red &
   \epsilon_\rho(s) \\
 \end{array}
 \]
@@ -1965,6 +1968,7 @@ And finally the rules.
 \end{itemize}
 \LC{The following rules were wrong. The types didn't match -- you
   forgot the lambda-abstractions.}
+\CK{They now seem to be okay, though!}
 \begin{itemize}
 \item
   $\epsilon_\tau(\mathtt{let}_{\varphi,\bot}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}))
