@@ -489,18 +489,18 @@ The following lemma is obvious, but worth stating explicitly.
 
 \subsubsection{Computability}
 
-In the rest of this section we adapt the Tait-Girard computability
-method to prove termination of~$\leadsto$. The proof is an adaptation
-of chapters~6 and~14 from the book ``Proofs and Types'' by Girard, and
-chapters~10 and~11 from the book ``Lectures on the Curry-Howard
-Isomorphism'' by Sorensen and Urzyczyn. An important difference with
-system~$\Fomega$ and related ones is that the rules for
-$\oplus_\tau$, $\otimes_\tau$, $\flatten_\tau$ and $\lift_\tau$ depend
-on the type~$\tau$. In particular, type substitution in terms may
-create redexes. For instance, if $\alpha$ is a type variable then
-$\oplus_\alpha t_1 t_2$ is not a redex, but
-$\oplus_{\sigma\arrtype\tau} t_1 t_2$ is. This makes adapting the
-computability method a bit more difficult.
+In the rest of this section we adapt Girard's method of candidates
+(which itself is based on Tait's computability method) to prove
+termination of~$\leadsto$. The proof is an adaptation of chapters~6
+and~14 from the book ``Proofs and Types'' by Girard, and chapters~10
+and~11 from the book ``Lectures on the Curry-Howard Isomorphism'' by
+Sorensen and Urzyczyn. An important difference with system~$\Fomega$
+and related ones is that the rules for $\oplus_\tau$, $\otimes_\tau$,
+$\flatten_\tau$ and $\lift_\tau$ depend on the type~$\tau$. In
+particular, type substitution in terms may create redexes. For
+instance, if $\alpha$ is a type variable then $\oplus_\alpha t_1 t_2$
+is not a redex, but $\oplus_{\sigma\arrtype\tau} t_1 t_2$ is. This
+makes adapting the computability method a bit more difficult.
 
 For the termination proof we assume without loss of generality that
 the terms are given in orthodox Church-style, i.e., instead of using
@@ -738,20 +738,6 @@ write~$\val{\varphi}{}{}$.
   and $\xi$ is an $\omega$-valuation, then $\val{\sigma}{\xi}{\omega}
   \in \Cb_{\omega(\sigma)}$.
 \end{lemma}
-
-\CK{I still see $\flatten_\sigma(s)$ and $\lift_\sigma(s)$ used in
-this proof. Has it been fully updated to the new definitions?}
-
-\LC{??? I don't understand what you're talking about here. We need
-  $\flatten$ and $\lift$ -- they are in our interpretation terms?}
-
-\CK{I'm referring to the functional notation: we need
-$\flatten_\sigma s$, not $\flatten_\sigma(s)$.  Since you replaced
-it in most other places, I wondered whether this proof had been
-updated.}
-
-\LC{Oh, I just treat $\flatten_\sigma(s)$ and $\flatten_\sigma s$
-  interchangeably, the parentheses being superfluous.}
 
 \begin{proof}
   By induction on the structure of~$\sigma$ we show that
@@ -1336,7 +1322,7 @@ First we state a simple lemma that will be used implicitly in what
 follows.
 
 \begin{lemma}
-  If~$\tau$ is a closed interpretation type in $\beta$-normal form the
+  If~$\tau$ is a closed interpretation type in $\beta$-normal form then
   one of the following holds:
   \begin{enumerate}
   \item $\tau = \nat$, or
@@ -1545,7 +1531,8 @@ numbers $n > 0$:
 
 \begin{lemma}\label{lem_flatten_succ}
   If $t \succ_\sigma s$ then $\flatten_\sigma t \succ_\nat
-  \flatten_\sigma s$ for all types $\sigma$.
+  \flatten_\sigma s$ for all types $\sigma$. The same holds
+  with~$\succeq$ instead of~$\succ$.
 \end{lemma}
 
 \begin{proof}
@@ -1579,11 +1566,14 @@ numbers $n > 0$:
   Let $s,t,u$ be terms of type $\sigma$.
   \begin{enumerate}
   \item If $s \succeq t$ then $s \oplus_\sigma u \succeq t
-    \oplus_\sigma u$ and $s \otimes_\sigma u \succeq t \otimes_\sigma
-    u$.
+    \oplus_\sigma u$, $u \oplus_\sigma s \succeq u \oplus_\sigma t$,
+    and $s \otimes_\sigma u \succeq t \otimes_\sigma u$, $u
+    \otimes_\sigma s \succeq u \otimes_\sigma t$.
   \item If $s \succ t$ then $s \oplus_\sigma u \succ t \oplus_\sigma
-    u$. Moreover, if additionally $u \succeq \lift_\sigma(1)$ then
-    also $s \otimes_\sigma u \succ t \otimes_\sigma u$.
+    u$ and $u \oplus_\sigma s \succ u \oplus_\sigma t$. Moreover, if
+    additionally $u \succeq \lift_\sigma(1)$ then also $s
+    \otimes_\sigma u \succ t \otimes_\sigma u$ and $u \otimes_\sigma s
+    \succ u \otimes_\sigma t$.
   \end{enumerate}
 \end{lemma}
 
@@ -1596,16 +1586,6 @@ numbers $n > 0$:
   \otimes u) w_1 \ldots w_n \succ (t \otimes u) w_1 \ldots w_n$.
 \end{proof}
 
-\begin{lemma}\label{lem_succeq_subst}
-  If $s \succ s'$ or $s \succeq s'$ then $t[\subst{x}{s}] \succeq
-  t[\subst{x}{s'}]$.
-\end{lemma}
-
-\begin{proof}
-  Induction on the size of~$t$. If $t = x$ then this follows from
-  Lemma~\ref{lem_succ_to_succeq}. TODO
-\end{proof}
-
 We observe that standard equality properties of addition and
 multiplication extend to interpretation terms of other types:
 
@@ -1613,14 +1593,15 @@ multiplication extend to interpretation terms of other types:
 For all types $\sigma$ and all terms $s,t,u$ of type $\sigma$, we
 have:
 \begin{enumerate}
-\item\label{lem:approx:symmetry}
-  $s \oplus_\sigma t \approx t \oplus_\sigma s$ and
-  $s \otimes_\sigma t \approx t \otimes_\sigma s$;
+\item\label{lem:approx:symmetry} $s \oplus_\sigma t \approx t
+  \oplus_\sigma s$ and $s \otimes_\sigma t \approx t \otimes_\sigma
+  s$;
 \item\label{lem:approx:assoc} $s \oplus_\sigma (t \oplus_\sigma u)
-  \approx (s \oplus_\sigma t) \oplus_\sigma u$ and $s
-  \otimes_\sigma (t \otimes_\sigma u) \approx (s \otimes_\sigma t) \otimes_\sigma u$;
-\item\label{lem:approx:distribution} $s \otimes_\sigma (t \oplus_\sigma u)
-  \approx (s \otimes_\sigma t) \oplus_\sigma (s \otimes_\sigma u)$;
+  \approx (s \oplus_\sigma t) \oplus_\sigma u$ and $s \otimes_\sigma
+  (t \otimes_\sigma u) \approx (s \otimes_\sigma t) \otimes_\sigma u$;
+\item\label{lem:approx:distribution} $s \otimes_\sigma (t
+  \oplus_\sigma u) \approx (s \otimes_\sigma t) \oplus_\sigma (s
+  \otimes_\sigma u)$;
 \item\label{lem:approx:neutral} $(\lift_\sigma 0) \oplus_\sigma s
   \approx s$ and $(\lift_\sigma 1) \otimes_\sigma s \approx s$.
 \end{enumerate}
@@ -1649,6 +1630,123 @@ have:
   $(\lift_\sigma(n+m))\da = (\lift_\sigma n \oplus_\sigma \lift_\sigma
   n)\da$ (analogously for multiplication). This suffices by
   Corollary~\ref{cor_succ_da} and the reflexivity of~$\approx$.
+\end{proof}
+
+\subsection{Weak monotonicity}\label{sec_weakly_monotone}
+
+We want to show that if $s \succeq s'$ then $t[\subst{x}{s}] \succeq
+t[\subst{x}{s'}]$. A straightforward proof attempt runs into a problem
+that, because of impredicativity of polymorhism, direct induction on
+type structure is not possible. We adopt a method similar to Girard's
+method of candidates from the termination proof.
+
+\begin{definition}\normalfont
+  A set~$X$ of terms of type~$\tau$ is a \emph{candidate of
+    type~$\tau$} when:
+  \begin{enumerate}
+  \item if $t \in X$ and $t \leadsto t'$ or $t' \leadsto t$ then $t'
+    \in X$,
+  %\item if $t \in X$ and $s_1 \succeq s_2$ then $t s_1 \succeq t s_2$.
+  \end{enumerate}
+  In the above we implicitly assume that all mentioned terms are
+  well-typed.
+\end{definition}
+
+\begin{definition}\label{def_wm_valuation}\normalfont
+  An $\omega$-valuation~$\xi$ is a mapping from type variables to
+  candidates such that $\xi(\alpha)$ is a candidate of
+  type~$\omega(\alpha)$.
+
+  We define $\val{\tau}{\xi}{\omega}$ by induction on~$\tau$.
+  \begin{itemize}
+  \item $\val{\alpha}{\xi}{\omega} = \xi(\alpha)$.
+  \item $\val{\nat}{\xi}{\omega}$ is the set of all terms $t \in
+    \Iterms$ such that $t : \nat$.
+  \item $\val{\sigma\arrtype\tau}{\xi}{\omega}$ is the set of all
+    terms $t \in \Iterms$ such that $t : \omega(\sigma\arrtype\tau)$ and:
+    \begin{itemize}
+    \item for all $s \in \val{\sigma}{\xi}{\omega}$ we have $t s \in
+      \val{\tau}{\xi}{\omega}$, and
+    \item if $s_1 \succeq s_2$ and $s_i \in \val{\sigma}{\xi}{\omega}$
+      then $t s_1 \succeq t s_2$.
+    \end{itemize}
+  \item $\val{\forall\alpha\sigma}{\xi}{\omega}$ is the set of all
+    terms $t \in \Iterms$ such that $t : \omega(\forall\alpha\sigma)$
+    and for every closed type~$\tau$ and every candidate~$X$ of
+    type~$\tau$ we have $t \tau \in
+    \val{\sigma}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\tau}]}$.
+  \end{itemize}
+\end{definition}
+
+\begin{lemma}
+  $\val{\tau}{\xi}{\omega}$ is a candidate of type~$\omega(\tau)$.
+\end{lemma}
+
+\begin{proof}
+  Induction on~$\tau$. If $\tau = \alpha$ then
+  $\val{\alpha}{\xi}{\omega} = \xi(\alpha)$ is a candidate. If $\tau =
+  \nat$ then this is obvious from definitions.
+
+  Assume $\tau=\tau_1\arrtype\tau_2$.
+
+  Assume $\tau=\forall\alpha\sigma$. TODO
+\end{proof}
+
+\begin{lemma}
+  Let $t : \omega(\tau)$. Let $\gamma_1,\gamma_2$ be substitutions
+  such that for $x \in \FV(t)$ of type~$\sigma$ we have $\gamma_i(x)
+  \in \val{\sigma}{\xi}{\omega}$ and $\gamma_1(x) \succeq
+  \gamma_2(x)$. Then $\gamma_i(t) \in \val{\tau}{\xi}{\omega}$ and
+  $\gamma_1(t) \succeq \gamma_2(t)$.
+\end{lemma}
+
+\begin{proof}
+  Induction on~$t$. We have the following cases.
+  \begin{itemize}
+  \item $t = x$. Then this follows from assumption on~$\gamma_i$.
+  \item $t = t_1 t_2$ and $t_1 : \sigma\arrtype\tau$ and $t_2 :
+    \sigma$. By the inductive hypothesis $\gamma_i(t_1) \in
+    \val{\sigma\arrtype\tau}{\xi}{\omega}$ and $\gamma_i(t_2) \in
+    \val{\sigma}{\xi}{\omega}$, and $\gamma_1(t_1) \succeq
+    \gamma_2(t_1)$ and $\gamma_1(t_2) \succeq \gamma_2(t_2)$. By the
+    definition of~$\val{}{}{}$ we have $\gamma_i(t) =
+    \gamma_i(t_1)\gamma_i(t_2) \in \val{\tau}{\xi}{\omega}$, and
+    $\gamma_1(t_1)\gamma_1(t_2) \succeq
+    \gamma_1(t_1)\gamma_2(t_2)$. By the definition of~$\succeq$ also
+    $\gamma_1(t_1)\gamma_2(t_2)\succeq\gamma_2(t_1)\gamma_2(t_2)$. By
+    the transitivity of~$\succeq$ we obtain $\gamma_1(t) =
+    \gamma_1(t_1)\gamma_1(t_2) \succeq \gamma_2(t_1)\gamma_2(t_2) =
+    \gamma_2(t)$.
+  \item $t = \abs{x}{u}$ and $\tau=\tau_1\arrtype\tau_2$. Let $s_1,s_2
+    \in \val{\tau_1}{\xi}{\omega}$ be such that $s_1 \succeq s_2$. Let
+    $\gamma_i'=\gamma[\subst{x}{s_i}]$. By the inductive hypothesis
+    $\gamma_1'(u)\succeq\gamma_2'(u)$. We have $\gamma_i(\abs{x}{u})
+    s_i \leadsto \gamma_i'(u)$. Hence $\gamma_1(t) s_1 \succeq
+    \gamma_2(t) s_2$ by Lemma~??. An (ALMOST) analogous argument shows
+    that if $s \in \val{\tau_1}{\xi}{\omega}$ then $\gamma_i(t) s \in
+    \val{\tau_1\arrtype\tau_2}{\xi}{\omega}$.
+  \item $t = u \phi$ and $\tau = \sigma[\subst{\alpha}{\phi}]$ and $u
+    : \forall\alpha\sigma$. By the inductive hypothesis $\gamma_i(u)
+    \in \val{\forall\alpha\sigma}{\xi}{\omega}$ and $\gamma_1(u)
+    \succeq \gamma_2(u)$. By the definition of~$\succeq$ we have
+    $\gamma_1(u) \phi \succeq \gamma_2(u) \phi$, i.e., $\gamma_1(t)
+    \succeq \gamma_2(t)$. Because~$\val{\phi}{\xi}{\omega}$ is a
+    candidate by Lemma~??, by the definition of~$\val{}{}{}$ we have
+    $\gamma_i(u) \phi \in
+    \val{\sigma}{\xi[\subst{\alpha}{\val{\phi}{\xi}{\omega}}]}{\omega[\subst{\alpha}{\phi}]}$. By
+    Lemma~?? we have
+    $\val{\sigma}{\xi[\subst{\alpha}{\val{\phi}{\xi}{\omega}}]}{\omega[\subst{\alpha}{\phi}]}
+    = \val{\sigma[\subst{\alpha}{\phi}]}{\xi}{\omega}$.
+  \item $t = \tabs{\alpha}{u}$ and $\tau = \forall\alpha\sigma$. Let
+    $\phi$ be a closed type. TODO.
+  \end{itemize}
+\end{proof}
+
+\begin{lemma}\label{lem_succeq_subst}
+  If $s \succeq s'$ then $t[\subst{x}{s}] \succeq t[\subst{x}{s'}]$.
+\end{lemma}
+
+\begin{proof}
 \end{proof}
 
 \subsection{Encodings of inductive types}\label{sec_encodings}
