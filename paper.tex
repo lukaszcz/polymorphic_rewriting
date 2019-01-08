@@ -1910,6 +1910,15 @@ And finally the rules.
   in urzy\_emb then $\Phi(s) \red \Phi(t)$. But this should be easy
   once the reductions are defined correctly.}
 
+\CK{Question: we are doing substitution in the above, but can we not
+  avoid  that, and instead reason modulo $\beta$-reduction also in
+  terms?  We already require left-hand sides to be patterns,
+  essentially, so it shouldn't matter much whether we have $t[x:=u]$
+  or $(\abs{y}{t}) \cdot u$.  I do not care much either way, and if
+  it would require a lot of change to the proofs it's probably not
+  worth it, but it seems like a natural way of thinking about
+  terms and types.}
+
 \subsection{Interpreting interesting terms}
 
 All terms will be mapped to interpretation terms, which are compared
@@ -2124,8 +2133,12 @@ We use the following type constructor mapping:
 \[
 \begin{array}{rcl}
 \Typemap(\bot) & = & \nat \\
-\Typemap(\mathtt{or}) & = & \lambda\alpha_1\lambda\alpha_2 . \alpha_1 \times \alpha_2 \\
-\Typemap(\mathtt{and}) & = & \lambda\alpha_1\lambda\alpha_2 . \alpha_1 \times \alpha_2 \\
+\Typemap(\mathtt{and}) & = & \lambda\alpha_1\lambda\alpha_2 .
+  \quant{\beta}{(\alpha_1 \arrtype \alpha_2 \arrtype \beta) \arrtype
+  \beta} \\
+\Typemap(\mathtt{or}) & = & \lambda\alpha_1\lambda\alpha_2 .
+  \quant{\beta}{\quant{\chi}{((\alpha_1 \arrtype \beta) \arrtype (\alpha_2
+  \arrtype \beta) \arrtype \chi) \arrtype \chi} \arrtype \beta} \\
 \Typemap(\mathtt{prop}_i) & = & \nat \\
 \Typemap(\exists) & = & \lambda(\alpha : * \arrkind *) . \quant{\beta}{\quant{\gamma}{\alpha\gamma \arrtype \beta} \arrtype \beta}
 \end{array}
@@ -2142,16 +2155,26 @@ And the following function symbol mapping:
 \Termmap(\mathtt{ext}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta : * . \lambda x:\alpha\beta . &
   \tabs{\xi}{\abs{y:\quant{\chi}{\alpha\chi
   \arrtype \xi}}{y * \beta \cdot x}} \\
+  & & & \phantom{AB}\oplus\ \lift_\xi(\flatten(x)) \\
+\Termmap(\mathtt{pair}) & = & \Lambda \alpha \Lambda \beta \lambda x :
+  \alpha, y : \beta.\quad & \Lambda \xi.\abs{f:\alpha \arrtype \beta
+  \arrtype \xi}{f \cdot x \cdot y\ \oplus \\
+  & & & \phantom{AB}\lift_{\xi}(\flatten_\alpha(x))\ \oplus \\
+  & & & \phantom{AB}\lift_\xi(\flatten_\beta(y))} \\
+\Termmap(\pi^1) & = & \Lambda \alpha \Lambda \beta \lambda x :
+  \quant{\xi}{(\alpha \arrtype \beta \arrtype \xi) \arrtype \xi}.\quad
+  & x * \alpha \cdot (\abs{yz}{y}) \oplus \lift_{\alpha}(1) \\
+\Termmap(\pi^2) & = & \Lambda \alpha \Lambda \beta \lambda x :
+  \quant{\xi}{(\alpha \arrtype \beta \arrtype \xi) \arrtype \xi}.\quad
+  & x * \beta \cdot (\abs{yz}{z}) \oplus \lift_{\beta}(1) \\
 \Termmap(\mathtt{in}^1) & = & \Lambda \alpha \Lambda \beta \lambda x : \alpha.\quad &
-  (x, \mathtt{lift}_\beta(1)) \\
+  \Lambda \xi.\lambda y.p * (\alpha \arrtype \xi) \cdot (\abs{yz}{y})
+  \cdot x \\
+  & & & \phantom{AB}\oplus\ \lift_\xi(\flatten_\alpha(x)) \\
 \Termmap(\mathtt{in}^2) & = & \Lambda \alpha \Lambda \beta \lambda x : \beta.\quad &
-  (\mathtt{lift}_\alpha(1), x) \\
-\Termmap(\pi^1) & = & \Lambda \alpha \Lambda \beta \lambda x : \alpha \times \beta.
-  \quad & \pi^1_{\alpha,\beta}(x) \oplus \lift_{\alpha}(1) \\
-\Termmap(\pi^2) & = & \Lambda \alpha \Lambda \beta \lambda x : \alpha \times \beta.
-  \quad & \pi^2_{\alpha,\beta}(x) \oplus \lift_{\beta}(1) \\
-\Termmap(\mathtt{pair}) & = & \Lambda \alpha \Lambda \beta \lambda x : \alpha, y :
-  \beta.\quad & (x, y) \\
+  \Lambda \xi.\lambda y.p * (\beta \arrtype \xi) \cdot (\abs{yz}{z})
+  \cdot x \\
+  & & & \phantom{AB}\oplus\ \lift_\xi(\flatten_\beta(x)) \\
 \end{array}
 \]
 \[
@@ -2161,15 +2184,17 @@ And the following function symbol mapping:
   y : \quant{\xi}{\alpha\xi \arrtype \beta}. \\
   & & \hfill x * \beta \cdot y \oplus \lift_{\beta}(\flatten(y) \oplus
   1) \\
-\Termmap(\mathtt{case}) & = & \Lambda \alpha,\beta,\xi . \lambda x : (\alpha
-  \times \beta), y : (\alpha \arrtype \xi), z : (\beta \arrtype \xi). \\
+\Termmap(\mathtt{case}) & = & \Lambda \alpha,\beta,\xi . \lambda x :
+  \quant{\gamma}{\quant{\chi}{((\alpha \arrtype \gamma) \arrtype (\beta
+  \arrtype \gamma) \arrtype \chi) \arrtype \chi} \arrtype \gamma},\\
+  & & \phantom{A}\hfill
+  y : (\alpha \arrtype \xi), z : (\beta \arrtype \xi). \\
   & & \quad
-  \lift_\xi(37) \oplus (\ \lift_\xi(\flatten_{\alpha \times\beta}(
-  x) \oplus 1) \otimes \\
-  & & \phantom{\quad\lift_\xi(37) \oplus a}\
-  ((y \cdot \proj^1_{\alpha,\beta}(x)) \oplus
-   (z \cdot \proj^2_{\alpha,\beta}(x)) \oplus \lift_\xi(1))
-  \ ) \\
+  x * \xi \cdot (\Lambda \chi.\abs{f:(\alpha \arrtype \xi) \arrtype
+  (\beta \arrtype \xi) \arrtype \chi}{f \cdot y \cdot z})\ \oplus \\
+  & & \quad\phantom{ABCDEFGHIJKL}
+    (y \cdot \lift_\alpha(0)) \oplus (z \cdot \lift_\beta(0)) \oplus
+    \lift_\xi(7) \\
 \end{array}
 \]
 
