@@ -2018,6 +2018,9 @@ And finally the rules.
   worth it, but it seems like a natural way of thinking about
   terms and types.}
 
+\LC{I think we can say we're doing $\beta$-reduction implicitly. This
+  works thanks to Lemma~\ref{lem_succ_red}.}
+
 \subsection{Interpreting interesting terms}
 
 All terms will be mapped to interpretation terms, which are compared
@@ -2038,6 +2041,9 @@ constructors in the expected way.
 substitution: type constructors $c$ are replaced by $\Typemap(c)$, and
 everything else stays the same (only we implicitly $\beta$-normalise as
 we do all the time).}
+\LC{It depends how you treat e.g. $\to$ -- is this the same symbol in
+  the syntax and the interpretation, or two different symbols? I think
+  this doesn't matter much.}
 We denote the extended mapping
 by~$\typeinterpret{\sigma}$. Thus, for example
 $\typeinterpret{\quant{\alpha}{\sigma}} =
@@ -2197,7 +2203,8 @@ guarantee monotonicity of both $\succinterpret$ and $\succeqinterpret$.
 \end{proof}
 
 \CK{We do need that if $s \succ t$ then $s\sigma \succ t\sigma$ for
-$\sigma$ a type substitution.  We have that by definition, right?}
+  $\sigma$ a type substitution.  We have that by definition, right?}
+\LC{Yes, this follows by manipulating closures.}
 
 \section{Some useful lemmas}
 
@@ -2306,6 +2313,10 @@ And the following function symbol mapping:
 before: with variables for the type denotations rather than arbitrary
 types.  The idea is that the rules can of course be instantiated.  It
 is easily changed to the other way if that is preferred.}
+
+\LC{I don't understand this. What is a ``variable for type
+  denotation''? How does it differ from a type (constructor)
+  variable?}
 
 \begin{itemize}
 \item $@_{\alpha,\beta}(\abs{x}{s},t) \red s[x:=t]$ \\ We have
