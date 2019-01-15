@@ -2671,6 +2671,11 @@ is easily changed to the other way if that is preferred.}
   denotation''? How does it differ from a type (constructor)
   variable?}
 
+\CK{It doesn't. However, when a type denotation is $\sigma$ (as it is
+  int he rules), then I assume that this does not stand in for a
+  variable, but for a specific type -- and then the translation will
+  have to contain $\typeinterpret{\sigma}$ instead of just $\sigma$.}
+
 \begin{itemize}
 \item $@_{\alpha,\beta}(\abs{x}{s},t) \red s[x:=t]$ \\ We have
   $\interpret{@_{\alpha,\beta}(\abs{x:\sigma}{s},t)} \arrrbeta
@@ -3067,7 +3072,184 @@ $ \\
 
 \CK{END OF CASE/CASE CHALLENGE (UNFINISHED).}
 
+\CK{Note: this goes wrong, and may be tricky to fix because of the
+horrible interpretation of $\mathtt{or}$.  It may be better to go back
+to pairing for $\mathtt{or}$.  However, the $\mathtt{let}$ cannot be
+changed in such a way.  I will now set out how we can deal with
+$\mathtt{let}/\mathtt{let}$, since it's the case most likely to lead
+to problems that are hard to work around.}
+
+\newpage
+
+In this, I say that $\Termmap(\mathtt{let}) =$ \\
+$\Lambda \varphi : * 
+\arrkind *.\Lambda \beta : *.\lambda x : \forall \chi[\forall \xi[
+\varphi\xi \arrtype \chi] \arrtype \chi].\lambda y : \forall \xi[
+\alpha \xi \arrtype \beta].$ \\
+\phantom{AB}\hfill
+  $A_{\varphi,\beta,x,y} \otimes
+    (x * \beta \cdot (y \oplus C_{\varphi,\beta,x,y}))
+  \oplus \\
+\phantom{AB}\hfill
+  B_{\varphi,\beta,x,y} \otimes (y * \Pi_{\varphi,\beta,x,y} \cdot
+    D_{\varphi,\beta,x,y})
+  \oplus \\
+\phantom{AB}\hfill
+  E_{\varphi,\beta,x,y}$.
+
+Here, terms $A,\dots,E$ and type $\Pi$ are yet to be determined.
+
+In the following, I will not use $\leadsto$ in either side but simply
+write $=$, essentially reasoning modulo $\leadsto$ (which I think we
+can safely do, but formalising can be done afterwards if it all works
+out).
+
+\begin{itemize}
+\item We need:
+  $\interpret{\mathtt{let}_{\psi,\rho}(\mathtt{let}_{\varphi,\exists
+  \psi}(s,\Lambda \alpha.\lambda x : \varphi\alpha.t),t)}$ \\
+  $\succeq^?$ \\
+  $\interpret{\mathtt{let}_{\varphi,\rho}(s,\Lambda \alpha.\lambda x:
+  \varphi\alpha.\mathtt{let}_{\psi,\rho}(t,u))}$
+\item That is: \\
+  $\Termmap(\mathtt{let})_{\psi,\rho}(
+  \Termmap(\mathtt{let})_{\varphi,\forall\beta[\forall\alpha[\psi\alpha
+  \arrtype \beta] \arrtype \beta]}(
+  \interpret{s},\Lambda \alpha.\lambda x : \varphi\alpha.\interpret{t}),
+  \interpret{u})$ \\
+  $\succeq^?$ \\
+  $\Termmap(\mathtt{let})_{\varphi,\rho}(
+  \interpret{s},\Lambda \alpha.\lambda x:\varphi\alpha.
+  \Termmap(\mathtt{let})_{\psi,\rho}(\interpret{t},\interpret{u}))$
+\item Let's expand and evaluate the inner occurrences of
+  $\Termmap(\mathtt{let})$: \\
+  $\Termmap(\mathtt{let})_{\psi,\rho}( \\
+  \phantom{AB}
+    A_Q \otimes (\interpret{s} * \forall\beta[\forall \alpha[\psi\alpha
+    \arrtype \beta] \arrtype \beta] \cdot ((\Lambda \alpha.\lambda x :
+  \varphi\alpha.\interpret{t}) \oplus C_Q)) \oplus \\
+  \phantom{AB}
+    B_Q \otimes ((\Lambda \alpha.\lambda x : \varphi\alpha.\interpret{t})
+    * \Pi_Q \cdot D_Q) \oplus \\
+  \phantom{AB}
+    E_Q\ , \\
+  \phantom{A} \interpret{u}\ )$ \\
+  $\succeq^?$ \\
+  $\Termmap(\mathtt{let})_{\varphi,\rho}(
+  \interpret{s},\Lambda \alpha.\lambda x:\varphi\alpha. \\
+  \phantom{AB}
+  A_R \otimes (\interpret{t} * \rho \cdot (\interpret{u} \oplus
+    C_R)) \oplus \\
+  \phantom{AB}
+    B_R \otimes (\interpret{u} * \Pi_R \cdot D_R) \oplus \\
+  \phantom{AB}
+  E_R\ )$ \\
+
+  Here, $Q$ stands for the subscript $\varphi,\forall\beta[\forall
+  \alpha[\psi\alpha\arrtype \beta] \arrtype\beta],\interpret{s},
+  \Lambda \alpha.\lambda x:\varphi\alpha.\interpret{t}$ and
+  $R$ stands for the subscript $\psi,\rho,\interpret{t},\interpret{u}$.
+\item Let's evaluate the left-hand side as far as we already can: \\
+  $\Termmap(\mathtt{let})_{\psi,\rho}( \\
+  \phantom{AB}
+    A_Q \otimes (\interpret{s} * \forall\beta[\forall \alpha[\psi\alpha
+    \arrtype \beta] \arrtype \beta] \cdot ((\Lambda \alpha.\lambda x :
+  \varphi\alpha.\interpret{t}) \oplus C_Q)) \oplus \\
+  \phantom{AB}
+    B_Q \otimes \interpret{t}[\alpha:=\Pi_Q][x:=D_Q] \oplus \\
+  \phantom{AB}
+    E_Q\ , \\
+  \phantom{A} \interpret{u}\ )$ \\
+  $\succeq^?$ \\
+  $\Termmap(\mathtt{let})_{\varphi,\rho}(
+  \interpret{s},\Lambda \alpha.\lambda x:\varphi\alpha. \\
+  \phantom{AB}
+  A_R \otimes (\interpret{t} * \rho \cdot (\interpret{u} \oplus
+    C_R)) \oplus \\
+  \phantom{AB}
+  B_R \otimes (\interpret{u} * \Pi_R \cdot D_R) \oplus \\
+  \phantom{AB}
+  E_R\ )$ \\
+\pagebreak
+\item Okay, let's expand the outer lets. \\
+  $A_P \otimes (\ \\
+  \phantom{A} (\:\:
+    A_Q \otimes (\interpret{s} * \forall\beta[\forall \alpha[\psi\alpha
+    \arrtype \beta] \arrtype \beta] \cdot ((\Lambda \alpha.\lambda x :
+  \varphi\alpha.\interpret{t}) \oplus C_Q)) \oplus \\
+  \phantom{AB}
+    B_Q \otimes \interpret{t}[\alpha:=\Pi_Q][x:=D_Q] \oplus \\
+  \phantom{AB}
+    E_Q \\
+  \phantom{A} ) * \rho \cdot (\interpret{u} \oplus C_P)\ )\ \oplus \\
+  \phantom{A} B_P \otimes (\interpret{u} * \Pi_P \cdot D_P)\ \oplus \\
+  \phantom{A} E_P$ \\
+  $\succeq^?$ \\
+  $A_S \otimes\ ( \\
+  \phantom{AB} \interpret{s} * \rho \cdot (\\
+  \phantom{AB} (\:\: \Lambda \alpha.\lambda x:\varphi\alpha.
+    A_R \otimes (\interpret{t} * \rho \cdot
+    (\interpret{u} \oplus C_R)) \oplus B_R \otimes (\interpret{u} *
+    \Pi_R \cdot D_R) \oplus E_R \\
+  \phantom{AB} ) \oplus C_S) \\
+  \phantom{A} )\ \oplus \\
+  \phantom{A} B_S \otimes\ ( \\
+  \phantom{AB} (\:\: A_R \otimes (\interpret{t} * \rho \cdot
+    (\interpret{u} \oplus C_R)) \oplus B_R \otimes (\interpret{u} *
+    \Pi_R \cdot D_R) \oplus E_R\ )[\alpha:=\Pi_S][x:=D_S] \\
+  \phantom{A} )\ \oplus \\
+  \phantom{A} E_S$ \\
+  Here, $P$ stands for the subscript $\psi,\rho,
+  A_Q \times \dots \oplus E_Q,\interpret{u}$ and
+  $S$ stands for the subscript $\varphi,\rho,\interpret{s},
+  \Lambda \alpha.\lambda x \dots E_R$.
+\item Using the definitions of $\oplus$ and $\otimes$, we can rewrite
+  the left-hand side as follows: \\
+  $A_P \otimes (\ \\
+  \phantom{A} (\:\: (A_Q * \rho \cdot (\interpret{u} \oplus C_P))\:\:
+  \otimes \\
+  \phantom{AB} (\interpret{s} * \forall\beta[\forall \alpha[\psi\alpha
+    \arrtype \beta] \arrtype \beta] \cdot ((\Lambda \alpha.\lambda x :
+    \varphi\alpha.\interpret{t}) \oplus C_Q) * \rho \cdot
+    (\interpret{u} \oplus C_P)) \\
+  \phantom{A} ) \oplus \\
+  \phantom{A} (\:\: (B_Q * \rho \cdot (\interpret{u} \oplus C_P))\:\:
+  \otimes \\
+  \phantom{AB} \interpret{t}[\alpha:=\Pi_Q][x:=D_Q] * \rho \cdot
+    (\interpret{u} \oplus C_P)\\
+  \phantom{A} ) \oplus \\
+  \phantom{A} E_Q * \rho \cdot (\interpret{u} \oplus C_P)\ )\ \oplus \\
+  \phantom{A} B_P \otimes (\interpret{u} * \Pi_P \cdot D_P)\ \oplus \\
+  \phantom{A} E_P$ \\
+  $\succeq^?$ \\
+  $A_S \otimes\ ( \\
+  \phantom{AB} \interpret{s} * \rho \cdot (\\
+  \phantom{AB} (\:\: \Lambda \alpha.\lambda x:\varphi\alpha.
+    A_R \otimes (\interpret{t} * \rho \cdot
+    (\interpret{u} \oplus C_R)) \oplus B_R \otimes (\interpret{u} *
+    \Pi_R \cdot D_R) \oplus E_R \\
+  \phantom{AB} ) \oplus C_S) \\
+  \phantom{A} )\ \oplus \\
+  \phantom{A} B_S \otimes\ ( \\
+  \phantom{AB} (\:\: A_R \otimes (\interpret{t} * \rho \cdot
+    (\interpret{u} \oplus C_R)) \oplus B_R \otimes (\interpret{u} *
+    \Pi_R \cdot D_R) \oplus E_R\ )[\alpha:=\Pi_S][x:=D_S] \\
+  \phantom{A} )\ \oplus \\
+  \phantom{A} E_S$ \\
+\item Further progress will likely require filling in some of those
+  terms $A\dots E$.  Note that for monotonicity, we must require that
+  always $A_? \succeq \lift(1)$ and $B_? \succeq \lift(1)$.
+  However, note that to be able to use absolute positiveness, the
+  left-hand side should at least have a part that $\succeq
+  \interpret{s} * \rho \cdot \langle$that very large term$\rangle$.
+  Since $s$ could be anything, note that $\langle$whatever$\rangle
+  \otimes \interpret{s} * \rho \cdot \langle$something smaller than
+  that very large term$\rangle$ is not comparable.
+\end{itemize}
+
 ==================
+
+\newpage
 
 \[
 \begin{array}{rcl}
