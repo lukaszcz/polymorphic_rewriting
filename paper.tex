@@ -1941,21 +1941,30 @@ the pair~$\val{\tau}{\xi}{\omega}$.
   Let~$\omega' = \omega[\subst{\alpha}{\omega(\tau)}]$ and $\xi' =
   \xi[\subst{\alpha}{\val{\tau}{\xi}{\omega}}]$. The proof by
   induction on~$\sigma$ is analogous to the proof of
-  Lemma~\ref{lem_val_subst}. The only difference is that in the case
+  Lemma~\ref{lem_val_subst}. The main difference is that in the case
   $\sigma = \sigma_1\arrtype\sigma_2$ we need to show that if e.g.~$t
   \in \val{\sigma[\subst{\alpha}{\tau}]}{\xi}{\omega}$ and $s_1
-  \succeq s_2$ and $s_i \in \val{\sigma_1}{\xi'}{\omega'}$ then $t s_1
-  \succeq t s_2$. But then $s_i \in
-  \val{\sigma_1[\subst{\alpha}{\tau}]}{\xi}{\omega}$ by the inductive
-  hypothesis, so $t s_1 \succeq t s_2$ by the definition
-  of~$\val{}{}{}$. TODO
+  \gteq{\sigma_1}{\xi'}{\omega'} s_2$ then $t s_1
+  \gteq{\sigma_2}{\xi'}{\omega'} t s_2$. But then $s_1
+  \gteq{\sigma_1[\subst{\alpha}{\tau}]}{\xi}{\omega} s_2$ by the
+  inductive hypothesis, so $t s_1
+  \gteq{\sigma_2[\subst{\alpha}{\tau}]}{\xi}{\omega} t s_2$ by
+  definition. Hence $t s_1 \gteq{\sigma_2}{\xi'}{\omega'} t s_2$ by
+  the inductive hypothesis.
 \end{proof}
 
 \begin{lemma}\label{lem_wm_forall}
   Let $\tau$ be a type constructor of kind~$\kappa$. Assume $\omega$
-  is closed for $\forall\alpha[\sigma]$ and for~$\tau$. If $t \in
-  \val{\forall(\alpha:\kappa)[\sigma]}{\xi}{\omega}$ then $t
-  (\omega(\tau)) \in \val{\sigma[\subst{\alpha}{\tau}]}{\xi}{\omega}$.
+  is closed for $\forall\alpha[\sigma]$ and for~$\tau$.
+  \begin{enumerate}
+  \item If $t \in \val{\forall(\alpha:\kappa)[\sigma]}{\xi}{\omega}$
+    then $t (\omega(\tau)) \in
+    \val{\sigma[\subst{\alpha}{\tau}]}{\xi}{\omega}$.
+  \item If $t_1 \gteq{\forall(\alpha:\kappa)[\sigma]}{\xi}{\omega}
+    t_2$ then $t_1 (\omega(\tau))
+    \gteq{\sigma[\subst{\alpha}{\tau}]}{\xi}{\omega} t_2
+    (\omega(\tau))$.
+  \end{enumerate}
 \end{lemma}
 
 \begin{proof}
@@ -1972,7 +1981,7 @@ the pair~$\val{\tau}{\xi}{\omega}$.
 
 \begin{proof}
   Analogous to the proof of Lemma~\ref{lem_beta_val}, using
-  Lemma~\ref{lem_val_subst_wm}. TODO
+  Lemma~\ref{lem_val_subst_wm}.
 \end{proof}
 
 For two replacements $\delta_1 = \gamma_1 \circ \omega$ and $\delta_2
@@ -3082,7 +3091,7 @@ to problems that are hard to work around.}
 \newpage
 
 In this, I say that $\Termmap(\mathtt{let}) =$ \\
-$\Lambda \varphi : * 
+$\Lambda \varphi : *
 \arrkind *.\Lambda \beta : *.\lambda x : \forall \chi[\forall \xi[
 \varphi\xi \arrtype \chi] \arrtype \chi].\lambda y : \forall \xi[
 \alpha \xi \arrtype \beta].$ \\
