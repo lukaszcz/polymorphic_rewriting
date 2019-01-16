@@ -3248,12 +3248,24 @@ out).
 \item Further progress will likely require filling in some of those
   terms $A\dots E$.  Note that for monotonicity, we must require that
   always $A_? \succeq \lift(1)$ and $B_? \succeq \lift(1)$.
-  However, note that to be able to use absolute positiveness, the
+  The difficulty is that, to be able to use absolute positiveness, the
   left-hand side should at least have a part that $\succeq
   \interpret{s} * \rho \cdot \langle$that very large term$\rangle$.
   Since $s$ could be anything, note that $\langle$whatever$\rangle
   \otimes \interpret{s} * \rho \cdot \langle$something smaller than
   that very large term$\rangle$ is not comparable.
+\item A pondering: if we neglect the monotonicity requirement and
+  simply choose $\Termmap(\mathtt{let}) = \Lambda \varphi.\Lambda \beta.
+  \lambda x.\lambda y.x * \beta \cdot y$, then we obtain the following
+  inequality: \\
+  $\interpret{s} * \forall\beta[\forall \alpha[\psi\alpha
+    \arrtype \beta] \arrtype \beta] \cdot (\Lambda \alpha.\lambda x :
+    \varphi\alpha.\interpret{t}) * \rho \cdot \interpret{u}$ \\
+  $\succeq^?$ \\
+  $\interpret{s} * \rho \cdot (\Lambda \alpha.\lambda x:\varphi\alpha.
+    \interpret{t} * \rho \cdot \interpret{u})$ \\
+  Does this work out somehow? It seems quite incomparable to me, but
+  perhaps with the types these are $\approx$-equal?
 \end{itemize}
 
 ==================
