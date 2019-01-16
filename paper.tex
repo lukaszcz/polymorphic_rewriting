@@ -57,6 +57,7 @@
 \newcommand{\apps}[3]{#1 \cdot #2 \cdots #3}
 \newcommand{\tapp}[2]{#1 * #2}
 \newcommand{\pair}[2]{\langle #1,#2 \rangle}
+\newcommand{\expair}[2]{[#1,#2]}
 \newcommand{\subst}[2]{#1:=#2}
 \newcommand{\meta}[2]{#1\langle#2\rangle}
 
@@ -80,6 +81,9 @@
 \newcommand{\val}[3]{\ensuremath{\llbracket#1\rrbracket_{#2}^{#3}}}
 \newcommand{\gteq}[3]{\ensuremath{\ge_{#1}^{#2,#3}}}
 \newcommand{\proves}{\vdash}
+
+\newcommand{\xcase}[4]{\mathtt{case}_{#1}\,#2\,\mathtt{of}\,#3\,\mathtt{or}\,#4}
+\newcommand{\xlet}[4]{\mathtt{let}_{#1}\,#2\,\mathtt{be}\,[#3]\,\mathtt{in}\,#4}
 
 \newcommand{\CK}[1]{\textcolor{blue}{CK: #1}}
 \newcommand{\CKchange}[1]{\textcolor{blue}{#1}}
@@ -2114,6 +2118,147 @@ each~$x : \tau$.
 
 \subsection{Encodings of inductive types}\label{sec_encodings}
 
+\subsubsection{Product types}
+
+\begin{definition}\normalfont
+  We define the following abbreviations:
+  \[
+  \begin{array}{rcl}
+    \sigma \times \tau &=& \forall p . (\sigma \arrtype \tau \arrtype p) \arrtype p \\
+    \pair{t_1}{t_2}_{\sigma,\tau} &=& \tabs{p}{\abs{x:\sigma\arrtype\tau\arrtype p}{x t_1 t_2 \oplus_p \\
+        &&\quad\lift_p (\flatten_\sigma t_1) \oplus_p \\ &&\quad\lift_p (\flatten_\tau t_2)}} \\
+    \pi^1_{\sigma,\tau}(t) &=& t \sigma (\abs{x:\sigma}{\abs{y:\tau}{x}}) \\
+    \pi^2_{\sigma,\tau}(t) &=& t \tau (\abs{x:\sigma}{\abs{y:\tau}{y}})
+  \end{array}
+  \]
+  We drop the type subscripts when clear or irrelevant.
+\end{definition}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item If $\Gamma \proves t_1 : \sigma$ and $\Gamma \proves t_2 :
+    \tau$ then $\Gamma \proves \pair{t_1}{t_2} : \sigma \times \tau$.
+  \item If $\Gamma \proves t : \tau_1 \times \tau_2$ then $\Gamma
+    \proves \pi^i(t) : \tau_i$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item $\pi^i(\pair{t_1}{t_2}) \leadsto t_i \oplus
+    \lift(\flatten(t_1)) \oplus \lift(\flatten(t_2))$.
+  \item $\pi^i(\pair{t_1}{t_2}) \succeq t_i$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item If $t_1 \succeq t_1'$ and $t_2 \succeq t_2'$ then
+    $\pair{t_1}{t_2} \succeq \pair{t_1'}{t_2'}$.
+  \item If $t_1 \succ t_1'$ and $t_2 \succeq t_2'$ (or $t_1 \succeq
+    t_1'$ and $t_2 \succ t_2'$) then $\pair{t_1}{t_2} \succ
+    \pair{t_1'}{t_2'}$.
+  \item If $t \succ t'$ (resp.~$t \succeq t'$) then $\pi^i(t) \succ
+    \pi^i(t')$ (resp.~$\pi^i(t)\succeq \pi^i(t')$).
+  \end{enumerate}
+\end{lemma}
+
+\subsubsection{Sum types}
+
+\begin{definition}\normalfont
+  We define the following abbreviations:
+  \[
+  \begin{array}{rcl}
+    \sigma + \tau &=& \forall p . (\sigma \arrtype p) \arrtype (\tau \arrtype p) \arrtype p \\
+    \iota^1_{\sigma,\tau}(t) &=&  \tabs{p}{\abs{x:\sigma\arrtype p}{\abs{y:\tau\arrtype p}{x t \oplus_p \\&&\quad\lift_p(\flatten_\sigma t)}}} \\
+    \iota^2_{\sigma,\tau}(t) &=&  \tabs{p}{\abs{x:\sigma\arrtype p}{\abs{y:\tau\arrtype p}{y t \oplus_p \\&&\quad\lift_p(\flatten_\tau t)}}} \\
+    \xcase{\rho}{t}{[x:\sigma]s_1}{[y:\tau]s_2} &=& t \rho (\abs{x:\sigma}{s_1}) (\abs{y:\tau}{s_2})
+  \end{array}
+  \]
+  We drop the type subscripts when clear or irrelevant.
+\end{definition}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item If $\Gamma \proves t : \sigma$ then $\Gamma \proves \iota^1(t) : \sigma + \tau$.
+  \item If $\Gamma \proves t : \tau$ then $\Gamma \proves \iota^2(t) : \sigma + \tau$.
+  \item If $\Gamma \proves t : \sigma + \tau$ and $\Gamma,x:\sigma
+    \proves s_1 : \rho$ and $\Gamma,y:\tau\proves s_2 : \rho$ then
+    $\xcase{}{t}{[x]s_1}{[y]s_2} : \rho$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item $\xcase{}{\iota^i(t)}{[x]s_1}{[x]s_2} \leadsto
+    s_i[\subst{x}{t}] \oplus \lift(\flatten(t))$.
+  \item $\xcase{}{\iota^i(t)}{[x]s_1}{[x]s_2} \succeq
+    s_i[\subst{x}{t}]$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item If $t \succ t'$ (resp.~$t \succeq t'$) then $\iota^i(t) \succ
+    \iota^i(t')$ (resp.~$\iota^i(t) \succeq \iota^i(t')$).
+  \item If $t \succ t'$ (resp.~$t \succeq t'$) and $s_1 \succeq s_1'$
+    and $s_2 \succeq s_2'$ then
+    \[
+    \xcase{}{t}{[x]s_1}{[x]s_2} \succ \xcase{}{t}{[x]s_1}{[x]s_2}
+    \]
+    (resp.~$\xcase{}{t}{[x]s_1}{[x]s_2} \succeq
+    \xcase{}{t}{[x]s_1}{[x]s_2}$).
+  \end{enumerate}
+\end{lemma}
+
+\subsubsection{Existential types}
+
+\begin{definition}\normalfont
+  We define the following abbreviations:
+  \[
+  \begin{array}{rcl}
+    \Sigma \alpha . \sigma &=& \forall p . (\forall \alpha . \sigma \arrtype p) \arrtype p \\
+    \expair{\tau}{t}_{\Sigma\alpha.\sigma} &=& \tabs{p}{\abs{x:\forall\alpha.\sigma\arrtype p}{x \tau t \oplus_p \lift_p(\flatten_{\sigma[\subst{\alpha}{\tau}]}t)}} \\
+    \xlet{\rho}{t}{\alpha,x:\sigma}{s} &=& t \rho (\tabs{\alpha}{\abs{x:\sigma}{s}})
+  \end{array}
+  \]
+  We drop the type subscripts when clear or irrelevant.
+\end{definition}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item If $\Gamma \proves t : \sigma[\subst{\alpha}{\tau}]$ then
+    $\Gamma \proves \expair{\tau}{t} : \Sigma \alpha . \sigma$.
+  \item If $\Gamma \proves t : \Sigma \alpha . \sigma$ and
+    $\Gamma,x:\sigma \proves s : \rho$ and $\alpha \notin
+    \FTV(\Gamma,\rho)$ then $\xlet{}{t}{\alpha,x}{s} : \rho$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \leadsto
+    s[\subst{\alpha}{\tau}][\subst{x}{t}] \oplus \lift(\flatten(t))$.
+  \item $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \succeq
+    s[\subst{\alpha}{\tau}][\subst{x}{t}]$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item If $t \succ t'$ (resp.~$t \succeq t'$) then $\expair{\tau}{t}
+    \succ \expair{\tau}{t'}$ (resp.~$\expair{\tau}{t} \succeq
+    \expair{\tau}{t'}$).
+  \item If $t \succ t'$ (resp.~$t \succeq t'$) and $s \succeq s'$ then
+    \[
+    \xlet{}{t}{\alpha,x}{s} \succ \xlet{}{t}{\alpha,x}{s}
+    \]
+    (resp.~$\xlet{}{t}{\alpha,x}{s} \succeq \xlet{}{t}{\alpha,x}{s}$).
+  \end{enumerate}
+\end{lemma}
+
+\subsubsection{Lists}
+
 
 \section{Systems of interest and their properties}\label{sec:systems}
 
@@ -2394,8 +2539,8 @@ introduced.}
 
 \begin{definition}\normalfont
 A \emph{type constructor mapping} is a function $\Typemap$ which maps
-a type constructor symbol to a \CKchange{closed} interpretation type
-constructor of the same kind.
+a type constructor symbol to a closed interpretation type constructor
+of the same kind.
 
 A fixed type constructor mapping $\Typemap$ is extended inductively to
 a function from type constructors to closed interpretation type
@@ -2513,24 +2658,10 @@ For the latter requirement, we can provide some sufficient criteria that
 guarantee monotonicity of both $\succinterpret$ and $\succeqinterpret$.
 
 \begin{definition}\normalfont
-  An interpretation term~$t$ is \emph{safe for~$x$} if one of the
-  following holds:
-  \begin{itemize}
-  \item $t = x u_1 \ldots u_m$,
-  \item $t = \lift(t')$ and $t'$ is safe for~$x$,
-  \item $t = \flatten(t')$ and $t'$ is safe for~$x$,
-  \item $t = s_1 \oplus s_2$ and either $s_1$ is safe for~$x$ or $s_2$
-    is safe for~$x$,
-  \item $t = s_1 \otimes s_2$ and either:
-    \begin{itemize}
-    \item $s_1$ is safe for~$x$ and $s_2 \succeq \lift(1)$, or
-    \item $s_2$ is safe for~$x$ and $s_1 \succeq \lift(1)$,
-    \end{itemize}
-  \item $t = \tabs{\alpha}{t'}$ and $t'$ is safe for~$x$,
-  \item $t = \abs{y}{t'}$ and $t'$ is safe for~$x$.
-  \end{itemize}
-  A symbol mapping~$\Termmap$ is \emph{safe} if for all symbols $\afun
-  : \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n : \kappa_n)
+  An interpretation term~$t$ is \emph{safe for~$x$} if $s_1 \succ s_2$
+  implies $t[\subst{x}{s_1}] \succ t[\subst{x}{s_2}]$. A symbol
+  mapping~$\Termmap$ is \emph{safe} if for all symbols $\afun :
+  \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n : \kappa_n)
   . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype \tau$
   with~$\tau$ a type atom we have: $\Termmap(\afun) = \tabs{\alpha_1
     \dots \alpha_n}{\abs{x_1 \dots x_k}{t}}$ with $t$ safe for
@@ -2538,21 +2669,32 @@ guarantee monotonicity of both $\succinterpret$ and $\succeqinterpret$.
 \end{definition}
 
 \begin{lemma}
-  If~$t$ is safe for~$x$ and $s \succ s'$ then $t[\subst{x}{s}] \succ
-  t[\subst{x}{s'}]$.
+  \begin{enumerate}
+  \item $x u_1 \ldots u_m$ is safe for~$x$.
+  \item If $t$ is safe for~$x$ then so is~$\lift(t)$
+    and~$\flatten(t)$.
+  \item If $s_1$ is safe for~$x$ or $s_2$ is safe for~$x$ then $s_1
+    \oplus s_2$ is safe for~$x$.
+  \item If either:
+    \begin{itemize}
+    \item $s_1$ is safe for~$x$ and $s_2 \succeq \lift(1)$, or
+    \item $s_2$ is safe for~$x$ and $s_1 \succeq \lift(1)$,
+    \end{itemize}
+    then $s_1 \otimes s_2$ is safe for~$x$.
+  \item If~$t$ is safe for~$x$ then so is~$\tabs{\alpha}{t}$
+    and~$\abs{y}{t}$ ($y \ne x$).
+  \item If $t_1$ is safe for~$x$ or~$t_2$ is safe for~$x$ then
+    $\pair{t_1}{t_2}$ is safe for~$x$.
+  \item If $t$ is safe for~$x$ then so is~$\pi^1(t)$ and~$\pi^2(t)$.
+  \item If $t$ is safe for~$x$ then so is~$\iota^1(t)$ and~$\iota^2(t)$.
+  \item If $t$ is safe for~$x$ then so is~$\xcase{}{t}{[x]s_1}{[y]s_2}$.
+  \item If $t$ is safe for~$x$ then so is~$\expair{\tau}{t}$.
+  \item If $t$ is safe for~$x$ then so is~$\xlet{}{t}{\alpha,x}{s}$.
+  \end{enumerate}
 \end{lemma}
 
 \begin{proof}
-  Induction on the structure of~$t$. If $t = x u_1 \ldots u_m$ then
-  TODO.
-\end{proof}
-
-\begin{lemma}
-  If $t$ is safe for~$x$ and $y \ne x$, then $t[\subst{y}{s}]$ is
-  still safe for~$x$.
-\end{lemma}
-
-\begin{proof}
+  TODO
 \end{proof}
 
 \begin{lemma}
