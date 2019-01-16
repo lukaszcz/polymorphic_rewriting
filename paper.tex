@@ -2746,16 +2746,12 @@ We use the following type constructor mapping:
 \[
 \begin{array}{rcl}
 \Typemap(\bot) & = & \nat \\
-\Typemap(\mathtt{and}) & = & \lambda\alpha_1\lambda\alpha_2 .
-  \quant{\beta}{(\alpha_1 \arrtype \alpha_2 \arrtype \beta) \arrtype
-  \beta} \\
-\Typemap(\mathtt{or}) & = & \lambda\alpha_1\lambda\alpha_2 .
-  \quant{\beta}{\quant{\chi}{((\alpha_1 \arrtype \beta) \arrtype (\alpha_2
-  \arrtype \beta) \arrtype \chi) \arrtype \chi} \arrtype \beta} \\
-\Typemap(\mathtt{prop}_i) & = & \nat \\
-\Typemap(\exists) & = & \lambda(\alpha : * \arrkind *) . \quant{\beta}{\quant{\gamma}{\alpha\gamma \arrtype \beta} \arrtype \beta}
+\Typemap(\mathtt{and}) & = & \lambda\alpha_1\lambda\alpha_2 . \alpha_1\times\alpha_2 \\
+\Typemap(\mathtt{or}) & = & \lambda\alpha_1\lambda\alpha_2 . \alpha_1\times\alpha_2 \\
+\Typemap(\exists) & = & \lambda(\alpha : * \arrkind *) . \Sigma \gamma . \alpha \gamma
 \end{array}
 \]
+\LC{Is $\Typemap(\mathtt{or}) = \lambda\alpha_1\lambda\alpha_2 . \alpha_1+\alpha_2$ worth a try?}
 And the following function symbol mapping:
 \[
 \begin{array}{rcll}
@@ -2766,48 +2762,32 @@ And the following function symbol mapping:
   y) \oplus 1) \\
 \Termmap(\mathtt{tapp}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta . \lambda x : \quant{\gamma}{\alpha\gamma} . \quad & x * \beta \oplus \lift_{\alpha\beta}(1) \\
 \Termmap(\mathtt{ext}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta : * . \lambda x:\alpha\beta . &
-  \tabs{\xi}{\abs{y:\quant{\chi}{\alpha\chi
-  \arrtype \xi}}{y * \beta \cdot x}} \\
-  & & & \phantom{AB}\oplus\ \lift_\xi(\flatten(x)) \\
+  \expair{\beta}{x} \\
 \Termmap(\mathtt{pair}) & = & \Lambda \alpha \Lambda \beta \lambda x :
-  \alpha, y : \beta.\quad & \Lambda \xi.\abs{f:\alpha \arrtype \beta
-  \arrtype \xi}{f \cdot x \cdot y\ \oplus \\
-  & & & \phantom{AB}\lift_{\xi}(\flatten_\alpha(x))\ \oplus \\
-  & & & \phantom{AB}\lift_\xi(\flatten_\beta(y))} \\
+  \alpha, y : \beta.\quad & \pair{x}{y} \\
 \Termmap(\pi^1) & = & \Lambda \alpha \Lambda \beta \lambda x :
-  \quant{\xi}{(\alpha \arrtype \beta \arrtype \xi) \arrtype \xi}.\quad
-  & x * \alpha \cdot (\abs{yz}{y}) \oplus \lift_{\alpha}(1) \\
+  \alpha \times \beta . \quad
+  & \pi^1(x) \oplus \lift_{\alpha}(1) \\
 \Termmap(\pi^2) & = & \Lambda \alpha \Lambda \beta \lambda x :
-  \quant{\xi}{(\alpha \arrtype \beta \arrtype \xi) \arrtype \xi}.\quad
-  & x * \beta \cdot (\abs{yz}{z}) \oplus \lift_{\beta}(1) \\
-\Termmap(\mathtt{in}^1) & = & \Lambda \alpha \Lambda \beta \lambda x : \alpha.\quad &
-  \Lambda \xi.\lambda p.p * (\alpha \arrtype \xi) \cdot (\abs{yz}{y})
-  \cdot x \\
-  & & & \phantom{AB}\oplus\ \lift_\xi(\flatten_\alpha(x)) \\
-\Termmap(\mathtt{in}^2) & = & \Lambda \alpha \Lambda \beta \lambda x : \beta.\quad &
-  \Lambda \xi.\lambda p.p * (\beta \arrtype \xi) \cdot (\abs{yz}{z})
-  \cdot x \\
-  & & & \phantom{AB}\oplus\ \lift_\xi(\flatten_\beta(x)) \\
+  \alpha\times\beta.\quad
+  & \pi^2(x) \oplus \lift_{\beta}(1) \\
+\Termmap(\mathtt{in}^1) & = & \Lambda \alpha \Lambda \beta \lambda x : \alpha.\quad & \pair{x}{\lift_\beta(1)} \\
+\Termmap(\mathtt{in}^2) & = & \Lambda \alpha \Lambda \beta \lambda x : \beta.\quad & \pair{\lift_\alpha(1)}{x} \\
 \end{array}
 \]
 \[
 \begin{array}{rcl}
-\Termmap(\mathtt{let}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta : * . \lambda x : \quant{\chi}{
-  \quant{\xi}{\alpha\xi \arrtype \chi} \arrtype \chi},
+\Termmap(\mathtt{let}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta : * . \lambda x : \Sigma \xi . \alpha\xi,
   y : \quant{\xi}{\alpha\xi \arrtype \beta}. \\
-  & & \hfill x * \beta \cdot y \oplus \lift_{\beta}(\flatten(y) \oplus
+  & & \hfill (\xlet{}{x}{\xi,z}{y\xi z}) \oplus \lift_{\beta}(\flatten(y) \oplus
   1) \\
-\Termmap(\mathtt{case}) & = & \Lambda \alpha,\beta,\xi . \lambda x :
-  \quant{\gamma}{\quant{\chi}{((\alpha \arrtype \gamma) \arrtype (\beta
-  \arrtype \gamma) \arrtype \chi) \arrtype \chi} \arrtype \gamma},\\
-  & & \phantom{A}\hfill
+\Termmap(\mathtt{case}) & = & \Lambda \alpha,\beta,\xi . \lambda x : \alpha \times \beta,
   y : (\alpha \arrtype \xi), z : (\beta \arrtype \xi). \\
   & & \quad
-  x * \xi \cdot (\Lambda \chi.\abs{f:(\alpha \arrtype \xi) \arrtype
-  (\beta \arrtype \xi) \arrtype \chi}{f \cdot y \cdot z})\ \oplus \\
+  \lift_\xi(37) \oplus (\lift_\xi(\flatten_{\alpha\times\beta}(x)\oplus 1) \otimes \\
   & & \quad\phantom{ABCDEFGHIJKL}
-    (y \cdot \lift_\alpha(0)) \oplus (z \cdot \lift_\beta(0)) \oplus
-    \lift_\xi(7) \\
+    (y \cdot \pi^1(x)) \oplus (z \cdot \pi^2(x)) \oplus
+    \lift_\xi(1)) \\
 \end{array}
 \]
 
