@@ -3414,6 +3414,20 @@ out).
   If we have these two, we can answer the pondering with ``yes''.
 \end{itemize}
 
+\LC{I don't think any of the above can be shown easily. The problem is
+  that you apply different types to $s$. To prove~$\approx$ one would
+  need to somehow consider how the normal form of~$s$ looks like, and
+  then see what happens when we reduce. Now, in the first problem
+  above, one can prove that the normal form of~$s$ is (assuming~$s$ is
+  closed): $\Lambda \beta . \lambda f : \forall \alpha . \varphi
+  \alpha \to \beta . f \tau w$ for some $\tau$ and~$w$. If $\beta
+  \notin \FV(\tau)$ then we may prove $f \notin \FV(w)$ and in that
+  case I think I can prove the $\approx$-equality. But in general we
+  may have $\beta \in \FV(\tau)$, and then after reducing you get a
+  more complex problem with comparing the two substitution variants
+  of~$w$, where~$w$ may be arbitrary of type~$\varphi \tau$. I think
+  the difficulty with the other two problems is analogous.}
+
 ==================
 
 \newpage
