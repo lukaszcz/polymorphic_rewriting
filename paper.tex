@@ -3238,7 +3238,7 @@ out).
 \begin{itemize}
 \item We need:
   $\interpret{\mathtt{let}_{\psi,\rho}(\mathtt{let}_{\varphi,\exists
-  \psi}(s,\Lambda \alpha.\lambda x : \varphi\alpha.t),t)}$ \\
+  \psi}(s,\Lambda \alpha.\lambda x : \varphi\alpha.t),u)}$ \\
   $\succeq^?$ \\
   $\interpret{\mathtt{let}_{\varphi,\rho}(s,\Lambda \alpha.\lambda x:
   \varphi\alpha.\mathtt{let}_{\psi,\rho}(t,u))}$
@@ -3376,6 +3376,7 @@ out).
   Since $s$ could be anything, note that $\langle$whatever$\rangle
   \otimes \interpret{s} * \rho \cdot \langle$something smaller than
   that very large term$\rangle$ is not comparable.
+\item --------------------------
 \item A pondering: if we neglect the monotonicity requirement and
   simply choose $\Termmap(\mathtt{let}) = \Lambda \varphi.\Lambda \beta.
   \lambda x.\lambda y.x * \beta \cdot y$, then we obtain the following
@@ -3388,6 +3389,29 @@ out).
     \interpret{t} * \rho \cdot \interpret{u})$ \\
   Does this work out somehow? It seems quite incomparable to me, but
   perhaps with the types these are $\approx$-equal?
+\item --------------------------
+\item Alternatively\dots\ what if we don't make C 0? \\
+  $\interpret{s} * (\Sigma\alpha.\psi\alpha) \cdot ((\Lambda \alpha.\lambda x :
+    \varphi\alpha.\interpret{t}) \oplus C_Q) * \rho \cdot
+    (\interpret{u} \oplus C_P)$ \\
+  $\succeq^?$ \\
+  $\interpret{s} * \rho \cdot (\:\: (\:\: \Lambda \alpha.\lambda x:\varphi\alpha.
+    \interpret{t} * \rho \cdot (\interpret{u} \oplus C_R)\:\:) \oplus C_S\:\:)$ \\
+
+  Here, $Q := \varphi,\Sigma\alpha.\psi\alpha,\interpret{s},\interpret{t}$ \\
+  and $R := \psi,\rho,\interpret{t},\interpret{u}$ \\
+  and $P :=\psi,\rho,\interpret{s} * (\Sigma \alpha.\psi\alpha) \cdot ((\Lambda \alpha.\lambda x.\interpret{t}) \oplus C_Q),\interpret{u}$ \\
+  and $S := \varphi,\rho,\interpret{s},\Lambda \alpha.\lambda x.\interpret{st} * \rho \cdot (\interpret{u} \oplus C_R)$ \
+
+  Is there any way to define $C_{\alpha,\beta,x,y}$ so that the above expression holds?
+\item --------------------------
+\item Generalised, what we want is roughly the following:
+  \begin{itemize}
+  \item Suppose $s : \forall \alpha [ \forall \vec{\beta} [\varphi_1\vec{\beta} \arrtype \dots \arrtype \varphi_n\vec{\beta} \arrtype \alpha] \arrtype \alpha]$.
+  \item Then: $s * \forall \gamma [\psi\gamma] \cdot (\Lambda \vec{\beta} \lambda \vec{x}.t) * \tau \succeq s * (\psi\tau) \cdot (\Lambda \vec{\beta} \lambda \vec{x}.t * \tau)$
+  \item And: $s * (\pi \arrtype \rho) \cdot (\Lambda \vec{\beta} \lambda \vec{x}.t) \cdot u \succeq s * (\psi\tau) \cdot (\Lambda \vec{\beta} \lambda \vec{x}.t \cdot u)$
+  \end{itemize}
+  If we have these two, we can answer the pondering with ``yes''.
 \end{itemize}
 
 ==================
