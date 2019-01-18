@@ -3526,6 +3526,18 @@ out).
   e.g.~$\Lambda \beta . \lambda f : \forall \alpha . \varphi \alpha
   \to \beta . f \zeta w \oplus_\beta f \zeta' w'$}
 
+\LC{The problem here essentially reduces to the following
+  problem. Given $s : \forall \alpha . \tau \to \rho$ with $\alpha
+  \notin \FV(\rho)$ (but possibly $\alpha \in \FV(\tau)$), do we have
+  $s \sigma_1 t_1 \succeq s \sigma_2 t_2$ for all appropriate
+  $\sigma_i,t_i$? I'm not sure if this is true. It it is, then I don't
+  have no idea of how to prove it syntactically. But if it's true then
+  this should somehow follow from parametricity of polymorphism. Maybe
+  to really get this we would need to switch to interpreting terms in
+  a particular model of~$\Fomega$ instead of interpreting them
+  syntactically by terms of extended~$\Fomega$. Compare: Wadler
+  ``Theorems for Free''.}
+
 ==================
 
 \newpage
