@@ -1669,7 +1669,7 @@ method of candidates from the termination proof.
     \lift_\tau(t_2)$,
   \item if $t_1 \ge^X t_2$ then $\flatten_\tau(t_1) \succeq_\nat
     \flatten_\tau(t_2)$,
-  \item $\ge^X$ is reflexive and transitive.
+  \item $\ge^X$ is reflexive and transitive on~$X$.
   \end{enumerate}
   The relation~$\ge^X$ is a \emph{comparison candidate for~$X$},
   and~$X$ is a \emph{candidate set}.
@@ -1764,7 +1764,9 @@ use~$\val{\sigma}{\xi}{\omega}$ to denote both the pair
 $(\val{\sigma}{\xi}{\omega},{\gteq{\sigma}{\xi}{\omega}})$ and its
 first element, depending on the context. For a type~$\tau$,
 by~$\gteq{\tau}{\xi}{\omega}$ we always denote the second element of
-the pair~$\val{\tau}{\xi}{\omega}$.
+the pair~$\val{\tau}{\xi}{\omega}$. If $\tau$ is closed then~$\xi$
+and~$\omega$ do not matter and we simply write~$\geq_\tau$
+and~$\val{\tau}{}{}$.
 
 \begin{lemma}\label{lem_val_wm_computable}
   If $\sigma$ is a type constructor, $\omega$ is closed for~$\sigma$,
@@ -2035,12 +2037,13 @@ each~$x : \tau$.
     $\delta_i'=\delta_i[\subst{x}{s}]$. This is well-defined because
     $s : \omega(\sigma_1)$ and~$\omega(x)$ has
     type~$\omega(\sigma_1)$. We have $\delta_1' \gteq{}{\xi}{\omega}
-    \delta_2'$ by the reflexivity
-    of~$\gteq{\sigma_1}{\xi}{\omega}$. Hence by the inductive
-    hypothesis $\delta_i'(u) \in \val{\sigma_2}{\xi}{\omega}$. We have
-    $\delta_i(\abs{x}{u}) s \leadsto \delta_i'(u)$, so
-    $\delta_i(\abs{x}{u}) s \in \val{\sigma_2}{\xi}{\omega}$ by
-    Lemma~\ref{lem_val_wm_computable} and property~1 of candidates.
+    \delta_2'$ by the reflexivity of~$\gteq{\sigma_1}{\xi}{\omega}$
+    (Lemma~\ref{lem_val_wm_computable} and property~6 of comparison
+    candidates). Hence by the inductive hypothesis $\delta_i'(u) \in
+    \val{\sigma_2}{\xi}{\omega}$. We have $\delta_i(\abs{x}{u}) s
+    \leadsto \delta_i'(u)$, so $\delta_i(\abs{x}{u}) s \in
+    \val{\sigma_2}{\xi}{\omega}$ by Lemma~\ref{lem_val_wm_computable}
+    and property~1 of candidate sets.
 
     Let $s_1,s_2 \in \val{\sigma_1}{\xi}{\omega}$ be such that $s_1
     \gteq{\sigma_1}{\xi}{\omega} s_2$. Let
@@ -2049,7 +2052,7 @@ each~$x : \tau$.
     $\delta_1'(u)\gteq{\sigma_2}{\xi}{\omega}\delta_2'(u)$. We have
     $\delta_i(\abs{x}{u}) s_i \leadsto \delta_i'(u)$. Thus
     $\delta_1(t) s_1 \gteq{\sigma_2}{\xi}{\omega} \delta_2(t) s_2$ by
-    Lemma~\ref{lem_gteq_candidate} and property~2 of comparison
+    Lemma~\ref{lem_val_wm_computable} and property~2 of comparison
     candidates.
 
     Finally, we show $\delta_1(t)
@@ -2060,7 +2063,7 @@ each~$x : \tau$.
     $\delta_1'(u) \gteq{\sigma_2}{\xi}{\omega} \delta_2'(u)$. We have
     $\delta_i(\abs{x}{u}) s \leadsto \delta_i'(u)$. Thus $\delta_1(t)
     s \gteq{\sigma_2}{\xi}{\omega} \delta_2(t) s$ by
-    Lemma~\ref{lem_gteq_candidate} and property~2 of comparison
+    Lemma~\ref{lem_val_wm_computable} and property~2 of comparison
     candidates.
   \item If $t = \tabs{\alpha:\kappa}{u}$ then $\sigma' =
     \forall\alpha[\tau]$ and $u : \tau$. Let $\psi$ be a closed type
@@ -2073,13 +2076,13 @@ each~$x : \tau$.
     \gteq{\tau}{\xi'}{\omega'} \delta_2'(u)$. We have
     $\delta_i(\tabs{\alpha}{u}) \psi \leadsto \delta_i'(u)$. Hence
     $\delta_i(\tabs{\alpha}{u}) \psi \in \val{\tau}{\xi'}{\omega'}$ by
-    Lemma~\ref{lem_val_wm_candidate} and property~1 of
-    candidates. Thus $\delta_i(\tabs{\alpha}{u}) \in
+    Lemma~\ref{lem_val_wm_computable} and property~1 of candidate
+    sets. Thus $\delta_i(\tabs{\alpha}{u}) \in
     \val{\forall\alpha[\tau]}{\xi}{\omega}$. Also
     $\delta_1(\tabs{\alpha}{u}) \psi \gteq{\tau}{\xi'}{\omega'}
-    \delta_2(\tabs{\alpha}{u}) \psi$ by Lemma~\ref{lem_gteq_candidate}
-    and property~2 of comparison candidates. Thus
-    $\delta_1(\tabs{\alpha}{u})
+    \delta_2(\tabs{\alpha}{u}) \psi$ by
+    Lemma~\ref{lem_val_wm_computable} and property~2 of comparison
+    candidates. Thus $\delta_1(\tabs{\alpha}{u})
     \gteq{\forall\alpha[\tau]}{\xi'}{\omega'}
     \delta_2(\tabs{\alpha}{u})$.
   \item If $t = t_1 t_2$ then $t_1 : \tau\arrtype\sigma'$ and $t_2 :
@@ -2088,13 +2091,13 @@ each~$x : \tau$.
     for~$\tau\arrtype\sigma'$. By the inductive hypothesis
     $\delta_i(t_1) \in \val{\tau\arrtype\sigma'}{\xi}{\omega}$ and
     $\delta_i(t_2) \in \val{\tau}{\xi}{\omega}$ and $\delta_1(t_1)
-    \gteq{\tau}{\xi}{\omega} \delta_2(t_1)$ and $\delta_1(t_1)
-    \gteq{\sigma'}{\xi}{\omega} \delta_2(t_1)$. By the definition of
-    $\val{\tau\arrtype\sigma'}{\xi}{\omega}$ we have $\delta_i(t) =
-    \delta_i(t_1)\delta_i(t_2) \in \val{\sigma'}{\xi}{\omega}$, and
-    $\delta_1(t_1)\delta_1(t_2) \gteq{\sigma'}{\xi}{\omega}
-    \delta_1(t_1)\delta_2(t_2)$. By the definition
-    of~$\gteq{\tau\arrtype\sigma'}{\xi}{\omega}$ we have
+    \gteq{\tau\arrtype\sigma'}{\xi}{\omega} \delta_2(t_1)$ and
+    $\delta_1(t_2) \gteq{\tau}{\xi}{\omega} \delta_2(t_2)$. By the
+    definition of $\val{\tau\arrtype\sigma'}{\xi}{\omega}$ we have
+    $\delta_i(t) = \delta_i(t_1)\delta_i(t_2) \in
+    \val{\sigma'}{\xi}{\omega}$, and $\delta_1(t_1)\delta_1(t_2)
+    \gteq{\sigma'}{\xi}{\omega} \delta_1(t_1)\delta_2(t_2)$. By the
+    definition of~$\gteq{\tau\arrtype\sigma'}{\xi}{\omega}$ we have
     $\delta_1(t_1)\delta_2(t_2)\gteq{\sigma'}{\xi}{\omega}\delta_2(t_1)\delta_2(t_2)$. Hence
     $\delta_1(t)\gteq{\sigma'}{\xi}{\omega}\delta_2(t)$ by the
     transitivity of~$\gteq{\sigma'}{\xi}{\omega}$.
@@ -2105,16 +2108,72 @@ each~$x : \tau$.
     \delta_2(s)$. Because $\FTV(\omega(t)) = \emptyset$, the mapping
     $\omega$ is closed for~$\psi$. So by Lemma~\ref{lem_wm_forall} we
     have $\delta_i(t) = \delta_i(s) \omega(\psi) \in
-    \val{\tau[\subst{\alpha}{\psi}]}{\xi}{\omega}$. TODO
+    \val{\tau[\subst{\alpha}{\psi}]}{\xi}{\omega}$ and $\delta_1(t)
+    \gteq{\tau[\subst{\alpha}{\psi}]}{\xi}{\omega} \delta_2(t)$.
   \end{itemize}
 \end{proof}
 
-\begin{lemma}\label{lem_succeq_subst}
-  If $s \succeq s'$ then $t[\subst{x}{s}] \succeq t[\subst{x}{s'}]$.
+\begin{corollary}\label{cor_typable_wm_computable}
+  If $t$ is closed and $t : \sigma$ then $t \in \val{\sigma}{}{}$.
+\end{corollary}
+
+\begin{lemma}\label{lem_gteq_to_succeq}
+  If $\sigma$ is a closed type and $t_1 \geq_\sigma t_2$ then
+  $t_1 \succeq_{\sigma} t_2$.
 \end{lemma}
 
 \begin{proof}
+  By coinduction. By Lemma~\ref{lem_beta_val_wm} we may assume
+  that~$\sigma$ is in $\beta$-normal form. The case $\sigma=\alpha$ is
+  impossible because~$\sigma$ is closed. If $\sigma = \nat$ then
+  ${\geq_\nat} = {\succeq_\nat}$.
+
+  Assume $\sigma=\sigma_1\arrtype\sigma_2$. Let $u : \sigma_1$ be
+  closed. By Corollary~\ref{cor_typable_wm_computable} we have $u \in
+  \val{\sigma_1}{}{}$. Hence $t_1 u \geq_{\sigma_2} t_2 u$. By the
+  coinductive hypothesis $t_1 u \succeq_{\sigma_2} t_2 u$. This
+  implies $t_1 \succeq_{\sigma} t_2$.
+
+  Assume $\sigma=\forall(\alpha:\kappa)\tau$. Let $\varphi$ be a
+  closed type constructor of kind~$\kappa$. By
+  Lemma~\ref{lem_val_wm_computable} we have $\val{\varphi}{}{} \in
+  \Cb_\varphi$. By the definition of~$\geq_{\forall\alpha\tau}$
+  and Lemma~\ref{lem_val_subst_wm} we have $t_1 \varphi
+  \geq_{\tau[\subst{\alpha}{\varphi}]} t_2 \varphi$. Note that
+  $\tau[\subst{\alpha}{\varphi}]$ is still closed. Hence by the
+  coinductive hypothesis $t_1 \varphi
+  \succeq_{\tau[\subst{\alpha}{\varphi}]} t_2 \varphi$. This implies
+  $t_1 \succeq_{\sigma} t_2$.
 \end{proof}
+
+\begin{corollary}\label{cor_gteq_succeq}
+  If~$\sigma$ is a closed type then ${\geq_{\sigma}} =
+  {\succeq_\sigma}$.
+\end{corollary}
+
+\begin{proof}
+  Follows from Lemma~\ref{lem_gteq_to_succeq} and
+  Lemma~\ref{lem_val_wm_computable} and property~1 of comparison
+  candidates.
+\end{proof}
+
+\begin{lemma}\label{lem_succeq_subst}
+  If $s \succeq_\sigma s'$ then $t[\subst{x}{s}] \succeq_\tau t[\subst{x}{s'}]$.
+\end{lemma}
+
+\begin{proof}
+  It suffices to show this when
+  $s,s',t[\subst{x}{s}],t[\subst{x}{s'}]$ and $\sigma,\tau$ are all
+  closed. Assume $s \succeq_\sigma s'$. Then $s \geq_{\sigma} s'$
+  by Corollary~\ref{cor_gteq_succeq}. Thus $t[\subst{x}{s}]
+  \geq_{\tau} t[\subst{x}{s'}]$ follows from
+  Lemma~\ref{lem_typable_wm_computable}. Hence $t[\subst{x}{s}]
+  \succeq_\tau t[\subst{x}{s'}]$ by Corollary~\ref{cor_gteq_succeq}.
+\end{proof}
+
+\begin{corollary}\label{cor_app_wm}
+  If $s \succeq s'$ then $t s \succeq t s'$.
+\end{corollary}
 
 \subsection{Encodings of inductive types}\label{sec_encodings}
 
@@ -3409,7 +3468,7 @@ out).
   \begin{itemize}
   \item Suppose $s : \forall \alpha [ \forall \vec{\beta} [\varphi_1\vec{\beta} \arrtype \dots \arrtype \varphi_n\vec{\beta} \arrtype \alpha] \arrtype \alpha]$.
   \item Then: $s * \forall \gamma [\psi\gamma] \cdot (\Lambda \vec{\beta} \lambda \vec{x}.t) * \tau \succeq s * (\psi\tau) \cdot (\Lambda \vec{\beta} \lambda \vec{x}.t * \tau)$
-  \item And: $s * (\pi \arrtype \rho) \cdot (\Lambda \vec{\beta} \lambda \vec{x}.t) \cdot u \succeq s * (\psi\tau) \cdot (\Lambda \vec{\beta} \lambda \vec{x}.t \cdot u)$
+  \item And: $s * (\pi \arrtype \rho) \cdot (\Lambda \vec{\beta} \lambda \vec{x}.t) \cdot u \succeq s * \rho \cdot (\Lambda \vec{\beta} \lambda \vec{x}.t \cdot u)$
   \end{itemize}
   If we have these two, we can answer the pondering with ``yes''.
 \end{itemize}
