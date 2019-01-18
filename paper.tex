@@ -1108,7 +1108,6 @@ write~$\val{\varphi}{}{}$.
   Lemma~\ref{lem_val_subst}.
 \end{proof}
 
-
 \begin{lemma}\label{lem_beta_val}
   If $\omega$ is closed for~$\sigma,\sigma'$ and $\sigma =_\beta
   \sigma'$ then $\val{\sigma}{\xi}{\omega} =
@@ -1315,11 +1314,33 @@ there exists a possibly infinite derivation tree using the above
 rules. In such a derivation tree all leaves must witness $s\da > t\da$
 in natural numbers. However, this also allows for infinite branches,
 which solves the problem of repeating types due to impredicative
-polymorphism. If e.g.  $s \succ_{\forall \alpha . \alpha} t$ then
+polymorphism. If e.g.~$s \succ_{\forall \alpha . \alpha} t$ then
 $\tapp{s}{\forall\alpha.\alpha} \succ_{\forall \alpha . \alpha}
 \tapp{t}{\forall\alpha.\alpha}$, which forces an infinite branch in
 the derivation tree. According to our definition any infinite branch
 may essentially be ignored.
+
+The coinductive definition of~$\succ$ and~$\succeq$ can be
+reformulated as follows.
+
+\begin{lemma}
+  $t \succeq s$ if and only if for every closure~$\cl$ and every
+  sequence $u_1,\ldots,u_n$ of closed terms and type constructors such
+  that $\cl(t) u_1 \ldots u_n : \nat$ we have $(\cl(t) u_1 \ldots
+  u_n)\da \ge (\cl(s) u_1 \ldots u_n)\da$ in natural numbers. An
+  analogous result holds with $\succ$ or $\approx$ instead
+  of~$\succeq$.
+\end{lemma}
+
+\begin{proof}
+  The direction from left to right follows by induction on~$n$. The
+  other direction follows by coinduction.
+\end{proof}
+
+In what follows, all proofs by coinduction could be reformulated to
+instead use the characterisation of $\succ$, $\succeq$ and~$\approx$
+from the above lemma. However, this would arguably make the proofs
+less perspicuous.
 
 \subsection{Properties of $\succ$ and $\succeq$}
 
