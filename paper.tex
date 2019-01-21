@@ -3588,8 +3588,32 @@ out).
 \flatten$ and $\sigma_1 = \sigma_2 = \mathtt{nat}$ and $t_1 = 1$ and
 $t_2 = 2$?}
 
+\LC{Yes, you're right. By ``appropriate $\sigma_i,t_i$'' I had in mind
+  that there is some appropriate relation between $t_1$ and $t_2$. But
+  now I think this can't be done. Because
+  $\flatten,\lift,\oplus,\otimes$ ``match on'' the type we don't
+  really have parametricity. And you've just almost provided a
+  counterexample to your original problem. Take $s = \Lambda \alpha
+  . \lambda f : \alpha . \lift_\alpha(\flatten_\alpha(f))$ and $\pi =
+  \rho = \nat$ and $t = \lambda x : \nat . x$ and $u = 1$. Then
+  \[
+  s * (\pi \arrtype \rho) \cdot t \cdot u \succeq s * \rho \cdot (t \cdot u)
+  \]
+  is equivalent to
+  \[
+  \lift_{\nat\arrtype\nat} (\flatten_{\nat\arrtype\nat} (\lambda x . x)) 1 \succeq \lift_\nat(\flatten_\nat ((\lambda x . x) 1))
+  \]
+  which after reduction is equivalent to
+  \[
+  0 \succeq 1
+  \]
+  So this is unfortunately false. It would probably be true without
+  our additional function symbols, but we need them.}
+
 \LC{But maybe this can be done with Logical Relations? I'll think
   about this\ldots}
+
+\LC{No, I don't think so anymore.}
 
 \CK{Well, let's say that this will be a great Future Work section.
   Thinking about it, we already have enough to merit publication
