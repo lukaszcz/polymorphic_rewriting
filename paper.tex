@@ -3538,8 +3538,31 @@ out).
   syntactically by terms of extended~$\Fomega$. Compare: Wadler
   ``Theorems for Free''.}
 
+\CK{This seems very unlikely to be true. Can we choose $s =
+\flatten$ and $\sigma_1 = \sigma_2 = \mathtt{nat}$ and $t_1 = 1$ and
+$t_2 = 2$?}
+
 \LC{But maybe this can be done with Logical Relations? I'll think
   about this\ldots}
+
+\CK{Well, let's say that this will be a great Future Work section.
+  Thinking about it, we already have enough to merit publication
+  of the initial ideas just by getting two versions of polymorphic
+  map (with either
+  $\mathtt{map} : \forall\alpha\beta [(\alpha \arrtype \beta) \arrtype
+  (\mathtt{list} \alpha) \arrtype (\mathtt{list} \beta)]$ or
+  $\mathtt{map} : \forall \varphi [
+  \forall \alpha [\alpha \arrtype \varphi\alpha]
+  \arrtype \mathtt{list} \arrtype \mathtt{list}]$) and part of urzy.
+  Deepening the theory to get more examples -- whether in this way or
+  through some other extension of the relation -- is probably even
+  better to publish separately (for example in a journal paper where
+  you have the space to put in the proofs).}
+
+\CK{Note: I do suspect that this problem is important to solve
+  eventually for more than just $\mathtt{let}$: from what I recall of
+  the discussion regarding $\mathtt{fold}$, I have a feeling that
+  interpreting $\mathtt{fold}$ would end up with similar problems.}
 
 ==================
 
