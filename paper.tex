@@ -2208,8 +2208,10 @@ each~$x : \tau$.
   \[
   \begin{array}{rcl}
     \sigma \times \tau &=& \forall p . (\sigma \arrtype \tau \arrtype p) \arrtype p \\
-    \pair{t_1}{t_2}_{\sigma,\tau} &=& \tabs{p}{\abs{x:\sigma\arrtype\tau\arrtype p}{x t_1 t_2 \oplus_p \\
-        &&\quad\lift_p (\flatten_\sigma t_1) \oplus_p \\ &&\quad\lift_p (\flatten_\tau t_2)}} \\
+    \pair{t_1}{t_2}_{\sigma,\tau} &=& \tabs{p}{\abs{x:\sigma\arrtype\tau\arrtype p}{x t_1 t_2 \oplus_p
+    }} \\
+%        &&\quad\lift_p (\flatten_\sigma t_1) \oplus_p \\ &&\quad\lift_p (\flatten_\tau t_2)}
+%}} \\
     \pi^1_{\sigma,\tau}(t) &=& t \sigma (\abs{x:\sigma}{\abs{y:\tau}{x}}) \\
     \pi^2_{\sigma,\tau}(t) &=& t \tau (\abs{x:\sigma}{\abs{y:\tau}{y}})
   \end{array}
@@ -2228,8 +2230,9 @@ each~$x : \tau$.
 
 \begin{lemma}
   \begin{enumerate}
-  \item $\pi^i(\pair{t_1}{t_2}) \leadsto t_i \oplus
-    \lift(\flatten(t_1)) \oplus \lift(\flatten(t_2))$.
+  \item $\pi^i(\pair{t_1}{t_2}) \leadsto^* t_i %\oplus
+    %\lift(\flatten(t_1)) \oplus \lift(\flatten(t_2))
+    $.
   \item $\pi^i(\pair{t_1}{t_2}) \succeq t_i$.
   \end{enumerate}
 \end{lemma}
@@ -2247,6 +2250,11 @@ each~$x : \tau$.
 \end{lemma}
 
 \subsubsection{Sum types}
+\CK{I'm omitting these from \texttt{urzy\_emb} for the time being,
+since using this will create similar problems for case/case as we have
+for let/let -- which I hope I can avoid by using product types instead.
+So, it might be better to not have them altogether, as it may lead to
+questions; but YMMV}
 
 \begin{definition}\normalfont
   We define the following abbreviations:
@@ -2301,7 +2309,8 @@ each~$x : \tau$.
   \[
   \begin{array}{rcl}
     \Sigma \alpha . \sigma &=& \forall p . (\forall \alpha . \sigma \arrtype p) \arrtype p \\
-    \expair{\tau}{t}_{\Sigma\alpha.\sigma} &=& \tabs{p}{\abs{x:\forall\alpha.\sigma\arrtype p}{x \tau t \oplus_p \lift_p(\flatten_{\sigma[\subst{\alpha}{\tau}]}t)}} \\
+    \expair{\tau}{t}_{\Sigma\alpha.\sigma} &=& \tabs{p}{\abs{x:\forall\alpha.\sigma\arrtype p}{x \tau t %\oplus_p \lift_p(\flatten_{\sigma[\subst{\alpha}{\tau}]}t)
+    }} \\
     \xlet{\rho}{t}{\alpha,x:\sigma}{s} &=& t \rho (\tabs{\alpha}{\abs{x:\sigma}{s}})
   \end{array}
   \]
@@ -2321,7 +2330,8 @@ each~$x : \tau$.
 \begin{lemma}
   \begin{enumerate}
   \item $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \leadsto
-    s[\subst{\alpha}{\tau}][\subst{x}{t}] \oplus \lift(\flatten(t))$.
+    s[\subst{\alpha}{\tau}][\subst{x}{t}] %\oplus \lift(\flatten(t))
+    $.
   \item $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \succeq
     s[\subst{\alpha}{\tau}][\subst{x}{t}]$.
   \end{enumerate}
@@ -2334,9 +2344,9 @@ each~$x : \tau$.
     \expair{\tau}{t'}$).
   \item If $t \succ t'$ (resp.~$t \succeq t'$) and $s \succeq s'$ then
     \[
-    \xlet{}{t}{\alpha,x}{s} \succ \xlet{}{t}{\alpha,x}{s}
+    \xlet{}{t}{\alpha,x}{s} \succ \xlet{}{\CKchange{t'}}{\alpha,x}{\CKchange{s'}}
     \]
-    (resp.~$\xlet{}{t}{\alpha,x}{s} \succeq \xlet{}{t}{\alpha,x}{s}$).
+    (resp.~$\xlet{}{t}{\alpha,x}{s} \succeq \xlet{}{\CKchange{t'}}{\alpha,x}{\CKchange{s'}}$).
   \end{enumerate}
 \end{lemma}
 
@@ -2828,12 +2838,15 @@ guarantee monotonicity of both $\succinterpret$ and $\succeqinterpret$.
     then $s_1 \otimes s_2$ is safe for~$x$.
   \item If~$t$ is safe for~$x$ then so is~$\tabs{\alpha}{t}$
     and~$\abs{y}{t}$ ($y \ne x$).
-  \item If $t_1$ is safe for~$x$ or~$t_2$ is safe for~$x$ then
-    $\pair{t_1}{t_2}$ is safe for~$x$.
+%  \item If $t_1$ is safe for~$x$ or~$t_2$ is safe for~$x$ then
+%    $\pair{t_1}{t_2}$ is safe for~$x$.
   \item If $t$ is safe for~$x$ then so is~$\pi^1(t)$ and~$\pi^2(t)$.
   \item If $t$ is safe for~$x$ then so is~$\iota^1(t)$ and~$\iota^2(t)$.
+  \CK{Not outcommenting this one because I haven't changed it yet (but
+  probably needs to be done in the future to be consistent with the
+  others.}
   \item If $t$ is safe for~$x$ then so is~$\xcase{}{t}{[x]s_1}{[y]s_2}$.
-  \item If $t$ is safe for~$x$ then so is~$\expair{\tau}{t}$.
+  %\item If $t$ is safe for~$x$ then so is~$\expair{\tau}{t}$.
   \item If $t$ is safe for~$x$ then so is~$\xlet{}{t}{\alpha,x}{s}$.
   \end{enumerate}
 \end{lemma}
@@ -2897,6 +2910,9 @@ We use the following type constructor mapping:
 \end{array}
 \]
 \LC{Is $\Typemap(\mathtt{or}) = \lambda\alpha_1\lambda\alpha_2 . \alpha_1+\alpha_2$ worth a try?}
+\CK{It's what I tried before, thinking it would simplify things, but
+  then I got the same problem for case/case as I then got for let/let.
+  A product type will likely be better here}
 And the following function symbol mapping:
 \[
 \begin{array}{rcll}
@@ -2907,17 +2923,24 @@ And the following function symbol mapping:
   y) \oplus 1) \\
 \Termmap(\mathtt{tapp}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta . \lambda x : \quant{\gamma}{\alpha\gamma} . \quad & x * \beta \oplus \lift_{\alpha\beta}(1) \\
 \Termmap(\mathtt{ext}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta : * . \lambda x:\alpha\beta . &
-  \expair{\beta}{x} \\
+  \expair{\beta}{x} \CKchange{\oplus \lift_{\Sigma\gamma.\beta\gamma}(
+  \flatten_{\alpha\gamma}(x))} \\
 \Termmap(\mathtt{pair}) & = & \Lambda \alpha \Lambda \beta \lambda x :
-  \alpha, y : \beta.\quad & \pair{x}{y} \\
+  \alpha, y : \beta.\quad & \pair{x}{y} \CKchange{\oplus \lift_{
+  \alpha \times \beta}(\flatten_\alpha(x) \oplus \flatten_{\beta}(y))} \\
 \Termmap(\pi^1) & = & \Lambda \alpha \Lambda \beta \lambda x :
   \alpha \times \beta . \quad
   & \pi^1(x) \oplus \lift_{\alpha}(1) \\
 \Termmap(\pi^2) & = & \Lambda \alpha \Lambda \beta \lambda x :
   \alpha\times\beta.\quad
   & \pi^2(x) \oplus \lift_{\beta}(1) \\
-\Termmap(\mathtt{in}^1) & = & \Lambda \alpha \Lambda \beta \lambda x : \alpha.\quad & \pair{x}{\lift_\beta(1)} \\
-\Termmap(\mathtt{in}^2) & = & \Lambda \alpha \Lambda \beta \lambda x : \beta.\quad & \pair{\lift_\alpha(1)}{x} \\
+\Termmap(\mathtt{in}^1) & = & \Lambda \alpha \Lambda \beta
+  \lambda x : \alpha.\quad & \pair{x}{\lift_\beta(1)}
+  \CKchange{\oplus \lift_{\alpha
+  \times \beta}(\flatten_{\alpha}(x))} \\
+\Termmap(\mathtt{in}^2) & = & \Lambda \alpha \Lambda \beta
+  \lambda x : \beta.\quad & \pair{\lift_\alpha(1)}{x}
+  \CKchange{\oplus \lift_{\alpha \times \beta}(\flatten_{\beta}(x))} \\
 \end{array}
 \]
 \[
@@ -2929,10 +2952,10 @@ And the following function symbol mapping:
 \Termmap(\mathtt{case}) & = & \Lambda \alpha,\beta,\xi . \lambda x : \alpha \times \beta,
   y : (\alpha \arrtype \xi), z : (\beta \arrtype \xi). \\
   & & \quad
-  \lift_\xi(37) \oplus (\lift_\xi(\flatten_{\alpha\times\beta}(x)\oplus 1) \otimes \\
+  \lift_\xi(37) \oplus (\lift_\xi(\flatten_{\alpha\times\beta}(x)\oplus 3)
+  \otimes \\
   & & \quad\phantom{ABCDEFGHIJKL}
-    (y \cdot \pi^1(x)) \oplus (z \cdot \pi^2(x)) \oplus
-    \lift_\xi(1)) \\
+    (\ y \cdot \pi^1(x) \oplus (z \cdot \pi^2(x) \oplus \lift_\xi(11)\ ) \\
 \end{array}
 \]
 
@@ -3109,7 +3132,7 @@ $
     \mathcal{J}(\mathtt{case})_{\sigma,\tau,\typeinterpret{\mathtt{or}\,
     \rho\,\pi}}(\interpret{u},\abs{x}{\interpret{s}},
     \abs{y}{\interpret{t}}),\abs{z}{\interpret{v}},
-    \abs{a}{\interpret{w}}) \red \\
+    \abs{a}{\interpret{w}}) \succeq \\
   \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},
     \abs{x}{\mathcal{J}(\mathtt{case})_{\rho,\pi,\xi}(\interpret{s},
     \abs{z}{\interpret{v}},\abs{a}{\interpret{w}})},\\
@@ -3121,154 +3144,175 @@ $ \\
   type denotations all the time); note that I am treating them as type
   variables here, otherwise they would have to be interpreted too.
 \item Note that the type interpretation $\typeinterpret{\mathtt{or}\,
-  \rho\,\pi}$ evaluates to $\quant{\alpha}{\quant{\beta}{((\sigma
-  \arrtype \alpha) \arrtype (\tau \arrtype \alpha) \arrtype\beta)
-  \arrtype \beta} \arrtype \alpha}$.  I will not fill that one in in
-  the formula, but note that it is the output type of the inner
-  $\mathtt{case}$.
-\item Note that $\Termmap(\mathtt{case}) = \Lambda \alpha\beta\xi.
-  \lambda x,y,z.x * \xi \cdot (\Lambda \chi \lambda f.f \cdot y \cdot
-  z) \oplus (y \cdot \lift(0)) \oplus (z \cdot \lift(0)) \oplus
-  \lift(7)$.
+  \rho\,\pi}$ evaluates to $\rho \times \pi$.  This is the output type
+  of the inner case in the left-hand side.
+\item Recall that:
+\[
+\begin{array}{rcl}
+\Termmap(\mathtt{case}) & = & \Lambda \alpha,\beta,\xi . \lambda x : \alpha \times \beta,
+  y : (\alpha \arrtype \xi), z : (\beta \arrtype \xi). \\
+  & & \quad
+  \lift_\xi(37) \oplus (\lift_\xi(\flatten_{\alpha\times\beta}(x)\oplus 3)
+    \otimes \\
+  & & \quad\phantom{ABCDEFGHIJKL}
+    (\ y \cdot \pi^1(x) \oplus z \cdot \pi^2(x) \oplus
+    \lift_\xi(11)\ ) \\
+\end{array}
+\]
 \item Let's fill in the inner $\mathtt{case}$ interpretations in the
   right-hand side: \\
   $\mathcal{J}(\mathtt{case})_{\rho,\pi,\xi}(
     \mathcal{J}(\mathtt{case})_{\sigma,\tau,\typeinterpret{\mathtt{or}\,
     \rho\,\pi}}(\interpret{u},\abs{x}{\interpret{s}},
     \abs{y}{\interpret{t}}),\abs{z}{\interpret{v}},
-    \abs{a}{\interpret{w}}) \red \\
-  \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},
-    \abs{x}{\interpret{s} * \xi \cdot (\Lambda \chi.\lambda f.f \cdot
-    (\abs{z}{\interpret{v}}) \cdot (\abs{a}{\interpret{w}})) \oplus \\
-    \phantom{ABCDEFGHIJKL}
-    ((\abs{z}{\interpret{v}}) \cdot \lift(0)) \oplus
-    ((\abs{a}{\interpret{w}}) \cdot \lift(0)) \oplus \lift(7)}, \\
-    \phantom{ABCDEFGHIJ}
-    \abs{y}{\interpret{t} * \xi \cdot (\Lambda \chi.\lambda f.
-    f \cdot (\abs{z}{\interpret{v}}) \cdot
-    (\abs{a}{\interpret{w}})) \oplus \\
-    \phantom{ABCDEFGHIJKL}
-    ((\abs{z}{\interpret{v}}) \cdot \lift(0)) \oplus
-    ((\abs{a}{\interpret{w}}) \cdot \lift(0)) \oplus \lift(7)})
-  $
+    \abs{a}{\interpret{w}}) \succeq \\
+  \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
+    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
+      \interpret{s}) \oplus 3) \otimes \\
+      \phantom{AB} \hfill (\ 
+      ((\lambda z.\interpret{v}) \cdot \pi^1(\interpret{s})) \oplus
+      ((\lambda a.\interpret{w}) \cdot \pi^2(\interpret{s})) \oplus
+      \lift_\xi(11)\ )},\\
+    \phantom{ABCDEFGHIJ}\abs{y}{
+    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
+      \interpret{t}) \oplus 3) \otimes \\
+      \phantom{AB} \hfill (\ 
+      ((\lambda z.\interpret{v}) \cdot \pi^1(\interpret{t})) \oplus
+      ((\lambda a.\interpret{w}) \cdot \pi^2(\interpret{t})) \oplus
+      \lift_\xi(11)\ )})
+$
 \item And $\beta$-normalise them.  We're allowed to do that by
   Lemma \ref{lem_succ_red}. \\
   $\mathcal{J}(\mathtt{case})_{\rho,\pi,\xi}(
     \mathcal{J}(\mathtt{case})_{\sigma,\tau,\typeinterpret{\mathtt{or}\,
     \rho\,\pi}}(\interpret{u},\abs{x}{\interpret{s}},
     \abs{y}{\interpret{t}}),\abs{z}{\interpret{v}},
-    \abs{a}{\interpret{w}}) \red \\
-  \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},
-    \abs{x}{\interpret{s} * \xi \cdot (\Lambda \chi.\lambda f.f \cdot
-    (\abs{z}{\interpret{v}}) \cdot (\abs{a}{\interpret{w}})) \oplus \\
-    \phantom{ABCDEFGHIJKL}
-    \interpret{v}[z:=\lift(0)] \oplus
-    \interpret{w}[a:=\lift(0)] \oplus \lift(7)}, \\
-    \phantom{ABCDEFGHIJ}
-    \abs{y}{\interpret{t} * \xi \cdot (\Lambda \chi.\lambda f.
-    f \cdot (\abs{z}{\interpret{v}}) \cdot
-    (\abs{a}{\interpret{w}})) \oplus \\
-    \phantom{ABCDEFGHIJKL}
-    \interpret{v}[z:=\lift(0)] \oplus
-    \interpret{w}[a:=\lift(0)] \oplus \lift(7)}\ )
-  $
-\item Now the inner $\mathtt{case}$ interpretation in the left-hand
-  side: \\
+    \abs{a}{\interpret{w}}) \succeq \\
+  \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
+    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
+      \interpret{s}) \oplus 3) \otimes \\
+      \phantom{AB} \hfill (\ 
+      \interpret{v}[z:=\pi^1(\interpret{s})] \oplus
+      \interpret{w}[z:=\pi^2(\interpret{s})] \oplus
+      \lift_\xi(11)\ )},\\
+    \phantom{ABCDEFGHIJ}\abs{y}{
+    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
+      \interpret{t}) \oplus 3) \otimes \\
+      \phantom{AB} \hfill (\ 
+      \interpret{v}[z:=\pi^1(\interpret{t})] \oplus
+      \interpret{w}[a:=\pi^2(\interpret{t})] \oplus
+      \lift_\xi(11)\ )})
+$
+\item Now we do the inner case interpretation in the left-hand side; we
+  immediately perform the $\beta$-reduction step. \\
   $\mathcal{J}(\mathtt{case})_{\rho,\pi,\xi}(
-    \interpret{u} * \typeinterpret{\mathtt{or}\,\rho\,\pi} \cdot
-    (\Lambda \chi\lambda f.f \cdot (\abs{x}{\interpret{s}}) \cdot
-    (\abs{y}{\interpret{t}})) \oplus \\
-    \phantom{ABCDEFGHIJ}
-    \interpret{s}[x:=\lift(0)]
-    \oplus \interpret{t}[y:=
-    \lift(0)] \oplus \lift(7)), \\
-    \phantom{ABCDEFGh}
-    \abs{z}{\interpret{v}},
-    \abs{a}{\interpret{w}}) \red \\
-  \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},
-    \abs{x}{\interpret{s} * \xi \cdot (\Lambda \chi.\lambda f.f \cdot
-    (\abs{z}{\interpret{v}}) \cdot (\abs{a}{\interpret{w}})) \oplus \\
-    \phantom{ABCDEFGHIJKL}
-    \interpret{v}[z:=\lift(0)] \oplus
-    \interpret{w}[a:=\lift(0)] \oplus \lift(7)}, \\
-    \phantom{ABCDEFGHIJ}
-    \abs{y}{\interpret{t} * \xi \cdot (\Lambda \chi.\lambda f.
-    f \cdot (\abs{z}{\interpret{v}}) \cdot
-    (\abs{a}{\interpret{w}})) \oplus \\
-    \phantom{ABCDEFGHIJKL}
-    \interpret{v}[z:=\lift(0)] \oplus
-    \interpret{w}[a:=\lift(0)] \oplus \lift(7)}\ )
+    \\
+    \phantom{AB}
+    \lift_{\rho \times \pi}(37) \oplus
+    \lift_{\rho \times \pi}(\flatten_{\sigma \times \tau}(\interpret{u})
+    \oplus 3) \otimes \\
+    \phantom{ABCDEFGHIJK}
+    (\ \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+       \interpret{t}[y:=\pi^2(\interpret{u})] \oplus
+       \lift_{\rho \times \pi}(11)
+    \ ), \\
+  \lambda z.\interpret{v},\ \lambda a.\interpret{w}) \succeq \\
+  \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
+    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
+      \interpret{s}) \oplus 3) \otimes \\
+      \phantom{AB} \hfill (\ 
+      \interpret{v}[z:=\pi^1(\interpret{s})] \oplus
+      \interpret{w}[z:=\pi^2(\interpret{s})] \oplus
+      \lift_\xi(11)\ )},\\
+    \phantom{ABCDEFGHIJ}\abs{y}{
+    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
+      \interpret{t}) \oplus 3) \otimes \\
+      \phantom{AB} \hfill (\ 
+      \interpret{v}[z:=\pi^1(\interpret{t})] \oplus
+      \interpret{w}[a:=\pi^2(\interpret{t})] \oplus
+      \lift_\xi(11)\ )})
+$
+\item Now I will fill in the outer $\mathtt{case}$ interpretation on
+  the left. To avoid this getting horribly messy, I will use the
+  shorthand notation $A$ explained below.\\
+  $\lift_\xi(37) \oplus
+  \lift_\xi(\flatten_{\rho \times \pi}(A) \oplus 3) \otimes \\
+  \phantom{ABCDEFG}
+  ( \interpret{v}[z:=\pi^1(A)] \oplus \interpret{w}[a:=\pi^2(A)]
+  \oplus \lift_\xi(11) ) \succeq \\
+  \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
+    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
+      \interpret{s}) \oplus 3) \otimes \\
+      \phantom{AB} \hfill (\ 
+      \interpret{v}[z:=\pi^1(\interpret{s})] \oplus
+      \interpret{w}[z:=\pi^2(\interpret{s})] \oplus
+      \lift_\xi(11)\ )},\\
+    \phantom{ABCDEFGHIJ}\abs{y}{
+    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
+      \interpret{t}) \oplus 3) \otimes \\
+      \phantom{AB} \hfill (\ 
+      \interpret{v}[z:=\pi^1(\interpret{t})] \oplus
+      \interpret{w}[a:=\pi^2(\interpret{t})] \oplus
+      \lift_\xi(11)\ )})
+$ \\
+  \\
+  Here, $A =
+    \lift_{\rho \times \pi}(37) \oplus
+    \lift_{\rho \times \pi}(\flatten_{\sigma \times \tau}(\interpret{u})
+    \oplus 3) \otimes \\
+    \phantom{ABCDEFGHIJK}
+    (\ \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+       \interpret{t}[y:=\pi^2(\interpret{u})] \oplus
+       \lift_{\rho \times \pi}(11)
+    \ )$.
+\item And let's of course also fill in the right-hand side. \\
+  $\lift_\xi(37) \oplus
+  \lift_\xi(\flatten_{\rho \times \pi}(A) \oplus 3) \otimes \\
+  \phantom{ABCDEFG}
+  ( \interpret{v}[z:=\pi^1(A)] \oplus \interpret{w}[a:=\pi^2(A)]
+  \oplus \lift_\xi(11) ) \succeq \\
+  \lift_\xi(37) \oplus
+  \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}) \oplus 3)
+  \otimes \\
+  \phantom{ABCDEFG}
+  (\ B_{\interpret{s}}[x:=\pi^1(\interpret{u})] \oplus
+     B_{\interpret{t}}[y:=\pi^2(\interpret{u})] \oplus \lift_\xi(11))
   $
-\item Now it gets messy. I will fill in the outer
-  $\mathtt{case}$ interpretation on the left. \\
-  $\langle\ \  \interpret{u} * \typeinterpret{\mathtt{or}\,\rho\,\pi} \cdot
-    (\Lambda \chi\lambda f.f \cdot (\abs{x}{\interpret{s}}) \cdot
-    (\abs{y}{\interpret{t}})) \oplus \\
-    \phantom{Ai}
-    \interpret{s}[x:=\lift(0)]
-    \oplus \interpret{t}[y:=
-    \lift(0)] \oplus \lift(7))\ \ \rangle \\
-    \phantom{A} * \xi \cdot (\Lambda \chi\lambda f.f \cdot
-    (\abs{z}{\interpret{v}}) \cdot (\abs{a}{\interpret{w}})) \\
-    \oplus
-    \interpret{v}[z:=\lift(0)] \oplus \interpret{w}[a:=\lift(0)]
-    \oplus \lift(7) \red \\
-  \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},
-    \abs{x}{\interpret{s} * \xi \cdot (\Lambda \chi.\lambda f.f \cdot
-    (\abs{z}{\interpret{v}}) \cdot (\abs{a}{\interpret{w}})) \oplus \\
-    \phantom{ABCDEFGHIJKL}
-    \interpret{v}[z:=\lift(0)] \oplus
-    \interpret{w}[a:=\lift(0)] \oplus \lift(7)}, \\
-    \phantom{ABCDEFGHIJ}
-    \abs{y}{\interpret{t} * \xi \cdot (\Lambda \chi.\lambda f.
-    f \cdot (\abs{z}{\interpret{v}}) \cdot
-    (\abs{a}{\interpret{w}})) \oplus \\
-    \phantom{ABCDEFGHIJKL}
-    \interpret{v}[z:=\lift(0)] \oplus
-    \interpret{w}[a:=\lift(0)] \oplus \lift(7)}\ )
+ \\ 
+  Here, $B_q =
+    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
+      \interpret{q}) \oplus 3) \otimes \\
+      \phantom{AB} \hfill (\ 
+      \interpret{v}[z:=\pi^1(q)] \oplus
+      \interpret{w}[z:=\pi^2(q)] \oplus
+      \lift_\xi(11)\ )$.
+\item Note that $s$ is a bound variable in $s$ and $y$ a bound variable
+  in $t$; these variables do not occur in $B_q$.  So, we can rewrite
+  the above inequality to:
+  $\lift_\xi(37) \oplus
+  \lift_\xi(\flatten_{\rho \times \pi}(A) \oplus 3) \otimes \\
+  \phantom{ABCDEFG}
+  ( \interpret{v}[z:=\pi^1(A)] \oplus \interpret{w}[a:=\pi^2(A)]
+  \oplus \lift_\xi(11) ) \succeq \\
+  \lift_\xi(37) \oplus
+  \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}) \oplus 3)
+  \otimes \\
+  \phantom{ABCDEFG}
+  (\ B_{\interpret{s}[x:=\pi^1(\interpret{u})]} \oplus
+     B_{\interpret{t}[y:=\pi^2(\interpret{u})]} \oplus \lift_\xi(11))
   $
-\item And of course also on the right. \\
-  $\langle\ \  \interpret{u} * \typeinterpret{\mathtt{or}\,\rho\,\pi} \cdot
-    (\Lambda \chi\lambda f.f \cdot (\abs{x}{\interpret{s}}) \cdot
-    (\abs{y}{\interpret{t}})) \oplus \\
-    \phantom{Ai}
-    \interpret{s}[x:=\lift(0)]
-    \oplus \interpret{t}[y:=
-    \lift(0)] \oplus \lift(7))\ \ \rangle \\
-    \phantom{AA} * \xi \cdot (\Lambda \chi\lambda f.f \cdot
-    (\abs{z}{\interpret{v}}) \cdot (\abs{a}{\interpret{w}})) \\
-    \phantom{A} \oplus
-    \interpret{v}[z:=\lift(0)] \oplus \interpret{w}[a:=\lift(0)]
-    \oplus \lift(7) \red \\
-  \interpret{u} * \xi \cdot
-    (\Lambda \chi\lambda f.f \cdot A \cdot B) \oplus \\
-    \phantom{A} \interpret{s}[x:=\lift(0)] * \xi \cdot (\Lambda \chi.
-    \lambda f.f \cdot
-    (\abs{z}{\interpret{v}}) \cdot (\abs{a}{\interpret{w}})) \oplus \\
-    \phantom{A}
-    \interpret{v}[z:=\lift(0)] \oplus
-    \interpret{w}[a:=\lift(0)] \oplus \lift(7)\ \oplus \\
-    \phantom{A}\interpret{t}[y:=\lift(0) * \xi \cdot (\Lambda \chi.
-    \lambda f.f \cdot (\abs{z}{\interpret{v}}) \cdot
-    (\abs{a}{\interpret{w}})) \oplus \\
-    \phantom{A}
-    \interpret{v}[z:=\lift(0)] \oplus
-    \interpret{w}[a:=\lift(0)] \oplus \lift(7) \oplus \\
-    \phantom{A} \lift(7)$.
-    where \\
-    $A =
-    \abs{x}{\interpret{s} * \xi \cdot (\Lambda \chi.\lambda f.f \cdot
-    (\abs{z}{\interpret{v}}) \cdot (\abs{a}{\interpret{w}})) \oplus \\
-    \phantom{ABCDEFGHIJKL}
-    \interpret{v}[z:=\lift(0)] \oplus
-    \interpret{w}[a:=\lift(0)] \oplus \lift(7)}$ \\
-    and $B =
-    \abs{y}{\interpret{t} * \xi \cdot (\Lambda \chi.\lambda f.
-    f \cdot (\abs{z}{\interpret{v}}) \cdot
-    (\abs{a}{\interpret{w}})) \oplus \\
-    \phantom{ABCDEFGHIJKL}
-    \interpret{v}[z:=\lift(0)] \oplus
-    \interpret{w}[a:=\lift(0)] \oplus \lift(7)}$.
+\item By Lemma \ref{lem:approxproperties} we can reorder parts of
+  $\oplus$ and by \ref{lem:plustimesmonotonic} we can strike parts of
+  $\oplus$ away against each other in the left- and right-hand side.
+  If \CK{(TODO: assumption here)} we also have that $(A \oplus B) \otimes
+  C \approx A \otimes C \oplus B \otimes C$, then we obtain the
+  following proof obligation: \\
+  TODO
+\end{itemize}
+
+==================
+
+\begin{itemize}
 \item By Lemma \ref{lem:approxproperties} we can reorder parts of
   $\oplus$ and by \ref{lem:plustimesmonotonic} we can strike parts of
   $\oplus$ away against each other in the left- and right-hand side,
@@ -3603,8 +3647,31 @@ out).
   syntactically by terms of extended~$\Fomega$. Compare: Wadler
   ``Theorems for Free''.}
 
+\CK{This seems very unlikely to be true. Can we choose $s =
+\flatten$ and $\sigma_1 = \sigma_2 = \mathtt{nat}$ and $t_1 = 1$ and
+$t_2 = 2$?}
+
 \LC{But maybe this can be done with Logical Relations? I'll think
   about this\ldots}
+
+\CK{Well, let's say that this will be a great Future Work section.
+  Thinking about it, we already have enough to merit publication
+  of the initial ideas just by getting two versions of polymorphic
+  map (with either
+  $\mathtt{map} : \forall\alpha\beta [(\alpha \arrtype \beta) \arrtype
+  (\mathtt{list} \alpha) \arrtype (\mathtt{list} \beta)]$ or
+  $\mathtt{map} : \forall \varphi [
+  \forall \alpha [\alpha \arrtype \varphi\alpha]
+  \arrtype \mathtt{list} \arrtype \mathtt{list}]$) and part of urzy.
+  Deepening the theory to get more examples -- whether in this way or
+  through some other extension of the relation -- is probably even
+  better to publish separately (for example in a journal paper where
+  you have the space to put in the proofs).}
+
+\CK{Note: I do suspect that this problem is important to solve
+  eventually for more than just $\mathtt{let}$: from what I recall of
+  the discussion regarding $\mathtt{fold}$, I have a feeling that
+  interpreting $\mathtt{fold}$ would end up with similar problems.}
 
 ==================
 
