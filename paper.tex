@@ -2352,69 +2352,6 @@ questions; but YMMV}
 
 \subsubsection{Lists}
 
-\subsection{Parametricity}
-
-To be filled in much later\ldots
-
-\begin{definition}\label{def_param_candidate}\normalfont
-  For two type constructors~$\tau_1,\tau_2$ of the same kind~$\kappa$,
-  we define by induction on~$\kappa$ the set~$\Rel_{\tau_1,\tau_2}$ of
-  $\tau_1,\tau_2$-candidates.
-
-  Assume $\kappa=*$, i.e., $\tau_1,\tau_2$ are types. A relation~$R$
-  between terms of type~$\tau_1$ and terms of type~$\tau_2$ is a
-  \emph{candidate relation} in $\Rel_{\tau_1,\tau_2}$ when the
-  following properties are satisfied:
-  \begin{enumerate}
-  \item if $R(t_1,t_2)$ and $t_1' \leadsto t_1$ (resp.~$t_2' \leadsto
-    t_2$) then $R(t_1',t_2)$ (resp.~$R(t_1,t_2')$),
-  \item \ldots
-  \end{enumerate}
-\end{definition}
-
-\begin{lemma}\label{lem_beta_param_candidate}
-  If $\sigma_1 =_\beta \sigma_1'$ and $\sigma_2 =_\beta \sigma_2'$
-  then $\Rel_{\sigma_1,\sigma_2} = \Rel_{\sigma_1',\sigma_2'}$.
-\end{lemma}
-
-\begin{proof}
-  Induction on the kind of~$\sigma_1,\sigma_2$.
-\end{proof}
-
-\begin{definition}\label{def_param_valuation}\normalfont
-  Let $\omega$ be a mapping from type constructor variables to pairs
-  of type constructors (respecting kinds). The mapping~$\omega$
-  extends in an obvious way to a mapping from type constructors to
-  pairs type constructors. We write $\omega_i(\tau)$ for the $i$-th
-  component of the pair~$\omega(\tau)$. A mapping~$\omega$ is
-  \emph{closed for~$\sigma$} if $\omega_i(\alpha)$ is closed for
-  $\alpha \in \FV(\sigma)$ (then $\omega_i(\sigma)$ is closed), for
-  $i=1,2$.
-
-  An \emph{$\omega$-valuation} is a mapping~$\xi$ on type constructor
-  variables such that $\xi(\alpha) \in
-  \Rel_{\omega_1(\alpha),\omega_2(\alpha)}$.
-
-  For each type constructor~$\sigma$, each mapping~$\omega$ closed
-  for~$\sigma$, and each $\omega$-valuation~$\xi$, we define
-  $\rval{\sigma}{\xi}{\omega}$ by induction on~$\sigma$:
-  \begin{itemize}
-  \item $\rval{\alpha}{\xi}{\omega} = \xi(\alpha)$ for a type
-    constructor variable~$\alpha$,
-  \item $\rval{\nat}{\xi}{\omega}(t_1,t_2)$ iff $t_1 \approx_\nat t_2$,
-  \item $\rval{\sigma \arrtype \tau}{\xi}{\omega}(t_1,t_2)$ iff $t_i :
-    \omega_i(\sigma\arrtype\tau)$ and for all $s_1,s_2$ such that
-    $\rval{\sigma}{\xi}{\omega}(s_1,s_2)$ we have
-    $\rval{\tau}{\xi}{\omega}(t_1 s_1, t_2 s_2)$,
-  \item $\rval{\forall(\alpha:\kappa)[\sigma]}{\xi}{\omega}(t_1,t_2)$
-    iff $t_i : \omega_i(\forall\alpha\sigma)$ and for all closed type
-    constructors~$\tau_1,\tau_2$ of kind~$\kappa$ and every $R \in
-    \Rel_{\tau_1,\tau_2}$ we have
-    $\rval{\sigma}{\xi[\subst{\alpha}{R}]}{\omega[\subst{\alpha}{(\tau_1,\tau_2)}]}$.
-  \end{itemize}
-\end{definition}
-
-
 \section{Systems of interest and their properties}\label{sec:systems}
 
 The systems of interest are sets of terms with a rewriting relation on
@@ -3169,14 +3106,14 @@ $ \\
   \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
     \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
       \interpret{s}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\ 
+      \phantom{AB} \hfill (\
       ((\lambda z.\interpret{v}) \cdot \pi^1(\interpret{s})) \oplus
       ((\lambda a.\interpret{w}) \cdot \pi^2(\interpret{s})) \oplus
       \lift_\xi(11)\ )},\\
     \phantom{ABCDEFGHIJ}\abs{y}{
     \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
       \interpret{t}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\ 
+      \phantom{AB} \hfill (\
       ((\lambda z.\interpret{v}) \cdot \pi^1(\interpret{t})) \oplus
       ((\lambda a.\interpret{w}) \cdot \pi^2(\interpret{t})) \oplus
       \lift_\xi(11)\ )})
@@ -3191,14 +3128,14 @@ $
   \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
     \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
       \interpret{s}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\ 
+      \phantom{AB} \hfill (\
       \interpret{v}[z:=\pi^1(\interpret{s})] \oplus
       \interpret{w}[z:=\pi^2(\interpret{s})] \oplus
       \lift_\xi(11)\ )},\\
     \phantom{ABCDEFGHIJ}\abs{y}{
     \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
       \interpret{t}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\ 
+      \phantom{AB} \hfill (\
       \interpret{v}[z:=\pi^1(\interpret{t})] \oplus
       \interpret{w}[a:=\pi^2(\interpret{t})] \oplus
       \lift_\xi(11)\ )})
@@ -3220,14 +3157,14 @@ $
   \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
     \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
       \interpret{s}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\ 
+      \phantom{AB} \hfill (\
       \interpret{v}[z:=\pi^1(\interpret{s})] \oplus
       \interpret{w}[z:=\pi^2(\interpret{s})] \oplus
       \lift_\xi(11)\ )},\\
     \phantom{ABCDEFGHIJ}\abs{y}{
     \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
       \interpret{t}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\ 
+      \phantom{AB} \hfill (\
       \interpret{v}[z:=\pi^1(\interpret{t})] \oplus
       \interpret{w}[a:=\pi^2(\interpret{t})] \oplus
       \lift_\xi(11)\ )})
@@ -3243,14 +3180,14 @@ $
   \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
     \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
       \interpret{s}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\ 
+      \phantom{AB} \hfill (\
       \interpret{v}[z:=\pi^1(\interpret{s})] \oplus
       \interpret{w}[z:=\pi^2(\interpret{s})] \oplus
       \lift_\xi(11)\ )},\\
     \phantom{ABCDEFGHIJ}\abs{y}{
     \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
       \interpret{t}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\ 
+      \phantom{AB} \hfill (\
       \interpret{v}[z:=\pi^1(\interpret{t})] \oplus
       \interpret{w}[a:=\pi^2(\interpret{t})] \oplus
       \lift_\xi(11)\ )})
@@ -3278,11 +3215,11 @@ $ \\
   (\ B_{\interpret{s}}[x:=\pi^1(\interpret{u})] \oplus
      B_{\interpret{t}}[y:=\pi^2(\interpret{u})] \oplus \lift_\xi(11))
   $
- \\ 
+ \\
   Here, $B_q =
     \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
       \interpret{q}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\ 
+      \phantom{AB} \hfill (\
       \interpret{v}[z:=\pi^1(q)] \oplus
       \interpret{w}[z:=\pi^2(q)] \oplus
       \lift_\xi(11)\ )$.
