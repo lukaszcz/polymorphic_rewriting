@@ -73,6 +73,11 @@
 \newcommand{\con}{\mathtt{c}}
 \newcommand{\afun}{\mathtt{f}}
 
+\newcommand{\List}{\mathtt{List}}
+\newcommand{\nil}{\mathtt{nil}}
+\newcommand{\cons}{\mathtt{cons}}
+\newcommand{\fold}{\mathtt{fold}}
+
 \newcommand{\ur}{\upharpoonright}
 \newcommand{\da}{\mathord{\downarrow}}
 \newcommand{\SN}{\mathrm{SN}}
@@ -2208,7 +2213,7 @@ each~$x : \tau$.
   \[
   \begin{array}{rcl}
     \sigma \times \tau &=& \forall p . (\sigma \arrtype \tau \arrtype p) \arrtype p \\
-    \pair{t_1}{t_2}_{\sigma,\tau} &=& \tabs{p}{\abs{x:\sigma\arrtype\tau\arrtype p}{x t_1 t_2 \oplus_p
+    \pair{t_1}{t_2}_{\sigma,\tau} &=& \tabs{p}{\abs{x:\sigma\arrtype\tau\arrtype p}{x t_1 t_2 % \oplus_p
     }} \\
 %        &&\quad\lift_p (\flatten_\sigma t_1) \oplus_p \\ &&\quad\lift_p (\flatten_\tau t_2)}
 %}} \\
@@ -2241,13 +2246,18 @@ each~$x : \tau$.
   \begin{enumerate}
   \item If $t_1 \succeq t_1'$ and $t_2 \succeq t_2'$ then
     $\pair{t_1}{t_2} \succeq \pair{t_1'}{t_2'}$.
-  \item If $t_1 \succ t_1'$ and $t_2 \succeq t_2'$ (or $t_1 \succeq
-    t_1'$ and $t_2 \succ t_2'$) then $\pair{t_1}{t_2} \succ
-    \pair{t_1'}{t_2'}$.
+%  \item If $t_1 \succ t_1'$ and $t_2 \succeq t_2'$ (or $t_1 \succeq
+%    t_1'$ and $t_2 \succ t_2'$) then $\pair{t_1}{t_2} \succ
+%    \pair{t_1'}{t_2'}$.
   \item If $t \succ t'$ (resp.~$t \succeq t'$) then $\pi^i(t) \succ
     \pi^i(t')$ (resp.~$\pi^i(t)\succeq \pi^i(t')$).
   \end{enumerate}
 \end{lemma}
+
+\LC{Note that the following is no longer true after removing the
+  $\oplus$ from pairs: If $t_1 \succ t_1'$ and $t_2 \succeq t_2'$ (or
+  $t_1 \succeq t_1'$ and $t_2 \succ t_2'$) then $\pair{t_1}{t_2} \succ
+  \pair{t_1'}{t_2'}$.}
 
 \subsubsection{Sum types}
 \CK{I'm omitting these from \texttt{urzy\_emb} for the time being,
@@ -2255,6 +2265,9 @@ since using this will create similar problems for case/case as we have
 for let/let -- which I hope I can avoid by using product types instead.
 So, it might be better to not have them altogether, as it may lead to
 questions; but YMMV}
+
+\LC{I think they should be omitted if not used, giving a reference to
+  where the encodings are explained for System F in the literature.}
 
 \begin{definition}\normalfont
   We define the following abbreviations:
@@ -2339,9 +2352,8 @@ questions; but YMMV}
 
 \begin{lemma}
   \begin{enumerate}
-  \item If $t \succ t'$ (resp.~$t \succeq t'$) then $\expair{\tau}{t}
-    \succ \expair{\tau}{t'}$ (resp.~$\expair{\tau}{t} \succeq
-    \expair{\tau}{t'}$).
+  \item If $t \succeq t'$ then $\expair{\tau}{t} \succeq
+    \expair{\tau}{t'}$.
   \item If $t \succ t'$ (resp.~$t \succeq t'$) and $s \succeq s'$ then
     \[
     \xlet{}{t}{\alpha,x}{s} \succ \xlet{}{\CKchange{t'}}{\alpha,x}{\CKchange{s'}}
@@ -2350,7 +2362,43 @@ questions; but YMMV}
   \end{enumerate}
 \end{lemma}
 
-\subsubsection{Lists}
+\subsubsection{Heterogenous lists}
+
+\begin{definition}\normalfont
+  We define the following abbreviations:
+  \[
+  \begin{array}{rcl}
+    \List &=& \forall p . (\forall \alpha . \alpha \arrtype p \arrtype p) \arrtype p \arrtype p \\
+    \nil &=& \tabs{p}{\abs{f:\forall \alpha . \alpha \arrtype p \arrtype p}{\abs{a : p}{a}}} \\
+    \cons_\rho(h,t) &=& \tabs{p}{\abs{f:\forall\alpha . \alpha \arrtype p \arrtype p}{\abs{a : p}{f \rho h (l p f a)}}} \\
+    \fold_\rho(f,a,l) &=& l \rho f a
+  \end{array}
+  \]
+  We drop the type subscripts when clear or irrelevant.
+\end{definition}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item $\Gamma \proves \nil : \List$.
+  \item If $\Gamma \proves h : \rho$ and $\Gamma \proves t : \List$
+    then $\Gamma \proves \cons_\rho(h,t) : \List$.
+  \item If $\Gamma \proves l : \List$ and $\Gamma \proves f : \forall
+    \alpha . \alpha \arrtype \rho \arrtype \rho$ and $a : \rho$ then
+    $\Gamma \proves \fold_\rho(f,a,l) : \rho$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item $\fold_\rho(f,a,\nil) \leadsto a$.
+  \item $\fold_\rho(f,a,\cons_\tau(h,t)) \leadsto f \tau h
+    (\fold_\rho(f,a,t))$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{lemma}
+  If $l \succ l'$ then $\fold_\rho(f,a,l) \succ \fold_\rho(f,a,l')$.
+\end{lemma}
 
 \section{Systems of interest and their properties}\label{sec:systems}
 
@@ -2430,7 +2478,39 @@ The reduction relation $\arr{\Rules}$ is the smallest monotonic
 relation that contains $\Rules$.
 \end{definition}
 
-\subsubsection{An example system.}
+\subsubsection{Map on heterogenous lists}
+
+We have the following type constructor symbols:
+\[
+\begin{array}{c}
+  \TypeConstructors = \{ \mathtt{List} : * \}
+\end{array}
+\]
+
+We have the following function symbols:
+\[
+\begin{array}{rcl}
+@ & : & \forall \alpha \forall \beta . (\alpha \arrtype \beta) \arrtype \alpha \arrtype \beta \\
+\mathtt{tapp} & : & \forall \alpha : * \arrkind * . \forall \beta .
+(\forall \beta [\alpha \beta]) \arrtype \alpha \beta \\
+\mathtt{nil} & : & \List \\
+\mathtt{cons} & : & \forall \alpha . \alpha \arrtype \List \arrtype \List \\
+\mathtt{map} & : & (\forall \alpha . \alpha \arrtype \alpha) \arrtype \List \arrtype \List
+\end{array}
+\]
+
+And finally the rules.
+\[
+\begin{array}{rcl}
+@_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] \\
+\mathtt{tapp}_{\abs{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \red &
+  s[\alpha:=\tau] \\
+\mathtt{map}(f,\nil) & \red & \nil \\
+\mathtt{map}(f,\cons_\tau(x,l)) & \red & \cons_\tau(@_{\tau,\tau}(f,x),\mathtt{map}(f,l))
+\end{array}
+\]
+
+\subsubsection{Intuitionistic second-order propositional logic IPC2}
 
 For the system of urzy\_emb, we have the following type constructor
 symbols:
@@ -2833,9 +2913,34 @@ TODO
 
 \subsection{Other}
 
-\section{Some systems of interest -- urzy\_emb?}
+\section{Some systems of interest}
 
 \subsection{Interpretations}
+
+\subsubsection{Map on heterogenous lists}
+
+We use the following type constructor mapping:
+\[
+\begin{array}{rcl}
+  \Typemap(\List) & = & \List
+\end{array}
+\]
+
+And the following function symbol mapping:
+\[
+\begin{array}{rcl}
+\Termmap(@) & = & \Lambda\alpha\Lambda\beta\lambda x: \alpha \arrtype \beta . \lambda y :
+  \alpha . x \cdot y \oplus \lift_\beta(\flatten_\alpha(
+  y) \oplus 1) \\
+\Termmap(\mathtt{tapp}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta . \lambda x : \quant{\gamma}{\alpha\gamma} . x * \beta \oplus \lift_{\alpha\beta}(1) \\
+\Termmap(\mathtt{nil}) & = & \nil \\
+\Termmap(\mathtt{cons}) & = & \tabs{\alpha}{\abs{x:\alpha}{\abs{y:\List}{\cons_\alpha(x,y)\oplus_\List \lift_\List(\flatten_\alpha(x) \oplus_\nat \flatten_\List(y))}}} \\
+\Termmap(\mathtt{map}) & = & \lambda f:\forall\alpha . \alpha\arrtype\alpha . \lambda l:\List . \\
+& &\quad\fold_\List(\tabs{\alpha}{\abs{x:\alpha}{\abs{a:\List}{\cons_\alpha(f \alpha x \oplus_\alpha x, a)\oplus_\List \lift_\List(1)}}},\nil,l)
+\end{array}
+\]
+
+\subsubsection{IPC2}
 
 We use the following type constructor mapping:
 \[
