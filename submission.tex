@@ -1,0 +1,158 @@
+\documentclass[a4paper,UKenglish,cleveref, autoref]{lipics-v2019}
+
+%\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
+
+\bibliographystyle{plainurl}% the mandatory bibstyle
+
+\newcommand{\Fomega}{\mathtt{F}_\omega}
+
+\newcommand{\Typevars}{\mathcal{A}}
+\newcommand{\Vars}{\mathcal{V}}
+\newcommand{\Rules}{\mathcal{R}}
+\newcommand{\World}{\mathcal{W}}
+
+\newcommand{\arrkind}{\Rightarrow}
+\newcommand{\arrtype}{\rightarrow}
+\newcommand{\quant}[2]{\forall #1.#2}
+
+\newcommand{\abs}[2]{\lambda #1.#2}
+\newcommand{\tabs}[2]{\Lambda #1.#2}
+\newcommand{\pair}[2]{\langle #1,#2 \rangle}
+\newcommand{\expair}[2]{[#1,#2]}
+
+\newcommand{\arrW}{\leadsto}
+\newcommand{\arr}[1]{\longrightarrow_{#1}}
+\newcommand{\red}{\longrightarrow}
+
+\newcommand{\nat}{\mathtt{nat}}
+\newcommand{\flatten}{\mathtt{flatten}}
+\newcommand{\lift}{\mathtt{lift}}
+
+\newcommand{\typeinterpret}[1]{\llbracket #1 \rrbracket}
+\newcommand{\interpret}[1]{\llbracket #1 \rrbracket}
+
+\newcommand{\refsec}[1]{Section~\ref{sec:#1}}
+
+\newcommand{\CK}[1]{\textcolor{blue}{CK: #1}}
+\newcommand{\LC}[1]{\textcolor{purple}{LC: #1}}
+
+\title{Polymorphic Higher-order Termination}
+
+%\titlerunning{Dummy short title}
+
+\author{\L ukasz Czajka}{Faculty of Informatics, TU Dortmund, Germany \and \url{http://www.myhomepage.edu} }{lukaszcz@mimuw.edu.pl}{https://orcid.org/0000-0002-1825-0097}{(Optional) author-specific funding acknowledgements}%TODO mandatory, please use full name; only 1 author per \author macro; first two parameters are mandatory, other parameters can be empty. Please provide at least the name of the affiliation and the country. The full address is optional
+
+\author{Cynthia Kop}{Institute of Computer Science, Radboud University Nijmegen, Netherlands \and \url{https://www.cs.ru.nl/~cynthiakop/}}{c.kop@cs.ru.nl}{https://orcid.org/0000-0002-6337-2544}{}
+
+\authorrunning{\L. Czajka and C.. Kop}
+
+\Copyright{\L ukasz Czajka and Cynthia Kop}
+
+\ccsdesc[100]{General and reference~General literature}
+\ccsdesc[100]{General and reference}%TODO mandatory: Please choose ACM 2012 classifications from https://dl.acm.org/ccs/ccs_flat.cfm 
+
+\keywords{Lambda calculi, termination}
+
+%\category{}%optional, e.g. invited paper
+
+%\relatedversion{A full version of the paper is available at \url{...}.}
+%\supplement{}%optional, e.g. related research data, source code, ... hosted on a repository like zenodo, figshare, GitHub, ...
+
+%\acknowledgements{I want to thank \dots}%optional
+
+%\nolinenumbers %uncomment to disable line numbering
+
+%\hideLIPIcs  %uncomment to remove references to LIPIcs series (logo, DOI, ...), e.g. when preparing a pre-final version to be uploaded to arXiv or another public repository
+
+%Editor-only macros:: begin (do not touch as author)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\EventEditors{John Q. Open and Joan R. Access}
+\EventNoEds{2}
+\EventLongTitle{42nd Conference on Very Important Topics (CVIT 2016)}
+\EventShortTitle{CVIT 2016}
+\EventAcronym{CVIT}
+\EventYear{2016}
+\EventDate{December 24--27, 2016}
+\EventLocation{Little Whinging, United Kingdom}
+\EventLogo{}
+\SeriesVolume{42}
+\ArticleNo{23}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\maketitle
+
+\CK{TODO: \L ukasz, please change your author affiliation as appropriate! I did not know your orcid, for instance.}
+\CK{TODO: figure out the right ACM classification and fill it in.}
+\CK{TODO: decide on better keywords.}
+
+%TODO mandatory: add short abstract of the document
+\begin{abstract}
+  We generalise the termination method of higher-order polynomial
+  interpretations to a setting with impredicative
+  polymorphism. Instead of using weakly monotonic functionals, we
+  interpret terms in a suitable extension of System~$\Fomega$. In
+  addition to enabling an interpretation of rewrite rules which make
+  essential use of impredicative polymorphism, thanks to the
+  possibility of encoding inductive data types in the polymorphic
+  lambda-calculus, this generalisation increases the power of the
+  method also in the non-polymorphic setting. As an illustration of
+  the potential of our method, we prove termination of a substantial
+  fragment of full intuitionistic second-order propositional logic
+  with permutative conversions.
+\end{abstract}
+
+\section{Introduction}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. 
+
+\section{Preliminaries}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. 
+
+\section{Systems of interest}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. 
+
+\section{A well-ordered set of terms}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. 
+
+\subsection{The set $\World$}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. 
+
+\subsection{The relation $\arrW$}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. 
+
+\subsection{The ordering pair $(\succeq,\succ)$}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. 
+
+\section{Weakly monotonic algebras}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. 
+
+\subsection{Weak monotonicity}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. 
+
+\subsection{Weakly monotonic algebras}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. \cite{pol:96}
+
+\section{Proving termination}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. 
+
+\subsection{Rule removal}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. 
+
+\subsection{Calculation rules}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. 
+
+\section{Larger examples}\label{sec:examples}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. 
+
+\section{Conclusions and future work}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. 
+
+\bibliography{references}
+
+\appendix
+
+\section{Complete proofs}
+
+\section{Proving the inequalities in \refsec{examples}}
+
+\end{document}
