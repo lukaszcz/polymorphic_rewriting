@@ -21,7 +21,7 @@ $(PDFDOCS0) : %.pdf : %.tex
 	pdflatex $<
 	pdflatex $<
 
-$(PDFDOCS1) : %.pdf : %.tex biblio.bib
+$(PDFDOCS1) : %.pdf : %.tex references.bib
 	pdflatex $<
 	bibtex $(subst .pdf,,$@)
 	pdflatex $<
