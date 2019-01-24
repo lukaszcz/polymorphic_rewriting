@@ -3344,12 +3344,106 @@ $ \\
      B_{\interpret{t}[y:=\pi^2(\interpret{u})]} \oplus \lift_\xi(11))
   $
 \item By Lemma \ref{lem:approxproperties} we can reorder parts of
-  $\oplus$ and by \ref{lem:plustimesmonotonic} we can strike parts of
-  $\oplus$ away against each other in the left- and right-hand side.
+  $\oplus$.
   If \CK{(TODO: assumption here)} we also have that $(A \oplus B) \otimes
   C \approx A \otimes C \oplus B \otimes C$, then we obtain the
   following proof obligation: \\
-  TODO
+  $\lift_\xi(37)\ \oplus \\
+  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
+  \interpret{v}[z:=\pi^1(A)] \oplus \\
+  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
+  \interpret{w}[a:=\pi^2(A)] \oplus \\
+  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
+  \lift_\xi(11) \oplus \\
+  \phantom{AB}\lift_\xi(3) \otimes \interpret{v}[z:=\pi^1(A)] \oplus \\
+  \phantom{AB}\lift_\xi(3) \otimes \interpret{w}[a:=\pi^2(A)] \oplus \\
+  \phantom{AB}\lift_\xi(3) \otimes \lift_\xi(11) \\
+  \succeq \\
+  \lift_\xi(37) \oplus \\
+  \phantom{AB} \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}))
+  \otimes B_{\interpret{s}[x:=\pi^1(\interpret{u})]} \oplus \\
+  \phantom{AB} \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}))
+  \otimes B_{\interpret{t}[y:=\pi^2(\interpret{u})]} \oplus \\
+  \phantom{AB} \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}))
+  \otimes \lift_\xi(11) \oplus \\
+  \phantom{AB}\lift_\xi(3) \otimes B_{\interpret{s}[x:=
+    \pi^1(\interpret{u})]} \oplus \\
+  \phantom{AB}\lift_\xi(3) \otimes B_{\interpret{t}[y:=
+    \pi^2(\interpret{u})]} \oplus \\
+  \phantom{AB}\lift_\xi(3) \otimes \lift_\xi(11)
+  $
+\item By Lemma \ref{lem:plustimesmonotonic} we can strike parts of
+  $\oplus$ away against each other in the left- and right-hand side.
+  We can also reorder the sides of an $\otimes$ and $\oplus$, giving:
+  \CK{(TODO: by ??)} \\
+  $\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
+  \interpret{v}[z:=\pi^1(A)] \oplus \\
+  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
+  \interpret{w}[a:=\pi^2(A)] \oplus \\
+  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
+  \lift_\xi(11) \oplus \\
+  \phantom{AB}\lift_\xi(3) \otimes \interpret{v}[z:=\pi^1(A)] \oplus \\
+  \phantom{AB}\lift_\xi(3) \otimes \interpret{w}[a:=\pi^2(A)] \\
+  \succeq \\
+  \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}))
+  \otimes B_{\interpret{s}[x:=\pi^1(\interpret{u})]} \oplus \\
+  \phantom{AB} \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}))
+  \otimes B_{\interpret{t}[y:=\pi^2(\interpret{u})]} \oplus \\
+  \phantom{AB} \lift_\xi(11) \otimes
+    \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u})) \oplus \\
+  \phantom{AB}\lift_\xi(3) \otimes B_{\interpret{s}[x:=
+    \pi^1(\interpret{u})]} \oplus \\
+  \phantom{AB}\lift_\xi(3) \otimes B_{\interpret{t}[y:=
+    \pi^2(\interpret{u})]} \\
+  $
+\item Now, if use the distribution property, as well as the
+  properties that $a \otimes b \approx b \otimes a$ and $a \oplus
+  b \approx b \oplus a$ and $\lift_\xi(a) R \lift_\xi(b) \approx
+  \lift_\xi(a R b)$ \CK{(TODO)}, note that
+  $B_q \approx \\
+  \lift_\xi(37 + 3 * 11) \oplus \\
+  \phantom{AB}\lift_\xi(3) \otimes \interpret{v}[z:=\pi^1(q)] \oplus \\
+  \phantom{AB}\lift_\xi(3) \otimes \interpret{w}[a:=\pi^2(q)] \\
+  \phantom{AB}\lift_\xi(11) \otimes \lift_\xi(\flatten_{\rho \times
+    \pi}(q)) \oplus \\
+  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(q)) \otimes
+    \interpret{v}[z:=\pi^1(q)] \oplus \\
+  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(q)) \otimes
+    \interpret{w}[a:=\pi^2(q)] \oplus \\
+  $
+  Using this, we expand the left-hand side of the inequality above: \\
+  $\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
+  \interpret{v}[z:=\pi^1(A)] \oplus \\
+  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
+  \interpret{w}[a:=\pi^2(A)] \oplus \\
+  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
+  \lift_\xi(11) \oplus \\
+  \phantom{AB}\lift_\xi(3) \otimes \interpret{v}[z:=\pi^1(A)] \oplus \\
+  \phantom{AB}\lift_\xi(3) \otimes \interpret{w}[a:=\pi^2(A)] \\
+  \succeq \\
+  \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}))
+  \otimes B_{\interpret{s}[x:=\pi^1(\interpret{u})]} \oplus \\
+  \phantom{AB} \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}))
+  \otimes B_{\interpret{t}[y:=\pi^2(\interpret{u})]} \oplus \\
+  \phantom{AB} \lift_\xi(11) \otimes
+    \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u})) \oplus \\
+  \phantom{AB}\lift_\xi(3) \otimes B_{\interpret{s}[x:=
+    \pi^1(\interpret{u})]} \oplus \\
+  \phantom{AB}\lift_xi(3 *(37 + 3 * 11)) \oplus
+  \phantom{AB}\lift_\xi(3 * 3) \otimes \interpret{v}[z:=\pi^1(
+    \interpret{t}[y:=\pi^2(\interpret{u})])] \oplus \\
+  \phantom{AB}\lift_\xi(3 * 3) \otimes \interpret{w}[a:=\pi^2(
+    \interpret{t}[y:=\pi^2(\interpret{u})])] \oplus \\
+  \phantom{AB}\lift_\xi(3 * 11) \otimes \lift_\xi(\flatten_{\rho \times
+    \pi}(\interpret{t}[y:=\pi^2(\interpret{u})])) \oplus
+  \phantom{AB}\lift_\xi(3) \otimes B_{\interpret{t}[y:=
+    \pi^2(\interpret{u})]} \\
+  $
+\item -----------------
+\item Taking into account that $\lift_\xi(n) \otimes \lift_\xi(m)
+  \approx \lift_\xi(n+m)$ and that $\lift_\xi(n) \otimes a \oplus
+  \lift_xi(m) \otimes a = \lift_xi(n+m) \otimes a$ \CK{(TODO: check
+  this)}, we can slightly simplify the right-hand side, obtaining: \\
 \end{itemize}
 
 ==================
