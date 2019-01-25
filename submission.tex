@@ -1,8 +1,11 @@
-\documentclass[a4paper,UKenglish,cleveref, autoref]{lipics-v2019}
+\documentclass[a4paper,UKenglish,cleveref,autoref,numberwithinsect]{lipics-v2019}
 
 %\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
 
 \bibliographystyle{plainurl}% the mandatory bibstyle
+
+\theoremstyle{definition}
+\newtheorem{defn}[theorem]{Definition}
 
 \newcommand{\Fomega}{\mathtt{F}_\omega}
 
@@ -14,6 +17,11 @@
 \newcommand{\arrkind}{\Rightarrow}
 \newcommand{\arrtype}{\rightarrow}
 \newcommand{\quant}[2]{\forall #1.#2}
+
+\newcommand{\abstraction}[2]{\backslash #1.#2}
+\newcommand{\app}[2]{#1 \cdot #2}
+\newcommand{\tapp}[2]{#1 * #2}
+\newcommand{\subst}[2]{#1:=#2}
 
 \newcommand{\abs}[2]{\lambda #1.#2}
 \newcommand{\tabs}[2]{\Lambda #1.#2}
@@ -33,6 +41,17 @@
 
 \newcommand{\refsec}[1]{Section~\ref{sec:#1}}
 
+\newcommand{\FTV}{\mathrm{FTV}}
+\newcommand{\FV}{\mathrm{FV}}
+\newcommand{\Tc}{\mathcal{T}}
+\newcommand{\Vc}{\mathcal{V}}
+
+\newcommand{\cl}{\mathcal{C}}
+\newcommand{\dom}{\mathrm{dom}}
+\newcommand{\nf}{\mathrm{nf}}
+
+\newcommand{\proves}{\vdash}
+
 \newcommand{\CK}[1]{\textcolor{blue}{CK: #1}}
 \newcommand{\LC}[1]{\textcolor{purple}{LC: #1}}
 
@@ -40,18 +59,20 @@
 
 %\titlerunning{Dummy short title}
 
-\author{\L ukasz Czajka}{Faculty of Informatics, TU Dortmund, Germany \and \url{http://www.mimuw.edu.pl/~lukaszcz/} }{lukaszcz@mimuw.edu.pl}{https://orcid.org/0000-0001-8083-4280}{}
+\author{{\L}ukasz Czajka}{Faculty of Informatics, TU Dortmund, Germany \and \url{http://www.mimuw.edu.pl/~lukaszcz/} }{lukaszcz@mimuw.edu.pl}{https://orcid.org/0000-0001-8083-4280}{}
 
 \author{Cynthia Kop}{Institute of Computer Science, Radboud University Nijmegen, Netherlands \and \url{https://www.cs.ru.nl/~cynthiakop/}}{c.kop@cs.ru.nl}{https://orcid.org/0000-0002-6337-2544}{}
 
-\authorrunning{\L. Czajka and C.. Kop}
+\authorrunning{\L. Czajka and C. Kop}
 
-\Copyright{\L ukasz Czajka and Cynthia Kop}
+\Copyright{{\L}ukasz Czajka and Cynthia Kop}
 
-\ccsdesc[100]{General and reference~General literature}
-\ccsdesc[100]{General and reference}%TODO mandatory: Please choose ACM 2012 classifications from https://dl.acm.org/ccs/ccs_flat.cfm
+\ccsdesc[500]{Theory of computation~Rewrite systems}
+\ccsdesc[500]{Theory of computation~Equational logic and rewriting}
+\ccsdesc[300]{Theory of computation~Type theory}
+\ccsdesc[100]{Theory of computation~Proof theory}
 
-\keywords{lambda calculi, termination, polymorphism, permutative conversions}
+\keywords{termination, polymorphism, permutative conversions}
 
 %\category{}%optional, e.g. invited paper
 
@@ -82,10 +103,6 @@
 
 \maketitle
 
-\CK{TODO: figure out the right ACM classification and fill it in.}
-\CK{TODO: decide on better keywords.}
-
-%TODO mandatory: add short abstract of the document
 \begin{abstract}
   We generalise the termination method of higher-order polynomial
   interpretations to a setting with impredicative
@@ -105,7 +122,222 @@
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti.
 
 \section{Preliminaries}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti.
+
+In this section we introduce the System~$\Fomega$ (see e.g., Sorensen,
+Urzyczyn, ``Lectures on the Curry-Howard Isomorphism'',
+Section~11.7.), which will form a basis both of our interpretations
+and of a general syntax for the investigated systems. First, we define
+the set of types.
+
+\begin{defn}\label{def_types}
+  \emph{Kinds} are defined inductively: $*$ is a kind, and if
+  $\kappa_1,\kappa_2$ are kinds then so is $\kappa_1 \arrkind
+  \kappa_2$.
+
+  We assume infinitely many \emph{type constructor variables} of each
+  kind. Variables of kind~$*$ are \emph{type variables}. We assume a
+  fixed set~$\Sigma_T$ of \emph{type constructor symbols} paired with
+  a kind, denoted $c : \kappa$. Every type constructor symbol~$c$
+  occurs with only one kind declaration. We assume there exists a
+  fixed type symbol~$\chi_*$ (of kind~$*$). For
+  $\kappa=\kappa_1\arrkind\kappa_2$ we define $\chi_\kappa = \lambda
+  \alpha:\kappa_1 . \chi_{\kappa_2}$.
+
+  We define \emph{type constructors} of kind~$\kappa$ by induction.
+  Type constructors of kind~$*$ are \emph{types}.
+  \begin{itemize}
+  \item A type constructor variable or symbol of kind~$\kappa$ is a
+    type constructor of kind~$\kappa$.
+  \item If $\varphi$ is a type constructor of kind $\kappa_1 \arrkind
+    \kappa_2$ and $\psi$ is a type constructor of kind~$\kappa_1$ then
+    $\varphi \psi$ is a type constructor of kind~$\kappa_2$.
+  \item If $\alpha$ is a type constructor variable of kind~$\kappa_1$
+    and $\varphi$ is a type constructor of kind~$\kappa_2$, then
+    $\lambda\alpha . \varphi$ is a type constructor of kind $\kappa_1
+    \arrkind \kappa_2$.
+  \item If $\alpha$ is a type constructor variable of kind~$\kappa$
+    and~$\tau$ is a type, then $\forall \alpha[\tau]$ is a type.
+  \item If $\tau_1,\tau_2$ are types, then $\tau_1 \arrtype \tau_2$ is
+    a type.
+  \end{itemize}
+  The set of type constructors of kind~$\kappa$ is denoted
+  by~$\Tc_\kappa$.
+
+  We use the standard notation $\forall \alpha . \tau$. When $\alpha$
+  is of kind $\kappa$ then we use the notation $\forall \alpha :
+  \kappa . \tau$. We treat type constructors up to
+  $\alpha$-conversion. Note that~$\forall$ binds variables.
+
+  Beta-reduction on type constructors is defined as the compatible
+  closure of the rule
+  \[
+  (\lambda\alpha.\varphi)\psi \to \varphi[\alpha := \psi]
+  \]
+  Note that type constructors are simply-typed lambda-terms, so
+  beta-reduction on type constructors terminates and is confluent,
+  hence every type constructor~$\tau$ has a unique beta-normal
+  form~$\nf_\beta(\tau)$. A \emph{type atom} is a type in
+  $\beta$-normal form which is not an arrow $\tau_1\arrtype\tau_2$ or
+  a quantification $\forall\alpha\tau$.
+
+  We define $\FV(\varphi)$ -- the set of free type constructor
+  variables of the type constructor~$\varphi$ -- in an obvious way by
+  induction on the structure of~$\varphi$. A type
+  constructor~$\varphi$ is \emph{closed} if $\FV(\varphi) =
+  \emptyset$.
+\end{defn}
+
+Terms are built from a set of function symbols, using abstraction and
+application.
+
+\begin{defn}\label{def_preterms}
+  We assume given an infinite set $\Vars$ of variables, and let
+  $\Gamma$ refer to a mapping from a finite subset of $\Vars$ to the
+  set of types. We assume given a fixed set $\Sigma$ of \emph{function
+    symbols}, each paired with a type, denoted $\mathtt{f} : \tau$.
+  Every function symbol $\mathtt{f}$ occurs only with one type
+  declaration.
+
+  The set of preterms consists of all expressions~$s$ such that
+  $\Gamma \vdash s : \sigma$ can be inferred for some type $\sigma$
+  and mapping $\Gamma$ by the following clauses:
+  \begin{itemize}
+  \item $\Gamma \vdash x : \sigma$ for every $(x : \sigma) \in \Gamma$.
+  \item $\Gamma \vdash \mathtt{f} : \sigma$ for all
+    $(\mathtt{f} : \sigma) \in \Sigma$.
+  \item $\Gamma \vdash \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
+    \in \Vars$ and $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$.
+  \item $\Gamma \vdash \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
+    $\alpha$ is a type constructor variable and $\Gamma \vdash s :
+    \sigma$ and for all $(x : \tau) \in \Gamma$: $\alpha \notin
+    \FV(\tau)$
+  \item $\Gamma \vdash \app{s}{t} : \tau$ if $\Gamma \vdash s : \sigma
+    \arrtype \tau$ and $\Gamma \vdash t : \sigma$
+  \item $\Gamma \vdash \tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$
+    if $\Gamma \vdash s : \quant{\alpha:\kappa}{\sigma}$ and~$\tau$
+    is a type constructor of kind~$\kappa$,
+  \item $\Gamma \vdash s : \tau$ if $\Gamma \vdash s : \tau'$ and
+    $\tau =_\beta \tau'$.
+  \end{itemize}
+  The set of free variables of a preterm~$t$, denoted $\FV(t)$, is
+  defined in the expected way. Analogously, we define the
+  set~$\FTV(t)$ of type constructor variables occurring free
+  in~$t$. We say that $t$ is \emph{closed} if $\FV(t) = \emptyset$ and
+  $\FTV(t) = \emptyset$.
+\end{defn}
+
+If $\alpha$ is a type constructor variable of kind~$\kappa$ then we
+use the notation $\tabs{\alpha:\kappa}{t}$.
+
+\begin{defn}\label{def_type_equiv}
+  We define the type equivalence relation~$\equiv$ on preterms by
+  induction on preterm structure.
+  \begin{itemize}
+  \item $x \equiv x$, $n \equiv n$,
+  \item if $\sigma =_\beta \tau$ then $f_\sigma \equiv f_\tau$ for
+    $f \in \Sigma$,
+  \item if $\sigma =_\beta \tau$ and $s \equiv t$ then
+    $\abs{x:\sigma}{s} \equiv \abs{x:\tau}{t}$,
+  \item if $s \equiv t$ then $\tabs{\alpha}{s} \equiv
+    \tabs{\alpha}{t}$,
+  \item if $s \equiv s'$ and $t \equiv t'$ then $s \cdot t \equiv s'
+    \cdot t'$,
+  \item if $s \equiv t$ and $\sigma =_\beta \tau$ then
+    $\tapp{s}{\sigma} \equiv \tapp{t}{\tau}$.
+  \end{itemize}
+  In other words, $s \equiv t$ iff $s$ and $t$ are identical modulo
+  $\beta$-conversion in types.
+\end{defn}
+
+\begin{lemma}
+  If $\Gamma \vdash s : \tau$ and $s \equiv t$ then $\Gamma \vdash t :
+  \tau$.
+\end{lemma}
+
+\begin{proof}
+  Induction on~$s$.
+\end{proof}
+
+\begin{defn}\label{def_terms}
+  The set of \emph{terms} is the set of the equivalence classes
+  of~$\equiv$.
+\end{defn}
+
+Because $\beta$-reduction on types is confluent and terminating, every
+term has a canonical preterm representative -- the one with all types
+occurring in it $\beta$-normalized. We say that a term is
+\emph{closed} if its canonical representative is. We define $\FTV(t)$
+as the value of~$\FTV$ on the canonical representative of~$t$.
+
+Because typing and term formation operations (abstraction,
+application, \ldots) are invariant under~$\equiv$, we may denote terms
+by their (canonical) representatives and informally treat them
+interchangeably.
+
+We will often abuse notation to omit $\cdot$ and $*$. Thus, $s t$ can
+refer to both $\app{s}{t}$ and $\tapp{s}{t}$. This is not ambiguous
+due to typing. We will also use $\abstraction{a}{s}$ for either
+$\abs{a}{s}$ or $\tabs{a}{s}$, depending on typing.
+
+\begin{lemma}[Substitution lemma]
+  \begin{enumerate}
+  \item If $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$ and
+    $\Gamma \proves t : \sigma$ then $\Gamma \proves s[\subst{x}{t}] :
+    \tau$.
+  \item If $\Gamma \proves t : \sigma$ and~$\tau$ is a type
+    constructor of the same kind as the variable~$\alpha$ then
+    $\Gamma[\subst{\alpha}{\tau}] \proves t[\subst{\alpha}{\tau}] :
+    \sigma[\subst{\alpha}{\tau}]$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  Induction on the typing derivation.
+\end{proof}
+
+\begin{lemma}[Generation lemma]
+  Assume $\Gamma \proves t : \sigma$ and let $\Vc = \FV(\sigma) \cup
+  \FTV(t) \cup \FTV(\Gamma)$. Then there is a type~$\sigma'$ such that
+  $\sigma' =_\beta \sigma$ and $\FV(\sigma') \subseteq \Vc$ and one of
+  the following holds.
+  \begin{itemize}
+  \item $t \equiv x$ is a variable and $(x : \tau) \in \Gamma$ and $\tau
+    =_\beta \sigma'$.
+  \item $t \equiv \mathtt{f}$ is a function symbol with $\mathtt{f} :
+    \sigma'$ in $\Sigma$.
+  \item $t \equiv \abs{x:\tau_1}{s}$ and
+    $\sigma'=\tau_1\arrtype\tau_2$ and $\Gamma \uplus \{ x : \tau_1 \}
+    \vdash s : \tau_2$.
+  \item $t \equiv \tabs{\alpha}{s}$ and
+    $\sigma' = \quant{\alpha}{\tau}$ and $\Gamma \vdash s : \tau$ and
+    for all $(x : \rho) \in \Gamma$: $\alpha \notin \FV(\rho)$.
+  \item $t \equiv \app{t_1}{t_2}$ and
+    $\Gamma \vdash t_1 : \tau \arrtype \sigma'$ and
+    $\Gamma \vdash t_2 : \tau$ and $\FV(\tau) \subseteq \Vc$.
+  \item $t \equiv \tapp{s}{\tau}$ and
+    $\sigma' = \rho[\subst{\alpha}{\tau}]$ and
+    $\Gamma \vdash s : \quant{(\alpha:\kappa)}{\rho}$ and~$\tau$ is a
+    type constructor of kind~$\kappa$.
+  \end{itemize}
+\end{lemma}
+
+\begin{proof}
+  By induction on the derivation $\Gamma \proves t : \sigma$, using
+  the substitution lemma. Note that if $\alpha \notin \Vc$ is of
+  kind~$\kappa$ and e.g.~$\Gamma \proves s : \sigma'$ with~$s$ a
+  subterm of~$t$, then $\Gamma \proves s :
+  \sigma'[\subst{\alpha}{\chi_\kappa}]$ by the substitution lemma (see
+  Definition~\ref{def_types}).
+\end{proof}
+
+For convenience, we sometimes assume without loss of generality that
+the terms are given in orthodox Church-style, i.e., instead of using
+contexts we assume that each variable occurrence is annotated with a
+type (where two occurrences of the same variable must be annotated
+with the same type). Note that given a context~$\Gamma$ under which
+all considered terms are typable, there is a natural isomorphism
+between typed terms as defined above and terms given in orthodox
+Church-style.
 
 \section{Systems of interest}
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti.
