@@ -3186,7 +3186,7 @@ $
     \mathcal{J}(\mathtt{case})_{\sigma,\tau,\typeinterpret{\mathtt{or}\,
     \rho\,\pi}}(\interpret{u},\abs{x}{\interpret{s}},
     \abs{y}{\interpret{t}}),\abs{z}{\interpret{v}},
-    \abs{a}{\interpret{w}}) \succeq \\
+    \abs{a}{\interpret{w}}) \succ \\
   \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},
     \abs{x}{\mathcal{J}(\mathtt{case})_{\rho,\pi,\xi}(\interpret{s},
     \abs{z}{\interpret{v}},\abs{a}{\interpret{w}})},\\
@@ -3222,7 +3222,7 @@ $ \\
     \mathcal{J}(\mathtt{case})_{\sigma,\tau,\typeinterpret{\mathtt{or}\,
     \rho\,\pi}}(\interpret{u},\abs{x}{\interpret{s}},
     \abs{y}{\interpret{t}}),\abs{z}{\interpret{v}},
-    \abs{a}{\interpret{w}}) \succeq \\
+    \abs{a}{\interpret{w}}) \succ \\
   \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
     \lift_\xi(5) \oplus
       \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(\interpret{s}))
@@ -3258,7 +3258,7 @@ $
     \mathcal{J}(\mathtt{case})_{\sigma,\tau,\typeinterpret{\mathtt{or}\,
     \rho\,\pi}}(\interpret{u},\abs{x}{\interpret{s}},
     \abs{y}{\interpret{t}}),\abs{z}{\interpret{v}},
-    \abs{a}{\interpret{w}}) \succeq \\
+    \abs{a}{\interpret{w}}) \succ \\
   \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
     \lift_\xi(5) \oplus
       \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(\interpret{s}))
@@ -3305,7 +3305,7 @@ $
     \lift_{\rho \times \pi}(3 \otimes \flatten_{\sigma \times \tau}(
       \interpret{u})) \otimes \interpret{t}[y:=\pi^2(\interpret{u})] \\
   \phantom{A}
-  , \abs{z}{\interpret{v}},,\ \abs{a}{\interpret{w}}\ )\ \succeq \\
+  , \abs{z}{\interpret{v}},,\ \abs{a}{\interpret{w}}\ )\ \succ \\
   \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
     \lift_\xi(5) \oplus
       \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(\interpret{s}))
@@ -3368,7 +3368,7 @@ $
   $. \\
   Thus we can rewrite the inequality to: \\
   $\mathcal{J}(\mathtt{case})_{\rho,\pi,\xi}(\ A,
-    \abs{z}{\interpret{v}},,\ \abs{a}{\interpret{w}}\ )\ \succeq \\
+    \abs{z}{\interpret{v}},,\ \abs{a}{\interpret{w}}\ )\ \succ \\
   \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\ \interpret{u},\abs{x}{
     B_{\interpret{s}}}, B_{\interpret{t}} )
 $
@@ -3385,7 +3385,7 @@ $
     \phantom{AB}
     \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
       \interpret{w}[a:=\pi^2(A)] \\
-  \succeq \\
+  \succ \\
     \lift_\xi(5) \oplus
     \lift_\xi(11 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
     \oplus \\
@@ -3413,7 +3413,7 @@ $
     \phantom{AB}
     \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
       \interpret{w}[a:=\pi^2(A)] \\
-  \succeq \\
+  \succ \\
     \lift_\xi(5) \oplus
     \lift_\xi(11 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
     \oplus \\
@@ -3443,7 +3443,7 @@ $
     \phantom{AB}
     \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
       \interpret{w}[a:=\pi^2(A)] \\
-  \succeq \\
+  \succ \\
     \lift_\xi(5) \oplus \\
     \phantom{AB}
     \lift_\xi(11 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
@@ -3564,7 +3564,7 @@ $
     \phantom{AB}
     \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
       \interpret{w}[a:=\pi^2(A)] \\
-  \succeq \\
+  \succ \\
     \lift_\xi(5 + 5) \oplus \\
     \phantom{AB}
     \lift_\xi((11 \oplus 3 \otimes 5 \oplus 3 \otimes 5) \otimes
@@ -3608,9 +3608,9 @@ $
       \otimes wsu \oplus \\
     \\
     \phantom{AB}
-      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
-      \otimes
-      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(tu)) \oplus \\
+      \lift_\xi(3 \otimes 11 \otimes \flatten_{\sigma \times
+      \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(tu))
+      \oplus \\
     \phantom{AB}
       \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
       \otimes vtu \oplus \\
@@ -3626,7 +3626,6 @@ $
       \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(tu))
       \otimes wtu \\
   $
-\item -------------
 \item This is starting to get just slightly unmanageable, so let's not
   try to expand the left-hand side all in one go.  Rather, let's look
   at what happens to the very first term.  Note that \\
@@ -3661,14 +3660,259 @@ $
     \flatten_{\sigma \times \tau}(\interpret{u}) \otimes
     \flatten_{\rho \times \pi}(su)) \oplus \\
   \phantom{AB}
-  \lift_xi(11 \otimes 3 \otimes \flatten_{\sigma \times \tau}(
+  \lift_\xi(11 \otimes 3 \otimes \flatten_{\sigma \times \tau}(
     \interpret{u}) \otimes \flatten_{\rho \times \pi}(tu))
   $
+\item This leaves the following inequality: \\
+  $\lift_\xi(11 \otimes 5) \oplus \hfill (L1) \\
+  \phantom{AB}
+  \lift_\xi(11 \otimes 11 \otimes \flatten_{\sigma \times \tau}(
+    \interpret{u})) \oplus \hfill (L2) \\
+  \phantom{AB}
+  \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(su)) \oplus
+    \hfill (L3) \\
+  \phantom{AB}
+  \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(tu)) \oplus
+    \hfill (L4) \\
+  \phantom{AB}
+  \lift_\xi(11 \otimes 3 \otimes
+    \flatten_{\sigma \times \tau}(\interpret{u}) \otimes
+    \flatten_{\rho \times \pi}(su)) \oplus
+    \hfill (L5) \\
+  \phantom{AB}
+  \lift_\xi(11 \otimes 3 \otimes \flatten_{\sigma \times \tau}(
+    \interpret{u}) \otimes \flatten_{\rho \times \pi}(tu)) \oplus
+    \hfill (L6) \\
+  \phantom{AB}
+    \interpret{v}[z:=\pi^1(A)] \oplus
+    \interpret{w}[a:=\pi^2(A)] \oplus \\
+  \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
+      \interpret{v}[z:=\pi^1(A)] \oplus \\
+  \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
+      \interpret{w}[a:=\pi^2(A)] \\
+  \succ \\
+    \lift_\xi(5 + 5) \oplus \hfill (R1) \\
+    \phantom{AB}
+    \lift_\xi((11 \oplus 3 \otimes 5 \oplus 3 \otimes 5) \otimes
+      \flatten_{\sigma \times \tau}(\interpret{u})) \oplus
+      \hfill (R2) \\
+    \phantom{AB}
+      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(su)) \oplus
+      \hfill (R3) \\
+    \phantom{AB}
+      \lift_\xi(1 \oplus 3 \otimes \flatten_{\rho \times \pi}(su))
+      \otimes vsu \oplus \\
+    \phantom{AB}
+      \lift_\xi(1 \oplus 3 \otimes \flatten_{\rho \times \pi}(su))
+      \otimes wsu \oplus \\
+    \phantom{AB}
+      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(tu)) \oplus
+      \hfill (R4) \\
+    \phantom{AB}
+      \lift_\xi(1 \oplus 3 \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes vtu \oplus \\
+    \phantom{AB}
+      \lift_\xi(1 \oplus 3 \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes wtu \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes 11 \otimes
+        \flatten_{\sigma \times \tau}(\interpret{u}) \otimes
+        \flatten_{\rho \times \pi}(su)) \oplus
+        \hfill (R5) \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes vsu \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes wsu \oplus \\
+    \phantom{AB}
+      \lift_\xi((3 \otimes 3) \otimes \flatten_{\sigma \times
+        \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(su))
+      \otimes vsu \oplus \\
+    \phantom{AB}
+      \lift_\xi((3 \otimes 3) \otimes \flatten_{\sigma \times
+        \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(su))
+      \otimes wsu \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes 11 \otimes \flatten_{\sigma \times
+      \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(tu))
+      \oplus \hfill (R6) \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes vtu \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes wtu \oplus \\
+    \phantom{AB}
+      \lift_\xi((3 \otimes 3) \otimes \flatten_{\sigma \times
+      \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes vtu \oplus \\
+    \phantom{AB}
+      \lift_\xi((3 \otimes 3) \otimes \flatten_{\sigma \times
+      \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes wtu
+  $
+\item Note that we can strike each of (L3)/(R3)--(L6)/(R6) away
+  against each other.  Moreover, since
+  $11 \otimes 5 > 5 + 5$ % CONSTANTS!
+  we have $(L1) \succ (R1)$.  We also have $(L2) \succeq (R2)$.
+  By absolute positiveness \CK{(TODO)}, we thus obtain: \\
+  $\interpret{v}[z:=\pi^1(A)] \oplus
+    \interpret{w}[a:=\pi^2(A)] \oplus \\
+  \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
+      \interpret{v}[z:=\pi^1(A)] \oplus \\
+  \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
+      \interpret{w}[a:=\pi^2(A)] \\
+  \succeq \\
+    \phantom{AB}
+      \lift_\xi(1 \oplus 3 \otimes \flatten_{\rho \times \pi}(su))
+      \otimes vsu \oplus \\
+    \phantom{AB}
+      \lift_\xi(1 \oplus 3 \otimes \flatten_{\rho \times \pi}(su))
+      \otimes wsu \oplus \\
+    \phantom{AB}
+      \lift_\xi(1 \oplus 3 \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes vtu \oplus \\
+    \phantom{AB}
+      \lift_\xi(1 \oplus 3 \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes wtu \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes vsu \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes wsu \oplus \\
+    \phantom{AB}
+      \lift_\xi((3 \otimes 3) \otimes \flatten_{\sigma \times
+        \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(su))
+      \otimes vsu \oplus \\
+    \phantom{AB}
+      \lift_\xi((3 \otimes 3) \otimes \flatten_{\sigma \times
+        \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(su))
+      \otimes wsu \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes vtu \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes wtu \oplus \\
+    \phantom{AB}
+      \lift_\xi((3 \otimes 3) \otimes \flatten_{\sigma \times
+      \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes vtu \oplus \\
+    \phantom{AB}
+      \lift_\xi((3 \otimes 3) \otimes \flatten_{\sigma \times
+      \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes wtu
+  $
+\item Now, we can use the same technique for dealing with the later
+  uses of $\flatten_{\rho \times \pi}(A)$.  Note that for any
+  $q$, we have: \\
+  $\lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes q = \\
+  \phantom{AB}
+  \lift_\xi(3 \otimes 5) \otimes q \oplus \\
+  \phantom{AB}
+  \lift_\xi(3 \otimes 11 \otimes \flatten_{\sigma \times \tau}(
+    \interpret{u})) \otimes q \oplus \\
+  \phantom{AB}
+  \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(su)) \otimes q \oplus \\
+  \phantom{AB}
+  \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(tu)) \otimes q \oplus \\
+  \phantom{AB}
+  \lift_\xi(3 \otimes 3 \otimes
+    \flatten_{\sigma \times \tau}(\interpret{u}) \otimes
+    \flatten_{\rho \times \pi}(su)) \otimes q \oplus \\
+  \phantom{AB}
+  \lift_\xi(3 \otimes 3 \otimes \flatten_{\sigma \times \tau}(
+    \interpret{u}) \otimes \flatten_{\rho \times \pi}(tu)) \otimes q
+  $. \\
+  Note also that both $A \succeq su$ and $A \succeq tu$ (since both
+  are parts).  Therefore, and by monotonicity of $\succeq$, we have
+  $\interpret{v}[z:=\pi^1(A)] \succeq \interpret{v}[z:=su] = vsu$ and
+  $\interpret{v}[z:=\pi^1(A)] \succeq \interpret{v}[z:=tu] = vtu$.
+  Consequently, \\
+  $\lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
+      \interpret{v}[z:=\pi^1(A)] \succeq \\
+  \phantom{AB}
+  vsu \oplus vtu \oplus \hfill \text{(since $3 \otimes 5 \geq 1 + 1$)} \\
+    % CONSTANTS!
+  \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes vsu \oplus
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes vtu \\
+      \phantom{ABCD}
+      \oplus \hfill \text{(since $3 \otimes 11 > 3 + 3$)} \\
+      % CONSTANTS!
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(su))
+      \otimes vsu \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes vtu \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes 3 \otimes
+      \flatten_{\sigma \times \tau}(\interpret{u}) \otimes
+      \flatten_{\rho \times \pi}(su)) \otimes vsu \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes 3 \otimes \flatten_{\sigma \times \tau}(
+      \interpret{u}) \otimes \flatten_{\rho \times \pi}(tu)) \otimes vtu
+  $.
+\item Removing these parts on both the left and the right of the
+  inequality leaves the following:
+  $\interpret{v}[z:=\pi^1(A)] \oplus
+    \interpret{w}[a:=\pi^2(A)] \oplus \\
+  \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
+      \interpret{w}[a:=\pi^1(A)] \\
+\succeq \\
+    \phantom{AB}
+      \lift_\xi(1 \oplus 3 \otimes \flatten_{\rho \times \pi}(su))
+      \otimes wsu \oplus
+      \hfill (R1, R3) \\
+    \phantom{AB}
+      \lift_\xi(1 \oplus 3 \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes wtu \oplus
+      \hfill (R1, R4) \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes wsu \oplus
+      \hfill (R2) \\
+    \phantom{AB}
+      \lift_\xi((3 \otimes 3) \otimes \flatten_{\sigma \times
+        \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(su))
+        \otimes wsu \oplus
+        \hfill (R5) \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes wtu \oplus
+      \hfill (R2) \\
+    \phantom{AB}
+      \lift_\xi((3 \otimes 3) \otimes \flatten_{\sigma \times
+      \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes wtu \hfill (R6)
+  $ \\
+  These last items on the right are easily removed by expanding the
+  remaining $\flatten_{\rho \times \pi}(A)$.
+\item The proof of case/case is now complete.  Note that, given the
+  requirements on the constants that we encountered, it would have
+  been sufficient to take:
+  \begin{itemize}
+  \item $3$ instead of $11$
+  \item $2$ instead of $5$
+  \item $1$ instead of $3$
+  \end{itemize}
+  Doing this would make the interpretation seem somewhat simpler
+  (although honestly not that much).
 \end{itemize}
 
 ==================
 
-\CK{END OF CASE/CASE CHALLENGE (UNFINISHED).}
+\CK{END OF CASE/CASE CHALLENGE (COMPLETE).}
 
 \newpage
 
