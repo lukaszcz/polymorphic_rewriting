@@ -52,8 +52,13 @@
 
 \newcommand{\proves}{\vdash}
 
+\newcommand{\List}{\mathtt{List}}
+\newcommand{\nil}{\mathtt{nil}}
+\newcommand{\cons}{\mathtt{cons}}
+\newcommand{\fold}{\mathtt{fold}}
+
 \newcommand{\CK}[1]{\textcolor{blue}{CK: #1}}
-\newcommand{\LC}[1]{\textcolor{purple}{LC: #1}}
+\newcommand{\LC}[1]{\textcolor{red}{LC: #1}}
 
 \title{Polymorphic Higher-order Termination}
 
@@ -70,9 +75,8 @@
 \ccsdesc[500]{Theory of computation~Rewrite systems}
 \ccsdesc[500]{Theory of computation~Equational logic and rewriting}
 \ccsdesc[300]{Theory of computation~Type theory}
-\ccsdesc[100]{Theory of computation~Proof theory}
 
-\keywords{termination, polymorphism, permutative conversions}
+\keywords{termination, polymorphism, higher-order rewriting, permutative conversions}
 
 %\category{}%optional, e.g. invited paper
 
@@ -119,9 +123,10 @@
 \end{abstract}
 
 \section{Introduction}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti.
 
-\section{Preliminaries}
+\cite{pol:96}
+
+\section{Preliminaries}\label{sec_preliminaries}
 
 In this section we introduce the System~$\Fomega$ (see e.g., Sorensen,
 Urzyczyn, ``Lectures on the Curry-Howard Isomorphism'',
@@ -165,7 +170,9 @@ the set of types.
 
   We use the standard notation $\forall \alpha . \tau$. When $\alpha$
   is of kind $\kappa$ then we use the notation $\forall \alpha :
-  \kappa . \tau$. We treat type constructors up to
+  \kappa . \tau$. If not indicated otherwise, if the kind of~$\alpha$
+  in $\forall\alpha\sigma$ is not given explicitly, we assume~$\alpha$
+  to be a type variable. We treat type constructors up to
   $\alpha$-conversion. Note that~$\forall$ binds variables.
 
   Beta-reduction on type constructors is defined as the compatible
@@ -339,44 +346,138 @@ all considered terms are typable, there is a natural isomorphism
 between typed terms as defined above and terms given in orthodox
 Church-style.
 
-\section{Systems of interest}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti.
+\section{Systems of interest}\label{sec_systems}
 
-\section{A well-ordered set of terms}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti.
+To represent the rewrite systems whose termination we are going to
+analyse, we use a syntax based on system~$\Fomega$, specialising
+Section~\ref{sec_preliminaries}.
+
+\begin{defn}
+  \emph{Kinds}, \emph{type constructors} and \emph{types} are defined
+  like in Definition~\ref{def_types}, parameterised by a fixed
+  set~$\Sigma_T$ of type constructor symbols.
+
+  Given a fixed set~$\Sigma$ of function symbols, we define
+  \emph{terms} like in Definition~\ref{def_terms} (based on
+  Definition~\ref{def_preterms}) with the following restrictions:
+  \begin{itemize}
+  \item if $\mathtt{f} : \sigma \in \Sigma$ then $\sigma$ is closed and
+    \[
+    \sigma = \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n : \kappa_n)
+    . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype \tau
+    \]
+    with~$\tau$ a type atom,
+  \item for any subterm $t_1 t_2$ of a term~$t$, the subterm~$t_1$ is
+    not a variable or an abstraction.
+  \end{itemize}
+\end{defn}
+
+We use the notation
+$\mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\ldots,s_k)$ for
+$\mathtt{f} \rho_1 \ldots \rho_n s_1 \ldots s_k$ when
+\[
+  \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots
+  \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
+  \sigma_k \arrtype \tau
+\]
+is a function symbol in~$\Sigma$ with~$\tau$ a type atom, and $\rho_i$
+is a type constructor of kind $\kappa_i$ for $i=1,\ldots,k$, and
+$\Gamma \proves s_i : \sigma_i[\alpha_1 := \rho_1]\ldots[\alpha_n :=
+  \rho_n]$ for $i=1,\ldots,k$, for an appropriate~$\Gamma$. We use
+this notation to stress the fact that by default there is no explicit
+application available. The application in the syntax of terms is used
+just as a convenient syntax, but does not correspond to the usual
+application operator since only applications of the form $\mathtt{f}
+u_1 \ldots u_n$ are allowed. True application can be modelled by
+including the symbol ${@} : \forall\alpha\forall\beta . (\alpha
+\arrtype \beta) \arrtype \alpha \arrtype \beta$ in
+$\Sigma$. Similarly, type application is modelled through a symbol
+$\mathtt{A} : \forall \alpha : * \arrkind * . \forall \beta . (\forall
+\beta [\alpha \beta]) \arrtype \alpha \beta$.
+
+The rewrite rules are simply a set of term pairs, whose monotonic
+closure generates the rewrite relation.
+
+\begin{definition}\normalfont
+  We fix a variable environment $\Gamma$, and assume given a set
+  $\Rules$ of term pairs $(\ell,r)$, such that:
+  \begin{itemize}
+  \item $\FV(r) \subseteq \FV(\ell) \subseteq \mathit{keys}(\Gamma)$;
+  \item $\ell$ and $r$ have the same type under $\Gamma$;
+  \item $\Rules$ is stable: if $(\ell,r) \in \Rules$ and $\omega$ is a
+    type constructor substitution and $\gamma$ is a term substitution
+    such that $\omega(\Gamma) \proves \gamma(x) : \omega(\Gamma(x))$,
+    then $(\gamma(\omega(\ell)),\gamma(\omega(r))) \in \Rules$.
+  \end{itemize}
+  The reduction relation $\arr{\Rules}$ is the smallest monotonic
+  relation that contains $\Rules$.
+\end{definition}
+
+\begin{example}[Fold on heterogenous lists]
+  We have the following type symbol:
+  \[
+  \begin{array}{c}
+    \mathtt{List} : *,
+  \end{array}
+  \]
+  the following function symbols:
+  \[
+  \begin{array}{rcl}
+    @ & : & \forall \alpha \forall \beta . (\alpha \arrtype \beta) \arrtype \alpha \arrtype \beta \\
+    \mathtt{A} & : & \forall \alpha : * \arrkind * . \forall \beta .
+    (\forall \beta [\alpha \beta]) \arrtype \alpha \beta \\
+    \mathtt{nil} & : & \List \\
+    \mathtt{cons} & : & \forall \alpha . \alpha \arrtype \List \arrtype \List \\
+    \mathtt{foldl} & : & \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \List
+  \end{array}
+  \]
+  and the following rules:
+  \[
+  \begin{array}{rcl}
+    @_{\sigma,\tau}(\abs{x:\sigma}{s},t) & \red & s[x:=t] \\
+    \mathtt{A}_{\tabs{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \red &
+    s[\alpha:=\tau] \\
+    \mathtt{foldl}_\sigma(f,a,\nil) & \red & a \\
+    \mathtt{foldl}_\sigma(f,a,\cons_\tau(x,l)) & \red & \mathtt{foldl}_\sigma(f,@_{\tau,\sigma}(@_{\sigma,\tau\arrtype\sigma}(\mathtt{A}_{\tabs{\alpha}{\sigma\arrtype\alpha\arrtype\sigma},\tau}(f),a),x),l)
+  \end{array}
+  \]
+  This example makes essential use of higher-rank polymorphism, which
+  is not reducible to shallow polymorphism as used in the~ML
+  programming language or in \LC{Cynthia: add here some references to
+    higher-order rewriting frameworks which allow shallow
+    polymorphism}. The above rules cannot be translated into an
+  infinite set of simply typed rules by instantiating the type
+  variables. In practice, when defining heterogenous lists in a
+  functional programming language which supports higher-rank
+  polymorphism (e.g.~recent extensions of Haskell), one would
+  constrain the type variable~$\alpha$ above with a type class to
+  guarantee the existence of certain operations on the elements of the
+  list.
+\end{example}
+
+\section{A well-ordered set of interpretation terms}
 
 \subsection{The set $\World$}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti.
 
 \subsection{The relation $\arrW$}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti.
 
 \subsection{The ordering pair $(\succeq,\succ)$}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti.
 
 \section{Weakly monotonic algebras}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti.
 
 \subsection{Weak monotonicity}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti.
 
 \subsection{Weakly monotonic algebras}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti. \cite{pol:96}
 
 \section{Proving termination}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti.
 
 \subsection{Rule removal}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti.
 
 \subsection{Calculation rules}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti.
 
 \section{Larger examples}\label{sec:examples}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti.
 
 \section{Conclusions and future work}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent convallis orci arcu, eu mollis dolor. Aliquam eleifend suscipit lacinia. Maecenas quam mi, porta ut lacinia sed, convallis ac dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse potenti.
 
 \bibliography{references}
 
