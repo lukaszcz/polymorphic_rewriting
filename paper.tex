@@ -3200,17 +3200,20 @@ $ \\
 \item Note that the type interpretation $\typeinterpret{\mathtt{or}\,
   \rho\,\pi}$ evaluates to $\rho \times \pi$.  This is the output type
   of the inner case in the left-hand side.
-\item Recall that:
+\item Let us say that:
 \[
 \begin{array}{rcl}
 \Termmap(\mathtt{case}) & = & \Lambda \alpha,\beta,\xi . \lambda x : \alpha \times \beta,
   y : (\alpha \arrtype \xi), z : (\beta \arrtype \xi). \\
+  & & \quad \lift_\xi(5) \oplus \\
+  & & \quad \lift_\xi(11 \otimes \flatten_{\alpha \times
+    \beta}(x)) \oplus y \cdot \pi^1(x) \oplus z \cdot \pi^2(x) \oplus\\
   & & \quad
-  \lift_\xi(37) \oplus (\lift_\xi(\flatten_{\alpha\times\beta}(x)\oplus 3)
-    \otimes \\
-  & & \quad\phantom{ABCDEFGHIJKL}
-    (\ y \cdot \pi^1(x) \oplus z \cdot \pi^2(x) \oplus
-    \lift_\xi(11)\ ) \\
+    \lift_\xi(3 \otimes \flatten_{\alpha \times \beta}(x)) \otimes
+    y \cdot \pi^1(x) \oplus \\
+  & & \quad
+    \lift_\xi(3 \otimes \flatten_{\alpha \times \beta}(x)) \otimes
+    z \cdot \pi^2(x)
 \end{array}
 \]
 \item Let's fill in the inner $\mathtt{case}$ interpretations in the
@@ -3221,19 +3224,33 @@ $ \\
     \abs{y}{\interpret{t}}),\abs{z}{\interpret{v}},
     \abs{a}{\interpret{w}}) \succeq \\
   \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
-    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
-      \interpret{s}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\
-      ((\lambda z.\interpret{v}) \cdot \pi^1(\interpret{s})) \oplus
-      ((\lambda a.\interpret{w}) \cdot \pi^2(\interpret{s})) \oplus
-      \lift_\xi(11)\ )},\\
+    \lift_\xi(5) \oplus
+      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(\interpret{s}))
+      \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      (\lambda z.\interpret{v}) \cdot \pi^1(\interpret{s}) \oplus
+      (\lambda a.\interpret{w}) \cdot \pi^2(\interpret{s}) \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(\interpret{s}))
+      \otimes (\lambda z.\interpret{v}) \cdot \pi^1(\interpret{s}) \oplus\\
+    \phantom{ABCDEFGHIJKL}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(\interpret{s}))
+      \otimes (\lambda a.\interpret{w}) \cdot \pi^2(\interpret{s})
+    },\ \\
     \phantom{ABCDEFGHIJ}\abs{y}{
-    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
-      \interpret{t}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\
-      ((\lambda z.\interpret{v}) \cdot \pi^1(\interpret{t})) \oplus
-      ((\lambda a.\interpret{w}) \cdot \pi^2(\interpret{t})) \oplus
-      \lift_\xi(11)\ )})
+    \lift_\xi(5) \oplus
+      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(\interpret{t}))
+      \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      (\lambda z.\interpret{v}) \cdot \pi^1(\interpret{t}) \oplus
+      (\lambda a.\interpret{w}) \cdot \pi^2(\interpret{t}) \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(\interpret{t}))
+      \otimes (\lambda z.\interpret{v}) \cdot \pi^1(\interpret{t}) \oplus\\
+    \phantom{ABCDEFGHIJKL}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(\interpret{t}))
+      \otimes (\lambda a.\interpret{w}) \cdot \pi^2(\interpret{t})
+    }\ )
 $
 \item And $\beta$-normalise them.  We're allowed to do that by
   Lemma \ref{lem_succ_red}. \\
@@ -3243,309 +3260,415 @@ $
     \abs{y}{\interpret{t}}),\abs{z}{\interpret{v}},
     \abs{a}{\interpret{w}}) \succeq \\
   \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
-    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
-      \interpret{s}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\
+    \lift_\xi(5) \oplus
+      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(\interpret{s}))
+      \oplus \\
+    \phantom{ABCDEFGHIJKL}
       \interpret{v}[z:=\pi^1(\interpret{s})] \oplus
-      \interpret{w}[z:=\pi^2(\interpret{s})] \oplus
-      \lift_\xi(11)\ )},\\
+      \interpret{w}[a:=\pi^2(\interpret{s})] \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(\interpret{s}))
+      \otimes \interpret{v}[z:=\pi^1(\interpret{s})] \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(\interpret{s}))
+      \otimes \interpret{w}[a:=\pi^2(\interpret{s})]
+    },\ \\
     \phantom{ABCDEFGHIJ}\abs{y}{
-    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
-      \interpret{t}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\
+    \lift_\xi(5) \oplus
+      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(\interpret{t}))
+      \oplus \\
+    \phantom{ABCDEFGHIJKL}
       \interpret{v}[z:=\pi^1(\interpret{t})] \oplus
-      \interpret{w}[a:=\pi^2(\interpret{t})] \oplus
-      \lift_\xi(11)\ )})
+      \interpret{w}[a:=\pi^2(\interpret{t})] \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(\interpret{t}))
+      \otimes \interpret{v}[z:=\pi^1(\interpret{t})] \oplus\\
+    \phantom{ABCDEFGHIJKL}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(\interpret{t}))
+      \otimes \interpret{w}[a:=\pi^2(\interpret{t})]
+    }\ )
 $
 \item Now we do the inner case interpretation in the left-hand side; we
   immediately perform the $\beta$-reduction step. \\
-  $\mathcal{J}(\mathtt{case})_{\rho,\pi,\xi}(
-    \\
-    \phantom{AB}
-    \lift_{\rho \times \pi}(37) \oplus
-    \lift_{\rho \times \pi}(\flatten_{\sigma \times \tau}(\interpret{u})
-    \oplus 3) \otimes \\
-    \phantom{ABCDEFGHIJK}
-    (\ \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
-       \interpret{t}[y:=\pi^2(\interpret{u})] \oplus
-       \lift_{\rho \times \pi}(11)
-    \ ), \\
-  \lambda z.\interpret{v},\ \lambda a.\interpret{w}) \succeq \\
+  $\mathcal{J}(\mathtt{case})_{\rho,\pi,\xi}( \\
+  \phantom{ABC}
+    \lift_{\rho \times \pi}(5) \oplus
+    \lift_{\rho \times \pi}(11 \otimes \flatten_{\sigma \times
+      \tau}(\interpret{u})) \oplus \\
+  \phantom{ABC}\interpret{s}[x:=\pi^1(\interpret{u})]
+    \oplus \interpret{t}[y:=\pi^2(\interpret{u})] \oplus \\
+  \phantom{ABC}
+    \lift_{\rho \times \pi}(3 \otimes \flatten_{\sigma \times \tau}(
+      \interpret{u})) \otimes \interpret{s}[x:=\pi^1(\interpret{u})]
+      \oplus \\
+  \phantom{ABC}
+    \lift_{\rho \times \pi}(3 \otimes \flatten_{\sigma \times \tau}(
+      \interpret{u})) \otimes \interpret{t}[y:=\pi^2(\interpret{u})] \\
+  \phantom{A}
+  , \abs{z}{\interpret{v}},,\ \abs{a}{\interpret{w}}\ )\ \succeq \\
   \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
-    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
-      \interpret{s}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\
+    \lift_\xi(5) \oplus
+      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(\interpret{s}))
+      \oplus \\
+    \phantom{ABCDEFGHIJKL}
       \interpret{v}[z:=\pi^1(\interpret{s})] \oplus
-      \interpret{w}[z:=\pi^2(\interpret{s})] \oplus
-      \lift_\xi(11)\ )},\\
+      \interpret{w}[a:=\pi^2(\interpret{s})] \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(\interpret{s}))
+      \otimes \interpret{v}[z:=\pi^1(\interpret{s})] \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(\interpret{s}))
+      \otimes \interpret{w}[a:=\pi^2(\interpret{s})]
+    },\ \\
     \phantom{ABCDEFGHIJ}\abs{y}{
-    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
-      \interpret{t}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\
+    \lift_\xi(5) \oplus
+      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(\interpret{t}))
+      \oplus \\
+    \phantom{ABCDEFGHIJKL}
       \interpret{v}[z:=\pi^1(\interpret{t})] \oplus
-      \interpret{w}[a:=\pi^2(\interpret{t})] \oplus
-      \lift_\xi(11)\ )})
+      \interpret{w}[a:=\pi^2(\interpret{t})] \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(\interpret{t}))
+      \otimes \interpret{v}[z:=\pi^1(\interpret{t})] \oplus\\
+    \phantom{ABCDEFGHIJKL}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(\interpret{t}))
+      \otimes \interpret{w}[a:=\pi^2(\interpret{t})]
+    }\ )
 $
-\item Now I will fill in the outer $\mathtt{case}$ interpretation on
-  the left. To avoid this getting horribly messy, I will use the
-  shorthand notation $A$ explained below.\\
-  $\lift_\xi(37) \oplus
-  \lift_\xi(\flatten_{\rho \times \pi}(A) \oplus 3) \otimes \\
-  \phantom{ABCDEFG}
-  ( \interpret{v}[z:=\pi^1(A)] \oplus \interpret{w}[a:=\pi^2(A)]
-  \oplus \lift_\xi(11) ) \succeq \\
-  \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
-    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
-      \interpret{s}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\
-      \interpret{v}[z:=\pi^1(\interpret{s})] \oplus
-      \interpret{w}[z:=\pi^2(\interpret{s})] \oplus
-      \lift_\xi(11)\ )},\\
-    \phantom{ABCDEFGHIJ}\abs{y}{
-    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
-      \interpret{t}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\
-      \interpret{v}[z:=\pi^1(\interpret{t})] \oplus
-      \interpret{w}[a:=\pi^2(\interpret{t})] \oplus
-      \lift_\xi(11)\ )})
-$ \\
-  \\
-  Here, $A =
-    \lift_{\rho \times \pi}(37) \oplus
-    \lift_{\rho \times \pi}(\flatten_{\sigma \times \tau}(\interpret{u})
-    \oplus 3) \otimes \\
-    \phantom{ABCDEFGHIJK}
-    (\ \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
-       \interpret{t}[y:=\pi^2(\interpret{u})] \oplus
-       \lift_{\rho \times \pi}(11)
-    \ )$.
-\item And let's of course also fill in the right-hand side. \\
-  $\lift_\xi(37) \oplus
-  \lift_\xi(\flatten_{\rho \times \pi}(A) \oplus 3) \otimes \\
-  \phantom{ABCDEFG}
-  ( \interpret{v}[z:=\pi^1(A)] \oplus \interpret{w}[a:=\pi^2(A)]
-  \oplus \lift_\xi(11) ) \succeq \\
-  \lift_\xi(37) \oplus
-  \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}) \oplus 3)
-  \otimes \\
-  \phantom{ABCDEFG}
-  (\ B_{\interpret{s}}[x:=\pi^1(\interpret{u})] \oplus
-     B_{\interpret{t}}[y:=\pi^2(\interpret{u})] \oplus \lift_\xi(11))
-  $
- \\
-  Here, $B_q =
-    \lift_\xi(37) \oplus \lift_\xi(\flatten_{\rho \times \pi}(
-      \interpret{q}) \oplus 3) \otimes \\
-      \phantom{AB} \hfill (\
+\item Once I start filling in the outer $\mathtt{case}$ interpretations
+  on both sides, this is going to get very messy indeed.  So, I will
+  use the following shorthand notations: \\
+  $A = \\
+  \phantom{ABC}\lift_{\rho \times \pi}(5) \oplus
+    \lift_{\rho \times \pi}(11 \otimes \flatten_{\sigma \times
+      \tau}(\interpret{u})) \oplus \\
+  \phantom{ABC}\interpret{s}[x:=\pi^1(\interpret{u})]
+    \oplus \interpret{t}[y:=\pi^2(\interpret{u})] \oplus \\
+  \phantom{ABC}
+    \lift_{\rho \times \pi}(3 \otimes \flatten_{\sigma \times \tau}(
+      \interpret{u})) \otimes \interpret{s}[x:=\pi^1(\interpret{u})]
+      \oplus \\
+  \phantom{ABC}
+    \lift_{\rho \times \pi}(3 \otimes \flatten_{\sigma \times \tau}(
+      \interpret{u})) \otimes \interpret{t}[y:=\pi^2(\interpret{u})]
+  $ \\
+  and for a given term $q$: \\
+  $B_q =
+    \lift_\xi(5) \oplus
+      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(q)) \oplus \\
+    \phantom{ABCDEFGHIJKL}
       \interpret{v}[z:=\pi^1(q)] \oplus
-      \interpret{w}[z:=\pi^2(q)] \oplus
-      \lift_\xi(11)\ )$.
+      \interpret{w}[a:=\pi^2(q)] \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(q))
+      \otimes \interpret{v}[z:=\pi^1(q)] \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(q))
+      \otimes \interpret{w}[a:=\pi^2(q)]
+  $. \\
+  Thus we can rewrite the inequality to: \\
+  $\mathcal{J}(\mathtt{case})_{\rho,\pi,\xi}(\ A,
+    \abs{z}{\interpret{v}},,\ \abs{a}{\interpret{w}}\ )\ \succeq \\
+  \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\ \interpret{u},\abs{x}{
+    B_{\interpret{s}}}, B_{\interpret{t}} )
+$
+\item Now I will fill in the outer $\mathtt{case}$ interpretations
+  on both sides, and immediately $\beta$-reduce them. \\
+  $\lift_\xi(5) \oplus
+    \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(A)) \oplus \\
+    \phantom{AB}
+    \interpret{v}[z:=\pi^1(A)] \oplus
+    \interpret{w}[a:=\pi^2(A)] \oplus \\
+    \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
+      \interpret{v}[z:=\pi^1(A)] \oplus \\
+    \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
+      \interpret{w}[a:=\pi^2(A)] \\
+  \succeq \\
+    \lift_\xi(5) \oplus
+    \lift_\xi(11 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+    \oplus \\
+    \phantom{AB}
+    B_{\interpret{s}}[x:=\pi^1(\interpret{u})] \oplus
+    B_{\interpret{t}}[x:=\pi^2(\interpret{u})] \oplus \\
+    \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes B_{\interpret{s}}[x:=\pi^1(\interpret{u})] \oplus \\
+    \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes B_{\interpret{t}}[x:=\pi^2(\interpret{u})]
+  $
 \item Note that $s$ is a bound variable in $s$ and $y$ a bound variable
   in $t$; these variables do not occur in $B_q$.  So, we can rewrite
   the above inequality to:
-  $\lift_\xi(37) \oplus
-  \lift_\xi(\flatten_{\rho \times \pi}(A) \oplus 3) \otimes \\
-  \phantom{ABCDEFG}
-  ( \interpret{v}[z:=\pi^1(A)] \oplus \interpret{w}[a:=\pi^2(A)]
-  \oplus \lift_\xi(11) ) \succeq \\
-  \lift_\xi(37) \oplus
-  \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}) \oplus 3)
-  \otimes \\
-  \phantom{ABCDEFG}
-  (\ B_{\interpret{s}[x:=\pi^1(\interpret{u})]} \oplus
-     B_{\interpret{t}[y:=\pi^2(\interpret{u})]} \oplus \lift_\xi(11))
-  $
-\item By Lemma \ref{lem:approxproperties} we can reorder parts of
-  $\oplus$.
-  If \CK{(TODO: assumption here)} we also have that $(A \oplus B) \otimes
-  C \approx A \otimes C \oplus B \otimes C$, then we obtain the
-  following proof obligation: \\
-  $\lift_\xi(37)\ \oplus \\
-  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
-  \interpret{v}[z:=\pi^1(A)] \oplus \\
-  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
-  \interpret{w}[a:=\pi^2(A)] \oplus \\
-  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
-  \lift_\xi(11) \oplus \\
-  \phantom{AB}\lift_\xi(3) \otimes \interpret{v}[z:=\pi^1(A)] \oplus \\
-  \phantom{AB}\lift_\xi(3) \otimes \interpret{w}[a:=\pi^2(A)] \oplus \\
-  \phantom{AB}\lift_\xi(3) \otimes \lift_\xi(11) \\
+  $\lift_\xi(5) \oplus
+    \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(A)) \oplus \\
+    \phantom{AB}
+    \interpret{v}[z:=\pi^1(A)] \oplus
+    \interpret{w}[a:=\pi^2(A)] \oplus \\
+    \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
+      \interpret{v}[z:=\pi^1(A)] \oplus \\
+    \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
+      \interpret{w}[a:=\pi^2(A)] \\
   \succeq \\
-  \lift_\xi(37) \oplus \\
-  \phantom{AB} \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}))
-  \otimes B_{\interpret{s}[x:=\pi^1(\interpret{u})]} \oplus \\
-  \phantom{AB} \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}))
-  \otimes B_{\interpret{t}[y:=\pi^2(\interpret{u})]} \oplus \\
-  \phantom{AB} \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}))
-  \otimes \lift_\xi(11) \oplus \\
-  \phantom{AB}\lift_\xi(3) \otimes B_{\interpret{s}[x:=
-    \pi^1(\interpret{u})]} \oplus \\
-  \phantom{AB}\lift_\xi(3) \otimes B_{\interpret{t}[y:=
-    \pi^2(\interpret{u})]} \oplus \\
-  \phantom{AB}\lift_\xi(3) \otimes \lift_\xi(11)
+    \lift_\xi(5) \oplus
+    \lift_\xi(11 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+    \oplus \\
+    \phantom{AB}
+    B_{\interpret{s}[x:=\pi^1(\interpret{u})]} \oplus
+    B_{\interpret{t}[x:=\pi^2(\interpret{u})]} \oplus \\
+    \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes B_{\interpret{s}[x:=\pi^1(\interpret{u})]} \oplus \\
+    \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes B_{\interpret{t}[x:=\pi^2(\interpret{u})]}
   $
-\item By Lemma \ref{lem:plustimesmonotonic} we can strike parts of
-  $\oplus$ away against each other in the left- and right-hand side.
-  We can also reorder the sides of an $\otimes$ and $\oplus$, giving:
-  \CK{(TODO: by ??)} \\
-  $\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
-  \interpret{v}[z:=\pi^1(A)] \oplus \\
-  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
-  \interpret{w}[a:=\pi^2(A)] \oplus \\
-  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
-  \lift_\xi(11) \oplus \\
-  \phantom{AB}\lift_\xi(3) \otimes \interpret{v}[z:=\pi^1(A)] \oplus \\
-  \phantom{AB}\lift_\xi(3) \otimes \interpret{w}[a:=\pi^2(A)] \\
+\item Now, let us expand the occurrences of $B_q$ on the right; we
+  will denote $su$ for $\interpret{s}[x:=\pi^1(\interpret{u})]$ and
+  $tu$ for $\interpret{t}[x:=\pi^2(\interpret{u})]$.  We use the
+  distribution property \CK{(TODO)} to obtain the following requirement:
+  \\
+  $\lift_\xi(5) \oplus
+    \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(A)) \oplus \\
+    \phantom{AB}
+    \interpret{v}[z:=\pi^1(A)] \oplus
+    \interpret{w}[a:=\pi^2(A)] \oplus \\
+    \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
+      \interpret{v}[z:=\pi^1(A)] \oplus \\
+    \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
+      \interpret{w}[a:=\pi^2(A)] \\
   \succeq \\
-  \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}))
-  \otimes B_{\interpret{s}[x:=\pi^1(\interpret{u})]} \oplus \\
-  \phantom{AB} \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}))
-  \otimes B_{\interpret{t}[y:=\pi^2(\interpret{u})]} \oplus \\
-  \phantom{AB} \lift_\xi(11) \otimes
-    \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u})) \oplus \\
-  \phantom{AB}\lift_\xi(3) \otimes B_{\interpret{s}[x:=
-    \pi^1(\interpret{u})]} \oplus \\
-  \phantom{AB}\lift_\xi(3) \otimes B_{\interpret{t}[y:=
-    \pi^2(\interpret{u})]} \\
+    \lift_\xi(5) \oplus \\
+    \phantom{AB}
+    \lift_\xi(11 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+    \oplus \\
+    \\
+    \phantom{AB}
+      \lift_\xi(5) \oplus \\
+    \phantom{AB}
+      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(su)) \oplus \\
+    \phantom{AB}
+      \interpret{v}[z:=\pi^1(su)] \oplus \\
+    \phantom{AB}
+      \interpret{w}[a:=\pi^2(su)] \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(su))
+      \otimes \interpret{v}[z:=\pi^1(su)] \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(su))
+      \otimes \interpret{w}[a:=\pi^2(su)] \oplus \\
+    \\
+    \phantom{AB}
+      \lift_\xi(5) \oplus \\
+    \phantom{AB}
+      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(tu)) \oplus \\
+    \phantom{AB}
+      \interpret{v}[z:=\pi^1(tu)] \oplus \\
+    \phantom{AB}
+      \interpret{w}[a:=\pi^2(tu)] \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes \interpret{v}[z:=\pi^1(tu)] \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes \interpret{w}[a:=\pi^2(tu)] \oplus \\
+  \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+        \otimes \lift_\xi(5) \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes
+      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(su)) \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes
+      \interpret{v}[z:=\pi^1(su)] \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes
+      \interpret{w}[a:=\pi^2(su)] \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(su))
+      \otimes \\
+      \phantom{ABCD}\interpret{v}[z:=\pi^1(su)] \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(su))
+      \otimes \\
+      \phantom{ABCD}\interpret{w}[a:=\pi^2(su)] \oplus \\
+    \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes
+      \lift_\xi(5) \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes
+      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(tu)) \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes
+      \interpret{v}[z:=\pi^1(tu)] \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes
+      \interpret{w}[a:=\pi^2(tu)] \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes \\
+      \phantom{ABCD}\interpret{v}[z:=\pi^1(tu)] \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes
+      \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes \\
+      \phantom{ABCD}\interpret{w}[a:=\pi^2(tu)] \\
   $
-\item Now, if use the distribution property, as well as the
-  properties that $a \otimes b \approx b \otimes a$ and $a \oplus
-  b \approx b \oplus a$ and $\lift_\xi(a) R \lift_\xi(b) \approx
-  \lift_\xi(a R b)$ \CK{(TODO)}, note that
-  $B_q \approx \\
-  \lift_\xi(37 + 3 * 11) \oplus \\
-  \phantom{AB}\lift_\xi(3) \otimes \interpret{v}[z:=\pi^1(q)] \oplus \\
-  \phantom{AB}\lift_\xi(3) \otimes \interpret{w}[a:=\pi^2(q)] \\
-  \phantom{AB}\lift_\xi(11) \otimes \lift_\xi(\flatten_{\rho \times
-    \pi}(q)) \oplus \\
-  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(q)) \otimes
-    \interpret{v}[z:=\pi^1(q)] \oplus \\
-  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(q)) \otimes
-    \interpret{w}[a:=\pi^2(q)] \oplus \\
-  $
-  Using this, we expand the left-hand side of the inequality above: \\
-  $\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
-  \interpret{v}[z:=\pi^1(A)] \oplus \\
-  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
-  \interpret{w}[a:=\pi^2(A)] \oplus \\
-  \phantom{AB}\lift_\xi(\flatten_{\rho \times \pi}(A)) \otimes
-  \lift_\xi(11) \oplus \\
-  \phantom{AB}\lift_\xi(3) \otimes \interpret{v}[z:=\pi^1(A)] \oplus \\
-  \phantom{AB}\lift_\xi(3) \otimes \interpret{w}[a:=\pi^2(A)] \\
+\item Yes, that's a monstrosity, and it will only get worse once we
+  get to the left-hand side. Let's combine what we can, using the
+  properties that for $R \in \{\oplus,\otimes\}$ always
+  $a R b \approx b R a$ and $\lift_\xi(a) R \lift_\xi(b) \approx
+  \lift_\xi(a R b)$, and also that $a \approx \lift(1) \otimes a$.
+  Let us also denote:
+  \begin{itemize}
+  \item $vsu := \interpret{v}[z:=\pi^1(su)] =
+    \interpret{v}[z:=\pi^1(\interpret{s}[x:=\pi^1(\interpret{u})])]$
+  \item $wsu := \interpret{w}[a:=\pi^2(su)] =
+    \interpret{w}[a:=\pi^2(\interpret{s}[x:=\pi^1(\interpret{u})])]$
+  \item $vtu := \interpret{v}[z:=\pi^1(tu)] =
+    \interpret{v}[z:=\pi^1(\interpret{t}[y:=\pi^2(\interpret{u})])]$
+  \item $wtu := \interpret{w}[a:=\pi^1(tu)] =
+    \interpret{w}[a:=\pi^2(\interpret{t}[y:=\pi^2(\interpret{u})])]$
+  \end{itemize}
+  Additionally striking away the (first) occurrences of $\lift_\xi(5)$
+  on both the left and the right against each other, this gives: \\
+  $\lift_\xi(11 \otimes \flatten_{\rho \times \pi}(A)) \oplus \\
+    \phantom{AB}
+    \interpret{v}[z:=\pi^1(A)] \oplus
+    \interpret{w}[a:=\pi^2(A)] \oplus \\
+    \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
+      \interpret{v}[z:=\pi^1(A)] \oplus \\
+    \phantom{AB}
+    \lift_\xi(3 \otimes \flatten_{\rho \times \pi}(A)) \otimes
+      \interpret{w}[a:=\pi^2(A)] \\
   \succeq \\
-  \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}))
-  \otimes B_{\interpret{s}[x:=\pi^1(\interpret{u})]} \oplus \\
-  \phantom{AB} \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u}))
-  \otimes B_{\interpret{t}[y:=\pi^2(\interpret{u})]} \oplus \\
-  \phantom{AB} \lift_\xi(11) \otimes
-    \lift_\xi(\flatten_{\sigma \times \tau}(\interpret{u})) \oplus \\
-  \phantom{AB}\lift_\xi(3) \otimes B_{\interpret{s}[x:=
-    \pi^1(\interpret{u})]} \oplus \\
-  \phantom{AB}\lift_xi(3 *(37 + 3 * 11)) \oplus
-  \phantom{AB}\lift_\xi(3 * 3) \otimes \interpret{v}[z:=\pi^1(
-    \interpret{t}[y:=\pi^2(\interpret{u})])] \oplus \\
-  \phantom{AB}\lift_\xi(3 * 3) \otimes \interpret{w}[a:=\pi^2(
-    \interpret{t}[y:=\pi^2(\interpret{u})])] \oplus \\
-  \phantom{AB}\lift_\xi(3 * 11) \otimes \lift_\xi(\flatten_{\rho \times
-    \pi}(\interpret{t}[y:=\pi^2(\interpret{u})])) \oplus
-  \phantom{AB}\lift_\xi(3) \otimes B_{\interpret{t}[y:=
-    \pi^2(\interpret{u})]} \\
+    \lift_\xi(5 + 5) \oplus \\
+    \phantom{AB}
+    \lift_\xi((11 \oplus 3 \otimes 5 \oplus 3 \otimes 5) \otimes
+      \flatten_{\sigma \times \tau}(\interpret{u})) \oplus \\
+    \\
+    \phantom{AB}
+      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(su)) \oplus \\
+    \phantom{AB}
+      \lift_\xi(1 \oplus 3 \otimes \flatten_{\rho \times \pi}(su))
+      \otimes vsu \oplus \\
+    \phantom{AB}
+      \lift_\xi(1 \oplus 3 \otimes \flatten_{\rho \times \pi}(su))
+      \otimes wsu \oplus \\
+    \\
+    \phantom{AB}
+      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(tu)) \oplus \\
+    \phantom{AB}
+      \lift_\xi(1 \oplus 3 \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes vtu \oplus \\
+    \phantom{AB}
+      \lift_\xi(1 \oplus 3 \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes wtu \oplus \\
+    \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes 11 \otimes
+        \flatten_{\sigma \times \tau}(\interpret{u}) \otimes
+        \flatten_{\rho \times \pi}(su)) \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes vsu \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes wsu \oplus \\
+    \phantom{AB}
+      \lift_\xi((3 \otimes 3) \otimes \flatten_{\sigma \times
+        \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(su))
+      \otimes vsu \oplus \\
+    \phantom{AB}
+      \lift_\xi((3 \otimes 3) \otimes \flatten_{\sigma \times
+        \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(su))
+      \otimes wsu \oplus \\
+    \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes
+      \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(tu)) \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes vtu \oplus \\
+    \phantom{AB}
+      \lift_\xi(3 \otimes \flatten_{\sigma \times \tau}(\interpret{u}))
+      \otimes wtu \oplus \\
+    \phantom{AB}
+      \lift_\xi((3 \otimes 3) \otimes \flatten_{\sigma \times
+      \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes vtu \oplus \\
+    \phantom{AB}
+      \lift_\xi((3 \otimes 3) \otimes \flatten_{\sigma \times
+      \tau}(\interpret{u}) \otimes \flatten_{\rho \times \pi}(tu))
+      \otimes wtu \\
   $
-\item -----------------
-\item Taking into account that $\lift_\xi(n) \otimes \lift_\xi(m)
-  \approx \lift_\xi(n+m)$ and that $\lift_\xi(n) \otimes a \oplus
-  \lift_xi(m) \otimes a = \lift_xi(n+m) \otimes a$ \CK{(TODO: check
-  this)}, we can slightly simplify the right-hand side, obtaining: \\
+\item -------------
+\item This is starting to get just slightly unmanageable, so let's not
+  try to expand the left-hand side all in one go.  Rather, let's look
+  at what happens to the very first term.  Note that \\
+  $A = \\
+  \phantom{ABC}\lift_{\rho \times \pi}(5) \oplus
+    \lift_{\rho \times \pi}(11 \otimes \flatten_{\sigma \times
+      \tau}(\interpret{u})) \oplus su \oplus tu \oplus \\
+  \phantom{ABC}
+    \lift_{\rho \times \pi}(3 \otimes \flatten_{\sigma \times \tau}(
+      \interpret{u})) \otimes su \oplus \\
+  \phantom{ABC}
+    \lift_{\rho \times \pi}(3 \otimes \flatten_{\sigma \times \tau}(
+      \interpret{u})) \otimes tu
+  $ \\
+  So, using that always $\flatten(\lift(n)) = n$ and that
+  $\flatten(a \oplus b) = \flatten(a) + \flatten(b)$ and that
+  $\lift(a + b) = \lift(a) \oplus \lift(b)$ \CK{(TODO)} we can
+  \emph{partially} expand the first part of the left-hand side as
+  follows: \\
+  $\lift_\xi(11 \otimes \flatten_{\rho \times \pi}(A)) = \\
+  \phantom{AB}
+  \lift_\xi(11 \otimes 5) \oplus \\
+  \phantom{AB}
+  \lift_\xi(11 \otimes 11 \otimes \flatten_{\sigma \times \tau}(
+    \interpret{u})) \oplus \\
+  \phantom{AB}
+  \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(su)) \oplus \\
+  \phantom{AB}
+  \lift_\xi(11 \otimes \flatten_{\rho \times \pi}(tu)) \oplus \\
+  \phantom{AB}
+  \lift_\xi(11 \otimes 3 \otimes
+    \flatten_{\sigma \times \tau}(\interpret{u}) \otimes
+    \flatten_{\rho \times \pi}(su)) \oplus \\
+  \phantom{AB}
+  \lift_xi(11 \otimes 3 \otimes \flatten_{\sigma \times \tau}(
+    \interpret{u}) \otimes \flatten_{\rho \times \pi}(tu))
+  $
 \end{itemize}
 
 ==================
 
-\begin{itemize}
-\item By Lemma \ref{lem:approxproperties} we can reorder parts of
-  $\oplus$ and by \ref{lem:plustimesmonotonic} we can strike parts of
-  $\oplus$ away against each other in the left- and right-hand side,
-  giving a proof obligation: \\
-  $\langle\ \  \interpret{u} * \typeinterpret{\mathtt{or}\,\rho\,\pi} \cdot
-    (\Lambda \chi\lambda f.f \cdot (\abs{x}{\interpret{s}}) \cdot
-    (\abs{y}{\interpret{t}})) \oplus \\
-    \phantom{A}
-    \interpret{s}[x:=\lift(0)]
-    \oplus \interpret{t}[y:=
-    \lift(0)] \oplus \lift(7))\ \ \rangle \\
-    \phantom{AA} * \xi \cdot (\Lambda \chi\lambda f.f \cdot
-    (\abs{z}{\interpret{v}}) \cdot (\abs{a}{\interpret{w}})) \succeq \\
-  \interpret{u} * \xi \cdot
-    (\Lambda \chi\lambda f.f \cdot A \cdot B) \oplus \\
-    \phantom{A} \interpret{s}[x:=\lift(0)] * \xi \cdot (\Lambda \chi.
-      \lambda f.f \cdot
-      (\abs{z}{\interpret{v}}) \cdot (\abs{a}{\interpret{w}})) \\
-    \phantom{A}\oplus \interpret{t}[y:=\lift(0) * \xi \cdot (\Lambda \chi.
-      \lambda f.f \cdot (\abs{z}{\interpret{v}}) \cdot
-      (\abs{a}{\interpret{w}})) \\
-    \phantom{A} \oplus \interpret{v}[z:=\lift(0)] \\
-    \phantom{A} \oplus \interpret{w}[a:=\lift(0)] \\
-    \phantom{A} \oplus \lift(7) \\
-    \phantom{A} \oplus \lift(7)$.
-    where \\
-    $A =
-    \abs{x}{\interpret{s} * \xi \cdot (\Lambda \chi.\lambda f.f \cdot
-    (\abs{z}{\interpret{v}}) \cdot (\abs{a}{\interpret{w}})) \oplus \\
-    \phantom{ABCDEFGHIJKL}
-    \interpret{v}[z:=\lift(0)] \oplus
-    \interpret{w}[a:=\lift(0)] \oplus \lift(7)}$ \\
-    and $B =
-    \abs{y}{\interpret{t} * \xi \cdot (\Lambda \chi.\lambda f.
-    f \cdot (\abs{z}{\interpret{v}}) \cdot
-    (\abs{a}{\interpret{w}})) \oplus \\
-    \phantom{ABCDEFGHIJKL}
-    \interpret{v}[z:=\lift(0)] \oplus
-    \interpret{w}[a:=\lift(0)] \oplus \lift(7)}$.
-\item This does not look so good. But now note that by definition,
-  $(s \oplus t) * \tau \leadsto (s * \tau) \oplus (t * \tau)$ and
-  also $(s \oplus t) \cdot u \leadsto (s \cdot u) \oplus (t \cdot u)$.
-  We can use this to split up the left-hand side: \\
-  $\interpret{u} * \typeinterpret{\mathtt{or}\,\rho\,\pi} \cdot
-    (\Lambda \chi\lambda f.f \cdot (\abs{x}{\interpret{s}}) \cdot
-    (\abs{y}{\interpret{t}})) * \xi \cdot (\Lambda \chi\lambda f.f \cdot
-    (\abs{z}{\interpret{v}}) \cdot (\abs{a}{\interpret{w}})) \oplus \\
-  \phantom{A}\interpret{s}[x:=\lift(0)] * \xi \cdot (\Lambda \chi
-    \lambda f.f \cdot (\abs{z}{\interpret{v}}) \cdot
-    (\abs{a}{\interpret{w}})) \oplus \\
-  \phantom{A}\interpret{t}[y:=\lift(0)] * \xi \cdot (\Lambda \chi
-    \lambda f.f \cdot (\abs{z}{\interpret{v}}) \cdot
-    (\abs{a}{\interpret{w}})) \oplus \\
-  \phantom{A}\lift_{\typeinterpret{\mathtt{or}\,\rho\,\tau}}(7)
-    * \xi \cdot (\Lambda \chi\lambda f.f \cdot
-    (\abs{z}{\interpret{v}}) \cdot (\abs{a}{\interpret{w}})) \\
-  \leadsto^* \\
-  \interpret{u} * \typeinterpret{\mathtt{or}\,\rho\,\pi} \cdot
-    (\Lambda \chi\lambda f.f \cdot (\abs{x}{\interpret{s}}) \cdot
-    (\abs{y}{\interpret{t}})) * \xi \cdot (\Lambda \chi\lambda f.f \cdot
-    (\abs{z}{\interpret{v}}) \cdot (\abs{a}{\interpret{w}})) \oplus \\
-  \phantom{A}\interpret{s}[x:=\lift(0)] * \xi \cdot (\Lambda \chi
-    \lambda f.f \cdot (\abs{z}{\interpret{v}}) \cdot
-    (\abs{a}{\interpret{w}})) \oplus \\
-  \phantom{A}\interpret{t}[y:=\lift(0)] * \xi \cdot (\Lambda \chi
-    \lambda f.f \cdot (\abs{z}{\interpret{v}}) \cdot
-    (\abs{a}{\interpret{w}})) \oplus \\
-  \phantom{A}\lift_{xi}(7)$.
-
-  PROBLEM: in the right-hand side, $\interpret{u}$ is applied to
-  something larger than in the left-hand side.  That is not something
-  that will be much helped by splitting additions.  So, a different
-  approach may be needed.  Will ponder on this. (But leaving it out
-  there because the problem is important for finding the right
-  interpretation.)
-\end{itemize}
-
 \CK{END OF CASE/CASE CHALLENGE (UNFINISHED).}
-
-\CK{Note: this goes wrong, and may be tricky to fix because of the
-horrible interpretation of $\mathtt{or}$.  It may be better to go back
-to pairing for $\mathtt{or}$.  However, the $\mathtt{let}$ cannot be
-changed in such a way.  I will now set out how we can deal with
-$\mathtt{let}/\mathtt{let}$, since it's the case most likely to lead
-to problems that are hard to work around.}
 
 \newpage
 
