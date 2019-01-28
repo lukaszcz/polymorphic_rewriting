@@ -1,6 +1,7 @@
 \documentclass[a4paper,UKenglish,cleveref,autoref,numberwithinsect]{lipics-v2019}
 
 \usepackage{stmaryrd}
+\usepackage{proof}
 
 %\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
 
@@ -42,6 +43,7 @@
 
 \newcommand{\typeinterpret}[1]{\llbracket #1 \rrbracket}
 \newcommand{\interpret}[1]{\llbracket #1 \rrbracket}
+\newcommand{\itp}[1]{\llbracket #1 \rrbracket}
 
 \newcommand{\refsec}[1]{Section~\ref{sec:#1}}
 
@@ -59,13 +61,20 @@
 \newcommand{\Cb}{\mathbb{C}}
 \newcommand{\Nbb}{\mathbb{N}}
 \newcommand{\val}[3]{\ensuremath{\llbracket#1\rrbracket_{#2}^{#3}}}
+\newcommand{\gteq}[3]{\ensuremath{\ge_{#1}^{#2,#3}}}
 
 \newcommand{\proves}{\vdash}
+
+\newcommand{\Typemap}{\mathcal{T\!M}}
+\newcommand{\Termmap}{\mathcal{J}}
+\newcommand{\succinterpret}{\succ^{\Termmap}}
+\newcommand{\succeqinterpret}{\succeq^{\Termmap}}
 
 \newcommand{\List}{\mathtt{List}}
 \newcommand{\nil}{\mathtt{nil}}
 \newcommand{\cons}{\mathtt{cons}}
 \newcommand{\fold}{\mathtt{fold}}
+\newcommand{\xlet}[4]{\mathtt{let}_{#1}\,#2\,\mathtt{be}\,[#3]\,\mathtt{in}\,#4}
 
 \newcommand{\CK}[1]{\textcolor{blue}{CK: #1}}
 \newcommand{\LC}[1]{\textcolor{red}{LC: #1}}
@@ -125,7 +134,7 @@
   addition to enabling an interpretation of rewrite rules which make
   essential use of impredicative polymorphism, thanks to the
   possibility of encoding inductive data types in the polymorphic
-  lambda-calculus, this generalisation increases the power of the
+  lambda-calculus, our generalisation increases the power of the
   method also in the non-polymorphic setting. As an illustration of
   the potential of our method, we prove termination of a substantial
   fragment of full intuitionistic second-order propositional logic
@@ -140,8 +149,8 @@
 
 In this section we introduce the System~$\Fomega$ (see
 e.g.~\cite[Section~11.7]{SorensenUrzyczyn2006}), which will form a
-basis both of our interpretations and of a general syntax for the
-investigated systems. First, we define the set of types.
+basis both of our interpretations and of a general syntactic framework
+for the investigated systems. First, we define the set of types.
 
 \begin{defn}\label{def_types}
   \emph{Kinds} are defined inductively: $*$ is a kind, and if
@@ -170,7 +179,7 @@ investigated systems. First, we define the set of types.
     $\lambda\alpha . \varphi$ is a type constructor of kind $\kappa_1
     \arrkind \kappa_2$.
   \item If $\alpha$ is a type constructor variable of kind~$\kappa$
-    and~$\tau$ is a type, then $\forall \alpha[\tau]$ is a type.
+    and~$\tau$ is a type, then $\forall\alpha\tau$ is a type.
   \item If $\tau_1,\tau_2$ are types, then $\tau_1 \arrtype \tau_2$ is
     a type.
   \end{itemize}
@@ -355,13 +364,14 @@ all considered terms are typable, there is a natural isomorphism
 between typed terms as defined above and terms given in orthodox
 Church-style.
 
-\section{Systems of interest}\label{sec_systems}
+\section{Polymorphic Algebraic Functional Systems}\label{sec_systems}
 
 To represent the rewrite systems whose termination we are going to
-analyse, we use a syntax based on system~$\Fomega$, specialising
-Section~\ref{sec_preliminaries}.
+analyse, we define the framework of Polymoprhic Algebraic Functional
+Systems (PAFS). We use a syntax based on system~$\Fomega$,
+specialising Section~\ref{sec_preliminaries}.
 
-\begin{defn}
+\begin{defn}\label{def_pafs_types_terms}
   \emph{Kinds}, \emph{type constructors} and \emph{types} are defined
   like in Definition~\ref{def_types}, parameterised by a fixed
   set~$\Sigma_T$ of type constructor symbols.
@@ -404,26 +414,58 @@ $\Sigma$. Similarly, type application is modelled through a symbol
 $\mathtt{A} : \forall \alpha : * \arrkind * . \forall \beta . (\forall
 \beta [\alpha \beta]) \arrtype \alpha \beta$.
 
+We fix a variable context~$\Gamma$.
+
+\begin{defn}\label{def_replacement}
+  A \emph{$\Gamma$-replacement} is a function $\delta = \gamma \circ
+  \omega$ satisfying:
+  \begin{enumerate}
+  \item $\omega$ is a type constructor substitution,
+  \item $\gamma$ is a term substitution such that $\omega(\Gamma)
+    \proves \gamma(x) : \omega(\tau)$ for every $(x : \tau) \in
+    \Gamma$.
+  \end{enumerate}
+
+  For~$\tau$ a type constructor, we use $\delta(\tau)$ to denote
+  $\omega(\tau)$. We use the notation $\delta[\subst{x}{t}] =
+  \gamma[\subst{x}{t}] \circ \omega$. Note that if $t \in \Iterms$ and
+  $\Gamma \proves t : \tau$ then $\delta(\Gamma) \proves \delta(t) :
+  \delta(\tau)$.
+\end{defn}
+
 The rewrite rules are simply a set of term pairs, whose monotonic
 closure generates the rewrite relation.
 
-\begin{defn}
-  We fix a variable environment $\Gamma$, and assume given a set
-  $\Rules$ of term pairs $(\ell,r)$, such that:
+\begin{defn}\label{def_rules}
+  A \emph{$\sigma$-context}~$C_\sigma$ is a term with a fresh function
+  symbol $\Box_\sigma \notin \Sigma$ of type~$\sigma$ occurring
+  exactly once. By~$C_\sigma[t]$ we denote a term obtained
+  from~$C_\sigma$ by substituting~$t$ for~$\Box_\sigma$. We drop the
+  $\sigma$ subscripts when clear or irrelevant.
+
+  A set $\Rules$ of term pairs $(\ell,r)$ is a set of \emph{rewrite
+    rules} if:
   \begin{itemize}
   \item $\FV(r) \subseteq \FV(\ell) \subseteq \mathit{keys}(\Gamma)$;
   \item $\ell$ and $r$ have the same type under $\Gamma$;
-  \item $\Rules$ is stable: if $(\ell,r) \in \Rules$ and $\omega$ is a
-    type constructor substitution and $\gamma$ is a term substitution
-    such that $\omega(\Gamma) \proves \gamma(x) : \omega(\Gamma(x))$,
-    then $(\gamma(\omega(\ell)),\gamma(\omega(r))) \in \Rules$.
   \end{itemize}
-  The reduction relation $\arr{\Rules}$ is the smallest monotonic
-  relation that contains $\Rules$.
+  The reduction relation $\arr{\Rules}$ is defined by: $t \arr{\Rules}
+  s$ iff $t = C[\delta(\ell)]$ and $s = C[\delta(r)]$ for some
+  $(\ell,r)\in\Rules$, a replacement~$\delta$, and a context~$C$.
+\end{defn}
+
+\begin{defn}\label{def_pafs}
+  A \emph{Polymorphic Algebraic Functional System (PAFS)} is a triple
+  $(\Sigma_T,\Sigma,\Rules)$ where~$\Sigma_T$ is a set of type
+  constructor symbols, $\Sigma$ a set of function symbols (restricted
+  as in Definition~\ref{def_pafs_types_terms}), and $\Rules$ is a set
+  of rules as in Definition~\ref{def_rules}. A term of a given
+  PAFS~$A$ is referred to as an $A$-term.
 \end{defn}
 
 \begin{example}[Fold on heterogenous lists]
-  We have the following type symbol:
+  The example from the introduction may be represented as a PAFS with
+  one type symbol
   \[
   \begin{array}{c}
     \mathtt{List} : *,
@@ -457,26 +499,25 @@ closure generates the rewrite relation.
     polymorphism}. The above rules cannot be translated into an
   infinite set of simply typed rules by instantiating the type
   variables. In practice, when defining heterogenous lists in a
-  functional programming language which supports higher-rank
-  polymorphism (e.g.~recent extensions of Haskell), one would
-  constrain the type variable~$\alpha$ above with a type class to
-  guarantee the existence of certain operations on the elements of the
-  list.
+  language with support for higher-rank polymorphism (e.g.~in recent
+  extensions of Haskell, or in a type-theory based proof assistant
+  like~Coq), one would constrain the type variable~$\alpha$ above with
+  a type class to guarantee the existence of certain operations on the
+  elements of the list.
 \end{example}
 
 \section{A well-ordered set of interpretation terms}
 
 In this section we define the set~$\Iterms$ of interpretation terms,
 and the relations~$\succeq$ and~$\succ$ on~$\Iterms$. We also define
-the set~$\World$ of final interpretation terms as the set of all
+the set~$\Iterms^f$ of final interpretation terms as the set of all
 closed interpretation terms normalized with a certain reduction
-relation. We will use the interpretation terms from~$\Iterms$ to
-interpret the terms in the systems whose termination we
-investigate. The pair $(\succeq,\succ)$ will be used as an ordering
+relation. We will use interpretation terms from~$\Iterms$ to interpret
+terms of~PAFSs. The pair $(\succeq,\succ)$ will be used as an ordering
 pair for the method of rule removal. In particular, the
 relation~$\succ$ will be well-founded.
 
-\subsection{The sets~$\Iterms$ and~$\World$}
+\subsection{Interpretation terms}
 
 \begin{defn}\label{def_iterms}
   The set~$\ITypes$ of \emph{interpretation types} is the set of types
@@ -551,9 +592,10 @@ normalise certain elements of~$\Iterms$ using the relation~$\arrW$.
 
   A \emph{final interpretation term} is an interpretation term $s \in
   \Iterms$ such that (a) $s$ is closed, and (b) $s$ is in normal form
-  with respect to $\arrW$.  We let $\World$ be the set of all final
-  interpretation terms. By~$\World_\tau$ we denote the set of all
-  final interpretation terms of interpretation type~$\tau$.
+  with respect to $\arrW$.  We let $\Iterms^f$ be the set of all final
+  interpretation terms. By~$\Iterms_\tau$ ($\Iterms^f_\tau$) we denote
+  the set of all (final) interpretation terms of interpretation
+  type~$\tau$ (under a fixed implicit context~$\Gamma$).
 \end{defn}
 
 An important difference with system~$\Fomega$ and related ones is that
@@ -610,11 +652,491 @@ w.r.t.~$\arrW$.
 
 \subsection{The ordering pair $(\succeq,\succ)$}
 
-\section{Weakly monotonic algebras}
+\begin{defn}\label{def_closure}
+  A \emph{$\Gamma$-closure}~$\cl = \gamma \circ \omega$ is a
+  $\Gamma$-replacement such that $\omega(\alpha)$ is closed for each
+  type constructor variable~$\alpha$, and $\gamma(x)$ is closed for
+  each term variable~$x$.
+\end{defn}
+
+We can now define the ordering pair $(\succeq,\succ)$, using
+coinduction.
+
+\begin{defn}\label{def:succ}
+  Let $R \in \{ \succ,\succeq \}$. For closed~$s,t\in\Iterms_\sigma$
+  and closed~$\sigma$ in $\beta$-normal form, the relation
+  $s\ R_{\sigma}\ t$ is defined coinductively by the following rules.
+  \[
+  \begin{array}{cc}
+    \infer={s\ R_\nat\ t}{s\da\ R\ t\da \text{ in natural numbers}} \quad&\quad
+    \infer={s\ R_{\sigma\arrtype\tau}\ t}{\app{s}{q}\ R_{\tau}\ \app{t}{q} \text{ for all } q \in \Iterms^f_\sigma} \\ \\
+    \multicolumn{2}{c}{
+    \infer={s\ R_{\forall(\alpha:\kappa)[\sigma]}\ t}{\tapp{s}{\tau}\ R_{\nf_\beta(\sigma[\subst{\alpha}{\tau}])}\ \tapp{t}{\tau} \text{ for all closed } \tau \in \Tc_{\kappa}}}
+  \end{array}
+  \]
+  We define $s \approx_\sigma t$ if both $s \succeq_\sigma t$ and $t
+  \succeq_\sigma s$.
+
+  For arbitrary types~$\sigma$ and arbitrary terms $s,t \in \Iterms$
+  we define $s \succ_\sigma t$ if for every closure~$\cl$ we can
+  obtain $\cl(s) \succ_{\nf_\beta(\cl(\sigma))} \cl(t)$ coinductively
+  with the above rules. The relations $\succeq_\sigma$ and
+  $\approx_\sigma$ are extended analogously. We drop the type
+  subscripts when clear or irrelevant.
+\end{defn}
+
+Note that in the case for~$\nat$ the terms~$s\da$, $t\da$ are natural
+numbers by Lemma~\ref{lem_final_nat} ($s\da,t\da$ are closed and in
+normal form, so they are final interpretation terms).
+
+Intuitively, the above definition means that e.g. $s \succ t$ iff
+there exists a possibly infinite derivation tree using the above
+rules. In such a derivation tree all leaves must witness $s\da > t\da$
+in natural numbers. However, this also allows for infinite branches,
+which solves the problem of repeating types due to impredicative
+polymorphism. If e.g.~$s \succ_{\forall \alpha . \alpha} t$ then
+$\tapp{s}{\forall\alpha.\alpha} \succ_{\forall \alpha . \alpha}
+\tapp{t}{\forall\alpha.\alpha}$, which forces an infinite branch in
+the derivation tree. According to our definition, any infinite branch
+may essentially be ignored.
+
+The coinductive definition of~$\succ$ and~$\succeq$ can be
+reformulated as follows.
+
+\begin{lemma}
+  $t \succeq s$ if and only if for every closure~$\cl$ and every
+  sequence $u_1,\ldots,u_n$ of closed terms and closed type
+  constructors such that $\cl(t) u_1 \ldots u_n : \nat$ we have
+  $(\cl(t) u_1 \ldots u_n)\da \ge (\cl(s) u_1 \ldots u_n)\da$ in
+  natural numbers. An analogous result holds with $\succ$ or $\approx$
+  instead of~$\succeq$.
+\end{lemma}
+
+\begin{proof}
+  The direction from left to right follows by induction on~$n$. The
+  other direction follows by coinduction.
+\end{proof}
+
+In what follows, all proofs by coinduction could be reformulated to
+instead use the characterisation of $\succ$, $\succeq$ and~$\approx$
+from the above lemma. However, this would arguably make the proofs
+less perspicuous.
+
+First we state a simple lemma that will be used implicitly.
+
+\begin{lemma}
+  If~$\tau$ is a closed interpretation type in $\beta$-normal form
+  then $\tau = \nat$ or $\tau = \tau_1\arrtype\tau_2$ or $\tau =
+  \forall\alpha\sigma$.
+\end{lemma}
+
+The most important property of~$\succ$ is that it is a well-founded
+ordering.
+
+\begin{lemma}\label{lem_well_founded}
+  $\succ$ is well-founded.
+\end{lemma}
+
+\begin{proof}
+  It suffices to show this for closed terms and closed types in
+  $\beta$-normal form, because any infinite sequence $t_1 \succ_\tau
+  t_2 \succ_\tau t_3 \succ_\tau \ldots$ induces an infinite sequence
+  $\cl(t_1) \succ_{\nf_\beta(\cl(\tau))} \cl(t_2)
+  \succ_{\nf_\beta(\cl(\tau))} \cl(t_3) \succ_{\nf_\beta(\cl(\tau))}
+  \ldots$ for any closure~$\cl$. By induction on the size of a
+  $\beta$-normal type~$\tau$ (with size measured as the number of the
+  occurrences of~$\forall$ and~$\arrtype$) one proves that there does
+  not exist an infinite sequence $t_1 \succ_\tau t_2 \succ_\tau t_3
+  \succ_\tau \ldots$ For instance, if $\alpha$ has kind~$\kappa$ and
+  $t_1 \succ_{\forall\alpha\tau} t_2 \succ_{\forall\alpha\tau} t_3
+  \succ_{\forall\alpha\tau} \ldots$ then $\tapp{t_1}{\chi_\kappa}
+  \succ_{\tau'} \tapp{t_2}{\chi_\kappa} \succ_{\tau'}
+  \tapp{t_3}{\chi_\kappa} \succ_{\tau'} \ldots$, where
+  $\tau'=\nf_\beta(\tau[\subst{\alpha}{\chi_\kappa}])$. Because $\tau$
+  is in $\beta$-normal form, all redexes in
+  $\tau[\subst{\alpha}{\chi_\kappa}]$ are created by the substitution
+  and must have the form $\chi_\kappa u$. Hence, by the definition
+  of~$\chi_\kappa$ (see Definition~\ref{def_chi_kappa}) the
+  type~$\tau'$ is smaller than~$\tau$. This is impossible by the
+  inductive hypothesis.
+\end{proof}
+
+\begin{lemma}\label{lem_transitive}
+  Both $\succ$ and $\succeq$ are transitive.
+\end{lemma}
+
+\begin{proof}
+  We show this for~$\succ$, the proof for~$\succeq$ being
+  analogous. Again, it suffices to prove this for closed terms and
+  closed types in $\beta$-normal form. We proceed by coinduction.
+
+  If $t_1 \succ_\nat t_2 \succ_\nat t_3$ then $t_1\da > t_2\da >
+  t_3\da$, so $t_1\da > t_3\da$. Thus $t_1 \succ_\nat t_3$.
+
+  If $t_1 \succ_{\sigma\arrtype\tau}t_2\succ_{\sigma\arrtype\tau}t_3$
+  then $\app{t_1}{q}\succ_{\tau}\app{t_2}{q}\succ_\tau\app{t_3}{q}$
+  for $q \in \Iterms^f_\sigma$. Hence
+  $\app{t_1}{q}\succ_\tau\app{t_3}{q}$ for $q \in \Iterms^f_\sigma$ by
+  the coinductive hypothesis. Thus $t_1\succ_{\sigma\arrtype\tau}
+  t_3$.
+
+  If $t_1
+  \succeq_{\forall(\alpha:\kappa)\sigma}t_2\succ_{\forall(\alpha:\kappa)\sigma}t_3$
+  then
+  $\tapp{t_1}{\tau}\succ_{\sigma'}\tapp{t_2}{\tau}\succ_{\sigma'}\tapp{t_3}{\tau}$
+  for any closed type constructor~$\tau$ of kind~$\kappa$, where
+  $\sigma' = \nf_\beta(\sigma[\subst{\alpha}{\tau}])$. Hence
+  $\tapp{t_1}{\tau}\succ_{\sigma'}\tapp{t_3}{\tau}$ by the coinductive
+  hypothesis. Thus $t_1\succeq_{\forall\alpha\sigma} t_3$.
+\end{proof}
+
+And that $\succeq$ is a quasi-ordering:
+
+\begin{lemma}\label{lem_reflexive}
+  $\succeq$ is reflexive.
+\end{lemma}
+
+\begin{proof}
+  By coinduction one shows that $\succeq_\sigma$ is reflexive on
+  closed terms for closed $\beta$-normal~$\sigma$. The general case is
+  then immediate from definitions.
+\end{proof}
+
+Finally, they must be compatible:
+
+\begin{lemma}\label{lem:compatibility}
+  We have $\succ \cdot \succeq\ \subseteq\ \succ$ and $\succeq \cdot
+  \succ\ \subseteq\ \succ$.
+\end{lemma}
+
+\begin{proof}
+  By coinduction, analogous to the transitivity proof.
+\end{proof}
+
+\begin{lemma}\label{lem_succ_to_succeq}
+  If $t \succ s$ then $t \succeq s$.
+\end{lemma}
+
+\begin{proof}
+  By coinduction.
+\end{proof}
+
+\begin{lemma}\label{lem_succ_red}
+  Assume $t \succ s$ (resp.~$t \succeq s$).
+  \begin{enumerate}
+  \item If $t \leadsto t'$ or $t' \leadsto t$ then $t' \succ s$
+    (resp.~$t' \succeq s$).
+  \item If $s \leadsto s'$ or $s' \leadsto s$ then $t \succ s'$
+    (resp.~$t \succeq s'$).
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  We show the first point assuming $t \leadsto t'$, other cases being
+  analogous. It suffices to show this for closed $t,t',s$ and the type
+  closed and in $\beta$-normal form, because $t \leadsto t'$ implies
+  $\cl(t) \leadsto \cl(t')$ for any closure~$\cl$.
+
+  We proceed by coinduction. If $t \succ_\nat s$ then $t\da = t'\da$
+  and the claim holds.
+
+  If $t \succ_{\sigma\arrtype\tau} s$ then for every $q \in
+  \Iterms^f_\sigma$ we have $\app{t}{q} \succ_\tau \app{s}{q}$. We
+  have $\app{t}{q} \leadsto \app{t'}{q}$. Hence $\app{t'}{q}
+  \succ_\tau \app{s}{q}$ by the coinductive hypothesis. Thus $t'
+  \succ_{\sigma\arrtype\tau} s$.
+
+  If $t \succ_{\forall(\alpha:\kappa)\sigma} s$ then for every closed
+  type constructor~$\tau$ of kind~$\kappa$ we have $\tapp{t}{\tau}
+  \succ_{\sigma'} \tapp{s}{\tau}$ where $\sigma' =
+  \nf_\beta(\sigma[\subst{\alpha}{\tau}])$. We have $\tapp{t}{\tau}
+  \leadsto \tapp{t'}{\tau}$. Hence $\tapp{t'}{\tau} \succ_{\sigma'}
+  \tapp{s}{\tau}$ by the coinductive hypothesis. Thus $t'
+  \succ_{\forall(\alpha:\kappa)\sigma} s$.
+\end{proof}
+
+\begin{corollary}\label{cor_succ_da}
+  For $R \in \{\succ,\succeq,\approx\}$: $s\ R\ t$ if and only if
+  $s\downarrow\ R\ t\downarrow$.
+\end{corollary}
+
+\section{Reduction pairs}
+
+The goal of this section is to define an interpretation~$\Termmap$
+of~PAFS function symbols and a reduction pair
+$(\succeqinterpret,\succinterpret)$ on PAFS terms. In the next
+section, we will show how a reduction pair may be used to prove
+termination of~PAFSs.
+
+First, we precisely define the notion of a reduction pair. We fix
+a~PAFS~$A$.
+
+\begin{defn}
+  A binary relation~$R$ on $A$-terms is \emph{monotonic} if $R(s, t)$
+  implies $R(C[s], C[t])$ for every context~$C$ (we assume $s,t$ have
+  the same type~$\sigma$). A binary relation~$R$ on $A$-terms is
+  \emph{stable} if $R(s, t)$ implies $R(\delta(s), \delta(t))$ for
+  every replacement~$\delta$.
+
+  A \emph{reduction pair} is a pair~$(\succeq^A,\succ^A)$ of a
+  quasi-order~$\succeq^A$ on $A$-terms and a well-founded
+  order~$\succ^A$ on $A$-terms such that:
+  \begin{itemize}
+  \item $\succeq^A$ and~$\succ^A$ are compatible, i.e., ${\succ^A}
+    \cdot {\succeq^A} \subseteq {\succ^A}$,
+  \item $\succeq^A$ and~$\succ^A$ are both stable,
+  \item $\succeq^A$ and~$\succ^A$ are both monotonic.
+  \end{itemize}
+\end{defn}
 
 \subsection{Weak monotonicity}
 
-\subsection{Weakly monotonic algebras}
+We first return to our system of interpretation terms with an aim to
+show that $s \succeq s'$ implies $t[\subst{x}{s}] \succeq
+t[\subst{x}{s'}]$. For this purpose, we prove a few lemmas, many of
+which also apply to~$\succ$, stating the preservation of~$\succeq$
+under term formation operations. We will need these results to obtain
+a reduction pair.
+
+\begin{lemma}\label{lem_app_succ}
+  If $t \succeq s$ (resp.~$t \succ s$) then $t u \succeq s u$
+  (resp.~$t u \succ s u$) with $u$ a term or type constructor.
+\end{lemma}
+
+\begin{proof}
+  Follows from definitions.
+\end{proof}
+
+\begin{lemma}\label{lem:liftgreater}
+  If $n \geq m$ (resp.~$n > m$) then $\lift_\sigma n \succeq
+  \lift_\sigma m$ (resp.~$\lift_\sigma n \succ \lift_\sigma m$) for
+  all types $\sigma$.
+\end{lemma}
+
+\begin{proof}
+  Without loss of generality we may assume $\sigma$ closed and in
+  $\beta$-normal form. By coinduction we show $\lift(n) u_1 \ldots u_k
+  \succeq \lift(m) u_1 \ldots u_k$ for closed $u_1,\ldots,u_k$. First
+  note that $(\lift\,t) u_1 \ldots u_k \leadsto^* \lift(t)$ (with a
+  different type subscript in~$\lift$ on the right side, omitted here
+  for conciseness).
+
+  If $\sigma = \nat$ then $(\lift(n) u_1 \ldots u_k)\da = n \ge m =
+  (\lift(m) u_1 \ldots u_k)\da$. Hence $\lift(n) u_1 \ldots u_k
+  \succeq_\nat \lift(m) u_1 \ldots u_k$.
+
+  If $\sigma = \tau_1\arrtype\tau_2$ then by the coinductive
+  hypothesis $\lift(n) u_1 \ldots u_k q \succeq_{\tau_2} \lift(m) u_1
+  \ldots u_k q$ for any $q \in \Iterms^f_{\tau_1}$. Hence $\lift(n)
+  u_1 \ldots u_k \succeq_\sigma \lift(m) u_1 \ldots u_k$.
+
+  If $\sigma = \forall(\alpha:\kappa)\tau$ then by the coinductive
+  hypothesis $\lift(n) u_1 \ldots u_k \xi \succeq_{\sigma'} \lift(m)
+  u_1 \ldots u_k \xi$ for any closed $\xi \in \Tc_\kappa$, where
+  $\sigma' = \tau[\subst{\alpha}{\xi}]$. Hence $\lift(n) u_1 \ldots
+  u_k \succeq_\sigma \lift(m) u_1 \ldots u_k$.
+\end{proof}
+
+\begin{lemma}\label{lem_flatten_succ}
+  If $t \succeq_\sigma s$ then $\flatten_\sigma t \succeq_\nat
+  \flatten_\sigma s$ for all types $\sigma$. The same holds
+  with~$\succ$ instead of~$\succeq$.
+\end{lemma}
+
+\begin{proof}
+  Without loss of generality we may assume~$\sigma$ is closed and in
+  $\beta$-normal form. Using Lemma~\ref{lem_succ_red}, one shows by
+  induction on~$\sigma$ that if $t \succeq_\sigma s$ then
+  $\flatten_\sigma t \succeq_\nat \flatten_\sigma s$ (the proof
+  for~$\succ$ is analogous).
+\end{proof}
+
+\begin{lemma}\label{lem_abs_succ}
+  If $t \succeq s$ then $\abs{x}{t} \succeq \abs{x}{s}$ and
+  $\tabs{\alpha}{t} \succeq \tabs{\alpha}{s}$. The same holds
+  with~$\succ$ instead of~$\succeq$.
+\end{lemma}
+
+\begin{proof}
+  Assume $t \succeq_\tau s$ and $\Gamma \proves x : \sigma$. Let~$\cl$
+  be a closure. We need to show $\cl(\abs{x}{t})
+  \succeq_{\cl(\sigma\arrtype\tau)} \cl(\abs{x}{s})$. Let $u \in
+  \Iterms^f_{\cl(\sigma)}$. Then $\cl' = \cl[\subst{x}{u}]$ is a
+  closure and $\cl'(t) \succeq_{\cl(\tau)} \cl'(s)$. Hence
+  $\cl(t)[\subst{x}{u}] \succeq_{\cl(\tau)} \cl(s)[\subst{x}{u}]$. By
+  Lemma~\ref{lem_succ_red} this implies $\cl(\abs{x}{t}) u
+  \succeq_{\cl(\tau)} \cl(\abs{x}{s}) u$. Therefore $\cl(\abs{x}{t})
+  \succeq_{\cl(\sigma\arrtype\tau)} \cl(\abs{x}{s})$. The proof for
+  the second part is analogous.
+\end{proof}
+
+\begin{lemma}\label{lem:plustimesmonotonic}
+  Let $s,t,u$ be terms of type $\sigma$.
+  \begin{enumerate}
+  \item If $s \succeq t$ then $s \oplus_\sigma u \succeq t
+    \oplus_\sigma u$, $u \oplus_\sigma s \succeq u \oplus_\sigma t$,
+    and $s \otimes_\sigma u \succeq t \otimes_\sigma u$, $u
+    \otimes_\sigma s \succeq u \otimes_\sigma t$.
+  \item If $s \succ t$ then $s \oplus_\sigma u \succ t \oplus_\sigma
+    u$ and $u \oplus_\sigma s \succ u \oplus_\sigma t$. Moreover, if
+    additionally $u \succeq \lift_\sigma(1)$ then also $s
+    \otimes_\sigma u \succ t \otimes_\sigma u$ and $u \otimes_\sigma s
+    \succ u \otimes_\sigma t$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  It suffices to prove this for closed $s,t,u$ and closed $\sigma$ in
+  $\beta$-normal form. The proof is similar to the proof of
+  Lemma~\ref{lem:liftgreater}. For instance, we show by coinduction
+  that for closed $w_1,\ldots,w_n$ if $s w_1 \ldots w_n \succ t w_1
+  \ldots w_n$ and $u w_1 \ldots w_n \succeq \lift(1) w_1 \ldots w_n$
+  then $(s \otimes u) w_1 \ldots w_n \succ (t \otimes u) w_1 \ldots
+  w_n$.
+\end{proof}
+
+The following lemma depends on the lemmas above. The full proof may be
+found in Appendix~\ref{app_proofs}. The proof is actually quite
+complex, and uses a method similar to Girard's method of candidates
+for the termination proof. The difficulty comes from the fact that due
+to impredicativity of polymorphism direct induction on type structure
+is not possible.
+
+\begin{lemma}\label{lem_succeq_subst}
+  If $s \succeq_\sigma s'$ then $t[\subst{x}{s}] \succeq_\tau
+  t[\subst{x}{s'}]$.
+\end{lemma}
+
+\begin{corollary}\label{cor_app_wm}
+  If $s \succeq s'$ then $t s \succeq t s'$.
+\end{corollary}
+
+\subsection{Interpretation mapping}
+
+\begin{defn}
+  A \emph{type constructor mapping} is a function $\Typemap$ which
+  maps a type constructor symbol to a closed interpretation type
+  constructor of the same kind.
+
+  A fixed type constructor mapping $\Typemap$ is extended inductively
+  to a function from type constructors to closed interpretation type
+  constructors in the expected way.
+
+  We denote the extended mapping by~$\typeinterpret{\sigma}$. Thus,
+  for example $\typeinterpret{\quant{\alpha}{\sigma}} =
+  \quant{\alpha}{\typeinterpret{\sigma}}$ and $\typeinterpret{\sigma
+    \arrtype \tau} = \typeinterpret{\sigma} \arrtype
+  \typeinterpret{\tau}$.
+\end{defn}
+
+Similarly, we employ a \emph{symbol mapping} as an aid to interpret
+PAFS terms.
+
+\begin{defn}
+  A \emph{symbol mapping} is a function $\Termmap$ which assigns to
+  each function symbol $\mathtt{f} : \rho$ a closed interpretation
+  term $\Termmap(\mathtt{f})$ of type~$\typeinterpret{\rho}$. For a
+  fixed symbol mapping $\Termmap$, we define $\interpret{s}$
+  inductively:
+  \[
+    \begin{array}{rclcrcl}
+      \interpret{x} & = & x &\quad&
+      \interpret{\mathtt{f}} &=& \Termmap(\mathtt{f}) \\
+      \interpret{\tabs{\alpha}{s}} & = & \tabs{\alpha}{\interpret{s}} &\quad&
+      \interpret{\abs{x:\sigma}{s}} & = & \abs{x:\typeinterpret{\sigma}}{
+                                          \interpret{s}} \\
+      \interpret{\app{t_1}{t_2}} &=& \app{\interpret{t_1}}{\interpret{t_2}} &\quad&
+      \interpret{\tapp{t}{\tau}} &=& \tapp{\interpret{t}}{\typeinterpret{\tau}}
+    \end{array}
+  \]
+  Symbol mapping is extended to contexts: \( \itp{\Gamma} := \{ (x :
+  \typeinterpret{\tau}) \mid (x : \tau) \in \Gamma \}.  \)
+\end{defn}
+
+Interpretation mapping preserves typing:
+
+\begin{lemma}
+  If $\Gamma \vdash s : \sigma$ then $\itp{\Gamma} \vdash
+  \interpret{s} : \typeinterpret{\sigma}$.
+\end{lemma}
+
+\begin{proof}
+  By induction on the form of $s$.
+\end{proof}
+
+\begin{defn}
+  For a fixed type constructor mapping $\Typemap$ and symbol mapping
+  $\Termmap$, the \emph{interpretation pair}
+  $(\succeqinterpret,\succinterpret)$ is defined as follows: $s
+  \succeqinterpret t$ if $\interpret{s} \succeq \interpret{t}$, and $s
+  \succinterpret t$ if $\interpret{s} \succ \interpret{t}$.
+\end{defn}
+
+We will show that under certain conditions on~$\Termmap$ the
+interpretation pair $(\succeqinterpret,\succinterpret)$ is a reduction
+pair.
+
+\begin{defn}\label{def_safe}
+  If $s_1 \succ s_2$ implies $t[\subst{x}{s_1}] \succ
+  t[\subst{x}{s_2}]$, then the interpretation term~$t$ is \emph{safe
+    for~$x$}. A symbol mapping~$\Termmap$ is \emph{safe} if for all
+  symbols
+  \[
+  \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n
+  : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype
+  \tau
+  \]
+  with~$\tau$ a type atom we have: $\Termmap(\mathtt{f}) =
+  \tabs{\alpha_1 \dots \alpha_n}{\abs{x_1 \dots x_k}{t}}$ with $t$
+  safe for each~$x_i$.
+\end{defn}
+
+\begin{lemma}\label{lem_safe}
+  \begin{enumerate}
+  \item $x u_1 \ldots u_m$ is safe for~$x$.
+  \item If $t$ is safe for~$x$ then so is~$\lift(t)$
+    and~$\flatten(t)$.
+  \item If $s_1$ is safe for~$x$ or $s_2$ is safe for~$x$ then $s_1
+    \oplus s_2$ is safe for~$x$.
+  \item If either:
+    \begin{itemize}
+    \item $s_1$ is safe for~$x$ and $s_2 \succeq \lift(1)$, or
+    \item $s_2$ is safe for~$x$ and $s_1 \succeq \lift(1)$,
+    \end{itemize}
+    then $s_1 \otimes s_2$ is safe for~$x$.
+  \item If~$t$ is safe for~$x$ then so is~$\tabs{\alpha}{t}$
+    and~$\abs{y}{t}$ ($y \ne x$).
+  \item If $t$ is safe for~$x$ then so is~$\pi^1(t)$ and~$\pi^2(t)$.
+  \item If $t$ is safe for~$x$ then so is~$\xlet{}{t}{\alpha,x}{s}$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  Each point follows from one of the lemmas proven above,
+  Lemma~\ref{lem_succ_to_succeq}, Lemma~\ref{lem_succeq_subst},
+  Lemma~\ref{lem:compatibility} and the transitivity of~$\succeq$. For
+  instance, assume $s_1 \succ s_2$ and let
+  $u_i^j=u_i[\subst{x}{s_j}]$. Then $(x u_1 \ldots
+  u_m)[\subst{x}{s_1}] = s_1 u_1^1 \ldots u_m^1$. By
+  Lemma~\ref{lem_app_succ} we have $s_1 u_1^1 \ldots u_m^1 \succ s_2
+  u_1^1 \ldots u_m^1$. By Lemma~\ref{lem_succ_to_succeq} and
+  Lemma~\ref{lem_succeq_subst} we have $u_i^1 \succeq u_i^2$. By
+  Corollary~\ref{cor_app_wm} and the transitivity of~$\succeq$ we
+  obtain $s_2 u_1^1 \ldots u_m^1 \succeq s_2 u_1^2 \ldots u_m^2$. By
+  Lemma~\ref{lem:compatibility} finally $(x u_1 \ldots
+  u_m)[\subst{x}{s_1}] = s_1 u_1^1 \ldots u_m^1 \succ s_2 u_1^2 \ldots
+  u_m^2 = (x u_1 \ldots u_m)[\subst{x}{s_2}]$.
+\end{proof}
+
+\begin{theorem}
+  If~$\Termmap$ is safe then $(\succeqinterpret,\succinterpret)$ is a
+  reduction pair.
+\end{theorem}
+
+\begin{proof}
+  TODO
+\end{proof}
+
 
 \section{Proving termination}
 
@@ -757,8 +1279,8 @@ have type~$\tau$.
     terms~$t$ such that $t : \omega(\sigma\arrtype\tau)$ and for
     every~$s \in \val{\sigma}{\xi}{\omega}$ with $s : \omega(\sigma)$
     we have $\app{t}{s} \in \val{\tau}{\xi}{\omega}$,
-  \item $\val{\forall(\alpha:\kappa)[\sigma]}{\xi}{\omega}$ is the set
-    of all terms~$t$ such that $t : \omega(\forall\alpha[\sigma])$ and
+  \item $\val{\forall(\alpha:\kappa)\sigma}{\xi}{\omega}$ is the set
+    of all terms~$t$ such that $t : \omega(\forall\alpha\sigma)$ and
     for every closed type constructor~$\varphi$ of kind~$\kappa$ and
     every $X \in \Cb_\varphi$ we have $\tapp{t}{\varphi} \in
     \val{\sigma}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$,
@@ -809,7 +1331,7 @@ write~$\val{\varphi}{}{}$.
     \in \SN$.
   \item Let $t \in \SN$ be such that $t : \nat$. The proof of
     $\flatten_\nat t \in \SN$ is analogous to the proof of $\lift_\nat
-    t \in \SN$ above.
+    t \in \SN$ above.\qedhere
   \end{enumerate}
 \end{proof}
 
@@ -1025,10 +1547,10 @@ write~$\val{\varphi}{}{}$.
     $\flatten_{\omega(\tau_2)}(t'(\lift_{\omega(\tau_1)}0))\in\SN$. Contradiction.
   \end{enumerate}
 
-  Assume $\sigma = \forall(\alpha:\kappa)[\tau]$. We check the
+  Assume $\sigma = \forall(\alpha:\kappa)\tau$. We check the
   conditions in Definition~\ref{def_candidate}.
   \begin{enumerate}
-  \item Let $t \in \val{\forall(\alpha:\kappa)[\tau]}{\xi}{\omega}$
+  \item Let $t \in \val{\forall(\alpha:\kappa)\tau}{\xi}{\omega}$
     and assume there is an infinite reduction $t \arrW t_1 \arrW
     t_2 \arrW t_3 \arrW \ldots$. Recall that~$\chi_\kappa$ from
     Definition~\ref{def_types} is a closed type constructor of
@@ -1041,9 +1563,9 @@ write~$\val{\varphi}{}{}$.
     is a candidate, so $t \chi_\kappa \in \SN$. But $t \chi_\kappa
     \arrW t_1 \chi_\kappa \arrW t_2 \chi_\kappa \arrW t_3
     \chi_\kappa \arrW \ldots$. Contradiction.
-  \item Let $t \in \val{\forall\alpha[\tau]}{\xi}{\omega}$ and $t
+  \item Let $t \in \val{\forall\alpha\tau}{\xi}{\omega}$ and $t
     \arrW t'$. By the subject reduction lemma $t' :
-    \omega(\forall\alpha[\tau])$. Let~$\varphi$ be a closed type
+    \omega(\forall\alpha\tau)$. Let~$\varphi$ be a closed type
     constructor of kind~$\kappa$ and~$X \in \Cb_{\varphi}$. Then $t
     \varphi \in
     \val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$. By
@@ -1051,11 +1573,11 @@ write~$\val{\varphi}{}{}$.
     $\val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$
     is a candidate, so $t' \varphi \in
     \val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$. Therefore
-    $t' \in \val{\forall\alpha[\tau]}{\xi}{\omega}$.
+    $t' \in \val{\forall\alpha\tau}{\xi}{\omega}$.
   \item Let $t$ be neutral such that $t :
-    \omega(\forall\alpha[\tau])$, and assume that for every~$t'$ with
+    \omega(\forall\alpha\tau)$, and assume that for every~$t'$ with
     $t \arrW t'$ we have $t' \in
-    \val{\forall\alpha[\tau]}{\xi}{\omega}$. Let~$\varphi$ be a closed
+    \val{\forall\alpha\tau}{\xi}{\omega}$. Let~$\varphi$ be a closed
     type constructor of kind~$\kappa$ and~$X \in
     \Cb_{\varphi}$. Assume $t \varphi \arrW t''$. Then $t'' = t'
     \varphi$ with $t \arrW t'$, because~$t$ is neutral. Hence $t
@@ -1066,15 +1588,15 @@ write~$\val{\varphi}{}{}$.
     is a candidate. Also $t \varphi$ is neutral, so $t \varphi \in
     \val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$
     because~$t''$ was arbitrary with $t \varphi \arrW t''$. This
-    implies that $t \in \val{\forall\alpha[\tau]}{\xi}{\omega}$.
+    implies that $t \in \val{\forall\alpha\tau}{\xi}{\omega}$.
   \item Assume $t_1,t_2 \in
-    \val{\forall\alpha[\tau]}{\xi}{\omega}$. We have already shown
+    \val{\forall\alpha\tau}{\xi}{\omega}$. We have already shown
     that this implies $t_1,t_2 \in \SN$. We prove
-    $\circ_{\omega(\forall\alpha[\tau])} t_1 t_2 \in
-    \val{\forall\alpha['tau]}{\xi}{\omega}$ by induction on $\nu(t_1)
-    + \nu(t_2)$. Since $s := \circ_{\omega(\forall\alpha[\tau])} t_1
+    $\circ_{\omega(\forall\alpha\tau)} t_1 t_2 \in
+    \val{\forall\alpha\tau}{\xi}{\omega}$ by induction on $\nu(t_1)
+    + \nu(t_2)$. Since $s := \circ_{\omega(\forall\alpha\tau)} t_1
     t_2$ is neutral, we have already proven that it suffices to show
-    that $s' \in \val{\forall\alpha[\tau]}{\xi}{\omega}$ whenever $s
+    that $s' \in \val{\forall\alpha\tau}{\xi}{\omega}$ whenever $s
     \arrW s'$. The cases when $t_1$ or $t_2$ are reduced are
     immediate with the induction hypotheses. The only remaining case
     is when $s'=\tabs{\alpha}{\circ_{\omega(\tau)} (t_1 \alpha) (t_2
@@ -1083,7 +1605,7 @@ write~$\val{\varphi}{}{}$.
     $t_1 \varphi$ and $t_2 \varphi$ in
     $\val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$
     (by definition of $t_1,t_2 \in
-    \val{\forall\alpha[\tau]}{\xi}{\omega}$). Let $\omega' =
+    \val{\forall\alpha\tau}{\xi}{\omega}$). Let $\omega' =
     \omega[\subst{\alpha}{\varphi}]$. By bound variable renaming, we
     may assume $\omega(\alpha) = \alpha$ and $\alpha$ does not occur
     in~$t_1,t_2$. Because
@@ -1095,14 +1617,14 @@ write~$\val{\varphi}{}{}$.
     \alpha))[\subst{\alpha}{\varphi}] \in
     \val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}.
     \]
-    Hence $s' \in \val{\forall\alpha[\tau]}{\xi}{\omega}$ by
+    Hence $s' \in \val{\forall\alpha\tau}{\xi}{\omega}$ by
     Lemma~\ref{lem_abstraction_computable}.
   \item Let $t \in \SN$ be such that $t : \nat$. By induction
-    on~$\nu(t)$ we show $s := \lift_{\omega(\forall\alpha[\tau])}(t)
-    \in \val{\forall\alpha[\tau]}{\xi}{\omega}$. First note that $s :
-    \omega(\forall\alpha[\tau])$. Since~$s$ is neutral, by the already
+    on~$\nu(t)$ we show $s := \lift_{\omega(\forall\alpha\tau)}(t)
+    \in \val{\forall\alpha\tau}{\xi}{\omega}$. First note that $s :
+    \omega(\forall\alpha\tau)$. Since~$s$ is neutral, by the already
     proven point~3 above, it suffices to show that $s' \in
-    \val{\forall\alpha[\tau]}{\xi}{\omega}$ whenever $s \arrW
+    \val{\forall\alpha\tau}{\xi}{\omega}$ whenever $s \arrW
     s'$. The case when~$t$ is reduced is immediate by the inductive
     hypothesis. The only remaining case is when $s' =
     \tabs{\alpha}{\lift_{\omega(\tau)}(t)}$ (without loss of
@@ -1116,24 +1638,24 @@ write~$\val{\varphi}{}{}$.
     (\lift_{\omega(\tau)}(t))[\subst{\alpha}{\varphi}] \in
     \val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}.
     \]
-    This implies $s' \in \val{\forall\alpha[\tau]}{\xi}{\omega}$.
-  \item Let $t \in \val{\forall\alpha[\tau]}{\xi}{\omega}$. We show $s
-    := \flatten_{\omega(\forall\alpha[\tau])}t \in \SN$. We have
+    This implies $s' \in \val{\forall\alpha\tau}{\xi}{\omega}$.
+  \item Let $t \in \val{\forall\alpha\tau}{\xi}{\omega}$. We show $s
+    := \flatten_{\omega(\forall\alpha\tau)}t \in \SN$. We have
     already shown $t \in \SN$ in point~1 above. Thus any infinite
     reduction starting from~$s$ must have the form $s \arrW^*
-    \flatten_{\omega(\forall\alpha[\tau])}t' \arrW
+    \flatten_{\omega(\forall\alpha\tau)}t' \arrW
     \flatten_{\omega(\tau)[\subst{\alpha}{\chi_\kappa}]}(t'
     \chi_\kappa) \arrW \ldots$ with $t \arrW^* t'$ (assuming
     $\omega(\alpha) = \alpha$ without loss of generality). We have
     already shown in point~2 above that
-    $\val{\forall\alpha[\tau]}{\xi}{\omega}$ is closed
+    $\val{\forall\alpha\tau}{\xi}{\omega}$ is closed
     under~$\arrW$, so $t' \in
-    \val{\forall\alpha[\tau]}{\xi}{\omega}$. We have
+    \val{\forall\alpha\tau}{\xi}{\omega}$. We have
     $\val{\chi_\kappa}{}{} \in \Cb_{\chi_\kappa}$ by
     Lemma~\ref{lem_chi_kappa_computable}. Since~$\chi_\kappa$ is also
     closed, we have $t' \chi_\kappa \in
     \val{\tau}{\xi[\subst{\alpha}{\val{\chi_\kappa}{}{}}]}{\omega[\subst{\alpha}{\chi_\kappa}]}$
-    by definition of $\val{\forall\alpha[\tau]}{\xi}{\omega}$. By the
+    by definition of $\val{\forall\alpha\tau}{\xi}{\omega}$. By the
     inductive hypothesis
     $\val{\tau}{\xi[\subst{\alpha}{\val{\chi_\kappa}{}{}}]}{\omega[\subst{\alpha}{\chi_\kappa}]}
     \in \Cb_{\omega[\subst{\alpha}{\chi_\kappa}](\tau)}$. Hence
@@ -1229,7 +1751,7 @@ write~$\val{\varphi}{}{}$.
   \val{\sigma_2}{\xi'}{\omega'}$, where the last equality follows from
   the inductive hypothesis. Thus $t \in
   \val{\sigma}{\xi'}{\omega'}$. The other direction is analogous. The
-  case $\sigma = \forall\alpha[\sigma']$ is also analogous.
+  case $\sigma = \forall\alpha\sigma'$ is also analogous.
 
   Assume $\sigma = \varphi\psi$. We have
   $\val{\sigma[\subst{\alpha}{\tau}]}{\xi}{\omega} =
@@ -1253,8 +1775,8 @@ write~$\val{\varphi}{}{}$.
 
 \begin{lemma}\label{lem_forall}
   Let $\tau$ be a type constructor of kind~$\kappa$. Assume $\omega$
-  is closed for $\forall\alpha[\sigma]$ and for~$\tau$. If $t \in
-  \val{\forall(\alpha:\kappa)[\sigma]}{\xi}{\omega}$ then $t
+  is closed for $\forall\alpha\sigma$ and for~$\tau$. If $t \in
+  \val{\forall(\alpha:\kappa)\sigma}{\xi}{\omega}$ then $t
   (\omega(\tau)) \in \val{\sigma[\subst{\alpha}{\tau}]}{\xi}{\omega}$.
 \end{lemma}
 
@@ -1262,7 +1784,7 @@ write~$\val{\varphi}{}{}$.
   By Lemma~\ref{lem_val_computable} we have~$\val{\tau}{\xi}{\omega}
   \in \Cb_{\omega(\tau)}$. So $t (\omega(\tau)) \in
   \val{\sigma}{\xi[\subst{\alpha}{\val{\tau}{\xi}{\omega}}]}{\omega[\subst{\alpha}{\omega(\tau)}]}$
-  by $t \in \val{\forall(\alpha:\kappa)[\sigma]}{\xi}{\omega}$. Hence
+  by $t \in \val{\forall(\alpha:\kappa)\sigma}{\xi}{\omega}$. Hence
   $t (\omega(\tau)) \in
   \val{\sigma[\subst{\alpha}{\tau}]}{\xi}{\omega}$ by
   Lemma~\ref{lem_val_subst}.
@@ -1345,7 +1867,7 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
     $\omega^*(t) \in \val{\sigma'}{\xi}{\omega}$ by
     Lemma~\ref{lem_abstraction_computable}.
   \item If $t = \tabs{\alpha:\kappa}{s}$ then $\sigma' =
-    \forall\alpha[\tau]$ and $s : \tau$. Let $\psi$ be a closed type
+    \forall\alpha\tau$ and $s : \tau$. Let $\psi$ be a closed type
     constructor of kind~$\kappa$ and let $X \in \Cb_\psi$. Let
     $\omega_1 = \omega[\subst{\alpha}{\psi}]$ and
     $\xi_1=\xi[\subst{\alpha}{X}]$. Then $\omega_1$ is closed
@@ -1364,13 +1886,13 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
     $\omega^*(t_2) : \omega(\tau)$. Then by definition
     $\omega^*(t) = (\omega^*(t_1))(\omega^*(t_2)) \in
     \val{\sigma'}{\xi}{\omega}$.
-  \item If $t = s \psi$ then $s : \forall\alpha[\tau]$ and $\sigma' =
+  \item If $t = s \psi$ then $s : \forall\alpha\tau$ and $\sigma' =
     \tau[\subst{\alpha}{\psi}]$. By the inductive hypothesis
-    $\omega^*(s) \in \val{\forall\alpha[\tau]}{\xi}{\omega}$. Because
+    $\omega^*(s) \in \val{\forall\alpha\tau}{\xi}{\omega}$. Because
     $\FTV(\omega(t)) = \emptyset$, the mapping $\omega$ is closed
     for~$\psi$. So by Lemma~\ref{lem_forall} we have $\omega^*(t) =
     \omega^*(s) \omega(\psi) \in
-    \val{\tau[\subst{\alpha}{\psi}]}{\xi}{\omega}$.
+    \val{\tau[\subst{\alpha}{\psi}]}{\xi}{\omega}$.\qedhere
   \end{itemize}
 \end{proof}
 
@@ -1408,6 +1930,546 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
   $t_1,t_2$ are final interpretation terms of type~$\nat$, hence
   natural numbers by the inductive hypothesis. But then $t$ contains a
   redex. Contradiction.
+\end{proof}
+
+\subsection{Weak monotonicity proof}\label{sec_weakly_monotone_proof}
+
+We want to show that if $s \succeq s'$ then $t[\subst{x}{s}] \succeq
+t[\subst{x}{s'}]$. A straightforward proof attempt runs into a problem
+that, because of impredicativity of polymorphism, direct induction on
+type structure is not possible. We adopt a method similar to Girard's
+method of candidates from the termination proof.
+
+\begin{defn}\label{def_wm_candidate}
+  By induction on the kind~$\kappa$ of a type constructor~$\tau$ we
+  define the set~$\Cb_\tau$ of all candidates of type
+  constructor~$\tau$.
+
+  First assume $\kappa=*$, i.e., $\tau$ is a type. A a set~$X$ of
+  terms of type~$\tau$ equipped with a binary relation~$\ge^X$ is a
+  \emph{candidate of type~$\tau$} if it satisfies the following
+  properties:
+  \begin{enumerate}
+  \item if $t \in X$ and $t' : \tau$ and $t' \leadsto t$ then $t' \in
+    X$,
+  \item if $t_1,t_2 \in X$ then $\circ_\tau t_1 t_2 \in X$ for $\circ
+    \in \{\oplus,\otimes\}$,
+  \item if $t : \nat$ then $\lift_\tau t \in X$.
+  \end{enumerate}
+  and the relation~$\ge^X$ satifies the following properties:
+  \begin{enumerate}
+  \item ${\succeq} \cap X \times X \subseteq {\ge^X}$,
+  \item if $t_1 \ge^X t_2$ and $t_1' \leadsto t_1$ (resp.~$t_2'
+    \leadsto t_2$) then $t_1' \ge^X t_2$ (resp.~$t_1 \ge^X t_2'$),
+  \item if $t_1 \ge^X t_1'$ and $t_2 \ge^X t_2'$ then $\circ_\tau t_1
+    t_2 \ge^X \circ_\tau t_1' t_2'$ for $\circ \in
+    \{\oplus,\otimes\}$,
+  \item if $t_1 \succeq_\nat t_2$ then $\lift_\tau(t_1) \ge^X
+    \lift_\tau(t_2)$,
+  \item if $t_1 \ge^X t_2$ then $\flatten_\tau(t_1) \succeq_\nat
+    \flatten_\tau(t_2)$,
+  \item $\ge^X$ is reflexive and transitive on~$X$.
+  \end{enumerate}
+  The relation~$\ge^X$ is a \emph{comparison candidate for~$X$},
+  and~$X$ is a \emph{candidate set}.
+
+  Now assume $\kappa = \kappa_1\arrkind\kappa_2$. A function $f :
+  \Tc_{\kappa_1} \times \bigcup_{\xi\in\Tc_{\kappa_1}}\Cb_\xi \to
+  \bigcup_{\xi\in\Tc_{\kappa_2}}\Cb_\xi$ is a \emph{candidate of type
+    constructor~$\tau$} if for every closed type constructor~$\sigma$
+  of kind~$\kappa_1$ and a candidate $X \in \Cb_\sigma$ we have
+  $f(\sigma,X) \in \Cb_{\tau\sigma}$.
+\end{defn}
+
+\begin{lemma}\label{lem_beta_wm_candidate}
+  If $\sigma =_\beta \sigma'$ then $\Cb_\sigma = \Cb_{\sigma'}$.
+\end{lemma}
+
+\begin{proof}
+  Induction on the kind of~$\sigma$.
+\end{proof}
+
+\begin{defn}\label{def_wm_valuation}
+  Let $\omega$ be a mapping from type constructor variables to type
+  constructors (respecting kinds). The mapping~$\omega$ extends in an
+  obvious way to a mapping from type constructors to type
+  constructors. A mapping~$\omega$ is \emph{closed for~$\sigma$} if
+  $\omega(\alpha)$ is closed for $\alpha \in \FV(\sigma)$ (then
+  $\omega(\sigma)$ is closed).
+
+  An \emph{$\omega$-valuation} is a mapping~$\xi$ on type constructor
+  variables such that $\xi(\alpha) \in \Cb_{\omega(\alpha)}$.
+
+  For each type constructor~$\sigma$, each mapping~$\omega$ closed
+  for~$\sigma$, and each $\omega$-valuation~$\xi$, we define
+  $\val{\sigma}{\xi}{\omega}$ by induction on~$\sigma$:
+  \begin{itemize}
+  \item $\val{\alpha}{\xi}{\omega} = \xi(\alpha)$ for a type
+    constructor variable~$\alpha$,
+  \item $\val{\nat}{\xi}{\omega}$ is the set of all terms~$t \in
+    \Iterms$ such that $t : \nat$; equipped with the relation
+    $\gteq{\nat}{\xi}{\omega} = \succeq_\nat$,
+  \item $\val{\sigma \arrtype \tau}{\xi}{\omega}$ is the set of all
+    terms~$t$ such that $t : \omega(\sigma\arrtype\tau)$ and:
+    \begin{itemize}
+    \item for all $s \in \val{\sigma}{\xi}{\omega}$ we have
+      $\app{t}{s} \in \val{\tau}{\xi}{\omega}$, and
+    \item if $s_1 \gteq{\sigma}{\xi}{\omega} s_2$ then $\app{t}{s_1}
+      \gteq{\tau}{\xi}{\omega} \app{t}{s_2}$;
+    \end{itemize}
+    equipped with the
+    relation~$\gteq{\sigma\arrtype\tau}{\xi}{\omega}$ defined by:
+    \begin{itemize}
+    \item $t_1 \gteq{\sigma\arrtype\tau}{\xi}{\omega} t_2$ iff
+      $t_1,t_2 \in \val{\sigma\arrtype\tau}{\xi}{\omega}$ and for
+      every $s \in \val{\sigma}{\xi}{\omega}$ we have $t_1 s
+      \gteq{\tau}{\xi}{\omega} t_2 s$,
+    \end{itemize}
+  \item $\val{\forall(\alpha:\kappa)[\sigma]}{\xi}{\omega}$ is the set
+    of all terms~$t$ such that $t : \omega(\forall\alpha[\sigma])$ and:
+    \begin{itemize}
+    \item for every closed type constructor~$\varphi$ of kind~$\kappa$
+      and every $X \in \Cb_\varphi$ we have $\tapp{t}{\varphi} \in
+      \val{\sigma}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$;
+    \end{itemize}
+    equipped with the
+    relation~$\gteq{\forall\alpha[\sigma]}{\xi}{\omega}$ defined by:
+    \begin{itemize}
+    \item $t_1 \gteq{\forall(\alpha:\kappa)[\sigma]}{\xi}{\omega} t_2$
+      iff $t_1,t_2 \in
+      \val{\forall(\alpha:\kappa)[\sigma]}{\xi}{\omega}$ and for every
+      closed type constructor~$\varphi$ of kind~$\kappa$ and every $X
+      \in \Cb_\varphi$ we have $t_1 \varphi
+      \gteq{\sigma}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}
+      t_2 \varphi$,
+    \end{itemize}
+  \item
+    $\val{\varphi \psi}{\xi}{\omega} =
+    \val{\varphi}{\xi}{\omega}(\omega(\psi),\val{\psi}{\xi}{\omega})$,
+  \item
+    $\val{\lambda(\alpha:\kappa)\varphi}{\xi}{\omega}(\psi,X) =
+    \val{\varphi}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\psi}]}$
+    for closed $\psi \in \Tc_\kappa$ and $X \in \Cb_\psi$.
+  \end{itemize}
+  In the above, if e.g.~$\val{\psi}{\xi}{\omega} \notin
+  \Cb_{\omega(\psi)}$ then $\val{\varphi \psi}{\xi}{\omega}$ is
+  undefined.
+\end{defn}
+
+Note that if $t \in \val{\sigma}{\xi}{\omega}$ then $t :
+\omega(\sigma)$, and if $t_1 \gteq{\sigma}{\xi}{\omega} t_2$ then
+$t_1,t_2\in\val{\sigma}{\xi}{\omega}$. For brevity we
+use~$\val{\sigma}{\xi}{\omega}$ to denote both the pair
+$(\val{\sigma}{\xi}{\omega},{\gteq{\sigma}{\xi}{\omega}})$ and its
+first element, depending on the context. For a type~$\tau$,
+by~$\gteq{\tau}{\xi}{\omega}$ we always denote the second element of
+the pair~$\val{\tau}{\xi}{\omega}$. If $\tau$ is closed then~$\xi$
+and~$\omega$ do not matter and we simply write~$\geq_\tau$
+and~$\val{\tau}{}{}$.
+
+\begin{lemma}\label{lem_val_wm_computable}
+  If $\sigma$ is a type constructor, $\omega$ is closed for~$\sigma$,
+  and $\xi$ is an $\omega$-valuation, then $\val{\sigma}{\xi}{\omega}
+  \in \Cb_{\omega(\sigma)}$.
+\end{lemma}
+
+\begin{proof}
+  Induction on~$\sigma$. If $\sigma=\alpha$ then $\xi(\alpha) \in
+  \Cb_{\omega(\alpha)}$ by definition. If $\sigma=\nat$ then this
+  follows from definitions.
+
+  Assume $\sigma=\sigma_1\arrtype\sigma_2$. We check the properties of
+  a candidate set.
+  \begin{enumerate}
+  \item The first property follows from the inductive hypothesis and
+    property~2 of comparison candidates.
+  \item Let $t_1,t_2 \in \val{\sigma}{\xi}{\omega}$. We need to show
+    $\circ_\omega(\sigma) t_1 t_2 \in
+    \val{\sigma_1\arrtype\sigma_2}{\xi}{\omega}$.
+
+    Let $s \in \val{\sigma_1}{\xi}{\omega}$. Then
+    $\circ_{\omega(\sigma)} t_1 t_2 s \leadsto
+    \circ_{\omega(\sigma_2)} (t_1 s) (t_2 s)$. Because $t_i \in
+    \val{\sigma_1\arrtype\sigma_2}{\xi}{\omega}$, we have $t_i s \in
+    \val{\sigma_2}{\xi}{\omega}$. By the inductive
+    hypothesis~$\val{\sigma_2}{\xi}{\omega} \in
+    \Cb_{\omega(\sigma_2)}$, so $\circ_{\omega(\sigma_2)} (t_1 s) (t_2
+    s) \in \val{\sigma_2}{\xi}{\omega}$. Hence
+    $\circ_{\omega(\sigma_2)} t_1 t_2 s \in
+    \val{\sigma_2}{\xi}{\omega}$ by property~1 of candidate sets.
+
+    Let $s_1 \gteq{\sigma_1}{\xi}{\omega} s_2$. Then $s_i \in
+    \val{\sigma_1}{\xi}{\omega}$. Because $t_j \in
+    \val{\sigma_1\arrtype\sigma_2}{\xi}{\omega}$, we have $t_j s_i \in
+    \val{\sigma_2}{\xi}{\omega}$ and $t_j s_1
+    \gteq{\sigma_2}{\xi}{\omega} t_j s_2$. By the inductive
+    hypothesis~$\gteq{\sigma_2}{\xi}{\omega}$ is a comparison
+    candidate for~$\val{\sigma_2}{\xi}{\omega}$. Thus
+    $\circ_{\omega(\sigma_2)} (t_1 s_1) (t_2 s_1)
+    \gteq{\sigma_2}{\xi}{\omega} \circ_{\omega(\sigma_2)} (t_1 s_2)
+    (t_2 s_2)$ by property~3 of comparison candidates. This suffices
+    by property~2 of comparison candidates.
+  \item Let $t : \nat$. Then $\lift_{\omega(\sigma)} t :
+    \omega(\sigma)$.
+
+    Let $s \in \val{\sigma_1}{\xi}{\omega}$. Then
+    $\lift_{\omega(\sigma)}t s \leadsto \lift_{\omega(\sigma_2)}
+    t$. By the inductive hypothesis $\lift_{\omega(\sigma_2)} t \in
+    \val{\sigma_2}{\xi}{\omega}$. Hence $\lift_{\omega(\sigma)}t s \in
+    \val{\sigma_2}{\xi}{\omega}$ by property~1 of candidate sets.
+
+    Let $s_1,s_2 \in \val{\sigma_1}{\xi}{\omega}$. By the inductive
+    hypothesis~$\gteq{\sigma_2}{\xi}{\omega}$ is a comparison
+    candidate for~$\val{\sigma_2}{\xi}{\omega}$. We have
+    $\lift_{\omega(\sigma_2)} t \gteq{\sigma_2}{\xi}{\omega}
+    \lift_{\omega(\sigma_2)} t$ by the reflexivity
+    of~$\gteq{\sigma_2}{\xi}{\omega}$ (property~6 of comparison
+    candidates). This suffices by property~2 of comparison candidates,
+    because $\lift_{\omega(\sigma)}t s_i \leadsto
+    \lift_{\omega(\sigma_2)} t$.
+  \end{enumerate}
+  Now we check the properties of a comparison candidate
+  for~$\val{\sigma_1\arrtype\sigma_2}{\xi}{\omega}$.
+  \begin{enumerate}
+  \item Suppose $t_1 \succeq t_2$ with $t_1,t_2 \in
+    \val{\sigma}{\xi}{\omega}$. Let $s \in
+    \val{\sigma_1}{\xi}{\omega}$. Then $t_1 s \succeq t_2 s$ by the
+    definition of~$\succeq$. Hence $t_1 s \gteq{\sigma_2}{\xi}{\omega}
+    t_2 s$ by the inductive hypothesis.
+  \item Follows from the inductive hypothesis and the already shown
+    property~1 of candidate sets
+    for~$\val{\sigma_1\arrtype\sigma_2}{\xi}{\omega}$.
+  \item Assume $t_i \gteq{\sigma}{\xi}{\omega} t_i'$. Let $s \in
+    \val{\sigma_1}{\xi}{\omega}$. We have $\circ_{\omega(\sigma)} t_1
+    t_2 s \leadsto \circ_{\omega(\sigma_2)} (t_1 s) (t_2 s)$ and
+    $\circ_{\omega(\sigma)} t_1' t_2' s \leadsto
+    \circ_{\omega(\sigma_2)} (t_1' s) (t_2' s)$. Since
+    $t_i,t_i'\in\val{\sigma}{\xi}{\omega}$, we have $t_i s
+    \gteq{\sigma_2}{\xi}{\omega} t_i' s$ and $t_i s, t_i' s \in
+    \val{\sigma_2}{\xi}{\omega}$. By the inductive hypothesis $\circ
+    (t_1 s) (t_2 s) \gteq{\sigma_2}{\xi}{\omega} \circ (t_1' s) (t_2'
+    s)$, so $\circ t_1 t_2 s \gteq{\sigma_2}{\xi}{\omega} \circ t_1'
+    t_2' s$ by property~2 of comparison candidates. This implies
+    $\circ t_1 t_2 \gteq{\sigma}{\xi}{\omega} \circ t_1' t_2'$.
+  \item Follows from Lemma~\ref{lem:liftgreater} and property~1 of
+    comparison candidates.
+  \item Assume $t_1 \gteq{\sigma}{\xi}{\omega} t_2$. Then
+    $\flatten_{\omega(\sigma)} t_i \leadsto
+    \flatten_{\omega(\sigma_2)} (t_i (\lift_{\omega(\sigma_1)}0))$. By
+    the inductive hypothesis and property~3 of candidate sets
+    $\lift_{\omega(\sigma_1)}0 \in \val{\sigma_1}{\xi}{\omega}$. Hence
+    $t_i (\lift_{\omega(\sigma_1)}0) \in \val{\sigma_2}{\xi}{\omega}$
+    and $t_1 (\lift_{\omega(\sigma_1)}0) \gteq{\sigma_2}{\xi}{\omega}
+    t_2 (\lift_{\omega(\sigma_1)}0)$. Thus
+    $\flatten_{\omega(\sigma_2)} (t_1 (\lift_{\omega(\sigma_1)}0))
+    \succeq_\nat \flatten_{\omega(\sigma_2)} (t_2
+    (\lift_{\omega(\sigma_1)}0))$ by the inductive hypothesis. This
+    implies $\flatten_{\omega(\sigma)} t_1 \succeq_\nat
+    \flatten_{\omega(\sigma)} t_2$.
+  \item Follows directly from the inductive hypothesis.
+  \end{enumerate}
+
+  If $\sigma=\forall\alpha\tau$ then the proof is analogous to the
+  case $\sigma=\sigma_1\arrtype\sigma_2$. If $\sigma=\varphi\psi$ or
+  $\sigma=\lambda(\alpha:\kappa)\varphi$ then the claim follows from
+  the inductive hypothesis and Lemma~\ref{lem_beta_wm_candidate}, like
+  in the proof of Lemma~\ref{lem_val_computable}.
+\end{proof}
+
+\begin{lemma}\label{lem_wm_circ}
+  If $\omega$ is closed for~$\sigma$ then $\circ_{\omega(\sigma)} \in
+  \val{\sigma \arrtype \sigma \arrtype \sigma}{\xi}{\omega}$ for
+  $\circ \in \{ \oplus, \otimes \}$.
+\end{lemma}
+
+\begin{proof}
+  Let $t_1,t_2 \in \val{\sigma}{\xi}{\omega}$. Then
+  $\circ_{\omega(\sigma)} t_1 t_2 \in \val{\sigma}{\xi}{\omega}$ by
+  Lemma~\ref{lem_val_wm_computable} and property~2 of candidate
+  sets.
+
+  Let $t_2' \in \val{\sigma}{\xi}{\omega}$ be such that $t_2
+  \gteq{\sigma}{\xi}{\omega} t_2'$. By
+  Lemma~\ref{lem_val_wm_computable} and properties~5 and~3 of
+  comparison candidates we have we have $\circ_{\omega(\sigma)} t_1
+  t_2 \gteq{\sigma}{\xi}{\omega} \circ_{\omega(\sigma)} t_1
+  t_2'$. This shows $\circ_{\omega(\sigma)} t_1 \in
+  \val{\sigma\arrtype\sigma}{\xi}{\omega}$.
+
+  Let $t_1' \in \val{\sigma}{\xi}{\omega}$ be such that $t_1
+  \gteq{\sigma}{\xi}{\omega} t_1'$. Let $u \in
+  \val{\sigma}{\xi}{\omega}$. By Lemma~\ref{lem_val_wm_computable} and
+  properties~2 and~3 of comparison candidates we have
+  $\circ_{\omega(\sigma)} t_1 u \gteq{\sigma}{\xi}{\omega}
+  \circ_{\omega(\sigma)} t_1' u$. Hence $\circ_{\omega(\sigma)} t_1
+  \gteq{\sigma\arrtype\sigma}{\xi}{\omega} \circ_{\omega(\sigma)}
+  t_1'$. This shows $\circ_{\omega(\sigma)} \in
+  \val{\sigma}{\xi}{\omega}$.
+\end{proof}
+
+\begin{lemma}\label{lem_wm_lift}
+  If $\omega$ is closed for~$\sigma$ then $\lift_{\omega(\sigma)} \in
+  \val{\nat\arrtype\sigma}{\xi}{\omega}$.
+\end{lemma}
+
+\begin{proof}
+  By Lemma~\ref{lem_val_wm_computable} and property~4 of comparison
+  candidates we have $\lift_{\omega(\sigma)}s_1
+  \gteq{\sigma}{\xi}{\omega} \lift_{\omega(\sigma)}s_2$ for all $s_i :
+  \nat$ with $s_1 \succeq_\nat s_2$. It remains to show that
+  $\lift_{\omega(\sigma)}s \in \val{\sigma}{\xi}{\omega}$ for all $s :
+  \nat$. This follows from Lemma~\ref{lem_val_wm_computable} and
+  property~3 of candidate sets.
+\end{proof}
+
+\begin{lemma}\label{lem_wm_flatten}
+  If $\omega$ is closed for~$\sigma$ then $\flatten_{\omega(\sigma)}
+  \in \val{\sigma\arrtype\nat}{\xi}{\omega}$.
+\end{lemma}
+
+\begin{proof}
+  Follows from Lemma~\ref{lem_val_wm_computable} and property~5 of
+  comparison candidates.
+\end{proof}
+
+\begin{lemma}\label{lem_val_subst_wm}
+  For any type constructors~$\sigma,\tau$ with $\alpha \notin
+  \FV(\tau)$, a mapping~$\omega$ closed for~$\sigma$ and for~$\tau$,
+  and an $\omega$-valuation~$\xi$, we have:
+  \[
+  \val{\sigma[\subst{\alpha}{\tau}]}{\xi}{\omega} =
+  \val{\sigma}{\xi[\subst{\alpha}{\val{\tau}{\xi}{\omega}}]}{\omega[\subst{\alpha}{\omega(\tau)}]}.
+  \]
+\end{lemma}
+
+\begin{proof}
+  Let~$\omega' = \omega[\subst{\alpha}{\omega(\tau)}]$ and $\xi' =
+  \xi[\subst{\alpha}{\val{\tau}{\xi}{\omega}}]$. The proof by
+  induction on~$\sigma$ is analogous to the proof of
+  Lemma~\ref{lem_val_subst}. The main difference is that in the case
+  $\sigma = \sigma_1\arrtype\sigma_2$ we need to show that if e.g.~$t
+  \in \val{\sigma[\subst{\alpha}{\tau}]}{\xi}{\omega}$ and $s_1
+  \gteq{\sigma_1}{\xi'}{\omega'} s_2$ then $t s_1
+  \gteq{\sigma_2}{\xi'}{\omega'} t s_2$. But then $s_1
+  \gteq{\sigma_1[\subst{\alpha}{\tau}]}{\xi}{\omega} s_2$ by the
+  inductive hypothesis, so $t s_1
+  \gteq{\sigma_2[\subst{\alpha}{\tau}]}{\xi}{\omega} t s_2$ by
+  definition. Hence $t s_1 \gteq{\sigma_2}{\xi'}{\omega'} t s_2$ by
+  the inductive hypothesis.
+\end{proof}
+
+\begin{lemma}\label{lem_wm_forall}
+  Let $\tau$ be a type constructor of kind~$\kappa$. Assume $\omega$
+  is closed for $\forall\alpha[\sigma]$ and for~$\tau$.
+  \begin{enumerate}
+  \item If $t \in \val{\forall(\alpha:\kappa)[\sigma]}{\xi}{\omega}$
+    then $t (\omega(\tau)) \in
+    \val{\sigma[\subst{\alpha}{\tau}]}{\xi}{\omega}$.
+  \item If $t_1 \gteq{\forall(\alpha:\kappa)[\sigma]}{\xi}{\omega}
+    t_2$ then $t_1 (\omega(\tau))
+    \gteq{\sigma[\subst{\alpha}{\tau}]}{\xi}{\omega} t_2
+    (\omega(\tau))$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  Analogous to the proof of Lemma~\ref{lem_forall}, using
+  Lemma~\ref{lem_val_wm_computable} and Lemma~\ref{lem_val_subst_wm}.
+\end{proof}
+
+\begin{lemma}\label{lem_beta_val_wm}
+  If $\omega$ is closed for~$\sigma,\sigma'$ and $\sigma =_\beta
+  \sigma'$ then $\val{\sigma}{\xi}{\omega} =
+  \val{\sigma'}{\xi}{\omega}$ and ${\gteq{\sigma}{\xi}{\omega}} =
+      {\gteq{\sigma'}{\xi}{\omega}}$.
+\end{lemma}
+
+\begin{proof}
+  Analogous to the proof of Lemma~\ref{lem_beta_val}, using
+  Lemma~\ref{lem_val_subst_wm}.
+\end{proof}
+
+For two replacements $\delta_1 = \gamma_1 \circ \omega$ and $\delta_2
+= \gamma_2 \circ \omega$ (see Definition~\ref{def_closure}) and an
+$\omega$-valuation~$\xi$ we write $\delta_1 \gteq{\tau}{\xi}{\omega}
+\delta_2$ iff $\delta_1(x) \gteq{\tau}{\xi}{\omega} \delta_2(x)$ for
+each~$x : \tau$.
+
+\begin{lemma}\label{lem_typable_wm_computable}
+  Assume $t : \sigma$ and $\delta_1=\gamma_1\circ\omega$,
+  $\delta_2=\gamma_2\circ\omega$ are replacements and~$\xi$ an
+  $\omega$-valuation such that $\delta_1 \gteq{}{\xi}{\omega}
+  \delta_2$ and $\omega$ is closed for~$\sigma$ and $\FTV(\omega(t)) =
+  \emptyset$ and for all $x^\tau \in \FV(t)$ we have $\delta_i(x) \in
+  \val{\tau}{\xi}{\omega}$. Then $\delta_i(t) \in
+  \val{\sigma}{\xi}{\omega}$ and $\delta_1(t)
+  \gteq{\sigma}{\xi}{\omega} \delta_2(t)$.
+\end{lemma}
+
+\begin{proof}
+  Induction on the structure of~$t$. By the generation lemma for $t :
+  \sigma$ there is a type~$\sigma'$ such that $\sigma' =_\beta \sigma$
+  and $\FV(\sigma') \subseteq \FV(\sigma) \cup \FTV(t)$ and one of the
+  cases below holds. Note that $\omega$ is closed for~$\sigma'$,
+  because it is closed for~$\sigma$ and $\FTV(\omega(t)) =
+  \emptyset$. Hence by Lemma~\ref{lem_beta_val_wm} it suffices to show
+  $\delta_i(t) \in \val{\sigma'}{\xi}{\omega}$ and $\delta_1(t)
+  \gteq{\sigma'}{\xi}{\omega} \delta_2(t)$.
+  \begin{itemize}
+  \item If $t = x^{\tau_1}$ and $\tau_1 =_\beta \sigma'$ then
+    $\delta_i(t) \in \val{\tau_1}{\xi}{\omega} =
+    \val{\sigma'}{\xi}{\omega}$ by assumption and
+    Lemma~\ref{lem_beta_val_wm}. Also $\delta_1(t)
+    \gteq{\sigma'}{\xi}{\omega} \delta_2(t)$ by assumption and
+    Lemma~\ref{lem_beta_val_wm}.
+  \item If $t = n$ is a natural number and $\sigma' = \nat$ then
+    $\delta_i(t) = t$ and thus $t \in \val{\nat}{}{}$ and $\delta_1(t)
+    \gteq{\nat}{\xi}{\omega} \delta_2(t)$ by definition and the
+    reflexivity of~$\gteq{\nat}{\xi}{\omega}$.
+  \item If $t$ is a function symbol then the claim follows from
+    Lemma~\ref{lem_wm_circ}, Lemma~\ref{lem_wm_lift} or
+    Lemma~\ref{lem_wm_flatten}, and the reflexivity
+    of~$\gteq{}{\xi}{\omega}$.
+  \item If $t = \abs{x:\sigma_1}{u}$ then $\sigma' =
+    \sigma_1\arrtype\sigma_2$ and $u : \sigma_2$. Let $s \in
+    \val{\sigma_1}{\xi}{\omega}$ and
+    $\delta_i'=\delta_i[\subst{x}{s}]$. This is well-defined because
+    $s : \omega(\sigma_1)$ and~$\omega(x)$ has
+    type~$\omega(\sigma_1)$. We have $\delta_1' \gteq{}{\xi}{\omega}
+    \delta_2'$ by the reflexivity of~$\gteq{\sigma_1}{\xi}{\omega}$
+    (Lemma~\ref{lem_val_wm_computable} and property~6 of comparison
+    candidates). Hence by the inductive hypothesis $\delta_i'(u) \in
+    \val{\sigma_2}{\xi}{\omega}$. We have $\delta_i(\abs{x}{u}) s
+    \leadsto \delta_i'(u)$, so $\delta_i(\abs{x}{u}) s \in
+    \val{\sigma_2}{\xi}{\omega}$ by Lemma~\ref{lem_val_wm_computable}
+    and property~1 of candidate sets.
+
+    Let $s_1,s_2 \in \val{\sigma_1}{\xi}{\omega}$ be such that $s_1
+    \gteq{\sigma_1}{\xi}{\omega} s_2$. Let
+    $\delta_i'=\delta_i[\subst{x}{s_i}]$. We have $\delta_1
+    \gteq{}{\xi}{\omega} \delta_2$. Hence by the inductive hypothesis
+    $\delta_1'(u)\gteq{\sigma_2}{\xi}{\omega}\delta_2'(u)$. We have
+    $\delta_i(\abs{x}{u}) s_i \leadsto \delta_i'(u)$. Thus
+    $\delta_1(t) s_1 \gteq{\sigma_2}{\xi}{\omega} \delta_2(t) s_2$ by
+    Lemma~\ref{lem_val_wm_computable} and property~2 of comparison
+    candidates.
+
+    Finally, we show $\delta_1(t)
+    \gteq{\sigma_1\arrtype\sigma_2}{\xi}{\omega} \delta_2(t)$. Let $s
+    \in \val{\sigma_1}{\xi}{\omega}$ and
+    $\delta_i'=\delta_i[\subst{x}{s}]$. We have $\delta_1'
+    \gteq{}{\xi}{\omega} \delta_2'$. By the inductive hypothesis
+    $\delta_1'(u) \gteq{\sigma_2}{\xi}{\omega} \delta_2'(u)$. We have
+    $\delta_i(\abs{x}{u}) s \leadsto \delta_i'(u)$. Thus $\delta_1(t)
+    s \gteq{\sigma_2}{\xi}{\omega} \delta_2(t) s$ by
+    Lemma~\ref{lem_val_wm_computable} and property~2 of comparison
+    candidates.
+  \item If $t = \tabs{\alpha:\kappa}{u}$ then $\sigma' =
+    \forall\alpha[\tau]$ and $u : \tau$. Let $\psi$ be a closed type
+    constructor of kind~$\kappa$ and let $X \in \Cb_\psi$. Let
+    $\omega' = \omega[\subst{\alpha}{\psi}]$ and
+    $\xi'=\xi[\subst{\alpha}{X}]$. Then $\omega'$ is closed for~$\tau$
+    and $\FTV(\omega'(u)) = \emptyset$. Let
+    $\delta_i'=\gamma_i\circ\omega'$. By the inductive hypothesis
+    $\delta_i'(u) \in \val{\tau}{\xi'}{\omega'}$ and $\delta_1'(u)
+    \gteq{\tau}{\xi'}{\omega'} \delta_2'(u)$. We have
+    $\delta_i(\tabs{\alpha}{u}) \psi \leadsto \delta_i'(u)$. Hence
+    $\delta_i(\tabs{\alpha}{u}) \psi \in \val{\tau}{\xi'}{\omega'}$ by
+    Lemma~\ref{lem_val_wm_computable} and property~1 of candidate
+    sets. Thus $\delta_i(\tabs{\alpha}{u}) \in
+    \val{\forall\alpha[\tau]}{\xi}{\omega}$. Also
+    $\delta_1(\tabs{\alpha}{u}) \psi \gteq{\tau}{\xi'}{\omega'}
+    \delta_2(\tabs{\alpha}{u}) \psi$ by
+    Lemma~\ref{lem_val_wm_computable} and property~2 of comparison
+    candidates. Thus $\delta_1(\tabs{\alpha}{u})
+    \gteq{\forall\alpha[\tau]}{\xi'}{\omega'}
+    \delta_2(\tabs{\alpha}{u})$.
+  \item If $t = t_1 t_2$ then $t_1 : \tau\arrtype\sigma'$ and $t_2 :
+    \tau$ and $\FV(\tau) \subseteq \FV(\sigma) \cup
+    \FTV(t)$. Hence~$\omega$ is closed for~$\tau$ and
+    for~$\tau\arrtype\sigma'$. By the inductive hypothesis
+    $\delta_i(t_1) \in \val{\tau\arrtype\sigma'}{\xi}{\omega}$ and
+    $\delta_i(t_2) \in \val{\tau}{\xi}{\omega}$ and $\delta_1(t_1)
+    \gteq{\tau\arrtype\sigma'}{\xi}{\omega} \delta_2(t_1)$ and
+    $\delta_1(t_2) \gteq{\tau}{\xi}{\omega} \delta_2(t_2)$. By the
+    definition of $\val{\tau\arrtype\sigma'}{\xi}{\omega}$ we have
+    $\delta_i(t) = \delta_i(t_1)\delta_i(t_2) \in
+    \val{\sigma'}{\xi}{\omega}$, and $\delta_1(t_1)\delta_1(t_2)
+    \gteq{\sigma'}{\xi}{\omega} \delta_1(t_1)\delta_2(t_2)$. By the
+    definition of~$\gteq{\tau\arrtype\sigma'}{\xi}{\omega}$ we have
+    $\delta_1(t_1)\delta_2(t_2)\gteq{\sigma'}{\xi}{\omega}\delta_2(t_1)\delta_2(t_2)$. Hence
+    $\delta_1(t)\gteq{\sigma'}{\xi}{\omega}\delta_2(t)$ by the
+    transitivity of~$\gteq{\sigma'}{\xi}{\omega}$.
+  \item If $t = s \psi$ then $s : \forall\alpha[\tau]$ and $\sigma' =
+    \tau[\subst{\alpha}{\psi}]$. By the inductive hypothesis
+    $\delta_i(s) \in \val{\forall\alpha[\tau]}{\xi}{\omega}$ and
+    $\delta_1(s) \gteq{\forall\alpha[\tau]}{\xi}{\omega}
+    \delta_2(s)$. Because $\FTV(\omega(t)) = \emptyset$, the mapping
+    $\omega$ is closed for~$\psi$. So by Lemma~\ref{lem_wm_forall} we
+    have $\delta_i(t) = \delta_i(s) \omega(\psi) \in
+    \val{\tau[\subst{\alpha}{\psi}]}{\xi}{\omega}$ and $\delta_1(t)
+    \gteq{\tau[\subst{\alpha}{\psi}]}{\xi}{\omega} \delta_2(t)$.\qedhere
+  \end{itemize}
+\end{proof}
+
+\begin{corollary}\label{cor_typable_wm_computable}
+  If $t$ is closed and $t : \sigma$ then $t \in \val{\sigma}{}{}$.
+\end{corollary}
+
+\begin{lemma}\label{lem_gteq_to_succeq}
+  If $\sigma$ is a closed type and $t_1 \geq_\sigma t_2$ then
+  $t_1 \succeq_{\sigma} t_2$.
+\end{lemma}
+
+\begin{proof}
+  By coinduction. By Lemma~\ref{lem_beta_val_wm} we may assume
+  that~$\sigma$ is in $\beta$-normal form. The case $\sigma=\alpha$ is
+  impossible because~$\sigma$ is closed. If $\sigma = \nat$ then
+  ${\geq_\nat} = {\succeq_\nat}$.
+
+  Assume $\sigma=\sigma_1\arrtype\sigma_2$. Let $u : \sigma_1$ be
+  closed. By Corollary~\ref{cor_typable_wm_computable} we have $u \in
+  \val{\sigma_1}{}{}$. Hence $t_1 u \geq_{\sigma_2} t_2 u$. By the
+  coinductive hypothesis $t_1 u \succeq_{\sigma_2} t_2 u$. This
+  implies $t_1 \succeq_{\sigma} t_2$.
+
+  Assume $\sigma=\forall(\alpha:\kappa)\tau$. Let $\varphi$ be a
+  closed type constructor of kind~$\kappa$. By
+  Lemma~\ref{lem_val_wm_computable} we have $\val{\varphi}{}{} \in
+  \Cb_\varphi$. By the definition of~$\geq_{\forall\alpha\tau}$ and
+  Lemma~\ref{lem_val_subst_wm} we have $t_1 \varphi
+  \geq_{\tau[\subst{\alpha}{\varphi}]} t_2 \varphi$. Note that
+  $\tau[\subst{\alpha}{\varphi}]$ is still closed. Hence by the
+  coinductive hypothesis $t_1 \varphi
+  \succeq_{\tau[\subst{\alpha}{\varphi}]} t_2 \varphi$. This implies
+  $t_1 \succeq_{\sigma} t_2$.
+\end{proof}
+
+\begin{corollary}\label{cor_gteq_succeq}
+  If~$\sigma$ is a closed type then ${\geq_{\sigma}} =
+  {\succeq_\sigma}$.
+\end{corollary}
+
+\begin{proof}
+  Follows from Lemma~\ref{lem_gteq_to_succeq},
+  Lemma~\ref{lem_val_wm_computable} and property~1 of comparison
+  candidates.
+\end{proof}
+
+{ \renewcommand{\thetheorem}{\ref{lem_succeq_subst}}
+\begin{lemma}
+  If $s \succeq_\sigma s'$ then $t[\subst{x}{s}] \succeq_\tau t[\subst{x}{s'}]$.
+\end{lemma}
+\addtocounter{theorem}{-1}}
+
+\begin{proof}
+  It suffices to show this when
+  $s,s',t[\subst{x}{s}],t[\subst{x}{s'}]$ and $\sigma,\tau$ are all
+  closed. Assume $s \succeq_\sigma s'$. Then $s \geq_{\sigma} s'$ by
+  Corollary~\ref{cor_gteq_succeq}. Thus $t[\subst{x}{s}] \geq_{\tau}
+  t[\subst{x}{s'}]$ follows from
+  Lemma~\ref{lem_typable_wm_computable}. Hence $t[\subst{x}{s}]
+  \succeq_\tau t[\subst{x}{s'}]$ by Corollary~\ref{cor_gteq_succeq}.
 \end{proof}
 
 \section{Proving the inequalities in \refsec{examples}}\label{app_ineqs}
