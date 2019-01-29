@@ -362,7 +362,9 @@ type (where two occurrences of the same variable must be annotated
 with the same type). Note that given a context~$\Gamma$ under which
 all considered terms are typable, there is a natural isomorphism
 between typed terms as defined above and terms given in orthodox
-Church-style.
+Church-style. We write $t : \tau$ if $t$ has type~$\tau$, in a fixed
+implicit context~$\Gamma$, or equivalently with~$t$ considered an
+orthodox Church-style typed term.
 
 \section{Polymorphic Algebraic Functional Systems}\label{sec_systems}
 
@@ -386,8 +388,14 @@ specialising Section~\ref{sec_preliminaries}.
     . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype \tau
     \]
     with~$\tau$ a type atom,
-  \item for any subterm $t_1 t_2$ of a term~$t$, the subterm~$t_1$ is
-    not a variable or an abstraction.
+  \item for any subterm $\app{s}{u}$ of a term~$t$, we have $s =
+    \mathtt{f} \rho_1 \ldots \rho_n u_1 \ldots u_m$ where
+    \[
+    \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots
+    \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
+    \sigma_k \arrtype \tau
+    \]
+    with $\tau$ a type atom and $m < k$.
   \end{itemize}
 \end{defn}
 
@@ -414,8 +422,6 @@ $\Sigma$. Similarly, type application is modelled through a symbol
 $\mathtt{A} : \forall \alpha : * \arrkind * . \forall \beta . (\forall
 \beta [\alpha \beta]) \arrtype \alpha \beta$.
 
-We fix a variable context~$\Gamma$.
-
 \begin{defn}\label{def_replacement}
   A \emph{$\Gamma$-replacement} is a function $\delta = \gamma \circ
   \omega$ satisfying:
@@ -434,7 +440,8 @@ We fix a variable context~$\Gamma$.
 \end{defn}
 
 The rewrite rules are simply a set of term pairs, whose monotonic
-closure generates the rewrite relation.
+closure generates the rewrite relation. We fix a variable
+context~$\Gamma$.
 
 \begin{defn}\label{def_rules}
   A \emph{$\sigma$-context}~$C_\sigma$ is a term with a fresh function
@@ -463,7 +470,7 @@ closure generates the rewrite relation.
   PAFS~$A$ is referred to as an $A$-term.
 \end{defn}
 
-\begin{example}[Fold on heterogenous lists]
+\begin{example}[Fold on heterogenous lists]\label{ex_fold_pafs}
   The example from the introduction may be represented as a PAFS with
   one type symbol
   \[
@@ -513,7 +520,7 @@ and the relations~$\succeq$ and~$\succ$ on~$\Iterms$. We also define
 the set~$\Iterms^f$ of final interpretation terms as the set of all
 closed interpretation terms normalized with a certain reduction
 relation. We will use interpretation terms from~$\Iterms$ to interpret
-terms of~PAFSs. The pair $(\succeq,\succ)$ will be used as an ordering
+terms of~PAFSs. The pair $(\succeq,\succ)$ will be used as a reduction
 pair for the method of rule removal. In particular, the
 relation~$\succ$ will be well-founded.
 
@@ -595,7 +602,7 @@ normalise certain elements of~$\Iterms$ using the relation~$\arrW$.
   with respect to $\arrW$.  We let $\Iterms^f$ be the set of all final
   interpretation terms. By~$\Iterms_\tau$ ($\Iterms^f_\tau$) we denote
   the set of all (final) interpretation terms of interpretation
-  type~$\tau$ (under a fixed implicit context~$\Gamma$).
+  type~$\tau$ (in a fixed implicit context~$\Gamma$).
 \end{defn}
 
 An important difference with system~$\Fomega$ and related ones is that
@@ -756,7 +763,7 @@ ordering.
   is in $\beta$-normal form, all redexes in
   $\tau[\subst{\alpha}{\chi_\kappa}]$ are created by the substitution
   and must have the form $\chi_\kappa u$. Hence, by the definition
-  of~$\chi_\kappa$ (see Definition~\ref{def_chi_kappa}) the
+  of~$\chi_\kappa$ (see Definition~\ref{def_types}) the
   type~$\tau'$ is smaller than~$\tau$. This is impossible by the
   inductive hypothesis.
 \end{proof}
@@ -880,7 +887,7 @@ a~PAFS~$A$.
 
   A \emph{reduction pair} is a pair~$(\succeq^A,\succ^A)$ of a
   quasi-order~$\succeq^A$ on $A$-terms and a well-founded
-  order~$\succ^A$ on $A$-terms such that:
+  ordering~$\succ^A$ on $A$-terms such that:
   \begin{itemize}
   \item $\succeq^A$ and~$\succ^A$ are compatible, i.e., ${\succ^A}
     \cdot {\succeq^A} \subseteq {\succ^A}$,
@@ -919,22 +926,17 @@ a reduction pair.
   \succeq \lift(m) u_1 \ldots u_k$ for closed $u_1,\ldots,u_k$. First
   note that $(\lift\,t) u_1 \ldots u_k \leadsto^* \lift(t)$ (with a
   different type subscript in~$\lift$ on the right side, omitted here
-  for conciseness).
-
-  If $\sigma = \nat$ then $(\lift(n) u_1 \ldots u_k)\da = n \ge m =
-  (\lift(m) u_1 \ldots u_k)\da$. Hence $\lift(n) u_1 \ldots u_k
-  \succeq_\nat \lift(m) u_1 \ldots u_k$.
-
-  If $\sigma = \tau_1\arrtype\tau_2$ then by the coinductive
-  hypothesis $\lift(n) u_1 \ldots u_k q \succeq_{\tau_2} \lift(m) u_1
-  \ldots u_k q$ for any $q \in \Iterms^f_{\tau_1}$. Hence $\lift(n)
-  u_1 \ldots u_k \succeq_\sigma \lift(m) u_1 \ldots u_k$.
-
-  If $\sigma = \forall(\alpha:\kappa)\tau$ then by the coinductive
-  hypothesis $\lift(n) u_1 \ldots u_k \xi \succeq_{\sigma'} \lift(m)
-  u_1 \ldots u_k \xi$ for any closed $\xi \in \Tc_\kappa$, where
-  $\sigma' = \tau[\subst{\alpha}{\xi}]$. Hence $\lift(n) u_1 \ldots
-  u_k \succeq_\sigma \lift(m) u_1 \ldots u_k$.
+  for conciseness). If $\sigma = \nat$ then $(\lift(n) u_1 \ldots
+  u_k)\da = n \ge m = (\lift(m) u_1 \ldots u_k)\da$. If $\sigma =
+  \tau_1\arrtype\tau_2$ then by the coinductive hypothesis $\lift(n)
+  u_1 \ldots u_k q \succeq_{\tau_2} \lift(m) u_1 \ldots u_k q$ for any
+  $q \in \Iterms^f_{\tau_1}$, so $\lift(n) u_1 \ldots u_k
+  \succeq_{\sigma} \lift(m) u_1 \ldots u_k$ by definition. If $\sigma
+  = \forall(\alpha:\kappa)\tau$ then by the coinductive hypothesis
+  $\lift(n) u_1 \ldots u_k \xi \succeq_{\sigma'} \lift(m) u_1 \ldots
+  u_k \xi$ for any closed $\xi \in \Tc_\kappa$, where $\sigma' =
+  \tau[\subst{\alpha}{\xi}]$. Hence $\lift(n) u_1 \ldots u_k
+  \succeq_{\sigma} \lift(m) u_1 \ldots u_k$ by definition
 \end{proof}
 
 \begin{lemma}\label{lem_flatten_succ}
@@ -999,8 +1001,8 @@ The following lemma depends on the lemmas above. The full proof may be
 found in Appendix~\ref{app_proofs}. The proof is actually quite
 complex, and uses a method similar to Girard's method of candidates
 for the termination proof. The difficulty comes from the fact that due
-to impredicativity of polymorphism direct induction on type structure
-is not possible.
+to the impredicativity of polymorphism direct induction on type
+structure is not possible.
 
 \begin{lemma}\label{lem_succeq_subst}
   If $s \succeq_\sigma s'$ then $t[\subst{x}{s}] \succeq_\tau
@@ -1028,6 +1030,15 @@ is not possible.
     \arrtype \tau} = \typeinterpret{\sigma} \arrtype
   \typeinterpret{\tau}$.
 \end{defn}
+
+\begin{lemma}\label{lem:substitutioninterpret:types}
+  $\typeinterpret{\sigma}[\alpha:=\typeinterpret{\tau}] =
+  \typeinterpret{\sigma[\alpha:=\tau]}$
+\end{lemma}
+
+\begin{proof}
+  Induction on~$\sigma$.
+\end{proof}
 
 Similarly, we employ a \emph{symbol mapping} as an aid to interpret
 PAFS terms.
@@ -1061,7 +1072,8 @@ Interpretation mapping preserves typing:
 \end{lemma}
 
 \begin{proof}
-  By induction on the form of $s$.
+  By induction on the form of $s$, using
+  Lemma~\ref{lem:substitutioninterpret:types}.
 \end{proof}
 
 \begin{defn}
@@ -1072,7 +1084,21 @@ Interpretation mapping preserves typing:
   \succinterpret t$ if $\interpret{s} \succ \interpret{t}$.
 \end{defn}
 
-We will show that under certain conditions on~$\Termmap$ the
+\begin{lemma}\label{lem:substitutioninterpret}
+  \begin{enumerate}
+  \item\label{lem:substitutioninterpret:mixed}
+    $\interpret{s}[\alpha:=\typeinterpret{\tau}] =
+    \interpret{s[\alpha:=\tau]}$.
+  \item\label{lem:substitutioninterpret:terms}
+    $\interpret{s}[x:=\interpret{t}] = \interpret{s[x:=t]}$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  Induction on~$s$.
+\end{proof}
+
+We will show that, under certain conditions on~$\Termmap$, the
 interpretation pair $(\succeqinterpret,\succinterpret)$ is a reduction
 pair.
 
@@ -1112,7 +1138,7 @@ pair.
 \end{lemma}
 
 \begin{proof}
-  Each point follows from one of the lemmas proven above,
+  Each point follows from one of the lemmas proven before,
   Lemma~\ref{lem_succ_to_succeq}, Lemma~\ref{lem_succeq_subst},
   Lemma~\ref{lem:compatibility} and the transitivity of~$\succeq$. For
   instance, assume $s_1 \succ s_2$ and let
@@ -1128,15 +1154,61 @@ pair.
   u_m^2 = (x u_1 \ldots u_m)[\subst{x}{s_2}]$.
 \end{proof}
 
-\begin{theorem}
+\begin{lemma}\label{lem_succinterpret_monotonic}
+  If~$\Termmap$ is safe then~$\succinterpret$ is monotonic.
+\end{lemma}
+
+\begin{proof}
+  Assume $s_1 \succinterpret s_2$. By induction on the structure of a
+  context~$C$ we show $C[s_1] \succinterpret C[s_2]$. If $C=\Box$ then
+  this is obvious. If $C = \abs{x}{C'}$ or $C = \tabs{\alpha}{C'}$
+  then $C'[s_1] \succinterpret C'[s_2]$ by the inductive hypothesis,
+  and thus $C[s_1] \succinterpret C[s_2]$ follows from
+  Lemma~\ref{lem_abs_succ} and definitions. If $C = C' t$ then
+  $C'[s_1] \succinterpret C'[s_2]$ by the inductive hypothesis, and
+  thus $C[s_1] \succinterpret C[s_2]$ follows from definitions.
+
+  Finally, assume $C = \app{t}{C'}$. Then $t = \mathtt{f} \rho_1
+  \ldots \rho_n t_1 \ldots t_m$ where
+  \[
+  \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n
+  : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype
+  \tau
+  \]
+  with~$\tau$ a type atom, $m < k$, and $\Termmap(\mathtt{f}) =
+  \tabs{\alpha_1 \dots \alpha_n}{\abs{x_1 \dots x_k}{u}}$ with $u$
+  safe for each~$x_i$. Without loss of generality assume $m=k-1$. Then
+  $\interpret{C[s_i]} \leadsto u'[\subst{x_k}{\interpret{C'[s_i]}}]$
+  where
+  $u'=u[\subst{\alpha_1}{\typeinterpret{\rho_1}}]\ldots[\subst{\alpha_n}{\typeinterpret{\rho_n}}][\subst{x_1}{\interpret{t_1}}]\ldots[\subst{x_{k-1}}{\interpret{t_{k-1}}}]$. By
+  the inductive hypothesis $\interpret{C'[s_1]} \succ
+  \interpret{C'[s_2]}$. Hence $u'[\subst{x_k}{\interpret{C'[s_1]}}]
+  \succ u'[\subst{x_k}{\interpret{C'[s_2]}}]$, because~$u$ is safe
+  for~$x_k$. Thus $\interpret{C[s_1]} \succ \interpret{C[s_2]}$ by
+  Lemma~\ref{lem_succ_red}.
+\end{proof}
+
+\begin{theorem}\label{thm_reduction_pair}
   If~$\Termmap$ is safe then $(\succeqinterpret,\succinterpret)$ is a
   reduction pair.
 \end{theorem}
 
 \begin{proof}
-  TODO
+  If follows from Lemma~\ref{lem_transitive} and
+  Lemma~\ref{lem_reflexive} that~$\succeqinterpret$ is a
+  quasi-order. Lemma~\ref{lem_well_founded} and
+  Lemma~\ref{lem_transitive} imply that~$\succinterpret$ is a
+  well-founded ordering. Compatibility follows from
+  Lemma~\ref{lem:compatibility}. Stability follows from definitions,
+  by manipulating closures. Monotonicity of~$\succeqinterpret$ follows
+  from Lemma~\ref{lem_succeq_subst}. Monotonicity of~$\succinterpret$
+  follows from Lemma~\ref{lem_succinterpret_monotonic}.
 \end{proof}
 
+\begin{example}\label{ex_fold_interpretation}
+  The following is a safe interpretation for the PAFS from
+  Example~\ref{ex_fold_pafs}: \LC{Cynthia: TODO}.
+\end{example}
 
 \section{Proving termination}
 
@@ -1165,9 +1237,8 @@ omit the type annotations for readability, denoting the above term
 by~$\lambda x : \tau\arrtype\sigma . x y$ or even~$\lambda x . x
 y$. Note that now type substitution also needs to change the type
 annotations. Also, each term has a unique type modulo
-$\beta$-conversion. We write $t : \tau$ if $t$ has type~$\tau$. The
-generation and subject reduction lemmas still hold for orthodox
-Church-style typed terms.
+$\beta$-conversion. The generation and subject reduction lemmas still
+hold for orthodox Church-style typed terms.
 
 \subsection{Strong Normalisation of~$\arrW$}
 
@@ -2160,11 +2231,11 @@ and~$\val{\tau}{}{}$.
     $\lift_{\omega(\sigma_1)}0 \in \val{\sigma_1}{\xi}{\omega}$. Hence
     $t_i (\lift_{\omega(\sigma_1)}0) \in \val{\sigma_2}{\xi}{\omega}$
     and $t_1 (\lift_{\omega(\sigma_1)}0) \gteq{\sigma_2}{\xi}{\omega}
-    t_2 (\lift_{\omega(\sigma_1)}0)$. Thus
+    t_2 (\lift_{\omega(\sigma_1)}0)$. Thus by the inductive hypothesis
     $\flatten_{\omega(\sigma_2)} (t_1 (\lift_{\omega(\sigma_1)}0))
     \succeq_\nat \flatten_{\omega(\sigma_2)} (t_2
-    (\lift_{\omega(\sigma_1)}0))$ by the inductive hypothesis. This
-    implies $\flatten_{\omega(\sigma)} t_1 \succeq_\nat
+    (\lift_{\omega(\sigma_1)}0))$. This implies
+    $\flatten_{\omega(\sigma)} t_1 \succeq_\nat
     \flatten_{\omega(\sigma)} t_2$.
   \item Follows directly from the inductive hypothesis.
   \end{enumerate}
