@@ -147,10 +147,10 @@
 
 \section{Preliminaries}\label{sec_preliminaries}
 
-In this section we introduce the System~$\Fomega$ (see
+In this section we introduce System~$\Fomega$ (see
 e.g.~\cite[Section~11.7]{SorensenUrzyczyn2006}), which will form a
 basis both of our interpretations and of a general syntactic framework
-for the investigated systems. First, we define the set of types.
+for the investigated systems.
 
 \begin{defn}\label{def_types}
   \emph{Kinds} are defined inductively: $*$ is a kind, and if
@@ -212,9 +212,6 @@ for the investigated systems. First, we define the set of types.
   \emptyset$.
 \end{defn}
 
-Terms are built from a set of function symbols, using abstraction and
-application.
-
 \begin{defn}\label{def_preterms}
   We assume given an infinite set $\Vars$ of variables, and let
   $\Gamma$ refer to a mapping from a finite subset of $\Vars$ to the
@@ -248,11 +245,9 @@ application.
   defined in the expected way. Analogously, we define the
   set~$\FTV(t)$ of type constructor variables occurring free
   in~$t$. We say that $t$ is \emph{closed} if $\FV(t) = \emptyset$ and
-  $\FTV(t) = \emptyset$.
+  $\FTV(t) = \emptyset$. If $\alpha$ is a type constructor variable of
+  kind~$\kappa$ then we use the notation $\tabs{\alpha:\kappa}{t}$.
 \end{defn}
-
-If $\alpha$ is a type constructor variable of kind~$\kappa$ then we
-use the notation $\tabs{\alpha:\kappa}{t}$.
 
 \begin{defn}\label{def_type_equiv}
   We define the type equivalence relation~$\equiv$ on preterms by
@@ -302,7 +297,7 @@ interchangeably.
 We will often abuse notation to omit $\cdot$ and $*$. Thus, $s t$ can
 refer to both $\app{s}{t}$ and $\tapp{s}{t}$. This is not ambiguous
 due to typing. We will also use $\abstraction{a}{s}$ for either
-$\abs{a}{s}$ or $\tabs{a}{s}$, depending on typing.
+$\abs{a}{s}$ or $\tabs{a}{s}$.
 
 \begin{lemma}[Substitution lemma]
   \begin{enumerate}
@@ -478,7 +473,7 @@ the proofs. Type subscripts are dropped when clear or irrelevant.
 
 To represent the rewrite systems whose termination we are going to
 analyse, we define the framework of Polymoprhic Algebraic Functional
-Systems (PAFS). We use a syntax based on system~$\Fomega$,
+Systems (PAFS). We use a syntax based on System~$\Fomega$,
 specialising Section~\ref{sec_preliminaries}.
 
 \begin{defn}\label{def_pafs_types_terms}
@@ -580,13 +575,7 @@ context~$\Gamma$.
 
 \begin{example}[Fold on heterogenous lists]\label{ex_fold_pafs}
   The example from the introduction may be represented as a PAFS with
-  one type symbol
-  \[
-  \begin{array}{c}
-    \mathtt{List} : *,
-  \end{array}
-  \]
-  the following function symbols:
+  one type symbol $\mathtt{List} : *$, the following function symbols:
   \[
   \begin{array}{rcl}
     @ & : & \forall \alpha \forall \beta . (\alpha \arrtype \beta) \arrtype \alpha \arrtype \beta \\
@@ -657,6 +646,13 @@ relation~$\succ$ will be well-founded.
   have type~$\nat$.
 \end{defn}
 
+For easier presentation, we will use $\oplus$ and $\otimes$ in
+\emph{infix, left-associative} notation, and omit the type denotation
+where it is clear from context. Thus, $s \oplus t \oplus u$ should be
+read as $\oplus_\sigma\,s\,(\oplus_\sigma\,t\,u)$ if $s$ has type
+$\sigma$. Similarly, we will sometimes omit the type denotation from
+$\flatten$ and $\lift$ when clear or irrelevant.
+
 To define the world of \emph{final interpretation terms}, we will
 normalise certain elements of~$\Iterms$ using the relation~$\arrW$.
 
@@ -713,7 +709,7 @@ normalise certain elements of~$\Iterms$ using the relation~$\arrW$.
   type~$\tau$ (in a fixed implicit context~$\Gamma$).
 \end{defn}
 
-An important difference with system~$\Fomega$ and related ones is that
+An important difference with System~$\Fomega$ and related ones is that
 the rules for $\oplus_\tau$, $\otimes_\tau$, $\flatten_\tau$ and
 $\lift_\tau$ depend on the type~$\tau$. In particular, type
 substitution in terms may create redexes. For instance, if $\alpha$ is
@@ -721,10 +717,6 @@ a type variable then $\oplus_\alpha t_1 t_2$ is not a redex, but
 $\oplus_{\sigma\arrtype\tau} t_1 t_2$ is. This makes adapting the
 standard computability-based termination proof method a bit more
 difficult.
-
-In the remainder of this section, we shall often speak simply of
-``terms'' and ``types'' when referring to interpretation terms and
-interpretation types.
 
 \subsection{The relation $\arrW$}
 
@@ -975,7 +967,8 @@ Finally, they must be compatible:
   $s\downarrow\ R\ t\downarrow$.
 \end{corollary}
 
-\section{Reduction pairs}
+
+\section{Reduction pairs}\label{sec_reduction_pairs}
 
 The goal of this section is to define an interpretation~$\Termmap$
 of~PAFS function symbols and a reduction pair
@@ -1321,9 +1314,108 @@ pair.
 
 \section{Proving termination}
 
+In this section we show how to use reduction pairs to prove
+termination of a PAFS. This is achieved by the method of rule removal.
+
 \subsection{Rule removal}
 
-\subsection{Calculation rules}
+\begin{theorem}\label{thm:ruleremove}
+  Let $\Rules = \Rules_1 \cup \Rules_2$, and suppose that
+  $\Rules_1\subseteq{\succ^\Rules}$ and
+  $\Rules_2\subseteq{\succeq^\Rules}$ for a reduction pair
+  $(\succeq^\Rules,\succ^\Rules)$. Then $\arr{\Rules}$ is terminating
+  if and only if $\arr{\Rules_2}$ is. In particular, $\arr{\Rules}$ is
+  terminating if $\Rules_2 = \emptyset$.
+\end{theorem}
+
+\begin{proof}
+  Monotonicity and stability of~$\succeq^\Rules$ and~$\succ^\Rules$
+  imply that ${\arr{\Rules_1}}\subseteq{\succ^\Rules}$ and
+  ${\arr{\Rules_2}}\subseteq{\succeq^\Rules}$.
+
+  By well-foundedness of $\succ^\Rules$, compatibility
+  of~$\succeq^\Rules$ and~$\succ^\Rules$, and transitivity
+  of~$\succeq^\Rules$, every infinite $\arr{\Rules}$ sequence can
+  contain only finitely many $\arr{\Rules_1}$ steps.
+\end{proof}
+
+The above theorem gives rise to the following algorithm:
+\begin{enumerate}
+\item While $\Rules$ is non-empty:
+  \begin{enumerate}
+  \item Orient all rules in $\Rules$ using $\succeq^\Rules$ or
+    $\succ^\Rules$; at least one of them must be oriented using
+    $\succ^\Rules$.
+  \item Remove all rules ordered by $\succ^\Rules$ from $\Rules$.
+  \end{enumerate}
+\end{enumerate}
+If this algorithm succeeds, we have proven termination.
+
+We propose using the pair $(\succeqinterpret,\succinterpret)$ from
+Section~\ref{sec_reduction_pairs}. To use this pair to prove
+termination of $\arr{\Rules}$ with rule removal, two things must be
+ensured:
+\begin{itemize}
+\item $\Termmap$ is safe;
+\item all rules in $\Rules$ can be oriented with $\succeqinterpret$ or
+  $\succinterpret$ and at least one with $\succinterpret$.
+\end{itemize}
+
+The first requirement guarantees that
+$(\succeqinterpret,\succinterpret)$ is a reduction pair (by
+Theorem~\ref{thm_reduction_pair}). Lemma~\ref{lem_safe} provides some
+sufficient safety criteria. The second requirement has to be verified
+for every individual rule.
+
+\subsection{Calculation rules}\label{sec_calculation_rules}
+
+We state a few lemmas which are helpful in showing rule orientation
+with~$\succeqinterpret$ and~$\succinterpret$. The proofs may be found
+in Appendix~\ref{app_proofs}.
+
+\begin{lemma}\label{lem:plusparts}
+For all types $\sigma$, terms $s,t$ of type $\sigma$ and natural
+numbers $n > 0$:
+\begin{enumerate}
+\item $s \oplus_{\sigma} t \succeq s$ and $s \oplus_{\sigma} t \succeq
+  t$;
+\item $s \oplus_{\sigma} (\lift_{\sigma} n) \succ s$ and
+  $(\lift_{\sigma} n) \oplus_{\sigma} t \succ t$.
+\end{enumerate}
+\end{lemma}
+
+\begin{lemma}\label{lem:approxproperties}
+For all types $\sigma$ and all terms $s,t,u$ of type $\sigma$, we
+have:
+\begin{enumerate}
+\item\label{lem:approx:symmetry} $s \oplus_\sigma t \approx t
+  \oplus_\sigma s$ and $s \otimes_\sigma t \approx t \otimes_\sigma
+  s$;
+\item\label{lem:approx:assoc} $s \oplus_\sigma (t \oplus_\sigma u)
+  \approx (s \oplus_\sigma t) \oplus_\sigma u$ and $s \otimes_\sigma
+  (t \otimes_\sigma u) \approx (s \otimes_\sigma t) \otimes_\sigma u$;
+\item\label{lem:approx:distribution} $s \otimes_\sigma (t
+  \oplus_\sigma u) \approx (s \otimes_\sigma t) \oplus_\sigma (s
+  \otimes_\sigma u)$;
+\item\label{lem:approx:neutral} $(\lift_\sigma 0) \oplus_\sigma s
+  \approx s$ and $(\lift_\sigma 1) \otimes_\sigma s \approx s$.
+\end{enumerate}
+\end{lemma}
+
+\begin{lemma}\label{lem_lift_approx}
+  \begin{enumerate}
+  \item $\lift_\sigma(n+m) \approx_\sigma (\lift_\sigma n)
+    \oplus_\sigma (\lift_\sigma n)$.
+  \item $\lift_\sigma(n m) \approx_\sigma (\lift_\sigma n)
+    \otimes_\sigma (\lift_\sigma n)$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{example}\label{ex_fold_orientation}
+  We continue with our example of fold on heterogenous lists. We prove
+  termination by rule removal, using the symbol mapping from
+  Example~\ref{ex_fold_interpretation}. \LC{Cynthia: TODO}
+\end{example}
 
 \section{Larger examples}\label{sec:examples}
 
@@ -2091,7 +2183,7 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
   $\forall$-quantifiers.
 \end{proof}
 
-{ \renewcommand{\thetheorem}{\ref{lem_final_nat}}
+{ \renewcommand{\thelemma}{\ref{lem_final_nat}}
 \begin{lemma}
   The only final interpretation terms of type $\nat$ are the natural
   numbers.
@@ -2636,7 +2728,7 @@ each~$x : \tau$.
   candidates.
 \end{proof}
 
-{ \renewcommand{\thetheorem}{\ref{lem_succeq_subst}}
+{ \renewcommand{\thelemma}{\ref{lem_succeq_subst}}
 \begin{lemma}
   If $s \succeq_\sigma s'$ then $t[\subst{x}{s}] \succeq_\tau t[\subst{x}{s'}]$.
 \end{lemma}
@@ -2650,6 +2742,105 @@ each~$x : \tau$.
   t[\subst{x}{s'}]$ follows from
   Lemma~\ref{lem_typable_wm_computable}. Hence $t[\subst{x}{s}]
   \succeq_\tau t[\subst{x}{s'}]$ by Corollary~\ref{cor_gteq_succeq}.
+\end{proof}
+
+\subsection{Proofs for Section~\ref{sec_calculation_rules}}
+
+{ \renewcommand{\thelemma}{\ref{lem:plusparts}}
+\begin{lemma}
+For all types $\sigma$, terms $s,t$ of type $\sigma$ and natural
+numbers $n > 0$:
+\begin{enumerate}
+\item $s \oplus_{\sigma} t \succeq s$ and $s \oplus_{\sigma} t \succeq
+  t$;
+\item $s \oplus_{\sigma} (\lift_{\sigma} n) \succ s$ and
+  $(\lift_{\sigma} n) \oplus_{\sigma} t \succ t$.
+\end{enumerate}
+\end{lemma}
+\addtocounter{theorem}{-1}}
+
+\begin{proof}
+  It suffices to prove this for closed $s,t$ and closed $\sigma$ in
+  $\beta$-normal form.
+  \begin{enumerate}
+  \item By coinduction we show $(s \oplus t) u_1 \ldots u_m
+    \succeq_\sigma s u_1 \ldots u_m$ for closed $u_1,\ldots,u_m$. The
+    second case is similar.
+
+    First note that $(s \oplus t) u_1 \ldots u_m \leadsto^* s u_1
+    \ldots u_m \oplus t u_1 \ldots u_m$.
+
+    If $\sigma = \nat$ then $((s \oplus t) u_1 \ldots u_m)\da = (s u_1
+    \ldots u_m)\da + (t u_1 \ldots u_m)\da \ge (s u_1 \ldots
+    u_m)\da$. Hence $(s \oplus t) u_1 \ldots u_m) \succeq_\nat s u_1
+    \ldots u_m$.
+
+    If $\sigma = \tau_1\arrtype\tau_2$ then by the coinductive
+    hypothesis $(s \oplus t) u_1 \ldots u_m q \succeq_{\tau_2} s u_1
+    \ldots u_m q$ for any $q \in \World_{\tau_1}$. Hence $(s \oplus t)
+    u_1 \ldots u_m \succeq_\sigma s u_1 \ldots u_m$.
+
+    If $\sigma = \forall(\alpha:\kappa)[\tau]$ then by the coinductive
+    hypothesis $(s \oplus t) u_1 \ldots u_m \xi \succeq_{\sigma'} s
+    u_1 \ldots u_m \xi$ for any closed $\xi \in \Tc_\kappa$, where
+    $\sigma' = \tau[\subst{\alpha}{\xi}]$. Hence $(s \oplus t) u_1
+    \ldots u_m \succeq_\sigma s u_1 \ldots u_m$.
+  \item By coinduction we show $(s \oplus (\lift n)) u_1 \ldots u_m
+    \succeq_\sigma s u_1 \ldots u_m$ for closed $u_1,\ldots,u_m$. The
+    second case is similar.
+
+    Note that $(s \oplus (\lift n)) u_1 \ldots u_m \leadsto^* s u_1
+    \ldots u_m \oplus n$. From this the case $\sigma=\nat$
+    follows. The other cases follow from the coinductive hypothesis,
+    like in the first point above.\qedhere
+  \end{enumerate}
+\end{proof}
+
+{ \renewcommand{\thelemma}{\ref{lem:approxproperties}}
+\begin{lemma}
+For all types $\sigma$ and all terms $s,t,u$ of type $\sigma$, we
+have:
+\begin{enumerate}
+\item\label{lem:approx:symmetry} $s \oplus_\sigma t \approx t
+  \oplus_\sigma s$ and $s \otimes_\sigma t \approx t \otimes_\sigma
+  s$;
+\item\label{lem:approx:assoc} $s \oplus_\sigma (t \oplus_\sigma u)
+  \approx (s \oplus_\sigma t) \oplus_\sigma u$ and $s \otimes_\sigma
+  (t \otimes_\sigma u) \approx (s \otimes_\sigma t) \otimes_\sigma u$;
+\item\label{lem:approx:distribution} $s \otimes_\sigma (t
+  \oplus_\sigma u) \approx (s \otimes_\sigma t) \oplus_\sigma (s
+  \otimes_\sigma u)$;
+\item\label{lem:approx:neutral} $(\lift_\sigma 0) \oplus_\sigma s
+  \approx s$ and $(\lift_\sigma 1) \otimes_\sigma s \approx s$.
+\end{enumerate}
+\end{lemma}
+\addtocounter{theorem}{-1}}
+
+\begin{proof}
+  The proof is again analogous to the proof of
+  Lemma~\ref{lem:plusparts}. For instance, for closed $s,t$ and closed
+  $\sigma$ in $\beta$-normal form, we show by coinduction that $(s
+  \oplus t) w_1 \ldots w_n \succeq (t \oplus s) w_1 \ldots w_n$ for
+  closed $w_1,\ldots,w_n$ (and then the same with $\preceq$).
+\end{proof}
+
+{ \renewcommand{\thelemma}{\ref{lem_lift_approx}}
+\begin{lemma}
+  \begin{enumerate}
+  \item $\lift_\sigma(n+m) \approx_\sigma (\lift_\sigma n)
+    \oplus_\sigma (\lift_\sigma n)$.
+  \item $\lift_\sigma(n m) \approx_\sigma (\lift_\sigma n)
+    \otimes_\sigma (\lift_\sigma n)$.
+  \end{enumerate}
+\end{lemma}
+\addtocounter{theorem}{-1}}
+
+\begin{proof}
+  It suffices to show this for closed~$\sigma$ in $\beta$-normal
+  form. Then one proves by induction on~$\sigma$ that
+  $(\lift_\sigma(n+m))\da = (\lift_\sigma n \oplus_\sigma \lift_\sigma
+  n)\da$ (analogously for multiplication). This suffices by
+  Corollary~\ref{cor_succ_da} and the reflexivity of~$\approx$.
 \end{proof}
 
 \section{Proving the inequalities in \refsec{examples}}\label{app_ineqs}
