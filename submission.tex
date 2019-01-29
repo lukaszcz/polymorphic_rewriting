@@ -77,6 +77,7 @@
 \newcommand{\xlet}[4]{\mathtt{let}_{#1}\,#2\,\mathtt{be}\,[#3]\,\mathtt{in}\,#4}
 
 \newcommand{\CK}[1]{\textcolor{blue}{CK: #1}}
+\newcommand{\CKchange}[1]{\textcolor{blue}{#1}}
 \newcommand{\LC}[1]{\textcolor{red}{LC: #1}}
 
 \title{Polymorphic Higher-order Termination}
@@ -598,9 +599,9 @@ context~$\Gamma$.
   \]
   This example makes essential use of higher-rank polymorphism, which
   is not reducible to shallow polymorphism as used in the~ML
-  programming language or in \LC{Cynthia: add here some references to
-    higher-order rewriting frameworks which allow shallow
-    polymorphism}. The above rules cannot be translated into an
+  programming language or in \CKchange{the polymorphic higher-order
+  rewriting formalisms of \cite{jou:oka:91,jou:rub:99}}. The above rules
+  cannot be translated into an
   infinite set of simply typed rules by instantiating the type
   variables. In practice, when defining heterogenous lists in a
   language with support for higher-rank polymorphism (e.g.~in recent

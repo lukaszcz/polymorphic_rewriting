@@ -1657,7 +1657,7 @@ have:
   closed $w_1,\ldots,w_n$ (and then the same with $\preceq$).
 \end{proof}
 
-\begin{lemma}
+\begin{lemma}\label{lem:liftsplit}
   \begin{enumerate}
   \item $\lift_\sigma(n+m) \approx_\sigma (\lift_\sigma n)
     \oplus_\sigma (\lift_\sigma n)$.
@@ -2245,7 +2245,7 @@ each~$x : \tau$.
   \end{enumerate}
 \end{lemma}
 
-\begin{lemma}
+\begin{lemma}\label{lem:projectreduce}
   \begin{enumerate}
   \item $\pi^i(\pair{t_1}{t_2}) \leadsto^* t_i %\oplus
     %\lift(\flatten(t_1)) \oplus \lift(\flatten(t_2))
@@ -2352,7 +2352,7 @@ questions; but YMMV}
   \end{enumerate}
 \end{lemma}
 
-\begin{lemma}
+\begin{lemma}\label{lem:extreduce}
   \begin{enumerate}
   \item $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \leadsto
     s[\subst{\alpha}{\tau}][\subst{x}{t}] %\oplus \lift(\flatten(t))
@@ -3002,19 +3002,265 @@ And the following function symbol mapping:
 \begin{array}{rcl}
 \Termmap(\mathtt{let}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta : * . \lambda x : \Sigma \xi . \alpha\xi,
   y : \quant{\xi}{\alpha\xi \arrtype \beta}. \\
-  & & \hfill (\xlet{}{x}{\xi,z}{y\xi z}) \oplus \lift_{\beta}(\flatten(y) \oplus
-  1) \\
-\Termmap(\mathtt{case}) & = & \Lambda \alpha,\beta,\xi . \lambda x : \alpha \times \beta,
-  y : (\alpha \arrtype \xi), z : (\beta \arrtype \xi). \\
+  & & \hfill (\xlet{\beta}{x}{\xi,z}{y\xi z}) \oplus y \cdot \lift_{\alpha
+  \xi}(0) \oplus \lift_\beta(1) \\
+\Termmap(\mathtt{case}) & = & \Lambda \alpha,\beta,\xi . \lambda x :
+  \alpha \times \beta, y : (\alpha \arrtype \xi), z : (\beta \arrtype
+  \xi). \\
   & & \quad
-  \lift_\xi(37) \oplus (\lift_\xi(\flatten_{\alpha\times\beta}(x)\oplus 3)
-  \otimes \\
-  & & \quad\phantom{ABCDEFGHIJKL}
-    (\ y \cdot \pi^1(x) \oplus (z \cdot \pi^2(x) \oplus \lift_\xi(11)\ ) \\
+  \lift_\xi(2) \oplus
+  \lift_\xi(3 \otimes \flatten_{\alpha \times \beta}(x)) \oplus \\
+  & & \quad\phantom{ABCDE}
+  \lift_\xi(\flatten_{\alpha \times \beta}(x) \oplus 1)
+    \otimes (y \cdot \pi^1(x) \oplus z \cdot \pi^2(x)) \\
 \end{array}
 \]
 
 \subsection{Rule orientation}
+
+I will use the following properties without explicitly stating them:
+\begin{description}
+\item[using $\approx$ as equality]
+  If $s \approx s'$ and $t \approx t'$, then $s \succ t$ if and
+  only if $s' \succ t'$, and the same for $\succeq$ (Lemma TODO).
+\item[inclusion of $\leadsto$ in $\approx$]
+  If $s \leadsto s'$ then $s \approx s'$ (Lemma TODO).
+\item[reordering $\oplus$ and $\otimes$]
+  We can reorder the parts of a $\oplus$ or $\otimes$ at leisure
+  (since for $\circ \in \{\oplus,\otimes\}$ we have:
+  $s \circ t \approx t \circ s$ and $(s \circ t) \circ q \approx
+  s \circ (t \circ q)$, Lemma \ref{lem:approxproperties}).
+\item[distribution] always $(s \oplus t) \otimes q
+  \approx s \otimes q \oplus t \otimes q$ (Lemma
+  \ref{lem:approxproperties}).
+\item[combining / splitting additive and multiplicative terms in a
+  lift] always
+  $\lift_\alpha(s) \oplus \lift_\alpha(t) \approx \lift_\alpha(s
+  \oplus t)$ and
+  $\lift_\alpha(s) \otimes \lift_\alpha(t) \approx \lift_\alpha(s
+  \otimes t)$ (Lemma \ref{lem:liftsplit}).
+  Note that in combination with distribution, this provides that
+  if $n = n_1 + n_2$, we have $\lift_\alpha(n) \otimes s \approx
+  \lift_\alpha(n_1) \otimes s \oplus \lift_\alpha(n_2) \otimes s$.
+\item[neutrality of $1$] For all terms $s$ of type $\sigma$:
+  $\lift_\sigma(1) \otimes s \approx s$ (Lemma
+  \ref{lem:approxproperties}).
+\item[absolute positiveness] If $s \approx s_1 \oplus \dots \oplus
+  s_n$ and $t = t_1 \oplus \dots \oplus t_k$ with $k \leq n$ and
+  $s_i \succeq t_i$ for $1 \leq i \leq k$, then $s \succeq t$; if
+  moreover some $s_i \succ t_i$ or $s_j \succ \lift(0)$ for $j > k$
+  then $s \succ t$ (Lemmas \ref{lem:plustimesmonotonic} and
+  \ref{lem:plusparts}).
+\item[removing non-zero multiplicants]
+  $\lift_\xi(t \oplus n) \otimes s \succeq s$ if $n > 0$
+  (a combination of splitting additive parts in a lift, distribution,
+  neutrality of $1$ and absolute positiveness).
+\end{description}
+
+\begin{itemize}
+\item $\interpret{@_{\sigma,\tau}(\abs{x}{s},t)} \succ
+  \interpret{s[x:=t]}$ \\ We have
+  $\interpret{@_{\sigma,\tau}(\abs{x:\sigma}{s},t)} \arrrbeta
+  (\abs{x:\typeinterpret{\sigma}}{\interpret{s}}) \cdot
+  \interpret{t} \oplus
+  \lift_\tau(\flatten_\sigma(\interpret{t}) \oplus 1) \leadsto
+  \interpret{s}[x:=\interpret{t}] \oplus \lift(\flatten(\interpret{t})
+  \oplus 1) \succ \interpret{s}[x:=\interpret{t}]$ (by absolute
+  positiveness), which equals $\interpret{s[x:=t]}$
+  by Lemma \ref{lem:substitutioninterpret}.
+%  Since, by Lemma \ref{lem_succ_red} $\leadsto \cdot \succ$ is
+%  contained in $\succ$ ,we have the required orientation of the rule.
+\item $\interpret{\mathtt{tapp}_{\abs{\alpha}{\sigma},\tau}(
+  \tabs{\alpha}{s})} \succ \interpret{s[\alpha:=\tau]}$ \\ We have
+  $\interpret{\mathtt{tapp}_{\lambda \alpha.\sigma,\tau}(
+  \tabs{\alpha}{s})} \arrrbeta (\tabs{\alpha}{\interpret{s}}) *
+   \beta \oplus \lift_{\varphi \beta}(1) \leadsto
+  \interpret{s}[\alpha:=\typeinterpret{\tau}] \oplus \lift(1) \succ
+  \interpret{s}[\alpha:=\typeinterpret{\tau}] =
+  \interpret{s[\alpha:=\tau]}$, using Lemma
+  \ref{lem:substitutioninterpret}.
+\item $\interpret{\pi^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t))}
+  \succ \interpret{s}$ \\ We have
+  $\interpret{\mathtt{pair}_{\sigma,\tau}(s,t))} \arrrbeta
+  \pair{\interpret{s}}{\interpret{t}} \oplus \lift_{\sigma,\tau}(
+  \flatten_{\sigma}(\interpret{s}) \oplus \flatten_{\tau}(\interpret{
+  t}))$ and therefore
+  $\interpret{\pi^1_{\alpha,\beta}(\mathtt{pair}_{\alpha,\beta}(s,t))}
+  \arrrbeta \pi^1(\pair{\interpret{s}}{\interpret{t}} \oplus \langle
+  \text{something}\rangle) \oplus \lift_\sigma(1) \succeq
+  \pi^1(\pair{\interpret{s}}{\interpret{t}}) \oplus \lift_\sigma(1)$ by
+  absolute positiveness and monotonicity (Lemma TODO),
+  which $\succ \interpret{s}$ by absolute positiveness and Lemma
+  \ref{lem:projectreduce}.
+\item $\interpret{\pi^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t))}
+  \succ \interpret{t}$ \\ Parallel to the inequality above.
+\item $\interpret{\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{
+  \sigma,\tau}(u),\abs{x}{s},\abs{y}{t})} \succ \interpret{s[x:=u]}$ \\
+  Write $A := \lift_{\sigma \times \tau}(\flatten_\sigma(\interpret{u}))$;
+  then $\interpret{\mathtt{in}^1_{\sigma,\tau}(u)} =
+  \pair{\interpret{u}}{\lift_\tau(1)} \oplus A$.
+  Additionally, let $B := \flatten_{\sigma \times \tau}(
+  \pair{\interpret{u}}{\lift_\tau(1)} \oplus A)$ and
+  $C := \interpret{\abs{y}{t}} \cdot \pi^2(
+  \pair{\interpret{u}}{\lift_\tau(1)} \oplus A)$.
+  Then we can write:
+  $\interpret{\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{
+  \sigma,\tau}(u),\abs{x}{s},\abs{y}{t})} = \lift_\rho(2) \oplus
+  \lift_\rho(3 \otimes B) \oplus
+  \lift_\rho(B \oplus 1) \otimes (\ 
+  \interpret{\abs{x}{s}} \cdot \pi^1(\pair{\interpret{u}}{
+  \lift_\tau(1)} \oplus A) \oplus C\ )$.
+  By splitting additive terms, distribution, neutrality of 1 and
+  absolute positiveness, this $\succ
+  \interpret{\abs{x}{s}} \cdot \pi^1(\pair{\interpret{u}}{
+  \lift_\tau(1)}) \leadsto^*
+  \interpret{\abs{x}{s}} \cdot \interpret{u}$ (by
+  Lemma \ref{lem:projectreduce}), $= (\abs{x}{\interpret{s}}) \cdot
+  \interpret{u} \arrrbeta \interpret{s}[x:=\interpret{u}] =
+  \interpret{s[x:=u]}$ by Lemma \ref{lem:substitutioninterpret}.
+\item $\interpret{\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^2_{
+  \sigma,\tau}(u),\abs{x}{s},\abs{y}{t})} \succ \interpret{s[x:=u]}$. \\
+  Parallel to the inequality above.
+\item $\interpret{\mathtt{let}_{\varphi,\rho}(
+  \mathtt{ext}_{\varphi,\tau}(s),
+  \tabs{\alpha}{\abs{x:\varphi\alpha}{t}})} \succ
+  \interpret{t[\alpha:=\tau][x:=s]}$. \\ We have
+  $\interpret{\mathtt{ext}_{\varphi,\tau}(s)} \succeq
+  \expair{\tau,\interpret{s}}$ by absolute positiveness.
+  Therefore, using monotonicity,
+  $\interpret{\mathtt{let}_{\varphi,\rho}(\mathtt{ext}_{\varphi,\tau}(
+  s),\tabs{\alpha}{\abs{x:\varphi \alpha}{t}})} \succeq
+  (\xlet{\rho}{
+    \expair{\tau}{\interpret{s}}
+  }{
+    \expair{\alpha}{x}
+  }{\\
+    \interpret{\tabs{\alpha}{\abs{x:\varphi \alpha}{t}}} * \alpha \cdot
+    x
+  }) \oplus
+  \interpret{\tabs{\alpha}{\abs{x:\varphi \alpha}{t}}} \cdot
+    \lift_{\varphi\alpha}(0) \oplus
+  \lift_\rho(1)$.
+  Again by absolute positiveness, this $\succ
+  \xlet{\rho}{\expair{\tau}{\interpret{s}}}{\expair{\alpha}{x}}{
+  \interpret{\tabs{\alpha}{\abs{x:\varphi \alpha}{t}}} * \alpha \cdot x
+  } \leadsto
+  \xlet{\rho}{\expair{\tau}{\interpret{s}}}{\expair{\alpha}{x}}{
+  \interpret{t}}$.
+  By Lemma \ref{lem:extreduce}, this term
+  $\succeq \interpret{t}[\alpha:=\tau][x:=\interpret{s}]$.
+  We complete by Lemma
+  \ref{lem:substitutioninterpret}.
+\end{itemize}
+
+\end{document}
+
+\[
+\begin{array}{rcl}
+\epsilon_\tau(\epsilon_\bot(s)) & \red & \epsilon_\tau(s) \\
+@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) & \red &
+  \epsilon_\tau(s) \\
+\mathtt{tapp}_{\varphi,\tau}(
+  \epsilon_{\quant{\alpha}{\varphi\alpha}}(s)) & \red &
+  \epsilon_{\varphi\tau}(s) \\
+\pi^1_{\sigma,\tau}(\epsilon_{\mathtt{and}\,\sigma\,\tau}(s)) & \red &
+  \epsilon_\sigma(s) \\
+\pi^2_{\sigma,\tau}(\epsilon_{\mathtt{and}\,\sigma\,\tau}(s)) & \red &
+  \epsilon_\tau(s) \\
+\mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}\,\sigma\,\tau}(
+  u),\abs{x:\sigma}{s},\abs{y:\tau}{t}) & \red & \epsilon_\rho(u) \\
+\mathtt{let}_{\varphi,\rho}(\epsilon_{\exists(\varphi)}(s),\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}) & \red &
+  \epsilon_\rho(s) \\
+\end{array}
+\]
+\begin{itemize}
+%\[
+%\begin{array}{rcl}
+\item $
+\epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t}))
+  %& \red &
+  \red
+  \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x:\sigma}{\epsilon_\rho(s)},
+  \abs{y:\tau}{\epsilon_\rho(t)}) $%\\
+\item $
+@_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\rho \arrtype \pi}(u,
+  \abs{x:\sigma}{s},\abs{y:\tau}{t}),v) %& \red &
+  \red
+  \mathtt{case}_{\sigma,\tau,\pi}(u,
+  \abs{x:\sigma}{@_{\rho,\pi}(s,v)},\abs{y:\tau}{@_{\rho,\pi}(t,v)}) $%\\
+\item $
+\mathtt{tapp}_{\varphi,\pi}(\mathtt{case}_{\sigma,\tau,
+  \quant{\alpha}{\varphi\alpha}}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t})) %& \red &
+  \red
+  \mathtt{case}_{\sigma,\tau,\varphi\pi}(u,
+  \abs{x:\sigma}{\mathtt{tapp}_{\varphi,\pi}(s)},\\
+  \abs{y:\tau}{\mathtt{tapp}_{\varphi,\pi}(t)}) $%\\
+\item $
+\pi^1_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}\,\rho\,\pi}(u,
+\abs{x:\sigma}{s},\abs{y:\tau}{t})) %& \red &
+  \red
+  \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x:\sigma}{\pi^1_{\rho,\pi}(s)},
+  \abs{y:\tau}{\pi^1_{\rho,\pi}(t)}) $%\\
+\item $
+\pi^2_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}\,\rho,\pi}(u,
+  \abs{x:\sigma}{s},\abs{y:\tau}{t})) %& \red &
+  \red
+  \mathtt{case}_{\sigma,\tau,\pi}(u,\abs{x:\sigma}{\pi^2_{\rho,\pi}(s)},
+  \abs{y:\tau}{\pi^2_{\rho,\pi}(t)}) $%\\
+\item $
+\mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,\tau,\mathtt{or}\,
+  \rho\,\pi}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t}),\abs{z:\rho}{v},\abs{a:\pi}{w}) %& \red &
+  \red\\
+  \mathtt{case}_{\sigma,\tau,\xi}(u,
+    \abs{x:\sigma}{\mathtt{case}_{\rho,\pi,\xi}(s,\abs{z:\rho}{v},\abs{a:\pi}{w})},
+    \abs{y:\tau}{\mathtt{case}_{\rho,\pi,\xi}(t,\abs{z:\rho}{v},\abs{a:\pi}{w})}) $%\\
+\item $
+    \mathtt{let}_{\varphi,\rho}(
+  \mathtt{case}_{\sigma,\tau,\exists\varphi}(
+  u,\abs{x:\sigma}{s},\abs{y:\tau}{t}),v) %& \red &
+  \red\\
+  \mathtt{case}_{\sigma,\tau,\rho}(u,
+  \abs{x:\sigma}{\mathtt{let}_{\varphi,\rho}(s,v)},
+  \abs{y:\tau}{\mathtt{let}_{\varphi,\rho}(t,v)})
+  $%\\
+%\end{array}
+%\]
+\end{itemize}
+
+\begin{itemize}
+\item
+  $\epsilon_\tau(\mathtt{let}_{\varphi,\bot}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}))
+  \red
+  \mathtt{let}_{\varphi,\tau}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{\epsilon_\tau(t)}})$
+\item $@_{\tau,\rho}(\mathtt{let}_{\varphi, \tau \arrtype
+  \rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}),u) \red
+  \mathtt{let}_{\varphi,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{@_{\tau,\rho}(t,
+      u)}})$
+\item
+  $\mathtt{tapp}_{\psi,\rho}(\mathtt{let}_{\varphi,\forall\beta[\psi\beta]}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}))
+  \red
+  \mathtt{let}_{\varphi,\psi\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{\mathtt{tapp}_{\psi,\rho}(t)}})$
+\item
+  $\pi^1_{\tau,\rho}(\mathtt{let}_{\varphi,
+  \mathtt{and}\,\tau,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}))
+  \red
+  \mathtt{let}_{\varphi,\tau}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{\pi^1_{\tau,
+        \rho}(t)}})$
+\item
+  $\pi^2_{\tau,\rho}(\mathtt{let}_{\varphi,
+  \mathtt{and}\,\tau\,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}))
+  \red
+  \mathtt{let}_{\varphi,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{\pi^2_{\tau,\rho}(t)}})$
+\item $\mathtt{case}_{\tau,\rho,\pi}(
+  \mathtt{let}_{\varphi,\mathtt{or}\,\tau\,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}),\abs{x:\tau}{u},\abs{y:\rho}{v})
+  \red
+  \mathtt{let}_{\varphi,\pi}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{\mathtt{case}_{\tau,\rho,\pi}(t,\abs{x:\tau}{u},\abs{y:\rho}{v})}})$
+\item
+  $\mathtt{let}_{\psi,\rho}(\mathtt{let}_{\varphi,\exists\psi}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}),u)
+  \red
+  \mathtt{let}_{\varphi,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{\mathtt{let}_{\psi,\rho}(t,u)}})$
+\end{itemize}
+
 
 \CK{Note: I am representing the rules slightly differently here than
 before: with variables for the type denotations rather than arbitrary
@@ -3030,147 +3276,7 @@ is easily changed to the other way if that is preferred.}
   variable, but for a specific type -- and then the translation will
   have to contain $\typeinterpret{\sigma}$ instead of just $\sigma$.}
 
-\begin{itemize}
-\item $@_{\alpha,\beta}(\abs{x}{s},t) \red s[x:=t]$ \\ We have
-  $\interpret{@_{\alpha,\beta}(\abs{x:\sigma}{s},t)} \arrrbeta
-  (\abs{x:\alpha}{\interpret{s}}) \cdot \interpret{t} \oplus
-  \lift_\beta(\flatten_\alpha(\interpret{t}) \oplus 1) \leadsto
-  \interpret{s}[x:=\interpret{t}] \oplus \lift(\flatten(\interpret{t})
-  \oplus 1)$.  Since, by Lemma \ref{lem:liftgreater} we have
-  $\lift(\flatten(\interpret{t}) \oplus 1) \succeq \lift(1)$, by Lemma
-  \ref{lem:plustimesmonotonic} this term $\succeq
-  \interpret{s}[x:=\interpret{t}] \oplus \lift(1)$, and by Lemma
-  \ref{lem:plusparts} this $\succ
-  \interpret{s}[x:=\interpret{t}]$, which equals $\interpret{s[x:=t]}$
-  by Lemma \ref{lem:substitutioninterpret}.
-  Since, by Lemma \ref{lem_succ_red} $\leadsto \cdot \succ$ is
-  contained in $\succ$ ,we have the required orientation of the rule.
-\item $\mathtt{tapp}_{\lambda\alpha.\varphi\alpha,\beta}(
-  \tabs{\alpha}{s}) \red s[\alpha:=\tau]$ \\ We have
-  $\interpret{\mathtt{tapp}_{\lambda \alpha.\varphi\alpha,\beta}(
-  \tabs{\alpha}{s})} \arrrbeta (\tabs{\alpha}{\interpret{s}}) *
-   \beta \oplus \lift_{\varphi \beta}(1) \leadsto
-  \interpret{s}[\alpha:=\typeinterpret{\tau}] \oplus \lift(1) \succ
-  \interpret{s}[\alpha:=\typeinterpret{\tau}] =
-  \interpret{s[\alpha:=\tau]}$, using Lemma \ref{lem:plusparts}.
-  Thus, we can remove this rule.
-\item $\pi^1_{\alpha,\beta}(\mathtt{pair}_{\alpha,\beta}(s,t)) \red
-  s$ \\
-  We have $\interpret{\mathtt{pair}_{\alpha,\beta}(s,t))} \arrrbeta
-  \Lambda \xi.\abs{f}{f \cdot \interpret{s} \cdot \interpret{t}
-  \oplus \lift_\xi(\flatten(\interpret{s}))\  \oplus \\
-  \lift_\xi(\flatten(\interpret{t}))}
-  $ and therefore
-  $\interpret{\pi^1_{\alpha,\beta}(\mathtt{pair}_{\alpha,\beta}(s,t))}
-  \arrrbeta (\Lambda \xi.\abs{f}{f \cdot \interpret{s} \cdot
-  \interpret{t} \oplus \lift_\xi(\flatten(\interpret{s})) \oplus
-  \lift_\xi(\flatten(\interpret{t}))}) * \alpha \cdot (\abs{yz}{y})
-  \oplus \lift_\alpha(1) \leadsto^*
-  (\abs{yz}{y}) \cdot \interpret{s} \cdot
-  \interpret{t} \oplus \lift_\alpha(\flatten(\interpret{s})) \oplus
-  \lift_\alpha(\flatten(\interpret{t})) \oplus \lift_\alpha(1) \leadsto^*
-  \interpret{s} \oplus \lift_\alpha(\dots) \oplus \lift_\alpha(1)$, and
-  by Lemma \ref{lem:plusparts} (and monotonicity of $\succeq$) this
-  term $\succ \interpret{s}$.
-\item $\pi^2_{\alpha,\beta}(\mathtt{pair}_{\alpha,\beta}(s,t)) \red
-  t$ \\
-  In the same way as above, we have $\interpret{\pi^2_{\alpha,\beta}(
-  \mathtt{pair}_{\alpha,\beta}(s,t))} \arrrbeta
-  \interpret{t} \oplus \lift_\beta(\dots) \oplus \lift_\beta(1)
-  \succ \interpret{t}$.
-\item $\mathtt{case}_{\alpha,\beta,\xi}(\mathtt{in}^1_{\alpha,\beta}(u),
-  \abs{x}{s},\abs{y}{t}) \red s[x:=u]$ \\
-  Write $X_\chi := \lift_\chi(\flatten_\alpha(\interpret{u}))$ and
-  $Y := (\abs{x}{\interpret{s}}) \cdot \lift_\alpha(0) \oplus
-  (\abs{y}{\interpret{t}}) \cdot \lift_\beta(0)$.
-  We have $\interpret{\mathtt{in}^1_{\alpha,\beta}(u)} \arrrbeta
-  \Lambda \chi.\abs{p}{(p * (\alpha \arrtype \chi) \cdot (\abs{yz}{y})
-  \cdot \interpret{u} \oplus X_\chi)}$.
-  Therefore $\interpret{\mathtt{case}_{\alpha,\beta,\xi}(
-  \mathtt{in}^1_{\alpha,\beta}(u),\abs{x}{s},\abs{y}{t})} \arrrbeta
-  (\Lambda \chi.\abs{p}{(p * (\alpha \arrtype \chi) \cdot (\abs{yz}{y})
-  \cdot \interpret{u} \oplus X_\chi)}) * \xi \cdot
-  (\Lambda \chi.\abs{f}{f \cdot (\abs{x}{\interpret{s}}) \cdot
-  (\abs{y}{\interpret{t}})}) \oplus Y \oplus \lift_\xi(7) \arrrbeta
-  ((\Lambda \chi.\abs{f}{f \cdot (\abs{x}{\interpret{s}}) \cdot
-  \abs{y}{\interpret{t}}}) * (\alpha \arrtype \xi) \cdot (\abs{yz}{y})
-  \cdot \interpret{u} \oplus X_\xi) \oplus Y \oplus \lift_\xi(7)
-  \arrrbeta
-  ((\abs{yz}{y}) \cdot (\abs{x}{\interpret{s}}) \cdot
-  \abs{y}{\interpret{t}}) \cdot \interpret{u} \oplus X_\xi) \oplus Y
-  \oplus \lift_\xi(7) \arrrbeta
-  \interpret{s}[x:=\interpret{u}] \oplus X_\xi \oplus Y
-  \oplus \lift_\xi(7)$.  By Lemma \ref{lem:plusparts} this term
-  $\succ \interpret{s}[x:=\interpret{u}]$, which is exactly
-  $\interpret{s[x:=u]}$ by Lemma \ref{lem:substitutioninterpret}.
-\item $\mathtt{case}_{\alpha,\beta,\xi}(\mathtt{in}^2_{\alpha,\beta}(u),
-  \abs{x}{s},\abs{y}{t}) \red t[x:=u]$ \\
-  Symmetric to the case above.
-\item $\mathtt{let}_{\varphi,\alpha}(\mathtt{ext}_{\varphi,\beta}(s),
-  \tabs{\gamma}{\abs{x:\varphi\gamma}{t}}) \red t[\alpha:=\beta][x:=s]$ \\
-  We have $\interpret{\mathtt{ext}_{\varphi,\beta}(s)} \arrrbeta
-  \Lambda \xi.\abs{y}{(y * \beta \cdot \interpret{s} \oplus X_\xi)}$ for
-  some term $X_\xi$.  Therefore
-  $\interpret{\mathtt{let}_{\varphi,\alpha}(\mathtt{ext}_{\varphi,
-  \beta}(s),\tabs{\alpha}{\abs{x:\varphi\alpha}{t}})} \arrrbeta
-  (\Lambda \xi.\abs{y}{(y * \beta \cdot \interpret{s} \oplus X_\xi)})
-  * \alpha \cdot (\tabs{\gamma}{\abs{x}{\interpret{t}}}) \oplus
-  \lift_\alpha(Y \oplus 1)$ for some $Y$, which
-  $\arrrbeta (\interpret{t}[x:=\interpret{s}] \oplus X_\alpha) \oplus
-  \lift_\alpha(Y \oplus 1)$.
-  By Lemma \ref{lem:plusparts}, this $\succ
-  \interpret{t}[x:=\interpret{s}] \oplus X_\alpha$, which $\succeq
-  \interpret{t}[x:=\interpret{s}]$.  Then by Lemma
-  \ref{lem:substitutioninterpret}, this equals $\interpret{t[x:=u]}$.
-%  Let $u := \mathtt{ext}_{\quant{\alpha}{\sigma},\tau}(s)$ and
-%  $w := \tabs{\alpha}{\abs{x}{t}}$.  Then we have:
-%  \begin{itemize}
-%  \item $\interpret{u} =
-%    \tabs{\xi}{\abs{y:\quant{\alpha}{\sigma \arrtype \xi}}{
-%    y * \typeinterpret{\tau} \cdot \interpret{s}}}$ (which has type
-%    $\quant{\xi}{\quant{\alpha}{\sigma \arrtype \xi} \arrtype \xi}$);
-%  \item $\interpret{w} = \tabs{\alpha}{\abs{x:\typeinterpret{\sigma}}{
-%    \interpret{t}}}$ (which has type $\quant{\alpha}{\sigma \arrtype
-%    \rho}$ with $\alpha \notin \FTV(\rho)$);
-%  \item $\interpret{\mathtt{let}_{\quant{\alpha}{\sigma},\rho}(u,w)} =
-%    \interpret{u} * \rho \cdot \interpret{w} \oplus
-%    \lift(\flatten(\interpret{w})\oplus 1) \succeq
-%    \interpret{u} * \rho \cdot \interpret{w} \oplus \lift(1)$ by
-%    Lemmas \ref{lem:liftgreater} and \ref{lem:plustimesmonotonic} as
-%    before; by Lemma \ref{lem:plustimesmonotonic} again this term
-%    $\succ \interpret{u} * \rho \cdot \interpret{w}
-%    \leadsto (\abs{y}{y * \typeinterpret{\tau} \cdot \interpret{s}})
-%    \cdot \interpret{w} \leadsto \interpret{w} * \typeinterpret{\tau}
-%    \cdot \interpret{s} \leadsto (\abs{x:\typeinterpret{\sigma}[\alpha:=
-%    \typeinterpret{\tau}]}{\interpret{t}[\alpha:=\typeinterpret{\tau}]})
-%    \cdot \interpret{s} \leadsto \interpret{t}[\alpha:=\typeinterpret{
-%    \tau}][x:=\interpret{s}]$.  By Lemma
-%    \ref{lem:substitutioninterpret} this is equal to
-%    $\interpret{t[\alpha:=\tau][x:=s]}$.
-%  \end{itemize}
-%\item $
-%\mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,\tau,\mathtt{or}(
-%  \rho,\pi)}(u,\abs{x}{s},\abs{y}{t}),\abs{z}{v},\abs{a}{w}) %& \red &
-%  \red\\
-%  \mathtt{case}_{\sigma,\tau,\xi}(u,
-%    \abs{x}{\mathtt{case}_{\rho,\pi,\xi}(s,\abs{z}{v},\abs{a}{w})},
-%    \abs{y}{\mathtt{case}_{\rho,\pi,\xi}(t,\abs{z}{v},\abs{a}{w})}) $\\
-%  We have:
-%  \begin{itemize}
-%  \item $aa := \interpret{\mathtt{case}_{\sigma,\tau,\mathtt{or}(\rho,
-%    \pi)}(u,\abs{x}{s},\abs{y}{t})} =$\\$
-%    \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(37) \oplus
-%    (\ \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(
-%      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
-%        \interpret{u}) \oplus 1) \otimes$ \\
-%    \phantom{x} \hfill
-%    $(\ ((\abs{x}{\interpret{s}}) \cdot \proj^1(\interpret{u})) \oplus
-%    ((\abs{y}{\interpret{t}}) \cdot \proj^2(\interpret{u})) \oplus
-%    \lift(1)\ )\ )$
-%  \end{itemize}
-\end{itemize}
-
-==================
+==============
 
 \CK{This one is really the nastiest to handle, and will likely take
 some tweaking in the interpretation to get right:}
