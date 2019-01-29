@@ -134,7 +134,7 @@
   addition to enabling an interpretation of rewrite rules which make
   essential use of impredicative polymorphism, thanks to the
   possibility of encoding inductive data types in the polymorphic
-  lambda-calculus, our generalisation increases the power of the
+  lambda-calculus, our generalisation eases the applicability of the
   method also in the non-polymorphic setting. As an illustration of
   the potential of our method, we prove termination of a substantial
   fragment of full intuitionistic second-order propositional logic
@@ -365,6 +365,114 @@ between typed terms as defined above and terms given in orthodox
 Church-style. We write $t : \tau$ if $t$ has type~$\tau$, in a fixed
 implicit context~$\Gamma$, or equivalently with~$t$ considered an
 orthodox Church-style typed term.
+
+\subsection{Encodings of inductive types}\label{sec_encodings}
+
+The polymorphic lambda-calculus has a much greater expressive power
+than the simply-typed lambda-calculus. Arbitrary inductive data types
+may be encoded, together with their constructors and recursors with
+appropriate derived reduction rules. This makes the polynomial
+interpretation method easier to apply, even in the non-polymorphic
+setting, through more sophisticated ``programming'' in the
+interpretations.
+
+The reader is advised to consult e.g.~\cite[Chapter~11]{Girard1989}
+for more background. Here, we only define abbreviations for a few
+inductive types used later. The lemmas stated in this section follow
+easily from definitions, after unfolding the abbreviations. We omit
+the proofs. Type subscripts are dropped when clear or irrelevant.
+
+\begin{defn}[Product types]
+  \[
+  \begin{array}{rcl}
+    \sigma \times \tau &=& \forall p . (\sigma \arrtype \tau \arrtype p) \arrtype p \\
+    \pair{t_1}{t_2}_{\sigma,\tau} &=& \tabs{p}{\abs{x:\sigma\arrtype\tau\arrtype p}{x t_1 t_2}} \\
+    \pi^1_{\sigma,\tau}(t) &=& t \sigma (\abs{x:\sigma}{\abs{y:\tau}{x}}) \\
+    \pi^2_{\sigma,\tau}(t) &=& t \tau (\abs{x:\sigma}{\abs{y:\tau}{y}})
+  \end{array}
+  \]
+\end{defn}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item If $\Gamma \proves t_1 : \sigma$ and $\Gamma \proves t_2 :
+    \tau$ then $\Gamma \proves \pair{t_1}{t_2} : \sigma \times \tau$.
+  \item If $\Gamma \proves t : \tau_1 \times \tau_2$ then $\Gamma
+    \proves \pi^i(t) : \tau_i$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{lemma}
+  $\pi^i(\pair{t_1}{t_2}) \leadsto^* t_i$
+\end{lemma}
+
+\begin{lemma}
+  If $t \succ t'$ then $\pi^i(t) \succ \pi^i(t')$.
+\end{lemma}
+
+\begin{defn}[Existential types]
+  \[
+  \begin{array}{rcl}
+    \Sigma \alpha . \sigma &=& \forall p . (\forall \alpha . \sigma \arrtype p) \arrtype p \\
+    \expair{\tau}{t}_{\Sigma\alpha.\sigma} &=& \tabs{p}{\abs{x:\forall\alpha.\sigma\arrtype p}{x \tau t}} \\
+    \xlet{\rho}{t}{\alpha,x:\sigma}{s} &=& t \rho (\tabs{\alpha}{\abs{x:\sigma}{s}})
+  \end{array}
+  \]
+\end{defn}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item If $\Gamma \proves t : \sigma[\subst{\alpha}{\tau}]$ then
+    $\Gamma \proves \expair{\tau}{t} : \Sigma \alpha . \sigma$.
+  \item If $\Gamma \proves t : \Sigma \alpha . \sigma$ and
+    $\Gamma,x:\sigma \proves s : \rho$ and $\alpha \notin
+    \FTV(\Gamma,\rho)$ then $\xlet{}{t}{\alpha,x}{s} : \rho$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{lemma}
+  $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \leadsto
+  s[\subst{\alpha}{\tau}][\subst{x}{t}]$.
+\end{lemma}
+
+\begin{lemma}
+  If $t \succ t'$ then $\xlet{}{t}{\alpha,x}{s} \succ
+  \xlet{}{t'}{\alpha,x}{s}$.
+\end{lemma}
+
+\begin{defn}[Heterogenous lists]
+  \[
+  \begin{array}{rcl}
+    \List &=& \forall p . (\forall \alpha . \alpha \arrtype p \arrtype p) \arrtype p \arrtype p \\
+    \nil &=& \tabs{p}{\abs{f:\forall \alpha . \alpha \arrtype p \arrtype p}{\abs{a : p}{a}}} \\
+    \cons_\rho(h,t) &=& \tabs{p}{\abs{f:\forall\alpha . \alpha \arrtype p \arrtype p}{\abs{a : p}{f \rho h (l p f a)}}} \\
+    \fold_\rho(f,a,l) &=& l \rho f a
+  \end{array}
+  \]
+\end{defn}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item $\Gamma \proves \nil : \List$.
+  \item If $\Gamma \proves h : \rho$ and $\Gamma \proves t : \List$
+    then $\Gamma \proves \cons_\rho(h,t) : \List$.
+  \item If $\Gamma \proves l : \List$ and $\Gamma \proves f : \forall
+    \alpha . \alpha \arrtype \rho \arrtype \rho$ and $a : \rho$ then
+    $\Gamma \proves \fold_\rho(f,a,l) : \rho$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{lemma}
+  \begin{enumerate}
+  \item $\fold_\rho(f,a,\nil) \leadsto a$.
+  \item $\fold_\rho(f,a,\cons_\tau(h,t)) \leadsto f \tau h
+    (\fold_\rho(f,a,t))$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{lemma}
+  If $l \succ l'$ then $\fold_\rho(f,a,l) \succ \fold_\rho(f,a,l')$.
+\end{lemma}
 
 \section{Polymorphic Algebraic Functional Systems}\label{sec_systems}
 
@@ -1134,6 +1242,7 @@ pair.
     and~$\abs{y}{t}$ ($y \ne x$).
   \item If $t$ is safe for~$x$ then so is~$\pi^1(t)$ and~$\pi^2(t)$.
   \item If $t$ is safe for~$x$ then so is~$\xlet{}{t}{\alpha,x}{s}$.
+  \item If $t$ is safe for~$x$ then so is~$\fold_\rho(f,a,t)$.
   \end{enumerate}
 \end{lemma}
 
