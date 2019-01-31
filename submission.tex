@@ -156,16 +156,14 @@ for the investigated systems.
 \begin{defn}\label{def_types}
   \emph{Kinds} are defined inductively: $*$ is a kind, and if
   $\kappa_1,\kappa_2$ are kinds then so is $\kappa_1 \arrkind
-  \kappa_2$.
-
-  We assume infinitely many \emph{type constructor variables} of each
-  kind. Variables of kind~$*$ are \emph{type variables}. We assume a
-  fixed set~$\Sigma_T$ of \emph{type constructor symbols} paired with
-  a kind, denoted $c : \kappa$. Every type constructor symbol~$c$
-  occurs with only one kind declaration. We assume there exists a
-  fixed type symbol~$\chi_*$ (of kind~$*$). For
-  $\kappa=\kappa_1\arrkind\kappa_2$ we define $\chi_\kappa = \lambda
-  \alpha:\kappa_1 . \chi_{\kappa_2}$.
+  \kappa_2$. We assume infinitely many \emph{type constructor
+    variables} of each kind. Variables of kind~$*$ are \emph{type
+    variables}. We assume a fixed set~$\Sigma_T$ of \emph{type
+    constructor symbols} paired with a kind, denoted $c :
+  \kappa$. Every type constructor symbol~$c$ occurs with only one kind
+  declaration. We assume there exists a fixed type symbol~$\chi_*$ (of
+  kind~$*$). For $\kappa=\kappa_1\arrkind\kappa_2$ we define
+  $\chi_\kappa = \lambda \alpha:\kappa_1 . \chi_{\kappa_2}$.
 
   We define \emph{type constructors} of kind~$\kappa$ by induction.
   Type constructors of kind~$*$ are \emph{types}.
@@ -215,11 +213,13 @@ for the investigated systems.
 
 \begin{defn}\label{def_preterms}
   We assume given an infinite set $\Vars$ of variables, and let
-  $\Gamma$ refer to a mapping from a finite subset of $\Vars$ to the
-  set of types. We assume given a fixed set $\Sigma$ of \emph{function
-    symbols}, each paired with a type, denoted $\mathtt{f} : \tau$.
-  Every function symbol $\mathtt{f}$ occurs only with one type
-  declaration.
+  $\Gamma$ refer to a set of pairs $x : \tau$ of a variable and a
+  type, such that each variable occurs at most once. We assume given a
+  fixed set $\Sigma$ of \emph{function symbols}, each paired with a
+  closed type, denoted $\mathtt{f} : \tau$.  Every function symbol
+  $\mathtt{f}$ occurs only with one type declaration. We use
+  $\Gamma,x:\tau$ for $\Gamma \cup \{x:\tau\}$. We set $\FTV(\Gamma) =
+  \bigcup\{\FV(\tau) \mid (x : \tau) \in \Gamma\}$.
 
   The set of preterms consists of all expressions~$s$ such that
   $\Gamma \vdash s : \sigma$ can be inferred for some type $\sigma$
@@ -229,16 +229,14 @@ for the investigated systems.
   \item $\Gamma \vdash \mathtt{f} : \sigma$ for all
     $(\mathtt{f} : \sigma) \in \Sigma$.
   \item $\Gamma \vdash \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
-    \in \Vars$ and $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$.
+    \in \Vars$ and $\Gamma, x : \sigma \vdash s : \tau$.
   \item $\Gamma \vdash \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
-    $\alpha$ is a type constructor variable and $\Gamma \vdash s :
-    \sigma$ and for all $(x : \tau) \in \Gamma$: $\alpha \notin
-    \FV(\tau)$
+    $\Gamma \vdash s : \sigma$ and $\alpha \notin \FTV(\Gamma)$.
   \item $\Gamma \vdash \app{s}{t} : \tau$ if $\Gamma \vdash s : \sigma
     \arrtype \tau$ and $\Gamma \vdash t : \sigma$
   \item $\Gamma \vdash \tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$
-    if $\Gamma \vdash s : \quant{\alpha:\kappa}{\sigma}$ and~$\tau$
-    is a type constructor of kind~$\kappa$,
+    if $\Gamma \vdash s : \quant{\alpha:\kappa}{\sigma}$ and~$\tau$ is
+    a type constructor of kind~$\kappa$,
   \item $\Gamma \vdash s : \tau$ if $\Gamma \vdash s : \tau'$ and
     $\tau =_\beta \tau'$.
   \end{itemize}
@@ -254,9 +252,7 @@ for the investigated systems.
   We define the type equivalence relation~$\equiv$ on preterms by
   induction on preterm structure.
   \begin{itemize}
-  \item $x \equiv x$, $n \equiv n$,
-  \item if $\sigma =_\beta \tau$ then $f_\sigma \equiv f_\tau$ for
-    $f \in \Sigma$,
+  \item $x \equiv x$, $f \equiv f$,
   \item if $\sigma =_\beta \tau$ and $s \equiv t$ then
     $\abs{x:\sigma}{s} \equiv \abs{x:\tau}{t}$,
   \item if $s \equiv t$ then $\tabs{\alpha}{s} \equiv
@@ -302,11 +298,9 @@ $\abs{a}{s}$ or $\tabs{a}{s}$.
 
 \begin{lemma}[Substitution lemma]
   \begin{enumerate}
-  \item If $\Gamma \uplus \{ x : \sigma \} \vdash s : \tau$ and
-    $\Gamma \proves t : \sigma$ then $\Gamma \proves s[\subst{x}{t}] :
-    \tau$.
-  \item If $\Gamma \proves t : \sigma$ and~$\tau$ is a type
-    constructor of the same kind as the variable~$\alpha$ then
+  \item If $\Gamma, x : \sigma \proves s : \tau$ and $\Gamma \proves t
+    : \sigma$ then $\Gamma \proves s[\subst{x}{t}] : \tau$.
+  \item If $\Gamma \proves t : \sigma$ then
     $\Gamma[\subst{\alpha}{\tau}] \proves t[\subst{\alpha}{\tau}] :
     \sigma[\subst{\alpha}{\tau}]$.
   \end{enumerate}
@@ -317,21 +311,20 @@ $\abs{a}{s}$ or $\tabs{a}{s}$.
 \end{proof}
 
 \begin{lemma}[Generation lemma]
-  Assume $\Gamma \proves t : \sigma$ and let $\Vc = \FV(\sigma) \cup
-  \FTV(t) \cup \FTV(\Gamma)$. Then there is a type~$\sigma'$ such that
-  $\sigma' =_\beta \sigma$ and $\FV(\sigma') \subseteq \Vc$ and one of
-  the following holds.
+  Assume $\Gamma \proves t : \sigma$ and let $\Vc = \FTV(t) \cup
+  \FTV(\Gamma)$. Then there is a type~$\sigma'$ such that $\sigma'
+  =_\beta \sigma$ and $\FV(\sigma') \subseteq \Vc$ and one of the
+  following holds.
   \begin{itemize}
-  \item $t \equiv x$ is a variable and $(x : \tau) \in \Gamma$ and $\tau
-    =_\beta \sigma'$.
+  \item $t \equiv x$ is a variable and $(x : \sigma') \in \Gamma$.
   \item $t \equiv \mathtt{f}$ is a function symbol with $\mathtt{f} :
     \sigma'$ in $\Sigma$.
   \item $t \equiv \abs{x:\tau_1}{s}$ and
-    $\sigma'=\tau_1\arrtype\tau_2$ and $\Gamma \uplus \{ x : \tau_1 \}
-    \vdash s : \tau_2$.
-  \item $t \equiv \tabs{\alpha}{s}$ and
-    $\sigma' = \quant{\alpha}{\tau}$ and $\Gamma \vdash s : \tau$ and
-    for all $(x : \rho) \in \Gamma$: $\alpha \notin \FV(\rho)$.
+    $\sigma'=\tau_1\arrtype\tau_2$ and $\Gamma, x : \tau_1 \vdash s :
+    \tau_2$.
+  \item $t \equiv \tabs{\alpha}{s}$ and $\sigma' =
+    \quant{\alpha}{\tau}$ and $\Gamma \vdash s : \tau$ and $\alpha
+    \notin \FTV(\Gamma)$.
   \item $t \equiv \app{t_1}{t_2}$ and
     $\Gamma \vdash t_1 : \tau \arrtype \sigma'$ and
     $\Gamma \vdash t_2 : \tau$ and $\FV(\tau) \subseteq \Vc$.
@@ -343,12 +336,11 @@ $\abs{a}{s}$ or $\tabs{a}{s}$.
 \end{lemma}
 
 \begin{proof}
-  By induction on the derivation $\Gamma \proves t : \sigma$, using
-  the substitution lemma. Note that if $\alpha \notin \Vc$ is of
-  kind~$\kappa$ and e.g.~$\Gamma \proves s : \sigma'$ with~$s$ a
-  subterm of~$t$, then $\Gamma \proves s :
-  \sigma'[\subst{\alpha}{\chi_\kappa}]$ by the substitution lemma (see
-  Definition~\ref{def_types}).
+  By induction on the derivation $\Gamma \proves t : \sigma$. Note
+  that if $\alpha \notin \Vc$ is of kind~$\kappa$ and~$\Gamma' \proves
+  s : \sigma'$ with~$\FTV(s) \cup \FTV(\Gamma') \subseteq \Vc$, then
+  $\Gamma \proves s : \sigma'[\subst{\alpha}{\chi_\kappa}]$ by the
+  substitution lemma.
 \end{proof}
 
 For convenience, we sometimes assume without loss of generality that
@@ -359,7 +351,7 @@ with the same type). Note that given a context~$\Gamma$ under which
 all considered terms are typable, there is a natural isomorphism
 between typed terms as defined above and terms given in orthodox
 Church-style. We write $t : \tau$ if $t$ has type~$\tau$, in a fixed
-implicit context~$\Gamma$, or equivalently with~$t$ considered an
+implicit context~$\Gamma$, or equivalently with~$t$ considered as an
 orthodox Church-style typed term.
 
 \subsection{Encodings of inductive types}\label{sec_encodings}
@@ -486,7 +478,7 @@ specialising Section~\ref{sec_preliminaries}.
   \emph{terms} like in Definition~\ref{def_terms} (based on
   Definition~\ref{def_preterms}) with the following restrictions:
   \begin{itemize}
-  \item if $\mathtt{f} : \sigma \in \Sigma$ then $\sigma$ is closed and
+  \item if $\mathtt{f} : \sigma \in \Sigma$ then
     \[
     \sigma = \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n : \kappa_n)
     . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype \tau
@@ -517,10 +509,10 @@ $\Gamma \proves s_i : \sigma_i[\alpha_1 := \rho_1]\ldots[\alpha_n :=
   \rho_n]$ for $i=1,\ldots,k$, for an appropriate~$\Gamma$. We use
 this notation to stress the fact that by default there is no explicit
 application available. The application in the syntax of terms is used
-just as a convenient syntax, but does not correspond to the usual
-application operator since only applications of the form $\mathtt{f}
-u_1 \ldots u_n$ are allowed. True application can be modelled by
-including the symbol ${@} : \forall\alpha\forall\beta . (\alpha
+just for convenience, but does not correspond to the usual application
+operator since only applications of the form $\mathtt{f} \rho_1 \ldots
+\rho_n u_1 \ldots u_m$ are allowed. True application can be modelled
+by including the symbol ${@} : \forall\alpha\forall\beta . (\alpha
 \arrtype \beta) \arrtype \alpha \arrtype \beta$ in
 $\Sigma$. Similarly, type application is modelled through a symbol
 $\mathtt{A} : \forall \alpha : * \arrkind * . \forall \beta . (\forall
@@ -599,16 +591,15 @@ context~$\Gamma$.
   \]
   This example makes essential use of higher-rank polymorphism, which
   is not reducible to shallow polymorphism as used in the~ML
-  programming language or in \CKchange{the polymorphic higher-order
-  rewriting formalisms of \cite{jou:oka:91,jou:rub:99}}. The above rules
-  cannot be translated into an
-  infinite set of simply typed rules by instantiating the type
-  variables. In practice, when defining heterogenous lists in a
-  language with support for higher-rank polymorphism (e.g.~in recent
-  extensions of Haskell, or in a type-theory based proof assistant
-  like~Coq), one would constrain the type variable~$\alpha$ above with
-  a type class to guarantee the existence of certain operations on the
-  elements of the list.
+  programming language or in the polymorphic higher-order rewriting
+  formalisms of~\cite{jou:oka:91,jou:rub:99}. The above rules cannot
+  be translated into an infinite set of simply typed rules by
+  instantiating the type variables. In practice, when defining
+  heterogenous lists in a language with support for higher-rank
+  polymorphism (e.g.~in recent extensions of Haskell, or in a
+  type-theory based proof assistant like~Coq), one would constrain the
+  type variable~$\alpha$ above with a type class to guarantee the
+  existence of certain operations on the elements of the list.
 \end{example}
 
 \section{A well-ordered set of interpretation terms}
@@ -633,29 +624,25 @@ relation~$\succ$ will be well-founded.
   from Definition~\ref{def_terms} (see also
   Definition~\ref{def_preterms}) where as types we take the
   interpretation types and as the set~$\Sigma$ of function symbols we
-  take $\Sigma = \Nbb \cup \Sigma_f$, where:
+  take $\Sigma = \{ n : \nat \mid n \in \Nbb \} \cup \Sigma_f$, where:
   \[
-    \begin{array}{rcl}
-      \Sigma_f &=& \{ \oplus_\sigma : \sigma \arrtype
-                 \sigma \arrtype \sigma, \otimes_\sigma : \sigma \arrtype \sigma
-                 \arrtype \sigma, \\ & & \flatten_{\sigma} : \sigma \arrtype
-                 \nat, \lift_{\sigma} : \nat \arrtype \sigma \mid \sigma \in \ITypes
+      \Sigma_f = \{ \oplus : \forall \alpha . \alpha \arrtype
+                 \alpha \arrtype \alpha, \otimes : \forall \alpha . \alpha \arrtype \alpha
+                 \arrtype \alpha, \flatten : \forall \alpha . \alpha \arrtype
+                 \nat, \lift : \forall \alpha . \nat \arrtype \alpha
                  \}
-    \end{array}
   \]
-  The natural numbers in~$\Nbb$ considered as constants are assumed to
-  have type~$\nat$.
 \end{defn}
 
-For easier presentation, we will use $\oplus$ and $\otimes$ in
+For easier presentation, we write $\oplus_\tau$, etc., instead of
+$\tapp{\oplus}{\tau}$, etc. We will also use $\oplus$ and $\otimes$ in
 \emph{infix, left-associative} notation, and omit the type denotation
 where it is clear from context. Thus, $s \oplus t \oplus u$ should be
 read as $\oplus_\sigma\,s\,(\oplus_\sigma\,t\,u)$ if $s$ has type
-$\sigma$. Similarly, we will sometimes omit the type denotation from
-$\flatten$ and $\lift$ when clear or irrelevant.
+$\sigma$.
 
-To define the world of \emph{final interpretation terms}, we will
-normalise certain elements of~$\Iterms$ using the relation~$\arrW$.
+To define \emph{final interpretation terms}, we will normalise certain
+elements of~$\Iterms$ using~$\arrW{}$.
 
 \begin{defn}
   We define the relation $\arrW$ on interpretation terms as the
@@ -718,8 +705,6 @@ a type variable then $\oplus_\alpha t_1 t_2$ is not a redex, but
 $\oplus_{\sigma\arrtype\tau} t_1 t_2$ is. This makes adapting the
 standard computability-based termination proof method a bit more
 difficult.
-
-\subsection{The relation $\arrW$}
 
 Now we state some properties of~$\arrW$, including strong
 normalisation. Because of space limits, most proofs are delegated to
@@ -889,16 +874,14 @@ ordering.
   t_3$.
 
   If $t_1
-  \succeq_{\forall(\alpha:\kappa)\sigma}t_2\succ_{\forall(\alpha:\kappa)\sigma}t_3$
+  \succ_{\forall(\alpha:\kappa)\sigma}t_2\succ_{\forall(\alpha:\kappa)\sigma}t_3$
   then
   $\tapp{t_1}{\tau}\succ_{\sigma'}\tapp{t_2}{\tau}\succ_{\sigma'}\tapp{t_3}{\tau}$
   for any closed type constructor~$\tau$ of kind~$\kappa$, where
   $\sigma' = \nf_\beta(\sigma[\subst{\alpha}{\tau}])$. Hence
   $\tapp{t_1}{\tau}\succ_{\sigma'}\tapp{t_3}{\tau}$ by the coinductive
-  hypothesis. Thus $t_1\succeq_{\forall\alpha\sigma} t_3$.
+  hypothesis. Thus $t_1\succ_{\forall\alpha\sigma} t_3$.
 \end{proof}
-
-And that $\succeq$ is a quasi-ordering:
 
 \begin{lemma}\label{lem_reflexive}
   $\succeq$ is reflexive.
@@ -910,10 +893,9 @@ And that $\succeq$ is a quasi-ordering:
   then immediate from definitions.
 \end{proof}
 
-Finally, they must be compatible:
-
 \begin{lemma}\label{lem:compatibility}
-  We have $\succ \cdot \succeq\ \subseteq\ \succ$ and $\succeq \cdot
+  The relations~$\succeq$ and~$\succ$ are compatible, i.e., $\succ
+  \cdot \succeq\ \subseteq\ \succ$ and $\succeq \cdot
   \succ\ \subseteq\ \succ$.
 \end{lemma}
 
@@ -1058,7 +1040,7 @@ a reduction pair.
 \begin{lemma}\label{lem_abs_succ}
   If $t \succeq s$ then $\abs{x}{t} \succeq \abs{x}{s}$ and
   $\tabs{\alpha}{t} \succeq \tabs{\alpha}{s}$. The same holds
-  with~$\succ$ instead of~$\succeq$.
+  for~$\succ$.
 \end{lemma}
 
 \begin{proof}
@@ -1079,7 +1061,7 @@ a reduction pair.
   \begin{enumerate}
   \item If $s \succeq t$ then $s \oplus_\sigma u \succeq t
     \oplus_\sigma u$, $u \oplus_\sigma s \succeq u \oplus_\sigma t$,
-    and $s \otimes_\sigma u \succeq t \otimes_\sigma u$, $u
+    $s \otimes_\sigma u \succeq t \otimes_\sigma u$, and $u
     \otimes_\sigma s \succeq u \otimes_\sigma t$.
   \item If $s \succ t$ then $s \oplus_\sigma u \succ t \oplus_\sigma
     u$ and $u \oplus_\sigma s \succ u \oplus_\sigma t$. Moreover, if
@@ -1106,9 +1088,8 @@ for the termination proof. The difficulty comes from the fact that due
 to the impredicativity of polymorphism direct induction on type
 structure is not possible.
 
-\begin{lemma}\label{lem_succeq_subst}
-  If $s \succeq_\sigma s'$ then $t[\subst{x}{s}] \succeq_\tau
-  t[\subst{x}{s'}]$.
+\begin{lemma}[Weak monotonicity]\label{lem_succeq_subst}
+  If $s \succeq s'$ then $t[\subst{x}{s}] \succeq t[\subst{x}{s'}]$.
 \end{lemma}
 
 \begin{corollary}\label{cor_app_wm}
@@ -1120,17 +1101,17 @@ structure is not possible.
 \begin{defn}
   A \emph{type constructor mapping} is a function $\Typemap$ which
   maps a type constructor symbol to a closed interpretation type
-  constructor of the same kind.
-
-  A fixed type constructor mapping $\Typemap$ is extended inductively
-  to a function from type constructors to closed interpretation type
-  constructors in the expected way.
-
-  We denote the extended mapping by~$\typeinterpret{\sigma}$. Thus,
-  for example $\typeinterpret{\quant{\alpha}{\sigma}} =
+  constructor of the same kind. A fixed type constructor mapping
+  $\Typemap$ is extended inductively to a function from type
+  constructors to closed interpretation type constructors in the
+  expected way. We denote the extended \emph{interpretation (type)
+    mapping} by~$\typeinterpret{\sigma}$. Thus,
+  e.g.~$\typeinterpret{\quant{\alpha}{\sigma}} =
   \quant{\alpha}{\typeinterpret{\sigma}}$ and $\typeinterpret{\sigma
     \arrtype \tau} = \typeinterpret{\sigma} \arrtype
-  \typeinterpret{\tau}$.
+  \typeinterpret{\tau}$. Interpretation type mapping is extended to
+  contexts: \( \itp{\Gamma} := \{ (x : \typeinterpret{\tau}) \mid (x :
+  \tau) \in \Gamma \}.  \)
 \end{defn}
 
 \begin{lemma}\label{lem:substitutioninterpret:types}
@@ -1149,8 +1130,8 @@ PAFS terms.
   A \emph{symbol mapping} is a function $\Termmap$ which assigns to
   each function symbol $\mathtt{f} : \rho$ a closed interpretation
   term $\Termmap(\mathtt{f})$ of type~$\typeinterpret{\rho}$. For a
-  fixed symbol mapping $\Termmap$, we define $\interpret{s}$
-  inductively:
+  fixed symbol mapping $\Termmap$, we define the \emph{interpretation
+    mapping} $\interpret{s}$ inductively:
   \[
     \begin{array}{rclcrcl}
       \interpret{x} & = & x &\quad&
@@ -1162,8 +1143,6 @@ PAFS terms.
       \interpret{\tapp{t}{\tau}} &=& \tapp{\interpret{t}}{\typeinterpret{\tau}}
     \end{array}
   \]
-  Symbol mapping is extended to contexts: \( \itp{\Gamma} := \{ (x :
-  \typeinterpret{\tau}) \mid (x : \tau) \in \Gamma \}.  \)
 \end{defn}
 
 Interpretation mapping preserves typing:
@@ -1313,12 +1292,10 @@ pair.
   Example~\ref{ex_fold_pafs}: \LC{Cynthia: TODO}.
 \end{example}
 
-\section{Proving termination}
+\section{Proving termination with rule removal}\label{sec_rule_removal}
 
 In this section we show how to use reduction pairs to prove
 termination of a PAFS. This is achieved by the method of rule removal.
-
-\subsection{Rule removal}
 
 \begin{theorem}\label{thm:ruleremove}
   Let $\Rules = \Rules_1 \cup \Rules_2$, and suppose that
@@ -1340,7 +1317,8 @@ termination of a PAFS. This is achieved by the method of rule removal.
   contain only finitely many $\arr{\Rules_1}$ steps.
 \end{proof}
 
-The above theorem gives rise to the following algorithm:
+The above theorem gives rise to the following \emph{rule removal}
+algorithm:
 \begin{enumerate}
 \item While $\Rules$ is non-empty:
   \begin{enumerate}
@@ -1368,11 +1346,9 @@ Theorem~\ref{thm_reduction_pair}). Lemma~\ref{lem_safe} provides some
 sufficient safety criteria. The second requirement has to be verified
 for every individual rule.
 
-\subsection{Calculation rules}\label{sec_calculation_rules}
-
-We state a few lemmas which are helpful in showing rule orientation
-with~$\succeqinterpret$ and~$\succinterpret$. The proofs may be found
-in Appendix~\ref{app_proofs}.
+Now we state a few lemmas which are helpful in showing rule
+orientation with~$\succeqinterpret$ and~$\succinterpret$. The proofs
+may be found in Appendix~\ref{app_proofs}.
 
 \begin{lemma}\label{lem:plusparts}
 For all types $\sigma$, terms $s,t$ of type $\sigma$ and natural
@@ -1419,6 +1395,8 @@ have:
 \end{example}
 
 \section{Larger examples}\label{sec:examples}
+
+\LC{Cynthia: TODO}
 
 \section{Conclusions and future work}
 
@@ -1963,34 +1941,28 @@ write~$\val{\varphi}{}{}$.
 \end{proof}
 
 \begin{lemma}\label{lem_circ}
-  If $\omega$ is closed for~$\sigma$ then $\circ_{\omega(\sigma)} \in
-  \val{\sigma \arrtype \sigma \arrtype \sigma}{\xi}{\omega}$ for
-  $\circ \in \{ \oplus, \otimes \}$.
+  $\circ \in \val{\forall\alpha . \alpha \arrtype \alpha \arrtype
+    \alpha}{}{}$ for $\circ \in \{ \oplus, \otimes \}$.
 \end{lemma}
 
 \begin{proof}
-  Follows from definitions, Lemma~\ref{lem_val_computable} and
-  property~4 of candidates.
+  Follows from definitions and property~4 of candidates.
 \end{proof}
 
 \begin{lemma}\label{lem_lift}
-  If $\omega$ is closed for~$\sigma$ then $\lift_{\omega(\sigma)} \in
-  \val{\nat\arrtype\sigma}{\xi}{\omega}$.
+  $\lift \in \val{\forall\alpha.\nat\arrtype\alpha}{}{}$.
 \end{lemma}
 
 \begin{proof}
-  Follows from definitions, Lemma~\ref{lem_val_computable} and
-  property~5 of candidates.
+  Follows from definitions and property~5 of candidates.
 \end{proof}
 
 \begin{lemma}\label{lem_flatten}
-  If $\omega$ is closed for~$\sigma$ then $\flatten_{\omega(\sigma)}
-  \in \val{\sigma\arrtype\nat}{\xi}{\omega}$.
+  $\flatten \in \val{\forall\alpha.\alpha\arrtype\nat}{}{}$.
 \end{lemma}
 
 \begin{proof}
-  Follows from definitions, Lemma~\ref{lem_val_computable} and
-  property~6 of candidates.
+  Follows from definitions and property~6 of candidates.
 \end{proof}
 
 \begin{lemma}\label{lem_val_subst}
@@ -2116,17 +2088,14 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
 
   By the generation lemma for $t : \sigma$ there is a type~$\sigma'$
   such that $\sigma' =_\beta \sigma$ and $\FV(\sigma') \subseteq
-  \FV(\sigma) \cup \FTV(t)$ and one of the cases below holds. Note
-  that~$\omega$ is closed for~$\sigma'$ because it is closed
-  for~$\sigma$ and $\FTV(\omega(t)) = \emptyset$. By
-  Lemma~\ref{lem_beta_val} it suffices to show $\omega^*(t) \in
-  \val{\sigma'}{\xi}{\omega}$.
+  \FTV(t)$ and one of the cases below holds. Note that~$\omega$ is
+  closed for~$\sigma'$ because it is closed for~$\sigma$ and
+  $\FTV(\omega(t)) = \emptyset$. By Lemma~\ref{lem_beta_val} it
+  suffices to show $\omega^*(t) \in \val{\sigma'}{\xi}{\omega}$.
   \begin{itemize}
-  \item If $t = x_1^{\tau_1}$ and $\tau_1 =_\beta \sigma'$ then
-    $\omega(t)[\subst{x_1}{u_1}] =
-    (x_1^{\omega(\tau_1)})[\subst{x_1}{u_1}] = u_1 \in
-    \val{\tau_1}{\xi}{\omega} = \val{\sigma'}{\xi}{\omega}$ by
-    assumption and Lemma~\ref{lem_beta_val}.
+  \item If $t = x_1^{\sigma'}$ then $\omega(t)[\subst{x_1}{u_1}] =
+    (x_1^{\omega(\sigma')})[\subst{x_1}{u_1}] = u_1 \in
+    \val{\sigma'}{\xi}{\omega}$ by assumption.
   \item If $t = n$ is a natural number and $\sigma' = \nat$ then $t
     \in \val{\nat}{}{}$ by definition.
   \item If $t$ is a function symbol then the claim follows from
@@ -2150,15 +2119,14 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
     $\alpha$ chosen fresh such that $\omega(\alpha) = \alpha$). Hence
     $\omega^*(t) \in \val{\tau}{\xi}{\omega}$ by
     Lemma~\ref{lem_abstraction_computable}.
-  \item If $t = t_1 t_2$ then $t_1 : \tau\arrtype\sigma'$ and
-    $t_2 : \tau$ and $\FV(\tau) \subseteq \FV(\sigma) \cup
-    \FTV(t)$. Hence~$\omega$ is closed for~$\tau$ and
-    for~$\tau\arrtype\sigma'$. By the inductive hypothesis
-    $\omega^*(t_1) \in \val{\tau\arrtype\sigma'}{\xi}{\omega}$ and
-    $\omega^*(t_2) \in \val{\tau}{\xi}{\omega}$. We have
-    $\omega^*(t_2) : \omega(\tau)$. Then by definition
-    $\omega^*(t) = (\omega^*(t_1))(\omega^*(t_2)) \in
-    \val{\sigma'}{\xi}{\omega}$.
+  \item If $t = t_1 t_2$ then $t_1 : \tau\arrtype\sigma'$ and $t_2 :
+    \tau$ and $\FV(\tau) \subseteq \FTV(t)$. Hence~$\omega$ is closed
+    for~$\tau$ and for~$\tau\arrtype\sigma'$. By the inductive
+    hypothesis $\omega^*(t_1) \in
+    \val{\tau\arrtype\sigma'}{\xi}{\omega}$ and $\omega^*(t_2) \in
+    \val{\tau}{\xi}{\omega}$. We have $\omega^*(t_2) :
+    \omega(\tau)$. Then by definition $\omega^*(t) =
+    (\omega^*(t_1))(\omega^*(t_2)) \in \val{\sigma'}{\xi}{\omega}$.
   \item If $t = s \psi$ then $s : \forall\alpha\tau$ and $\sigma' =
     \tau[\subst{\alpha}{\psi}]$. By the inductive hypothesis
     $\omega^*(s) \in \val{\forall\alpha\tau}{\xi}{\omega}$. Because
@@ -2218,8 +2186,8 @@ method of candidates from the termination proof.
   define the set~$\Cb_\tau$ of all candidates of type
   constructor~$\tau$.
 
-  First assume $\kappa=*$, i.e., $\tau$ is a type. A a set~$X$ of
-  terms of type~$\tau$ equipped with a binary relation~$\ge^X$ is a
+  First assume $\kappa=*$, i.e., $\tau$ is a type. A set~$X$ of terms
+  of type~$\tau$ equipped with a binary relation~$\ge^X$ is a
   \emph{candidate of type~$\tau$} if it satisfies the following
   properties:
   \begin{enumerate}
@@ -2450,59 +2418,55 @@ and~$\val{\tau}{}{}$.
 \end{proof}
 
 \begin{lemma}\label{lem_wm_circ}
-  If $\omega$ is closed for~$\sigma$ then $\circ_{\omega(\sigma)} \in
-  \val{\sigma \arrtype \sigma \arrtype \sigma}{\xi}{\omega}$ for
-  $\circ \in \{ \oplus, \otimes \}$.
+  $\circ \in \val{\forall \alpha . \alpha \arrtype \alpha \arrtype
+    \alpha}{}{}$ for $\circ \in \{ \oplus, \otimes \}$.
 \end{lemma}
 
 \begin{proof}
-  Let $t_1,t_2 \in \val{\sigma}{\xi}{\omega}$. Then
-  $\circ_{\omega(\sigma)} t_1 t_2 \in \val{\sigma}{\xi}{\omega}$ by
-  Lemma~\ref{lem_val_wm_computable} and property~2 of candidate
+  Let~$\tau$ be a closed type and let $X \in \Cb_{\tau}$. Let
+  $\omega(\alpha) = \tau$ and $\xi(\alpha) = X$.
+
+  Let $t_1,t_2 \in \val{\alpha}{\xi}{\omega} = X$. Then $\circ_{\tau}
+  t_1 t_2 \in \val{\alpha}{\xi}{\omega}$ by property~2 of candidate
   sets.
 
-  Let $t_2' \in \val{\sigma}{\xi}{\omega}$ be such that $t_2
-  \gteq{\sigma}{\xi}{\omega} t_2'$. By
-  Lemma~\ref{lem_val_wm_computable} and properties~5 and~3 of
-  comparison candidates we have we have $\circ_{\omega(\sigma)} t_1
-  t_2 \gteq{\sigma}{\xi}{\omega} \circ_{\omega(\sigma)} t_1
-  t_2'$. This shows $\circ_{\omega(\sigma)} t_1 \in
-  \val{\sigma\arrtype\sigma}{\xi}{\omega}$.
+  Let $t_2' \in \val{\alpha}{\xi}{\omega}$ be such that $t_2
+  \gteq{\alpha}{\xi}{\omega} t_2'$, i.e., $t_2 \ge^X t_2'$. By
+  properties~6 and~3 of comparison candidates we have we have
+  $\circ_{\tau} t_1 t_2 \gteq{\alpha}{\xi}{\omega} \circ_{\tau} t_1
+  t_2'$. This shows $\circ_{\tau} t_1 \in
+  \val{\alpha\arrtype\alpha}{\xi}{\omega}$.
 
-  Let $t_1' \in \val{\sigma}{\xi}{\omega}$ be such that $t_1
-  \gteq{\sigma}{\xi}{\omega} t_1'$. Let $u \in
-  \val{\sigma}{\xi}{\omega}$. By Lemma~\ref{lem_val_wm_computable} and
-  properties~2 and~3 of comparison candidates we have
-  $\circ_{\omega(\sigma)} t_1 u \gteq{\sigma}{\xi}{\omega}
-  \circ_{\omega(\sigma)} t_1' u$. Hence $\circ_{\omega(\sigma)} t_1
-  \gteq{\sigma\arrtype\sigma}{\xi}{\omega} \circ_{\omega(\sigma)}
-  t_1'$. This shows $\circ_{\omega(\sigma)} \in
-  \val{\sigma}{\xi}{\omega}$.
+  Let $t_1' \in \val{\alpha}{\xi}{\omega}$ be such that $t_1
+  \gteq{\alpha}{\xi}{\omega} t_1'$. Let $u \in
+  \val{\alpha}{\xi}{\omega}$. By properties~6 and~3 of comparison
+  candidates we have $\circ_{\tau} t_1 u \gteq{\alpha}{\xi}{\omega}
+  \circ_{\tau} t_1' u$. Hence $\circ_{\tau} t_1
+  \gteq{\alpha\arrtype\alpha}{\xi}{\omega} \circ_{\tau} t_1'$. This
+  shows $\circ_{\tau} \in
+  \val{\alpha\arrtype\alpha\arrtype\alpha}{\xi}{\omega}$.
 \end{proof}
 
 \begin{lemma}\label{lem_wm_lift}
-  If $\omega$ is closed for~$\sigma$ then $\lift_{\omega(\sigma)} \in
-  \val{\nat\arrtype\sigma}{\xi}{\omega}$.
+  $\lift \in \val{\forall\alpha.\nat\arrtype\alpha}{}{}$.
 \end{lemma}
 
 \begin{proof}
-  By Lemma~\ref{lem_val_wm_computable} and property~4 of comparison
-  candidates we have $\lift_{\omega(\sigma)}s_1
-  \gteq{\sigma}{\xi}{\omega} \lift_{\omega(\sigma)}s_2$ for all $s_i :
-  \nat$ with $s_1 \succeq_\nat s_2$. It remains to show that
-  $\lift_{\omega(\sigma)}s \in \val{\sigma}{\xi}{\omega}$ for all $s :
-  \nat$. This follows from Lemma~\ref{lem_val_wm_computable} and
-  property~3 of candidate sets.
+  Let~$\tau$ be a closed type and let $X \in \Cb_{\tau}$. Let
+  $\omega(\alpha) = \tau$ and $\xi(\alpha) = X$. By property~4 of
+  comparison candidates we have $\lift_{\tau}s_1
+  \gteq{\alpha}{\xi}{\omega} \lift_{\tau}s_2$ for all $s_i : \nat$
+  with $s_1 \succeq_\nat s_2$. It remains to show that $\lift_{\tau}s
+  \in \val{\alpha}{\xi}{\omega} = X$ for all $s : \nat$. This follows
+  from property~3 of candidate sets.
 \end{proof}
 
 \begin{lemma}\label{lem_wm_flatten}
-  If $\omega$ is closed for~$\sigma$ then $\flatten_{\omega(\sigma)}
-  \in \val{\sigma\arrtype\nat}{\xi}{\omega}$.
+  $\flatten \in \val{\forall\alpha.\alpha\arrtype\nat}{}{}$.
 \end{lemma}
 
 \begin{proof}
-  Follows from Lemma~\ref{lem_val_wm_computable} and property~5 of
-  comparison candidates.
+  Follows from definitions and property~5 of comparison candidates.
 \end{proof}
 
 \begin{lemma}\label{lem_val_subst_wm}
@@ -2582,19 +2546,16 @@ each~$x : \tau$.
 \begin{proof}
   Induction on the structure of~$t$. By the generation lemma for $t :
   \sigma$ there is a type~$\sigma'$ such that $\sigma' =_\beta \sigma$
-  and $\FV(\sigma') \subseteq \FV(\sigma) \cup \FTV(t)$ and one of the
-  cases below holds. Note that $\omega$ is closed for~$\sigma'$,
-  because it is closed for~$\sigma$ and $\FTV(\omega(t)) =
-  \emptyset$. Hence by Lemma~\ref{lem_beta_val_wm} it suffices to show
-  $\delta_i(t) \in \val{\sigma'}{\xi}{\omega}$ and $\delta_1(t)
+  and $\FV(\sigma') \subseteq \FTV(t)$ and one of the cases below
+  holds. Note that $\omega$ is closed for~$\sigma'$, because it is
+  closed for~$\sigma$ and $\FTV(\omega(t)) = \emptyset$. Hence by
+  Lemma~\ref{lem_beta_val_wm} it suffices to show $\delta_i(t) \in
+  \val{\sigma'}{\xi}{\omega}$ and $\delta_1(t)
   \gteq{\sigma'}{\xi}{\omega} \delta_2(t)$.
   \begin{itemize}
-  \item If $t = x^{\tau_1}$ and $\tau_1 =_\beta \sigma'$ then
-    $\delta_i(t) \in \val{\tau_1}{\xi}{\omega} =
-    \val{\sigma'}{\xi}{\omega}$ by assumption and
-    Lemma~\ref{lem_beta_val_wm}. Also $\delta_1(t)
-    \gteq{\sigma'}{\xi}{\omega} \delta_2(t)$ by assumption and
-    Lemma~\ref{lem_beta_val_wm}.
+  \item If $t = x^{\sigma'}$ then $\delta_i(t) \in
+    \val{\sigma'}{\xi}{\omega}$ by assumption. Also $\delta_1(t)
+    \gteq{\sigma'}{\xi}{\omega} \delta_2(t)$ by assumption.
   \item If $t = n$ is a natural number and $\sigma' = \nat$ then
     $\delta_i(t) = t$ and thus $t \in \val{\nat}{}{}$ and $\delta_1(t)
     \gteq{\nat}{\xi}{\omega} \delta_2(t)$ by definition and the
@@ -2658,11 +2619,11 @@ each~$x : \tau$.
     \gteq{\forall\alpha[\tau]}{\xi'}{\omega'}
     \delta_2(\tabs{\alpha}{u})$.
   \item If $t = t_1 t_2$ then $t_1 : \tau\arrtype\sigma'$ and $t_2 :
-    \tau$ and $\FV(\tau) \subseteq \FV(\sigma) \cup
-    \FTV(t)$. Hence~$\omega$ is closed for~$\tau$ and
-    for~$\tau\arrtype\sigma'$. By the inductive hypothesis
-    $\delta_i(t_1) \in \val{\tau\arrtype\sigma'}{\xi}{\omega}$ and
-    $\delta_i(t_2) \in \val{\tau}{\xi}{\omega}$ and $\delta_1(t_1)
+    \tau$ and $\FV(\tau) \subseteq \FTV(t)$. Hence~$\omega$ is closed
+    for~$\tau$ and for~$\tau\arrtype\sigma'$. By the inductive
+    hypothesis $\delta_i(t_1) \in
+    \val{\tau\arrtype\sigma'}{\xi}{\omega}$ and $\delta_i(t_2) \in
+    \val{\tau}{\xi}{\omega}$ and $\delta_1(t_1)
     \gteq{\tau\arrtype\sigma'}{\xi}{\omega} \delta_2(t_1)$ and
     $\delta_1(t_2) \gteq{\tau}{\xi}{\omega} \delta_2(t_2)$. By the
     definition of $\val{\tau\arrtype\sigma'}{\xi}{\omega}$ we have
@@ -2730,7 +2691,7 @@ each~$x : \tau$.
 \end{proof}
 
 { \renewcommand{\thelemma}{\ref{lem_succeq_subst}}
-\begin{lemma}
+\begin{lemma}[Weak monotonicity]
   If $s \succeq_\sigma s'$ then $t[\subst{x}{s}] \succeq_\tau t[\subst{x}{s'}]$.
 \end{lemma}
 \addtocounter{theorem}{-1}}
@@ -2745,7 +2706,7 @@ each~$x : \tau$.
   \succeq_\tau t[\subst{x}{s'}]$ by Corollary~\ref{cor_gteq_succeq}.
 \end{proof}
 
-\subsection{Proofs for Section~\ref{sec_calculation_rules}}
+\subsection{Proofs for Section~\ref{sec_rule_removal}}
 
 { \renewcommand{\thelemma}{\ref{lem:plusparts}}
 \begin{lemma}
