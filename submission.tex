@@ -132,8 +132,8 @@
   interpretations to a setting with impredicative
   polymorphism. Instead of using weakly monotonic functionals, we
   interpret terms in a suitable extension of System~$\Fomega$. In
-  addition to enabling an interpretation of rewrite rules which make
-  essential use of impredicative polymorphism, thanks to the
+  addition to enabling a direct interpretation of rewrite rules which
+  make essential use of impredicative polymorphism, thanks to the
   possibility of encoding inductive data types in the polymorphic
   lambda-calculus, our generalisation eases the applicability of the
   method also in the non-polymorphic setting. As an illustration of
@@ -144,9 +144,84 @@
 
 \section{Introduction}
 
+Termination of higher-order term rewriting
+systems~\cite[Chapter~11]{Terese2003} has been an active area of
+research for several decades. Higher-order polynomial
+interpretations~\cite{pol:96,Kop2012,FuhsKop2012}, introduced by Jaco
+van de Pol~\cite{Pol1993,pol:96}, generalise polynomial
+interpretations -- a termination method complete for first-order
+rewriting.
 
+In this paper, we further generalise higher-order polynomial
+interpretations to a higher-order formalism with full impredicative
+polymorphism. In the term rewriting literature, polymorphic
+higher-order frameworks are usually restricted to shallow (rank-1,
+weak) polymorphism, i.e., type quantifiers are effectively allowed
+only at the top of a type. While shallow polymorphism often suffices
+in functional programming practice, there do exist interesting
+examples of rewrite systems which require higher-rank impredicative
+polymorphism.
 
-\cite{pol:96}
+For instance, in recent extensions of Haskell or in some type-theory
+based proof assistants (e.g.~Coq) one may define a type of
+heterogenous lists.
+\[
+\begin{array}{l}
+  \List : * \\
+  \mathtt{nil} : \List \\
+  \mathtt{cons} : \forall \alpha . \alpha \arrtype \List \arrtype \List \\
+  \mathtt{foldl} : \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \List \\
+  \mathtt{foldl}_\sigma(f,a,\nil) \red a \\
+  \mathtt{foldl}_\sigma(f,a,\cons_\tau(x,l)) \red \mathtt{foldl}_\sigma(f,f \tau a x,l)
+\end{array}
+\]
+The above states that $\List$ is a type ($*$), states the types of its
+two constructors $\nil$ and $\cons$, and defines the correspoding
+fold-left function~$\mathtt{foldl}$. Each element of a heterogenous
+list may have a different type. Together with the element, the
+function argument of~$\mathtt{foldl}$ receives the element's type. The
+$\forall$-quantifier binds type variables -- a term of type $\forall
+\alpha . \tau$ takes a type~$\rho$ as an argument and the result is a
+term of type~$\tau[\subst{\alpha}{\rho}]$.
+
+Polymorphism in type theory is parametric, which means that a
+polymorphic function behaves uniformly with respect to its generic
+arguments, not depending on their actual types. This makes it
+impossible to directly extract elements from a heterogenous list -- we
+can only perform some operations on them under the assumption that we
+know nothing about their types. In practice, one would constrain the
+type variable~$\alpha$ above with a type class to guarantee the
+existence of certain functions on the elements of a list.
+
+Impredicativity of polymorphism means that the type itself may be
+substituted for its own type variable, e.g., if $\mathtt{f} : \forall
+\alpha . \tau$ then $f (\forall \alpha . \tau) :
+\tau[\subst{\alpha}{\forall\alpha.\tau}]$. This prevents a translation
+into an infinite set of simply typed rules by instantiating the type
+variables. The above example is not directly reducible to shallow
+polymorphism as used in the~ML programming language or the polymorphic
+higher-order rewriting formalisms of~\cite{jou:oka:91,jou:rub:99}.
+
+We will use the above rules for fold on heterogenous lists as our
+running example, but their termination could be shown by encoding them
+in System~$\mathtt{F}$. In Section~\ref{sec:examples}, we study a more
+complex example -- termination of a substantial fragment of~IPC2,
+i.e., full intuitionistic second-order propositional logic with
+permutative conversions. Permutative
+conversions~\cite[Chapter~6]{TroelstraSchwichtenberg1996} are used in
+proof theory to obtain ``good'' normal forms of natural deduction
+proofs, which satisfy e.g.~the subformula property. Termination proofs
+for systems with permutative conversions are notoriously tedious and
+difficult, with some incorrect claims in the literature and no uniform
+methodology. Pol and Schwichtenberg used higher-order polynomial
+interpretations to prove termination of a fragment of first-order
+logic with permutative conversions~\cite{PolSchwichtenberg1995}, in
+the hope of providing a more perspicuous proof of this well-known
+result. Notably, they did not treat disjunction. The
+paper~\cite{SorensenUrzyczyn2010} depends on termination of~IPC2,
+citing a proof from~\cite{Wojdyga2008}, which, however, later turned
+out to be incorrect. To our knowledge, termination of the full
+system~IPC2 remains an open problem.
 
 \section{Preliminaries}\label{sec_preliminaries}
 
@@ -363,7 +438,7 @@ than the simply-typed lambda-calculus. Arbitrary inductive data types
 may be encoded, together with their constructors and recursors with
 appropriate derived reduction rules. This makes the polynomial
 interpretation method easier to apply, even in the non-polymorphic
-setting, through more sophisticated ``programming'' in the
+setting, thanks to more sophisticated ``programming'' in the
 interpretations.
 
 The reader is advised to consult e.g.~\cite[Chapter~11]{Girard1989}
@@ -476,8 +551,8 @@ specialising Section~\ref{sec_preliminaries}.
   like in Definition~\ref{def_types}, parameterised by a fixed
   set~$\Sigma_T$ of type constructor symbols.
 
-  Given a fixed set~$\Sigma$ of function symbols, we define
-  \emph{terms} like in Definition~\ref{def_terms} (based on
+  Given a fixed set~$\Sigma$ of function symbols, we define \emph{PAFS
+    terms} like in Definition~\ref{def_terms} (based on
   Definition~\ref{def_preterms}) with the following restrictions:
   \begin{itemize}
   \item if $\mathtt{f} : \sigma \in \Sigma$ then
@@ -520,6 +595,10 @@ $\Sigma$. Similarly, type application is modelled through a symbol
 $\mathtt{A} : \forall \alpha : * \arrkind * . \forall \beta . (\forall
 \beta [\alpha \beta]) \arrtype \alpha \beta$.
 
+\begin{lemma}
+  If $t,s$ are PAFS terms then so is $t[\subst{x}{s}]$.
+\end{lemma}
+
 \begin{defn}\label{def_replacement}
   A \emph{$\Gamma$-replacement} is a function $\delta = \gamma \circ
   \omega$ satisfying:
@@ -553,10 +632,12 @@ context~$\Gamma$.
   \begin{itemize}
   \item $\FV(r) \subseteq \FV(\ell) \subseteq \mathit{keys}(\Gamma)$;
   \item $\ell$ and $r$ have the same type under $\Gamma$;
+  \item if $(\ell,r) \in \Rules$ then $(\delta(\ell),\delta(r)) \in
+    \Rules$ for any replacement~$\delta$.
   \end{itemize}
   The reduction relation $\arr{\Rules}$ is defined by: $t \arr{\Rules}
-  s$ iff $t = C[\delta(\ell)]$ and $s = C[\delta(r)]$ for some
-  $(\ell,r)\in\Rules$, a replacement~$\delta$, and a context~$C$.
+  s$ iff $t = C[\ell]$ and $s = C[r]$ for some $(\ell,r)\in\Rules$ and
+  a context~$C$.
 \end{defn}
 
 \begin{defn}\label{def_pafs}
@@ -591,17 +672,8 @@ context~$\Gamma$.
     \mathtt{foldl}_\sigma(f,a,\cons_\tau(x,l)) & \red & \mathtt{foldl}_\sigma(f,@_{\tau,\sigma}(@_{\sigma,\tau\arrtype\sigma}(\mathtt{A}_{\tabs{\alpha}{\sigma\arrtype\alpha\arrtype\sigma},\tau}(f),a),x),l)
   \end{array}
   \]
-  This example makes essential use of higher-rank polymorphism, which
-  is not reducible to shallow polymorphism as used in the~ML
-  programming language or in the polymorphic higher-order rewriting
-  formalisms of~\cite{jou:oka:91,jou:rub:99}. The above rules cannot
-  be translated into an infinite set of simply typed rules by
-  instantiating the type variables. In practice, when defining
-  heterogenous lists in a language with support for higher-rank
-  polymorphism (e.g.~in recent extensions of Haskell, or in a
-  type-theory based proof assistant like~Coq), one would constrain the
-  type variable~$\alpha$ above with a type class to guarantee the
-  existence of certain operations on the elements of the list.
+  Formally, the above represent an infinite set of rules, one rule for
+  each substitution of~PAFS terms for $s$, $t$, etc.
 \end{example}
 
 \section{A well-ordered set of interpretation terms}
@@ -636,12 +708,12 @@ relation~$\succ$ will be well-founded.
   \]
 \end{defn}
 
-For easier presentation, we write $\oplus_\tau$, etc., instead of
-$\tapp{\oplus}{\tau}$, etc. We will also use $\oplus$ and $\otimes$ in
-\emph{infix, left-associative} notation, and omit the type denotation
-where it is clear from context. Thus, $s \oplus t \oplus u$ should be
-read as $\oplus_\sigma\,s\,(\oplus_\sigma\,t\,u)$ if $s$ has type
-$\sigma$.
+For easier presentation, we write $\oplus_\tau$, $\otimes_\tau$, etc.,
+instead of $\tapp{\oplus}{\tau}$, $\tapp{\otimes}{\tau}$, etc. We will
+also use $\oplus$ and $\otimes$ in \emph{infix, left-associative}
+notation, and omit the type denotation where it is clear from
+context. Thus, $s \oplus t \oplus u$ should be read as
+$\oplus_\sigma\,s\,(\oplus_\sigma\,t\,u)$ if $s$ has type $\sigma$.
 
 To define \emph{final interpretation terms}, we will normalise certain
 elements of~$\Iterms$ using~$\arrW{}$.
@@ -967,9 +1039,7 @@ a~PAFS~$A$.
 \begin{defn}
   A binary relation~$R$ on $A$-terms is \emph{monotonic} if $R(s, t)$
   implies $R(C[s], C[t])$ for every context~$C$ (we assume $s,t$ have
-  the same type~$\sigma$). A binary relation~$R$ on $A$-terms is
-  \emph{stable} if $R(s, t)$ implies $R(\delta(s), \delta(t))$ for
-  every replacement~$\delta$.
+  the same type~$\sigma$).
 
   A \emph{reduction pair} is a pair~$(\succeq^A,\succ^A)$ of a
   quasi-order~$\succeq^A$ on $A$-terms and a well-founded
@@ -977,7 +1047,6 @@ a~PAFS~$A$.
   \begin{itemize}
   \item $\succeq^A$ and~$\succ^A$ are compatible, i.e., ${\succ^A}
     \cdot {\succeq^A} \subseteq {\succ^A}$,
-  \item $\succeq^A$ and~$\succ^A$ are both stable,
   \item $\succeq^A$ and~$\succ^A$ are both monotonic.
   \end{itemize}
 \end{defn}
@@ -1283,10 +1352,10 @@ pair.
   quasi-order. Lemma~\ref{lem_well_founded} and
   Lemma~\ref{lem_transitive} imply that~$\succinterpret$ is a
   well-founded ordering. Compatibility follows from
-  Lemma~\ref{lem:compatibility}. Stability follows from definitions,
-  by manipulating closures. Monotonicity of~$\succeqinterpret$ follows
-  from Lemma~\ref{lem_succeq_subst}. Monotonicity of~$\succinterpret$
-  follows from Lemma~\ref{lem_succinterpret_monotonic}.
+  Lemma~\ref{lem:compatibility}. Monotonicity of~$\succeqinterpret$
+  follows from Lemma~\ref{lem_succeq_subst}. Monotonicity
+  of~$\succinterpret$ follows from
+  Lemma~\ref{lem_succinterpret_monotonic}.
 \end{proof}
 
 \begin{example}\label{ex_fold_interpretation}
@@ -1309,8 +1378,8 @@ termination of a PAFS. This is achieved by the method of rule removal.
 \end{theorem}
 
 \begin{proof}
-  Monotonicity and stability of~$\succeq^\Rules$ and~$\succ^\Rules$
-  imply that ${\arr{\Rules_1}}\subseteq{\succ^\Rules}$ and
+  Monotonicity of~$\succeq^\Rules$ and~$\succ^\Rules$ implies that
+  ${\arr{\Rules_1}}\subseteq{\succ^\Rules}$ and
   ${\arr{\Rules_2}}\subseteq{\succeq^\Rules}$.
 
   By well-foundedness of $\succ^\Rules$, compatibility
@@ -1402,6 +1471,7 @@ have:
 
 \section{Conclusions and future work}
 
+\addcontentsline{toc}{section}{References}
 \bibliography{references}
 
 \clearpage
@@ -2765,17 +2835,15 @@ numbers $n > 0$:
 For all types $\sigma$ and all terms $s,t,u$ of type $\sigma$, we
 have:
 \begin{enumerate}
-\item\label{lem:approx:symmetry} $s \oplus_\sigma t \approx t
-  \oplus_\sigma s$ and $s \otimes_\sigma t \approx t \otimes_\sigma
-  s$;
-\item\label{lem:approx:assoc} $s \oplus_\sigma (t \oplus_\sigma u)
-  \approx (s \oplus_\sigma t) \oplus_\sigma u$ and $s \otimes_\sigma
-  (t \otimes_\sigma u) \approx (s \otimes_\sigma t) \otimes_\sigma u$;
-\item\label{lem:approx:distribution} $s \otimes_\sigma (t
-  \oplus_\sigma u) \approx (s \otimes_\sigma t) \oplus_\sigma (s
-  \otimes_\sigma u)$;
-\item\label{lem:approx:neutral} $(\lift_\sigma 0) \oplus_\sigma s
-  \approx s$ and $(\lift_\sigma 1) \otimes_\sigma s \approx s$.
+\item $s \oplus_\sigma t \approx t \oplus_\sigma s$ and $s
+  \otimes_\sigma t \approx t \otimes_\sigma s$;
+\item $s \oplus_\sigma (t \oplus_\sigma u) \approx (s \oplus_\sigma t)
+  \oplus_\sigma u$ and $s \otimes_\sigma (t \otimes_\sigma u) \approx
+  (s \otimes_\sigma t) \otimes_\sigma u$;
+\item $s \otimes_\sigma (t \oplus_\sigma u) \approx (s \otimes_\sigma
+  t) \oplus_\sigma (s \otimes_\sigma u)$;
+\item $(\lift_\sigma 0) \oplus_\sigma s \approx s$ and $(\lift_\sigma
+  1) \otimes_\sigma s \approx s$.
 \end{enumerate}
 \end{lemma}
 \addtocounter{theorem}{-1}}
