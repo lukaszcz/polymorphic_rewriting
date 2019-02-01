@@ -176,7 +176,7 @@ heterogenous lists.
 \end{array}
 \]
 The above states that $\List$ is a type ($*$), states the types of its
-two constructors $\nil$ and $\cons$, and defines the correspoding
+two constructors $\nil$ and $\cons$, and defines the corresponding
 fold-left function~$\mathtt{foldl}$. Each element of a heterogenous
 list may have a different type. Together with the element, the
 function argument of~$\mathtt{foldl}$ receives the element's type. The
@@ -190,8 +190,8 @@ arguments, not depending on their actual types. This makes it
 impossible to directly extract elements from a heterogenous list -- we
 can only perform some operations on them under the assumption that we
 know nothing about their types. In practice, one would constrain the
-type variable~$\alpha$ above with a type class to guarantee the
-existence of certain functions on the elements of a list.
+type variable~$\alpha$ above with a type class, in order to guarantee
+the existence of certain functions on the elements of a list.
 
 Impredicativity of polymorphism means that the type itself may be
 substituted for its own type variable, e.g., if $\mathtt{f} : \forall
@@ -1384,7 +1384,7 @@ ensured:
 \begin{itemize}
 \item $\Termmap$ is safe;
 \item all rules in $\Rules$ can be oriented with $\succeqinterpret$ or
-  $\succinterpret$ and at least one with $\succinterpret$.
+  $\succinterpret$, and at least one with $\succinterpret$.
 \end{itemize}
 
 The first requirement guarantees that
@@ -1393,7 +1393,7 @@ Theorem~\ref{thm_reduction_pair}). Lemma~\ref{lem_safe} provides some
 sufficient safety criteria. The second requirement has to be verified
 for every individual rule.
 
-Now we state a few lemmas which are helpful in showing rule
+Now, we state a few lemmas which are helpful in showing rule
 orientation with~$\succeqinterpret$ and~$\succinterpret$. The proofs
 may be found in Appendix~\ref{app_proofs}.
 
