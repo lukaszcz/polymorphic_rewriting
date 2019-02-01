@@ -233,74 +233,65 @@ for the investigated systems.
 \begin{defn}\label{def_types}
   \emph{Kinds} are defined inductively: $*$ is a kind, and if
   $\kappa_1,\kappa_2$ are kinds then so is $\kappa_1 \arrkind
-  \kappa_2$. We assume infinitely many \emph{type constructor
-    variables} of each kind. Variables of kind~$*$ are \emph{type
-    variables}. We assume a fixed set~$\Sigma_T$ of \emph{type
-    constructor symbols} paired with a kind, denoted $c :
-  \kappa$. Every type constructor symbol~$c$ occurs with only one kind
-  declaration. We assume there exists a fixed type symbol~$\chi_*$ (of
-  kind~$*$). For $\kappa=\kappa_1\arrkind\kappa_2$ we define
-  $\chi_\kappa = \lambda \alpha:\kappa_1 . \chi_{\kappa_2}$.
+  \kappa_2$. We assume an infinite set~$\Vc_\kappa$ of \emph{type
+    constructor variables} of each kind~$\kappa$. Variables of
+  kind~$*$ are \emph{type variables}. We assume a fixed
+  set~$\Sigma^T_\kappa$ of \emph{type constructor symbols} paired of
+  kind~$\kappa$, denoted $c : \kappa$.
 
-  We define \emph{type constructors} of kind~$\kappa$ by induction.
-  Type constructors of kind~$*$ are \emph{types}.
-  \begin{itemize}
-  \item A type constructor variable or symbol of kind~$\kappa$ is a
-    type constructor of kind~$\kappa$.
-  \item If $\varphi$ is a type constructor of kind $\kappa_1 \arrkind
-    \kappa_2$ and $\psi$ is a type constructor of kind~$\kappa_1$ then
-    $\varphi \psi$ is a type constructor of kind~$\kappa_2$.
-  \item If $\alpha$ is a type constructor variable of kind~$\kappa_1$
-    and $\varphi$ is a type constructor of kind~$\kappa_2$, then
-    $\lambda\alpha . \varphi$ is a type constructor of kind $\kappa_1
-    \arrkind \kappa_2$.
-  \item If $\alpha$ is a type constructor variable of kind~$\kappa$
-    and~$\tau$ is a type, then $\forall\alpha\tau$ is a type.
-  \item If $\tau_1,\tau_2$ are types, then $\tau_1 \arrtype \tau_2$ is
-    a type.
-  \end{itemize}
-  The set of type constructors of kind~$\kappa$ is denoted
-  by~$\Tc_\kappa$.
-
-  We use the standard notation $\forall \alpha . \tau$. When $\alpha$
-  is of kind $\kappa$ then we use the notation $\forall \alpha :
-  \kappa . \tau$. If not indicated otherwise, if the kind of~$\alpha$
-  in $\forall\alpha\sigma$ is not given explicitly, we assume~$\alpha$
-  to be a type variable. We treat type constructors up to
-  $\alpha$-conversion. Note that~$\forall$ binds variables.
-
-  Beta-reduction on type constructors is defined as the compatible
-  closure of the rule
+  We define the set~$\Tc_\kappa$ of \emph{type constructors} of
+  kind~$\kappa$ by the following grammar. Type constructors of
+  kind~$*$ are \emph{types}.
   \[
-  (\lambda\alpha.\varphi)\psi \to \varphi[\alpha := \psi]
+  \begin{array}{rcl}
+    \Tc_{*} &::=& \Vc_{*}
+    \mid \Sigma^T_{*} \mid
+    \Tc_{\kappa\arrkind *}\Tc_{\kappa} \mid \forall\Vc_\kappa\Tc_* \mid \Tc_*\arrtype\Tc_* \\
+    \Tc_{\kappa_1\arrkind\kappa_2} &::=& \Vc_{\kappa_1\arrkind\kappa_2}
+    \mid \Sigma^T_{\kappa_1\arrkind\kappa_2} \mid
+    \Tc_{\kappa\arrkind(\kappa_1\arrkind\kappa_2)}\Tc_{\kappa} \mid \lambda \Vc_{\kappa_1} \Tc_{\kappa_2}
+  \end{array}
   \]
-  Note that type constructors are simply-typed lambda-terms, so
-  beta-reduction on type constructors terminates and is confluent,
-  hence every type constructor~$\tau$ has a unique beta-normal
-  form~$\nf_\beta(\tau)$. A \emph{type atom} is a type in
-  $\beta$-normal form which is not an arrow $\tau_1\arrtype\tau_2$ or
-  a quantification $\forall\alpha\tau$.
+
+  We use the standard notations $\forall \alpha . \tau$ and $\lambda
+  \alpha . \tau$. When $\alpha$ is of kind $\kappa$ then we use the
+  notation $\forall \alpha : \kappa . \tau$. If not indicated
+  otherwise, we assume~$\alpha$ to be a type variable. We treat type
+  constructors up to $\alpha$-conversion.
+
+  The compatible closure of the rule $(\lambda\alpha.\varphi)\psi \to
+  \varphi[\alpha := \psi]$ defines $\beta$-reduction on type
+  constructors. Note that type constructors are simply-typed
+  lambda-terms, so $\beta$-reduction on type constructors terminates
+  and is confluent, hence every type constructor~$\tau$ has a unique
+  $\beta$-normal form~$\nf_\beta(\tau)$. A \emph{type atom} is a type
+  in $\beta$-normal form which is not an arrow $\tau_1\arrtype\tau_2$
+  or a quantification $\forall\alpha\tau$.
 
   We define $\FV(\varphi)$ -- the set of free type constructor
   variables of the type constructor~$\varphi$ -- in an obvious way by
-  induction on the structure of~$\varphi$. A type
-  constructor~$\varphi$ is \emph{closed} if $\FV(\varphi) =
-  \emptyset$.
+  induction on~$\varphi$. A type constructor~$\varphi$ is
+  \emph{closed} if $\FV(\varphi) = \emptyset$.
+
+  We assume a fixed type symbol~$\chi_* \in
+  \Sigma^T_\kappa$. For $\kappa=\kappa_1\arrkind\kappa_2$ we define
+  $\chi_\kappa = \lambda \alpha:\kappa_1 . \chi_{\kappa_2}$.
 \end{defn}
 
 \begin{defn}\label{def_preterms}
   We assume given an infinite set $\Vars$ of variables, and let
-  $\Gamma$ refer to a set of pairs $x : \tau$ of a variable and a
-  type, such that each variable occurs at most once. We assume given a
-  fixed set $\Sigma$ of \emph{function symbols}, each paired with a
-  closed type, denoted $\mathtt{f} : \tau$.  Every function symbol
-  $\mathtt{f}$ occurs only with one type declaration. We use
-  $\Gamma,x:\tau$ for $\Gamma \cup \{x:\tau\}$. We set $\FTV(\Gamma) =
-  \bigcup\{\FV(\tau) \mid (x : \tau) \in \Gamma\}$.
+  $\Gamma$ refer to a variable context -- a set of pairs $x : \tau$ of
+  a variable and a type, such that each variable occurs at most
+  once. We assume given a fixed set $\Sigma$ of \emph{function
+    symbols}, each paired with a closed type, denoted $\mathtt{f} :
+  \tau$.  Every function symbol $\mathtt{f}$ occurs only with one type
+  declaration. We use $\Gamma,x:\tau$ for $\Gamma \cup \{x:\tau\}$. We
+  set $\FTV(\Gamma) = \bigcup\{\FV(\tau) \mid (x : \tau) \in
+  \Gamma\}$.
 
   The set of preterms consists of all expressions~$s$ such that
   $\Gamma \vdash s : \sigma$ can be inferred for some type $\sigma$
-  and mapping $\Gamma$ by the following clauses:
+  and context $\Gamma$ by the following clauses:
   \begin{itemize}
   \item $\Gamma \vdash x : \sigma$ for every $(x : \sigma) \in \Gamma$.
   \item $\Gamma \vdash \mathtt{f} : \sigma$ for all
@@ -323,24 +314,8 @@ for the investigated systems.
   in~$t$. We say that $t$ is \emph{closed} if $\FV(t) = \emptyset$ and
   $\FTV(t) = \emptyset$. If $\alpha$ is a type constructor variable of
   kind~$\kappa$ then we use the notation $\tabs{\alpha:\kappa}{t}$.
-\end{defn}
-
-\begin{defn}\label{def_type_equiv}
-  We define the type equivalence relation~$\equiv$ on preterms by
-  induction on preterm structure.
-  \begin{itemize}
-  \item $x \equiv x$, $f \equiv f$,
-  \item if $\sigma =_\beta \tau$ and $s \equiv t$ then
-    $\abs{x:\sigma}{s} \equiv \abs{x:\tau}{t}$,
-  \item if $s \equiv t$ then $\tabs{\alpha}{s} \equiv
-    \tabs{\alpha}{t}$,
-  \item if $s \equiv s'$ and $t \equiv t'$ then $s \cdot t \equiv s'
-    \cdot t'$,
-  \item if $s \equiv t$ and $\sigma =_\beta \tau$ then
-    $\tapp{s}{\sigma} \equiv \tapp{t}{\tau}$.
-  \end{itemize}
-  In other words, $s \equiv t$ iff $s$ and $t$ are identical modulo
-  $\beta$-conversion in types.
+  We define the equivalence relation~$\equiv$ by: $s \equiv t$ iff $s$
+  and $t$ are identical modulo $\beta$-conversion in types.
 \end{defn}
 
 \begin{lemma}
@@ -549,7 +524,8 @@ specialising Section~\ref{sec_preliminaries}.
 \begin{defn}\label{def_pafs_types_terms}
   \emph{Kinds}, \emph{type constructors} and \emph{types} are defined
   like in Definition~\ref{def_types}, parameterised by a fixed
-  set~$\Sigma_T$ of type constructor symbols.
+  set~$\Sigma^T = \bigcup_{\kappa}\Sigma^T_\kappa$ of type constructor
+  symbols.
 
   Given a fixed set~$\Sigma$ of function symbols, we define \emph{PAFS
     terms} like in Definition~\ref{def_terms} (based on
@@ -642,7 +618,7 @@ context~$\Gamma$.
 
 \begin{defn}\label{def_pafs}
   A \emph{Polymorphic Algebraic Functional System (PAFS)} is a triple
-  $(\Sigma_T,\Sigma,\Rules)$ where~$\Sigma_T$ is a set of type
+  $(\Sigma^T,\Sigma,\Rules)$ where~$\Sigma^T$ is a set of type
   constructor symbols, $\Sigma$ a set of function symbols (restricted
   as in Definition~\ref{def_pafs_types_terms}), and $\Rules$ is a set
   of rules as in Definition~\ref{def_rules}. A term of a given
@@ -691,7 +667,7 @@ relation~$\succ$ will be well-founded.
 
 \begin{defn}\label{def_iterms}
   The set~$\ITypes$ of \emph{interpretation types} is the set of types
-  as in Definition~\ref{def_types} with $\Sigma_T = \{ \nat : * \}$,
+  as in Definition~\ref{def_types} with $\Sigma^T = \{ \nat : * \}$,
   i.e., there is a single type constant~$\nat$. Then $\chi_* = \nat$.
 
   The set~$\Iterms$ of \emph{interpretation terms} is the set of terms
