@@ -3831,6 +3831,149 @@ absolute positiveness may be applied.
   \]
   Using absolute positiveness, it is clear that the inequality is
   oriented.
+\item $\interpret{\mathtt{tapp}_{\varphi,\pi}(\mathtt{case}_{\sigma,\tau,
+  \quant{\alpha}{\varphi\alpha}}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t}))}
+  \succ \\ \interpret{\mathtt{case}_{\sigma,\tau,\varphi\pi}(u,
+  \abs{x:\sigma}{\mathtt{tapp}_{\varphi,\pi}(s)},
+  \abs{y:\tau}{\mathtt{tapp}_{\varphi,\pi}(t)})}$ \\
+  On the left-hand side, we have
+  \[
+  \begin{array}{l}
+  \interpret{\mathtt{tapp}_{\varphi,\pi}(\mathtt{case}_{\sigma,\tau,
+  \quant{\alpha}{\varphi\alpha}}(u,\abs{x}{s},\abs{y}{t}))} \approx \\
+  %
+  \lift_{\typeinterpret{\varphi\pi}}(2) \otimes ( \\
+    \phantom{ABC}
+    \lift_{\quant{\alpha}{\typeinterpret{\varphi}\alpha}}(2) \oplus
+    \lift_{\quant{\alpha}{\typeinterpret{\varphi}\alpha}}(3 \otimes
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \oplus \\
+    \phantom{ABC}
+    \lift_{\quant{\alpha}{\typeinterpret{\varphi}\alpha}}(
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u}) \oplus 1) \otimes (
+      \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+      \interpret{t}[y:=\pi^2(\interpret{u})]) \\
+  \phantom{A}) * \typeinterpret{\pi} \oplus
+  \lift_{\typeinterpret{\varphi\pi}}(1) \approx \\
+  %
+  \lift_{\typeinterpret{\varphi\pi}}(4)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(6 \otimes
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    \interpret{s}[x:=\pi^1(\interpret{u})] * \typeinterpret{\pi}\ \oplus\\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    \interpret{t}[y:=\pi^2(\interpret{u})] * \typeinterpret{\pi}\ \oplus\\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \otimes \interpret{s}[x:=\pi^1(\interpret{u})]
+      * \typeinterpret{\pi}\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \otimes \interpret{t}[x:=\pi^2(\interpret{u})]
+      * \typeinterpret{\pi}\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(1) \approx \\
+  %
+  \lift_{\typeinterpret{\varphi\pi}}(5)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(6 \otimes
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    \interpret{s}[x:=\pi^1(\interpret{u})] * \typeinterpret{\pi}\ \oplus\\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    \interpret{t}[y:=\pi^2(\interpret{u})] * \typeinterpret{\pi}\ \oplus\\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \otimes \interpret{s}[x:=\pi^1(\interpret{u})]
+      * \typeinterpret{\pi}\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \otimes \interpret{t}[x:=\pi^2(\interpret{u})]
+      * \typeinterpret{\pi} \\
+  \end{array}
+  \]
+
+  On the right-hand side, we have:
+  \[
+  \begin{array}{l}
+  \interpret{\mathtt{case}_{\sigma,\tau,\varphi\pi}(u,
+    \abs{x:\sigma}{\mathtt{tapp}_{\varphi,\pi}(s)},
+    \abs{y:\tau}{\mathtt{tapp}_{\varphi,\pi}(t)})} \approx \\
+  %
+  \lift_{\typeinterpret{\varphi\pi}}(2)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(3 \otimes \flatten_{
+    \typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \oplus 1)\ \otimes \\
+  \phantom{ABC}(\ 
+    \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    (\typeinterpret{s}[x:=\pi^1(\interpret{u})]
+      * \typeinterpret{\pi}) \oplus
+    \lift_{\typeinterpret{\varphi\pi}}(1)\ \oplus \\
+  \phantom{ABCD}
+    \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    (\typeinterpret{t}[x:=\pi^2(\interpret{u})]
+      * \typeinterpret{\pi}) \oplus
+    \lift_{\typeinterpret{\varphi\pi}}(1)
+  \ ) \approx \\
+  %
+  \lift_{\typeinterpret{\varphi\pi}}(4)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(5 \otimes \flatten_{
+    \typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \oplus 1)\ \otimes \\
+  \phantom{ABC}(\ 
+    \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    (\typeinterpret{s}[x:=\pi^1(\interpret{u})]
+      * \typeinterpret{\pi})\ \oplus \\
+  \phantom{ABCD}
+    \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    (\typeinterpret{t}[x:=\pi^2(\interpret{u})]
+      * \typeinterpret{\pi})
+  \ ) \approx \\
+  %
+  \lift_{\typeinterpret{\varphi\pi}}(4)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(5 \otimes \flatten_{
+    \typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    \interpret{s}[x:=\pi^1(\interpret{u})] * \typeinterpret{\pi}\ \oplus\\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    \interpret{t}[y:=\pi^2(\interpret{u})] * \typeinterpret{\pi}\ \oplus\\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \otimes \interpret{s}[x:=\pi^1(\interpret{u})]
+      * \typeinterpret{\pi}\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \otimes \interpret{t}[x:=\pi^2(\interpret{u})]
+      * \typeinterpret{\pi} \\
+  \end{array}
+  \]
+  Again, it is clear that the required inequality holds.
 \end{itemize}
 
 \end{document}
@@ -3838,13 +3981,6 @@ absolute positiveness may be applied.
 \begin{itemize}
 %\[
 %\begin{array}{rcl}
-\item $
-\mathtt{tapp}_{\varphi,\pi}(\mathtt{case}_{\sigma,\tau,
-  \quant{\alpha}{\varphi\alpha}}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t})) %& \red &
-  \red
-  \mathtt{case}_{\sigma,\tau,\varphi\pi}(u,
-  \abs{x:\sigma}{\mathtt{tapp}_{\varphi,\pi}(s)},\\
-  \abs{y:\tau}{\mathtt{tapp}_{\varphi,\pi}(t)}) $%\\
 \item $
 \pi^1_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}\,\rho\,\pi}(u,
 \abs{x:\sigma}{s},\abs{y:\tau}{t})) %& \red &
