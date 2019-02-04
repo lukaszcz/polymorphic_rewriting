@@ -737,7 +737,7 @@ elements of~$\Iterms$ using~$\arrW{}$.
   confluence of $\beta$-reduction on types), so they correctly define
   a relation on interpretation terms -- the equivalence classes
   of~$\equiv$. We say that $s$ is a \emph{redex} if $s$ reduces by one
-  of the rules (\ref{arrW:plus:base}).
+  of the rules 4-15.
 
   A \emph{final interpretation term} is an interpretation term $s \in
   \Iterms$ such that (a) $s$ is closed, and (b) $s$ is in normal form
@@ -752,9 +752,16 @@ the rules for $\oplus_\tau$, $\otimes_\tau$, $\flatten_\tau$ and
 $\lift_\tau$ depend on the type~$\tau$. In particular, type
 substitution in terms may create redexes. For instance, if $\alpha$ is
 a type variable then $\oplus_\alpha t_1 t_2$ is not a redex, but
-$\oplus_{\sigma\arrtype\tau} t_1 t_2$ is. This makes adapting the
-standard computability-based termination proof method a bit more
-difficult.
+$\oplus_{\sigma\arrtype\tau} t_1 t_2$ is. This makes the question of
+termination subtle. Indeed, System~$\Fomega$ is extremely sensitive to
+modifications which are not of a logical nature. For instance, adding
+a constant $\mathtt{J} : \forall \alpha \beta . \alpha \arrtype \beta$
+with a reduction rule $\mathtt{J} \tau \tau \leadsto \lambda x : \tau
+. x$ makes the system non-terminating~\cite{Girard1971}. Our rules do
+not allow such a definition. Note that the natural number constants
+are mutually indistinguishable inside our reduction system (e.g.~there
+is no test for zero). For the purposes of termination, the type~$\nat$
+may essentially be considered a singleton.
 
 Now we state some properties of~$\arrW$, including strong
 normalisation. Because of space limits, most proofs are delegated to
