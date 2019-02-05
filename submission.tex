@@ -131,12 +131,15 @@
   We generalise the termination method of higher-order polynomial
   interpretations to a setting with impredicative
   polymorphism. Instead of using weakly monotonic functionals, we
-  interpret terms in a suitable extension of System~$\Fomega$. In
-  addition to enabling a direct interpretation of rewrite rules which
-  make essential use of impredicative polymorphism, thanks to the
-  possibility of encoding inductive data types in the polymorphic
-  lambda-calculus, our generalisation eases the applicability of the
-  method also in the non-polymorphic setting. As an illustration of
+  interpret terms in a suitable extension of System~$\Fomega$.
+  %CK: reformulating this because it's a long and rather hard-to-read
+  %sentence, and because I wanted to save a line.
+  \CKchange{This enables} a direct interpretation of rewrite rules which
+  make essential use of impredicative polymorphism\CKchange{.  Our
+  generalisation also} eases the applicability of the \CKchange{method}
+  in the non-polymorphic setting \CKchange{by allowing for an encoding
+  of} inductive data \CKchange{types.} %in the polymorphic lambda-calculus.
+  As an illustration of
   the potential of our method, we prove termination of a substantial
   fragment of full intuitionistic second-order propositional logic
   with permutative conversions.
@@ -146,11 +149,16 @@
 
 Termination of higher-order term rewriting
 systems~\cite[Chapter~11]{Terese2003} has been an active area of
-research for several decades. Higher-order polynomial
-interpretations~\cite{pol:96,Kop2012,FuhsKop2012}, introduced by Jaco
-van de Pol~\cite{Pol1993,pol:96}, generalise polynomial
-interpretations -- a termination method complete for first-order
-rewriting.
+research for several decades.
+%CK: _polynomial_ interpretations are not complete for first-order
+%rewriting! Algebra interpretations are. And Jaco never introduced
+%higher-order polynomials; that definition is mine.
+\CKchange{One powerful method, introduced by v.d. Pol \cite{Pol1993,pol:96},
+interprets terms into \emph{weakly monotonic algebras}.  In later work
+\cite{FuhsKop2012,Kop2012}, these algebra interpetations are specialised
+into \emph{higher-order polynomial interpretations}, a generalisation of
+the popular -- and highly automatable -- technique of polynomial
+interpretations for first-order term rewriting.}
 
 In this paper, we further generalise higher-order polynomial
 interpretations to a higher-order formalism with full impredicative
@@ -164,18 +172,30 @@ polymorphism.
 
 For instance, in recent extensions of Haskell or in some type-theory
 based proof assistants (e.g.~Coq) one may define a type of
-heterogenous lists.
+heterogenous lists\CKchange{.
+%CK: creating space; you may undo this if you think it is not the right
+%place to cut space
+%\[
+%\begin{array}{l}
+%  \List : * \\
+%  \mathtt{nil} : \List \\
+%  \mathtt{cons} : \forall \alpha . \alpha \arrtype \List \arrtype \List \\
+%  \mathtt{foldl} : \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \List \\
+%  \mathtt{foldl}_\sigma(f,a,\nil) \red a \\
+%  \mathtt{foldl}_\sigma(f,a,\cons_\tau(x,l)) \red \mathtt{foldl}_\sigma(f,f \tau a x,l)
+%\end{array}
+%\]
 \[
-\begin{array}{l}
-  \List : * \\
-  \mathtt{nil} : \List \\
-  \mathtt{cons} : \forall \alpha . \alpha \arrtype \List \arrtype \List \\
-  \mathtt{foldl} : \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \List \\
+\begin{array}{ll}
+  \List : * &
   \mathtt{foldl}_\sigma(f,a,\nil) \red a \\
-  \mathtt{foldl}_\sigma(f,a,\cons_\tau(x,l)) \red \mathtt{foldl}_\sigma(f,f \tau a x,l)
+  \mathtt{nil} : \List &
+  \mathtt{foldl}_\sigma(f,a,\cons_\tau(x,l)) \red \mathtt{foldl}_\sigma(f,f \tau a x,l) \\
+  \mathtt{cons} : \forall \alpha . \alpha \arrtype \List \arrtype \List \quad\quad \\
+  \multicolumn{2}{l}{\mathtt{foldl} : \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \List} \\
 \end{array}
 \]
-The above states that $\List$ is a type ($*$), states the types of its
+T}he above states that $\List$ is a type ($*$), \CKchange{gives} the types of its
 two constructors $\nil$ and $\cons$, and defines the corresponding
 fold-left function~$\mathtt{foldl}$. Each element of a heterogenous
 list may have a different type. Together with the element, the
@@ -184,6 +204,9 @@ $\forall$-quantifier binds type variables -- a term of type $\forall
 \alpha . \tau$ takes a type~$\rho$ as an argument and the result is a
 term of type~$\tau[\subst{\alpha}{\rho}]$.
 
+\CK{I would be inclined to remove this paragraph from the introduction,
+as it does little to motivate our work or the problem we solve, but
+rather causes a distraction.}
 Polymorphism in type theory is parametric, which means that a
 polymorphic function behaves uniformly with respect to its generic
 arguments, not depending on their actual types. This makes it
@@ -202,10 +225,17 @@ variables. The above example is not directly reducible to shallow
 polymorphism as used in the~ML programming language or the polymorphic
 higher-order rewriting formalisms of~\cite{jou:oka:91,jou:rub:99}.
 
-We will use the above rules for fold on heterogenous lists as our
-running example, but their termination could be shown by encoding them
-in System~$\mathtt{F}$. In Section~\ref{sec:examples}, we study a more
-complex example -- termination of a substantial fragment of~IPC2,
+%CK: This comes across a little week, I think. Reformulating!
+%We will use the above rules for fold on heterogenous lists as our
+%running example, but their termination could be shown by encoding them
+%in System~$\mathtt{F}$.
+%In Section~\ref{sec:examples}, we study a more complex example --
+\CK{The technique we will develop in this paper can be used to handle
+systems like the one above.  However, termination of heterogeneous fold
+can be shown in other ways (e.g., an encoding in System~$\mathtt{F}$).
+Hence, we will also study a more complex example in
+Section~\ref{sec:examples}:}
+termination of a substantial fragment of~IPC2,
 i.e., full intuitionistic second-order propositional logic with
 permutative conversions. Permutative
 conversions~\cite[Chapter~6]{TroelstraSchwichtenberg1996} are used in
@@ -213,7 +243,15 @@ proof theory to obtain ``good'' normal forms of natural deduction
 proofs, which satisfy e.g.~the subformula property. Termination proofs
 for systems with permutative conversions are notoriously tedious and
 difficult, with some incorrect claims in the literature and no uniform
-methodology. Pol and Schwichtenberg used higher-order polynomial
+methodology.
+\CKchange{It is our goal to make termination proofs for systems like
+this substantially easier in the future.}
+
+\CK{I would be inclined to move this part to the example section; I
+think it would fit better in a discussion of what we have and what we
+do not get.  It would be a good fit here if we actually did solve the
+open problem, but at present we don't.}
+Pol and Schwichtenberg used higher-order polynomial
 interpretations to prove termination of a fragment of first-order
 logic with permutative conversions~\cite{PolSchwichtenberg1995}, in
 the hope of providing a more perspicuous proof of this well-known

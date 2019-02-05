@@ -5003,6 +5003,14 @@ absolute positiveness may be applied.
   \interpret{v}[z:=\pi^1(A)] \oplus \interpret{v}[z:=\pi^1(A)] \oplus
   \interpret{v}[z:=\pi^1(A)] \succeq vsu \oplus vtu$); thus, the
   inequality holds.
+
+\item
+  $\interpret{\mathtt{let}_{\varphi,\rho}(
+  \mathtt{case}_{\sigma,\tau,\exists\varphi}(
+  u,\abs{x:\sigma}{s},\abs{y:\tau}{t}),v)} \succ \\
+  \interpret{\mathtt{case}_{\sigma,\tau,\rho}(u,
+  \abs{x:\sigma}{\mathtt{let}_{\varphi,\rho}(s,v)},
+  \abs{y:\tau}{\mathtt{let}_{\varphi,\rho}(t,v)})}$
 \end{itemize}
 
 \end{document}
