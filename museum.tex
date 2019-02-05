@@ -1,6 +1,15 @@
 % A museum of no-longer-needed lemmas and such (fragments of proofs of
 % which may however become useful later)
 
+Polymorphism in type theory is parametric, which means that a
+polymorphic function behaves uniformly with respect to its generic
+arguments, not depending on their actual types. This makes it
+impossible to directly extract elements from a heterogenous list -- we
+can only perform some operations on them under the assumption that we
+know nothing about their types. In practice, one would constrain the
+type variable~$\alpha$ above with a type class, in order to guarantee
+the existence of certain functions on the elements of a list.
+
 
 \subsection{Parametricity}
 

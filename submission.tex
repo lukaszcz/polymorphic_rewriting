@@ -80,6 +80,7 @@
 \newcommand{\CK}[1]{\textcolor{blue}{CK: #1}}
 \newcommand{\CKchange}[1]{\textcolor{blue}{#1}}
 \newcommand{\LC}[1]{\textcolor{red}{LC: #1}}
+\newcommand{\LCchange}[1]{\textcolor{red}{#1}}
 
 \title{Polymorphic Higher-order Termination}
 
@@ -135,11 +136,17 @@
   interpret terms in a suitable extension of System~$\Fomega$.
   %CK: reformulating this because it's a long and rather hard-to-read
   %sentence, and because I wanted to save a line.
-  \CKchange{This enables} a direct interpretation of rewrite rules which
-  make essential use of impredicative polymorphism\CKchange{.  Our
-  generalisation also} eases the applicability of the \CKchange{method}
-  in the non-polymorphic setting \CKchange{by allowing for an encoding
-  of} inductive data \CKchange{types.} %in the polymorphic lambda-calculus.
+  %% LC: Yes, I do have a bit of this Slavic languages-influenced
+  %% habit, where you tend to write in long and complex sentences,
+  %% which nonetheless sounds good and doesn't compromise clarity,
+  %% because there is a very sophisticated grammar to disambiguate
+  %% things, unlike in English where precise complex grammatical
+  %% structures are almost non-existent ;)
+  This enables a direct interpretation of rewrite rules which
+  make essential use of impredicative polymorphism.  Our
+  generalisation also eases the applicability of the method
+  in the non-polymorphic setting by allowing for an encoding
+  of inductive data types.
   As an illustration of
   the potential of our method, we prove termination of a substantial
   fragment of full intuitionistic second-order propositional logic
@@ -154,12 +161,16 @@ research for several decades.
 %CK: _polynomial_ interpretations are not complete for first-order
 %rewriting! Algebra interpretations are. And Jaco never introduced
 %higher-order polynomials; that definition is mine.
-\CKchange{One powerful method, introduced by v.d. Pol \cite{Pol1993,pol:96},
+%% LC: Assuming you would correct me if wrong, I didn't check this
+%% (or think much about it -- in hidsight it's pretty stupid to claim
+%% polynomial interpretations are complete, especially that I actually
+%% learned about them at some point).
+One powerful method, introduced by v.d. Pol \cite{Pol1993,pol:96},
 interprets terms into \emph{weakly monotonic algebras}.  In later work
 \cite{FuhsKop2012,Kop2012}, these algebra interpetations are specialised
 into \emph{higher-order polynomial interpretations}, a generalisation of
 the popular -- and highly automatable -- technique of polynomial
-interpretations for first-order term rewriting.}
+interpretations for first-order term rewriting.
 
 In this paper, we further generalise higher-order polynomial
 interpretations to a higher-order formalism with full impredicative
@@ -173,19 +184,7 @@ polymorphism.
 
 For instance, in recent extensions of Haskell or in some type-theory
 based proof assistants (e.g.~Coq) one may define a type of
-heterogenous lists\CKchange{.
-%CK: creating space; you may undo this if you think it is not the right
-%place to cut space
-%\[
-%\begin{array}{l}
-%  \List : * \\
-%  \mathtt{nil} : \List \\
-%  \mathtt{cons} : \forall \alpha . \alpha \arrtype \List \arrtype \List \\
-%  \mathtt{foldl} : \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \List \\
-%  \mathtt{foldl}_\sigma(f,a,\nil) \red a \\
-%  \mathtt{foldl}_\sigma(f,a,\cons_\tau(x,l)) \red \mathtt{foldl}_\sigma(f,f \tau a x,l)
-%\end{array}
-%\]
+heterogenous lists.
 \[
 \begin{array}{ll}
   \List : * &
@@ -193,10 +192,10 @@ heterogenous lists\CKchange{.
   \mathtt{nil} : \List &
   \mathtt{foldl}_\sigma(f,a,\cons_\tau(x,l)) \red \mathtt{foldl}_\sigma(f,f \tau a x,l) \\
   \mathtt{cons} : \forall \alpha . \alpha \arrtype \List \arrtype \List \quad\quad \\
-  \multicolumn{2}{l}{\mathtt{foldl} : \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \List} \\
+  \multicolumn{2}{l}{\mathtt{foldl} : \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \List}
 \end{array}
 \]
-T}he above states that $\List$ is a type ($*$), \CKchange{gives} the types of its
+The above states that $\List$ is a type ($*$), gives the types of its
 two constructors $\nil$ and $\cons$, and defines the corresponding
 fold-left function~$\mathtt{foldl}$. Each element of a heterogenous
 list may have a different type. Together with the element, the
@@ -204,18 +203,6 @@ function argument of~$\mathtt{foldl}$ receives the element's type. The
 $\forall$-quantifier binds type variables -- a term of type $\forall
 \alpha . \tau$ takes a type~$\rho$ as an argument and the result is a
 term of type~$\tau[\subst{\alpha}{\rho}]$.
-
-\CK{I would be inclined to remove this paragraph from the introduction,
-as it does little to motivate our work or the problem we solve, but
-rather causes a distraction.}
-Polymorphism in type theory is parametric, which means that a
-polymorphic function behaves uniformly with respect to its generic
-arguments, not depending on their actual types. This makes it
-impossible to directly extract elements from a heterogenous list -- we
-can only perform some operations on them under the assumption that we
-know nothing about their types. In practice, one would constrain the
-type variable~$\alpha$ above with a type class, in order to guarantee
-the existence of certain functions on the elements of a list.
 
 Impredicativity of polymorphism means that the type itself may be
 substituted for its own type variable, e.g., if $\mathtt{f} : \forall
@@ -226,50 +213,28 @@ variables. The above example is not directly reducible to shallow
 polymorphism as used in the~ML programming language or the polymorphic
 higher-order rewriting formalisms of~\cite{jou:oka:91,jou:rub:99}.
 
-%CK: This comes across a little week, I think. Reformulating!
-%We will use the above rules for fold on heterogenous lists as our
-%running example, but their termination could be shown by encoding them
-%in System~$\mathtt{F}$.
-%In Section~\ref{sec:examples}, we study a more complex example --
-\CK{The technique we will develop in this paper can be used to handle
-systems like the one above.  However, termination of heterogeneous fold
-can be shown in other ways (e.g., an encoding in System~$\mathtt{F}$).
-Hence, we will also study a more complex example in
-Section~\ref{sec:examples}:}
-termination of a substantial fragment of~IPC2,
-i.e., full intuitionistic second-order propositional logic with
-permutative conversions. Permutative
+The technique we will develop in this paper can be used to handle
+systems like the one above.  However, termination of heterogeneous
+fold can be shown in other ways (e.g., an encoding in
+System~$\mathtt{F}$). Hence, we will also study a more complex example
+in Section~\ref{sec:examples}: termination of a substantial fragment
+of~IPC2, i.e., full intuitionistic second-order propositional logic
+with permutative conversions. Permutative
 conversions~\cite[Chapter~6]{TroelstraSchwichtenberg1996} are used in
 proof theory to obtain ``good'' normal forms of natural deduction
 proofs, which satisfy e.g.~the subformula property. Termination proofs
 for systems with permutative conversions are notoriously tedious and
 difficult, with some incorrect claims in the literature and no uniform
-methodology.
-\CKchange{It is our goal to make termination proofs for systems like
-this substantially easier in the future.}
-
-\CK{I would be inclined to move this part to the example section; I
-think it would fit better in a discussion of what we have and what we
-do not get.  It would be a good fit here if we actually did solve the
-open problem, but at present we don't.}
-Pol and Schwichtenberg used higher-order polynomial
-interpretations to prove termination of a fragment of first-order
-logic with permutative conversions~\cite{PolSchwichtenberg1995}, in
-the hope of providing a more perspicuous proof of this well-known
-result. Notably, they did not treat disjunction. The
-paper~\cite{SorensenUrzyczyn2010} depends on termination of~IPC2,
-citing a proof from~\cite{Wojdyga2008}, which, however, later turned
-out to be incorrect. To our knowledge, termination of the full
-system~IPC2 remains an open problem.
+methodology. It is our goal to make termination proofs for systems
+like this substantially easier in the future.
 
 \section{Preliminaries}\label{sec_preliminaries}
 
 In this section we introduce System~$\Fomega$ (see
 e.g.~\cite[Section~11.7]{SorensenUrzyczyn2006}), which will form a
 basis both of our interpretations and of a general syntactic framework
-for the investigated systems.
-\CKchange{We assume familiarity with core notions of lambda
-calculi such as substitution and $\alpha$-conversion.}
+for the investigated systems. We assume familiarity with core notions
+of lambda calculi such as substitution and $\alpha$-conversion.
 
 \begin{defn}\label{def_types}
   \emph{Kinds} are defined inductively: $*$ is a kind, and if
@@ -300,11 +265,7 @@ calculi such as substitution and $\alpha$-conversion.}
   otherwise, we assume~$\alpha$ to be a type variable. We treat type
   constructors up to $\alpha$-conversion.
 
-  \CK{This example is not part of the running example (which is very boring
-  in the way of types), but I figured something like this should be included
-  because type constructors having a higher kind was very unfamiliar to me
-  at first, and we may get RTA reviewers.}
-  \CKchange{\begin{example}
+  \begin{example}
   If $\Sigma^T_{*} = \{ \List \}$ and $\Sigma^T_{* \arrkind * \arrkind
   *} = \{ \Pair \}$, types are for instance $\List$ and
   $\forall \alpha.\Pair\,\alpha\,\List$.  The expression
@@ -313,17 +274,17 @@ calculi such as substitution and $\alpha$-conversion.}
   $\sigma \in \Tc_{* \arrkind *}$, then both
   $\exists(\sigma)$ and $\exists (\lambda \alpha.\sigma\alpha)$ are
   types.
-  \end{example}}
+  \end{example}
 
   The compatible closure of the rule $(\lambda\alpha.\varphi)\psi \to
   \varphi[\alpha := \psi]$ defines $\beta$-reduction on type
-  constructors. \CKchange{As} type constructors are \CKchange{(mostly)} simply-typed
-  lambda-terms, \CKchange{their $\beta$-reduction} %on type constructors
+  constructors. As type constructors are \LCchange{(essentially)} simply-typed
+  lambda-terms, their $\beta$-reduction
   terminates
-  and is confluent\CKchange{; hence} every type constructor~$\tau$ has a unique
+  and is confluent; hence every type constructor~$\tau$ has a unique
   $\beta$-normal form~$\nf_\beta(\tau)$. A \emph{type atom} is a type
   in $\beta$-normal form which is not an arrow $\tau_1\arrtype\tau_2$
-  or \CKchange{quantification} $\forall\alpha.\tau$.
+  or quantification $\forall\alpha.\tau$.
 
   We define $\FV(\varphi)$ -- the set of free type constructor
   variables of the type constructor~$\varphi$ -- in an obvious way by
@@ -355,12 +316,8 @@ calculi such as substitution and $\alpha$-conversion.}
     $(\mathtt{f} : \sigma) \in \Sigma$.
   \item $\Gamma \vdash \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
     \in \Vars$ and $\Gamma, x : \sigma \vdash s : \tau$.
-  \item $\Gamma \vdash \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
+  \item $\Gamma \vdash \tabs{\alpha:\kappa}{s} : \quant{\alpha:\kappa}{\sigma}$ if
     $\Gamma \vdash s : \sigma$ and $\alpha \notin \FTV(\Gamma)$.
-    \CK{Given the conventions you set earlier, it is implied here that $\alpha$
-    is a type variable, which I don't think is intended.  Should we change this
-    to $\tabs{\alpha:\kappa}{s} : \quant{\alpha:\kappa}{\sigma}$ with a note
-    that if no kind is specified, it should be assumed to be *?}
   \item $\Gamma \vdash \app{s}{t} : \tau$ if $\Gamma \vdash s : \sigma
     \arrtype \tau$ and $\Gamma \vdash t : \sigma$
   \item $\Gamma \vdash \tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$
@@ -385,11 +342,21 @@ calculi such as substitution and $\alpha$-conversion.}
 \end{lemma}
 
 \CK{If these are preliminaries, are there not actually proofs in the
-literature that we could refer to? (Or are you trying to keep the
-reference list small?}
-\begin{proof}
-  Induction on~$s$.
-\end{proof}
+  literature that we could refer to? Or are you trying to keep the
+  reference list small?}
+\LC{This is problematic, because with System~$\Fomega$ it's a bit like
+  with higher-order rewriting -- it comes in many slightly different
+  variants, though unlike in rewriting all of them are essentially
+  equivalent. I don't think you'll find in the literature
+  \emph{exactly} the system we have here. The reference I give at the
+  beginning defines only a Curry-style variant, with no types in
+  terms. And few presentations are parameterised with type constructor
+  or function symbols. Nonetheless, I think we can just outcomment
+  this proof, as it is pretty trivial and clear to people who know
+  about System~$\Fomega$.}
+%\begin{proof}
+%  Induction on~$s$.
+%\end{proof}
 
 \begin{defn}\label{def_terms}
   The set of \emph{terms} is the set of the equivalence classes
@@ -429,6 +396,7 @@ $\abs{a}{s}$ or $\tabs{a}{s}$.
 \CK{In the following lemma, do you need $\sigma'$ at all other than in
 the first two cases? I would guess that for the rest, choosing $\sigma$
 suffices?}
+\LC{It doesn't because you can always do $\beta$-conversion on types using the last typing rule.}
 \begin{lemma}[Generation lemma]
   Assume $\Gamma \proves t : \sigma$ and let $\Vc = \FTV(t) \cup
   \FTV(\Gamma)$. Then there is a type~$\sigma'$ such that $\sigma'
@@ -441,10 +409,9 @@ suffices?}
   \item $t \equiv \abs{x:\tau_1}{s}$ and
     $\sigma'=\tau_1\arrtype\tau_2$ and $\Gamma, x : \tau_1 \vdash s :
     \tau_2$.
-  \item $t \equiv \tabs{\alpha}{s}$ and $\sigma' =
-    \quant{\alpha}{\tau}$ and $\Gamma \vdash s : \tau$ and $\alpha
+  \item $t \equiv \tabs{\alpha:\kappa}{s}$ and $\sigma' =
+    \quant{\alpha:\kappa}{\tau}$ and $\Gamma \vdash s : \tau$ and $\alpha
     \notin \FTV(\Gamma)$.
-    \CK{Same question applies as before: should there be kinds added?}
   \item $t \equiv \app{t_1}{t_2}$ and
     $\Gamma \vdash t_1 : \tau \arrtype \sigma'$ and
     $\Gamma \vdash t_2 : \tau$ and $\FV(\tau) \subseteq \Vc$.
@@ -456,16 +423,20 @@ suffices?}
 \end{lemma}
 
 \begin{proof}
-  By induction on the derivation $\Gamma \proves t : \sigma$. Note
-  that if $\alpha \notin \Vc$ is of kind~$\kappa$ and~$\Gamma' \proves
-  s : \sigma'$ with~$\FTV(s) \cup \FTV(\Gamma') \subseteq \Vc$, then
-  $\Gamma \proves s : \sigma'[\subst{\alpha}{\chi_\kappa}]$ by the
-  substitution lemma.
+  By induction on the derivation $\Gamma \proves t : \sigma$. To
+  ensure $\FV(\sigma') \subseteq \Vc$, note if $\alpha \notin \Vc$ is
+  of kind~$\kappa$ and~$\Gamma' \proves s : \sigma'$ with~$\FTV(s)
+  \cup \FTV(\Gamma') \subseteq \Vc$, then $\Gamma \proves s :
+  \sigma'[\subst{\alpha}{\chi_\kappa}]$ by the substitution lemma
+  (thus we can eliminate~$\alpha$).
 \CK{I do not understand this proof sketch. $\Vc$ is defined as a set of
 term variables, so $\alpha$ cannot be an element, nor can any element
 of some $\FTV$.  I am also confused what $\chi_\kappa$ has to do with
 this; is it still part of the proof, or is it an observation about the
 result?}
+\LC{$\Vc$ is a set of type constructor variables. $\FTV$ (Free Type
+  Variables) is not $\FV$ (Free Variables). Maybe we should invent a
+  better abbreviation and explain this more conspicuously?}
 \end{proof}
 
 For convenience, we sometimes assume without loss of generality that
@@ -490,10 +461,9 @@ setting, thanks to more sophisticated ``programming'' in the
 interpretations.
 
 The reader is advised to consult e.g.~\cite[Chapter~11]{Girard1989}
-for more background. Here, we only define abbreviations for a few
-inductive types used later. The lemmas stated in this section follow
-easily from definitions, after unfolding the abbreviations. We omit
-the proofs. Type subscripts are dropped when clear or irrelevant.
+for more background and explanations. Here, we only state standard
+abbreviations for a few inductive types used later. Type subscripts
+are dropped when clear or irrelevant.
 
 \CK{To limit the very formal feel of this subsection -- with constant
 definitions and lemmas -- it may be better to put a short explanation
@@ -501,83 +471,39 @@ below each definition, and put the lemmas together (e.g., a lemma
 ``all types are as you would expect them'' and a lemma ``all the
 reductions are as you would hope'').}
 
+\LC{I don't think we should be explaining here why we're defining the
+  encodings the way we do, because this is a standard construction and
+  someone who wants to learn more should consult the references. For
+  the rest of the paper, it matters only that the encodings have the
+  right properties expressed by the lemmas. And I see no point in
+  explaining what pairs or existentials are either (existentials are
+  needed only for the IPC2 system -- I think we have no space to
+  explain the rationale of IPC2 in detail). But I think saying birefly
+  what the lemmas do and putting them separately is a good idea.}
+
+\LC{I removed the lemmas mentioning $\succ$.}
+
 \begin{defn}[Product types]
-%CK: shortening, but easily undone if you disagree with the aesthetics
-%  \[
-%  \begin{array}{rcl}
-%    \sigma \times \tau &=& \forall p . (\sigma \arrtype \tau \arrtype p) \arrtype p \\
-%    \pair{t_1}{t_2}_{\sigma,\tau} &=& \tabs{p}{\abs{x:\sigma\arrtype\tau\arrtype p}{x t_1 t_2}} \\
-%    \pi^1_{\sigma,\tau}(t) &=& t \sigma (\abs{x:\sigma}{\abs{y:\tau}{x}}) \\
-%    \pi^2_{\sigma,\tau}(t) &=& t \tau (\abs{x:\sigma}{\abs{y:\tau}{y}})
-%  \end{array}
-%  \]
-  \CKchange{\[
+  \[
   \begin{array}{rclcrcl}
     \sigma \times \tau &=& \forall p . (\sigma \arrtype \tau \arrtype p) \arrtype p & \quad &
     \pi^1_{\sigma,\tau}(t) &=& t \sigma (\abs{x:\sigma}{\abs{y:\tau}{x}}) \\
     \pair{t_1}{t_2}_{\sigma,\tau} &=& \tabs{p}{\abs{x:\sigma\arrtype\tau\arrtype p}{x t_1 t_2}} & &
     \pi^2_{\sigma,\tau}(t) &=& t \tau (\abs{x:\sigma}{\abs{y:\tau}{y}}) \\
   \end{array}
-  \]}
+  \]
 \end{defn}
 
-\begin{lemma}
-  \begin{enumerate}
-  \item If $\Gamma \proves t_1 : \sigma$ and $\Gamma \proves t_2 :
-    \tau$ then $\Gamma \proves \pair{t_1}{t_2} : \sigma \times \tau$.
-  \item If $\Gamma \proves t : \tau_1 \times \tau_2$ then $\Gamma
-    \proves \pi^i(t) : \tau_i$.
-  \end{enumerate}
-\end{lemma}
-
-\begin{lemma}\label{lem:projectreduce}
-  $\pi^i(\pair{t_1}{t_2}) \leadsto^* t_i$
-\end{lemma}
-
-\CK{We don't have $\succ$ yet, so we cannot do this here.  It is part of the lemma on safety regardless, though.  Remove?}
-\begin{lemma}
-  If $t \succ t'$ then $\pi^i(t) \succ \pi^i(t')$.
-\end{lemma}
-
 \begin{defn}[Existential types]
-  %CK: Space, but easily undone
-%  \[
-%  \begin{array}{rcl}
-%    \Sigma \alpha . \sigma &=& \forall p . (\forall \alpha . \sigma \arrtype p) \arrtype p \\
-%    \expair{\tau}{t}_{\Sigma\alpha.\sigma} &=& \tabs{p}{\abs{x:\forall\alpha.\sigma\arrtype p}{x \tau t}} \\
-%    \xlet{\rho}{t}{\alpha,x:\sigma}{s} &=& t \rho (\tabs{\alpha}{\abs{x:\sigma}{s}})
-%  \end{array}
-%  \]
-  \CKchange{\[
+  \[
   \begin{array}{rclcrcl}
     \Sigma \alpha . \sigma &=& \forall p . (\forall \alpha . \sigma \arrtype p) \arrtype p & \quad &
     \expair{\tau}{t}_{\Sigma\alpha.\sigma} &=& \tabs{p}{\abs{x:\forall\alpha.\sigma\arrtype p}{x \tau t}} \\
-    & & & & 
+    & & & &
     \xlet{\rho}{t}{\alpha,x:\sigma}{s} &=& t \rho (\tabs{\alpha}{\abs{x:\sigma}{s}}) \\
   \end{array}
-  \]}
+  \]
 \end{defn}
-
-\begin{lemma}
-  \begin{enumerate}
-  \item If $\Gamma \proves t : \sigma[\subst{\alpha}{\tau}]$ then
-    $\Gamma \proves \expair{\tau}{t} : \Sigma \alpha . \sigma$.
-  \item If $\Gamma \proves t : \Sigma \alpha . \sigma$ and
-    $\Gamma,x:\sigma \proves s : \rho$ and $\alpha \notin
-    \FTV(\Gamma,\rho)$ then $\xlet{}{t}{\alpha,x}{s} : \rho$.
-  \end{enumerate}
-\end{lemma}
-
-\begin{lemma}\label{lem:extreduce}
-  $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \leadsto
-  s[\subst{\alpha}{\tau}][\subst{x}{t}]$.
-\end{lemma}
-
-\CK{Same here: $\succ$ does not yet exist.}
-\begin{lemma}
-  If $t \succ t'$ then $\xlet{}{t}{\alpha,x}{s} \succ
-  \xlet{}{t'}{\alpha,x}{s}$.
-\end{lemma}
 
 \begin{defn}[Heterogenous lists]
   %CK: Here space saving will not work, as the cons is too large.
@@ -591,8 +517,19 @@ reductions are as you would hope'').}
   \]
 \end{defn}
 
-\begin{lemma}
+All terms have the expected types.
+
+\begin{lemma}\label{lem:encodings_types}
   \begin{enumerate}
+  \item If $\Gamma \proves t_1 : \sigma$ and $\Gamma \proves t_2 :
+    \tau$ then $\Gamma \proves \pair{t_1}{t_2} : \sigma \times \tau$.
+  \item If $\Gamma \proves t : \tau_1 \times \tau_2$ then $\Gamma
+    \proves \pi^i(t) : \tau_i$.
+  \item If $\Gamma \proves t : \sigma[\subst{\alpha}{\tau}]$ then
+    $\Gamma \proves \expair{\tau}{t} : \Sigma \alpha . \sigma$.
+  \item If $\Gamma \proves t : \Sigma \alpha . \sigma$ and
+    $\Gamma,x:\sigma \proves s : \rho$ and $\alpha \notin
+    \FTV(\Gamma,\rho)$ then $\xlet{}{t}{\alpha,x}{s} : \rho$.
   \item $\Gamma \proves \nil : \List$.
   \item If $\Gamma \proves h : \rho$ and $\Gamma \proves t : \List$
     then $\Gamma \proves \cons_\rho(h,t) : \List$.
@@ -602,16 +539,17 @@ reductions are as you would hope'').}
   \end{enumerate}
 \end{lemma}
 
-\begin{lemma}
+The reductions are also as one would expect.
+
+\begin{lemma}\label{lem:encodings_reduce}
   \begin{enumerate}
-  \item $\fold_\rho(f,a,\nil) \leadsto a$.
-  \item $\fold_\rho(f,a,\cons_\tau(h,t)) \leadsto f \tau h
+  \item $\pi^i(\pair{t_1}{t_2}) \leadsto^* t_i$.
+  \item $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \leadsto^*
+    s[\subst{\alpha}{\tau}][\subst{x}{t}]$.
+  \item $\fold_\rho(f,a,\nil) \leadsto^* a$.
+  \item $\fold_\rho(f,a,\cons_\tau(h,t)) \leadsto^* f \tau h
     (\fold_\rho(f,a,t))$.
   \end{enumerate}
-\end{lemma}
-
-\begin{lemma}
-  If $l \succ l'$ then $\fold_\rho(f,a,l) \succ \fold_\rho(f,a,l')$.
 \end{lemma}
 
 \section{Polymorphic Algebraic Functional Systems}\label{sec_systems}
@@ -1549,6 +1487,15 @@ have:
 \end{example}
 
 \section{Larger examples}\label{sec:examples}
+
+Pol and Schwichtenberg used higher-order polynomial interpretations to
+prove termination of a fragment of first-order logic with permutative
+conversions~\cite{PolSchwichtenberg1995}, in the hope of providing a
+more perspicuous proof of this well-known result. Notably, they did
+not treat disjunction. The paper~\cite{SorensenUrzyczyn2010} depends
+on termination of~IPC2, citing a proof from~\cite{Wojdyga2008}, which,
+however, later turned out to be incorrect. To our knowledge,
+termination of the full system~IPC2 remains an open problem.
 
 \LC{Cynthia: TODO}
 
