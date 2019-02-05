@@ -71,6 +71,7 @@
 \newcommand{\succeqinterpret}{\succeq^{\Termmap}}
 
 \newcommand{\List}{\mathtt{List}}
+\newcommand{\Pair}{\mathtt{Pair}}
 \newcommand{\nil}{\mathtt{nil}}
 \newcommand{\cons}{\mathtt{cons}}
 \newcommand{\fold}{\mathtt{fold}}
@@ -267,6 +268,8 @@ In this section we introduce System~$\Fomega$ (see
 e.g.~\cite[Section~11.7]{SorensenUrzyczyn2006}), which will form a
 basis both of our interpretations and of a general syntactic framework
 for the investigated systems.
+\CKchange{We assume familiarity with core notions of lambda
+calculi such as substitution and $\alpha$-conversion.}
 
 \begin{defn}\label{def_types}
   \emph{Kinds} are defined inductively: $*$ is a kind, and if
@@ -274,12 +277,12 @@ for the investigated systems.
   \kappa_2$. We assume an infinite set~$\Vc_\kappa$ of \emph{type
     constructor variables} of each kind~$\kappa$. Variables of
   kind~$*$ are \emph{type variables}. We assume a fixed
-  set~$\Sigma^T_\kappa$ of \emph{type constructor symbols} paired of
+  set~$\Sigma^T_\kappa$ of \emph{type constructor symbols} paired with a
   kind~$\kappa$, denoted $c : \kappa$.
-
+  % CK: space, and this fits together well enough, I think.
   We define the set~$\Tc_\kappa$ of \emph{type constructors} of
-  kind~$\kappa$ by the following grammar. Type constructors of
-  kind~$*$ are \emph{types}.
+  kind~$\kappa$ by the following grammar.
+  Type constructors of kind~$*$ are \emph{types}.
   \[
   \begin{array}{rcl}
     \Tc_{*} &::=& \Vc_{*}
@@ -297,14 +300,30 @@ for the investigated systems.
   otherwise, we assume~$\alpha$ to be a type variable. We treat type
   constructors up to $\alpha$-conversion.
 
+  \CK{This example is not part of the running example (which is very boring
+  in the way of types), but I figured something like this should be included
+  because type constructors having a higher kind was very unfamiliar to me
+  at first, and we may get RTA reviewers.}
+  \CKchange{\begin{example}
+  If $\Sigma^T_{*} = \{ \List \}$ and $\Sigma^T_{* \arrkind * \arrkind
+  *} = \{ \Pair \}$, types are for instance $\List$ and
+  $\forall \alpha.\Pair\,\alpha\,\List$.  The expression
+  $\Pair\,\List$ is a type constructor, but not a type.  If
+  $\Sigma^T_{(* \arrkind *) \arrkind *} = \{ \exists \}$ and
+  $\sigma \in \Tc_{* \arrkind *}$, then both
+  $\exists(\sigma)$ and $\exists (\lambda \alpha.\sigma\alpha)$ are
+  types.
+  \end{example}}
+
   The compatible closure of the rule $(\lambda\alpha.\varphi)\psi \to
   \varphi[\alpha := \psi]$ defines $\beta$-reduction on type
-  constructors. Note that type constructors are simply-typed
-  lambda-terms, so $\beta$-reduction on type constructors terminates
-  and is confluent, hence every type constructor~$\tau$ has a unique
+  constructors. \CKchange{As} type constructors are \CKchange{(mostly)} simply-typed
+  lambda-terms, \CKchange{their $\beta$-reduction} %on type constructors
+  terminates
+  and is confluent\CKchange{; hence} every type constructor~$\tau$ has a unique
   $\beta$-normal form~$\nf_\beta(\tau)$. A \emph{type atom} is a type
   in $\beta$-normal form which is not an arrow $\tau_1\arrtype\tau_2$
-  or a quantification $\forall\alpha\tau$.
+  or \CKchange{quantification} $\forall\alpha.\tau$.
 
   We define $\FV(\varphi)$ -- the set of free type constructor
   variables of the type constructor~$\varphi$ -- in an obvious way by
@@ -338,6 +357,10 @@ for the investigated systems.
     \in \Vars$ and $\Gamma, x : \sigma \vdash s : \tau$.
   \item $\Gamma \vdash \tabs{\alpha}{s} : \quant{\alpha}{\sigma}$ if
     $\Gamma \vdash s : \sigma$ and $\alpha \notin \FTV(\Gamma)$.
+    \CK{Given the conventions you set earlier, it is implied here that $\alpha$
+    is a type variable, which I don't think is intended.  Should we change this
+    to $\tabs{\alpha:\kappa}{s} : \quant{\alpha:\kappa}{\sigma}$ with a note
+    that if no kind is specified, it should be assumed to be *?}
   \item $\Gamma \vdash \app{s}{t} : \tau$ if $\Gamma \vdash s : \sigma
     \arrtype \tau$ and $\Gamma \vdash t : \sigma$
   \item $\Gamma \vdash \tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$
@@ -361,6 +384,9 @@ for the investigated systems.
   \tau$.
 \end{lemma}
 
+\CK{If these are preliminaries, are there not actually proofs in the
+literature that we could refer to? (Or are you trying to keep the
+reference list small?}
 \begin{proof}
   Induction on~$s$.
 \end{proof}
@@ -375,7 +401,7 @@ term has a canonical preterm representative -- the one with all types
 occurring in it $\beta$-normalized. We say that a term is
 \emph{closed} if its canonical representative is. We define $\FTV(t)$
 as the value of~$\FTV$ on the canonical representative of~$t$.
-
+%
 Because typing and term formation operations (abstraction,
 application, \ldots) are invariant under~$\equiv$, we may denote terms
 by their (canonical) representatives and informally treat them
@@ -400,6 +426,9 @@ $\abs{a}{s}$ or $\tabs{a}{s}$.
   Induction on the typing derivation.
 \end{proof}
 
+\CK{In the following lemma, do you need $\sigma'$ at all other than in
+the first two cases? I would guess that for the rest, choosing $\sigma$
+suffices?}
 \begin{lemma}[Generation lemma]
   Assume $\Gamma \proves t : \sigma$ and let $\Vc = \FTV(t) \cup
   \FTV(\Gamma)$. Then there is a type~$\sigma'$ such that $\sigma'
@@ -415,6 +444,7 @@ $\abs{a}{s}$ or $\tabs{a}{s}$.
   \item $t \equiv \tabs{\alpha}{s}$ and $\sigma' =
     \quant{\alpha}{\tau}$ and $\Gamma \vdash s : \tau$ and $\alpha
     \notin \FTV(\Gamma)$.
+    \CK{Same question applies as before: should there be kinds added?}
   \item $t \equiv \app{t_1}{t_2}$ and
     $\Gamma \vdash t_1 : \tau \arrtype \sigma'$ and
     $\Gamma \vdash t_2 : \tau$ and $\FV(\tau) \subseteq \Vc$.
@@ -431,6 +461,11 @@ $\abs{a}{s}$ or $\tabs{a}{s}$.
   s : \sigma'$ with~$\FTV(s) \cup \FTV(\Gamma') \subseteq \Vc$, then
   $\Gamma \proves s : \sigma'[\subst{\alpha}{\chi_\kappa}]$ by the
   substitution lemma.
+\CK{I do not understand this proof sketch. $\Vc$ is defined as a set of
+term variables, so $\alpha$ cannot be an element, nor can any element
+of some $\FTV$.  I am also confused what $\chi_\kappa$ has to do with
+this; is it still part of the proof, or is it an observation about the
+result?}
 \end{proof}
 
 For convenience, we sometimes assume without loss of generality that
@@ -460,15 +495,30 @@ inductive types used later. The lemmas stated in this section follow
 easily from definitions, after unfolding the abbreviations. We omit
 the proofs. Type subscripts are dropped when clear or irrelevant.
 
+\CK{To limit the very formal feel of this subsection -- with constant
+definitions and lemmas -- it may be better to put a short explanation
+below each definition, and put the lemmas together (e.g., a lemma
+``all types are as you would expect them'' and a lemma ``all the
+reductions are as you would hope'').}
+
 \begin{defn}[Product types]
-  \[
-  \begin{array}{rcl}
-    \sigma \times \tau &=& \forall p . (\sigma \arrtype \tau \arrtype p) \arrtype p \\
-    \pair{t_1}{t_2}_{\sigma,\tau} &=& \tabs{p}{\abs{x:\sigma\arrtype\tau\arrtype p}{x t_1 t_2}} \\
+%CK: shortening, but easily undone if you disagree with the aesthetics
+%  \[
+%  \begin{array}{rcl}
+%    \sigma \times \tau &=& \forall p . (\sigma \arrtype \tau \arrtype p) \arrtype p \\
+%    \pair{t_1}{t_2}_{\sigma,\tau} &=& \tabs{p}{\abs{x:\sigma\arrtype\tau\arrtype p}{x t_1 t_2}} \\
+%    \pi^1_{\sigma,\tau}(t) &=& t \sigma (\abs{x:\sigma}{\abs{y:\tau}{x}}) \\
+%    \pi^2_{\sigma,\tau}(t) &=& t \tau (\abs{x:\sigma}{\abs{y:\tau}{y}})
+%  \end{array}
+%  \]
+  \CKchange{\[
+  \begin{array}{rclcrcl}
+    \sigma \times \tau &=& \forall p . (\sigma \arrtype \tau \arrtype p) \arrtype p & \quad &
     \pi^1_{\sigma,\tau}(t) &=& t \sigma (\abs{x:\sigma}{\abs{y:\tau}{x}}) \\
-    \pi^2_{\sigma,\tau}(t) &=& t \tau (\abs{x:\sigma}{\abs{y:\tau}{y}})
+    \pair{t_1}{t_2}_{\sigma,\tau} &=& \tabs{p}{\abs{x:\sigma\arrtype\tau\arrtype p}{x t_1 t_2}} & &
+    \pi^2_{\sigma,\tau}(t) &=& t \tau (\abs{x:\sigma}{\abs{y:\tau}{y}}) \\
   \end{array}
-  \]
+  \]}
 \end{defn}
 
 \begin{lemma}
@@ -480,22 +530,32 @@ the proofs. Type subscripts are dropped when clear or irrelevant.
   \end{enumerate}
 \end{lemma}
 
-\begin{lemma}
+\begin{lemma}\label{lem:projectreduce}
   $\pi^i(\pair{t_1}{t_2}) \leadsto^* t_i$
 \end{lemma}
 
+\CK{We don't have $\succ$ yet, so we cannot do this here.  It is part of the lemma on safety regardless, though.  Remove?}
 \begin{lemma}
   If $t \succ t'$ then $\pi^i(t) \succ \pi^i(t')$.
 \end{lemma}
 
 \begin{defn}[Existential types]
-  \[
-  \begin{array}{rcl}
-    \Sigma \alpha . \sigma &=& \forall p . (\forall \alpha . \sigma \arrtype p) \arrtype p \\
+  %CK: Space, but easily undone
+%  \[
+%  \begin{array}{rcl}
+%    \Sigma \alpha . \sigma &=& \forall p . (\forall \alpha . \sigma \arrtype p) \arrtype p \\
+%    \expair{\tau}{t}_{\Sigma\alpha.\sigma} &=& \tabs{p}{\abs{x:\forall\alpha.\sigma\arrtype p}{x \tau t}} \\
+%    \xlet{\rho}{t}{\alpha,x:\sigma}{s} &=& t \rho (\tabs{\alpha}{\abs{x:\sigma}{s}})
+%  \end{array}
+%  \]
+  \CKchange{\[
+  \begin{array}{rclcrcl}
+    \Sigma \alpha . \sigma &=& \forall p . (\forall \alpha . \sigma \arrtype p) \arrtype p & \quad &
     \expair{\tau}{t}_{\Sigma\alpha.\sigma} &=& \tabs{p}{\abs{x:\forall\alpha.\sigma\arrtype p}{x \tau t}} \\
-    \xlet{\rho}{t}{\alpha,x:\sigma}{s} &=& t \rho (\tabs{\alpha}{\abs{x:\sigma}{s}})
+    & & & & 
+    \xlet{\rho}{t}{\alpha,x:\sigma}{s} &=& t \rho (\tabs{\alpha}{\abs{x:\sigma}{s}}) \\
   \end{array}
-  \]
+  \]}
 \end{defn}
 
 \begin{lemma}
@@ -508,17 +568,19 @@ the proofs. Type subscripts are dropped when clear or irrelevant.
   \end{enumerate}
 \end{lemma}
 
-\begin{lemma}
+\begin{lemma}\label{lem:extreduce}
   $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \leadsto
   s[\subst{\alpha}{\tau}][\subst{x}{t}]$.
 \end{lemma}
 
+\CK{Same here: $\succ$ does not yet exist.}
 \begin{lemma}
   If $t \succ t'$ then $\xlet{}{t}{\alpha,x}{s} \succ
   \xlet{}{t'}{\alpha,x}{s}$.
 \end{lemma}
 
 \begin{defn}[Heterogenous lists]
+  %CK: Here space saving will not work, as the cons is too large.
   \[
   \begin{array}{rcl}
     \List &=& \forall p . (\forall \alpha . \alpha \arrtype p \arrtype p) \arrtype p \arrtype p \\
