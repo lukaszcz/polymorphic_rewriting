@@ -2,6 +2,7 @@
 
 \usepackage{stmaryrd}
 \usepackage{proof}
+\usepackage[dvipsnames]{xcolor}
 
 %\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
 
@@ -78,7 +79,7 @@
 \newcommand{\fold}{\mathtt{fold}}
 \newcommand{\xlet}[4]{\mathtt{let}_{#1}\,#2\,\mathtt{be}\,[#3]\,\mathtt{in}\,#4}
 
-\newcommand{\CK}[1]{\textcolor{blue}{CK: #1}}
+\newcommand{\CK}[1]{\textcolor{violet}{CK: #1}}
 \newcommand{\CKchange}[1]{\textcolor{blue}{#1}}
 \newcommand{\LC}[1]{\textcolor{red}{LC: #1}}
 \newcommand{\LCchange}[1]{\textcolor{red}{#1}}
@@ -529,12 +530,14 @@ the desired derivation rules:}
   \end{enumerate}
 \end{lemma}
 
-\section{Polymorphic Algebraic Functional Systems}\label{sec_systems}
+\section{Polymorphic Functional Systems}\label{sec_systems}
 
-To represent the rewrite systems whose termination we are going to
-analyse, we define the framework of Polymorphic Algebraic Functional
-Systems (PAFS). We use a syntax based on System~$\Fomega$,
-specialising Section~\ref{sec_preliminaries}.
+\CKchange{In this section, we will present a form of higher-order term rewriting
+systems based on $\Fomega$: \emph{Polymorphic Functional Systems (PFSs)}.
+Systems of interest, such as logic systems like ICP2 and higher-order
+TRSs with shallow or full polymorphism can be encoded into PFSs, and then proved
+terminating with the technique we will develop in Sections
+\ref{sec:World}--\ref{sec_rule_removal}.}
 
 \begin{defn}\label{def_pafs_types_terms}
   \emph{Kinds}, \emph{type constructors} and \emph{types} are defined
@@ -542,17 +545,17 @@ specialising Section~\ref{sec_preliminaries}.
   set~$\Sigma^T = \bigcup_{\kappa}\Sigma^T_\kappa$ of type constructor
   symbols.
 
-  Given a fixed set~$\Sigma$ of function symbols, we define \emph{PAFS
-    terms} like in Definition~\ref{def_terms} (based on
-  Definition~\ref{def_preterms}) with the following restrictions:
-  \begin{itemize}
-  \item if $\mathtt{f} : \sigma \in \Sigma$ then
+  %CK: space restructuring
+  \CKchange{We assume given a fixed set~$\Sigma$ of function symbols, such
+  that for $\mathtt{f} : \sigma \in \Sigma$ we can write:
     \[
     \sigma = \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n : \kappa_n)
     . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype \tau
     \]
-    with~$\tau$ a type atom,
-  \item for any subterm $\app{s}{u}$ of a term~$t$, we have $s =
+  with $\tau$ a type atom,  We} define \emph{PFS
+    terms} like in Definition~\ref{def_terms} (based on
+  Definition~\ref{def_preterms}) with the \CKchange{restriction that
+  for} any subterm $\app{s}{u}$ of a term~$t$, we have $s =
     \mathtt{f} \rho_1 \ldots \rho_n u_1 \ldots u_m$ where
     \[
     \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots
@@ -560,38 +563,59 @@ specialising Section~\ref{sec_preliminaries}.
     \sigma_k \arrtype \tau
     \]
     with $\tau$ a type atom and $m < k$.
-  \end{itemize}
 \end{defn}
 
-We use the notation
-$\mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\ldots,s_k)$ for
+\CK{Note: this definition \emph{does} allow us to have a subterm
+$\mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\ldots,s_m)$ with $m < k$ that
+does not occur at the head of an application.  I do not mind this at
+all.  However, it does mean I had to change the text below a little
+to allow for it, so if you feel that this should not be allowed,
+change the part with $m \leq k$.  The definition also allows us to
+have $s * \tau$ directly rather than encoded.  Are you happy to have
+this?  I am fine with it, since I do not believe that it will be in the
+way of monotonicity, but I also do not need it.  Again, I did adapt the
+text to take into account that it is allowed.}
+
+\CKchange{Note that this definition does not allow for a variable or
+abstraction to occur at the head of an application, nor can we have
+terms of the form $s \cdot t * \tau \cdot q$ (although terms of the
+form $s \cdot t * \tau$, or $x * \tau$ with $x$ a variable, 
+\emph{are} allowed to occur).  To stress this restriction, we will
+use the notation
+$\mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\ldots,s_m)$ as an alternative
+way to denote
 $\mathtt{f} \rho_1 \ldots \rho_n s_1 \ldots s_k$ when
-\[
+$
   \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots
   \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
   \sigma_k \arrtype \tau
-\]
-is a function symbol in~$\Sigma$ with~$\tau$ a type atom, and $\rho_i$
-is a type constructor of kind $\kappa_i$ for $i=1,\ldots,k$, and
-$\Gamma \proves s_i : \sigma_i[\alpha_1 := \rho_1]\ldots[\alpha_n :=
-  \rho_n]$ for $i=1,\ldots,k$, for an appropriate~$\Gamma$. We use
-this notation to stress the fact that by default there is no explicit
-application available. The application in the syntax of terms is used
-just for convenience, but does not correspond to the usual application
-operator since only applications of the form $\mathtt{f} \rho_1 \ldots
-\rho_n u_1 \ldots u_m$ are allowed. True application can be modelled
-by including the symbol ${@} : \forall\alpha\forall\beta . (\alpha
-\arrtype \beta) \arrtype \alpha \arrtype \beta$ in
-$\Sigma$. Similarly, type application is modelled through a symbol
-$\mathtt{A} : \forall \alpha : * \arrkind * . \forall \beta . (\forall
-\beta [\alpha \beta]) \arrtype \alpha \beta$.
+$
+is} a function symbol in~$\Sigma$ with~$\tau$ a type atom \CKchange{and $m \leq k$.
+%CK: omitting this, because it is implied by
+%  $\mathtt{f} \rho_1 \ldots \rho_n s_1 \ldots s_k$ being a term in the
+%  first place.
+%and $\rho_i$
+%is a type constructor of kind $\kappa_i$ for $i=1,\ldots,k$, and
+%$\Gamma \proves s_i : \sigma_i[\alpha_1 := \rho_1]\ldots[\alpha_n :=
+%  \rho_n]$ for $i=1,\ldots,k$, for an appropriate~$\Gamma$.
+This allows us to represent terms in a ``functional'' way, where
+application does not explicitly occur (only implicitly in the
+construction of $\mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\ldots,s_m)$).}
+
+\CKchange{The following result follows easily by induction on term
+structure:}
 
 \begin{lemma}
-  If $t,s$ are PAFS terms then so is $t[\subst{x}{s}]$.
+  If $t,s$ are PFS terms then so is $t[\subst{x}{s}]$.
 \end{lemma}
 
+\CKchange{PFS terms will be rewritten through a reduction relation
+$\arr{\Rules}$ based on a (usually infinite) set of rewrite rules.
+To define this relation, we need two additional notions.}
+
 \begin{defn}\label{def_replacement}
-  A \emph{$\Gamma$-replacement} is a function $\delta = \gamma \circ
+  \CKchange{For a variable context $\Gamma$,
+  a} \emph{$\Gamma$-replacement} is a function $\delta = \gamma \circ
   \omega$ satisfying:
   \begin{enumerate}
   \item $\omega$ is a type constructor substitution,
@@ -605,19 +629,22 @@ $\mathtt{A} : \forall \alpha : * \arrkind * . \forall \beta . (\forall
   \gamma[\subst{x}{t}] \circ \omega$. Note that if $t \in \Iterms$ and
   $\Gamma \proves t : \tau$ then $\delta(\Gamma) \proves \delta(t) :
   \delta(\tau)$.
+  \CK{The set $\Iterms$ is not defined here; can you reformulate this?}
 \end{defn}
 
-The rewrite rules are simply a set of term pairs, whose monotonic
-closure generates the rewrite relation. We fix a variable
-context~$\Gamma$.
-
-\begin{defn}\label{def_rules}
+\begin{defn}\label{def:context}
   A \emph{$\sigma$-context}~$C_\sigma$ is a term with a fresh function
   symbol $\Box_\sigma \notin \Sigma$ of type~$\sigma$ occurring
   exactly once. By~$C_\sigma[t]$ we denote a term obtained
   from~$C_\sigma$ by substituting~$t$ for~$\Box_\sigma$. We drop the
   $\sigma$ subscripts when clear or irrelevant.
+\end{defn}
 
+\CKchange{Now, the} rewrite rules are simply a set of term pairs, whose
+monotonic closure generates the rewrite relation. We fix a variable
+context~$\Gamma$.
+
+\begin{defn}\label{def_rules}
   A set $\Rules$ of term pairs $(\ell,r)$ is a set of \emph{rewrite
     rules} if:
   \begin{itemize}
@@ -628,26 +655,45 @@ context~$\Gamma$.
   \end{itemize}
   The reduction relation $\arr{\Rules}$ is defined by: $t \arr{\Rules}
   s$ iff $t = C[\ell]$ and $s = C[r]$ for some $(\ell,r)\in\Rules$ and
-  a context~$C$.
+  context~$C$.
 \end{defn}
 
 \begin{defn}\label{def_pafs}
-  A \emph{Polymorphic Algebraic Functional System (PAFS)} is a triple
+  A \emph{Polymorphic Functional System (PFS)} is a triple
   $(\Sigma^T,\Sigma,\Rules)$ where~$\Sigma^T$ is a set of type
   constructor symbols, $\Sigma$ a set of function symbols (restricted
-  as in Definition~\ref{def_pafs_types_terms}), and $\Rules$ is a set
-  of rules as in Definition~\ref{def_rules}. A term of a given
-  PAFS~$A$ is referred to as an $A$-term.
+  as in Def.~\ref{def_pafs_types_terms}), and $\Rules$ is a set
+  of rules as in Definition~\ref{def_rules}. A term of \CKchange{a %given
+  PFS~$A$} is referred to as an $A$-term.
 \end{defn}
 
+\CKchange{While PFS-terms are a restriction from the general terms
+of system $\Fomega$, the reduction relation allows us to actually encode
+$\Fomega$ as a PFS: we can do so by including the symbol
+${@} : \forall\alpha\forall\beta . (\alpha \arrtype \beta) \arrtype \alpha
+\arrtype \beta$ in $\Sigma$ and adding all rules of the form
+$@_{\sigma,\tau}(\abs{x}{s},t) \red s[x:=t]$.
+Similarly, $\beta$-reduction of type abstraction can be modelled
+by including a symbol
+$\mathtt{A} : \forall \alpha : * \arrkind * . \forall \beta . (\forall
+\gamma.\alpha \gamma) \arrtype \alpha \beta$ and rules
+$\mathtt{A}_{\varphi,\sigma}(\abs{\alpha}{s}) \red s[\alpha:=\sigma]$.
+It is also allowed to simply include rules
+$(\tabs{\alpha}{s})*\tau \red s[\alpha:=\tau]$ without the extra
+symbol, but to apply the method from
+Sections \ref{sec:World}--\ref{sec_rule_removal}, it is often more
+convenient to include the symbol, since it will allow us to assign an
+arbitrary polynomial interpretation to type application.
+}
+
 \begin{example}[Fold on heterogenous lists]\label{ex_fold_pafs}
-  The example from the introduction may be represented as a PAFS with
+  The example from the introduction may be represented as a PFS with
   one type symbol $\mathtt{List} : *$, the following function symbols:
   \[
   \begin{array}{rcl}
     @ & : & \forall \alpha \forall \beta . (\alpha \arrtype \beta) \arrtype \alpha \arrtype \beta \\
     \mathtt{A} & : & \forall \alpha : * \arrkind * . \forall \beta .
-    (\forall \beta [\alpha \beta]) \arrtype \alpha \beta \\
+    (\forall \gamma .\alpha \gamma) \arrtype \alpha \beta \\
     \mathtt{nil} & : & \List \\
     \mathtt{cons} & : & \forall \alpha . \alpha \arrtype \List \arrtype \List \\
     \mathtt{foldl} & : & \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \List
@@ -657,24 +703,25 @@ context~$\Gamma$.
   \[
   \begin{array}{rcl}
     @_{\sigma,\tau}(\abs{x:\sigma}{s},t) & \red & s[x:=t] \\
-    \mathtt{A}_{\tabs{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \red &
+    \CKchange{\mathtt{A}_{\abs{\alpha}{\sigma},\tau}}(\tabs{\alpha}{s}) & \red &
     s[\alpha:=\tau] \\
-    \mathtt{foldl}_\sigma(f,a,\nil) & \red & a \\
-    \mathtt{foldl}_\sigma(f,a,\cons_\tau(x,l)) & \red & \mathtt{foldl}_\sigma(f,@_{\tau,\sigma}(@_{\sigma,\tau\arrtype\sigma}(\mathtt{A}_{\tabs{\alpha}{\sigma\arrtype\alpha\arrtype\sigma},\tau}(f),a),x),l)
+    \mathtt{foldl}_\sigma(f,s,\nil) & \red & s \\
+    \mathtt{foldl}_\sigma(f,s,\cons_\tau(h,t)) & \red & \mathtt{foldl}_\sigma(f,@_{\tau,\sigma}(@_{\sigma,\tau
+    \arrtype\sigma}(\mathtt{A}_{\tabs{\alpha}{\sigma\arrtype\alpha\arrtype\sigma},\tau}(f),s),h),t)
   \end{array}
   \]
-  Formally, the above represent an infinite set of rules, one rule for
-  each substitution of~PAFS terms for $s$, $t$, etc.
+  Formally, the above represents an infinite set of rules, one rule for
+  each \CKchange{choice of types $\sigma,\tau$ and PFS terms $s$, $t$}, etc.
 \end{example}
 
-\section{A well-ordered set of interpretation terms}
+\section{A well-ordered set of interpretation terms}\label{sec:World}
 
 In this section we define the set~$\Iterms$ of interpretation terms,
 and the relations~$\succeq$ and~$\succ$ on~$\Iterms$. We also define
 the set~$\Iterms^f$ of final interpretation terms as the set of all
 closed interpretation terms normalized with a certain reduction
 relation. We will use interpretation terms from~$\Iterms$ to interpret
-terms of~PAFSs. The pair $(\succeq,\succ)$ will be used as a reduction
+terms of~PFSs. The pair $(\succeq,\succ)$ will be used as a reduction
 pair for the method of rule removal. In particular, the
 relation~$\succ$ will be well-founded.
 
@@ -1026,13 +1073,13 @@ ordering.
 \section{Reduction pairs}\label{sec_reduction_pairs}
 
 The goal of this section is to define an interpretation~$\Termmap$
-of~PAFS function symbols and a reduction pair
-$(\succeqinterpret,\succinterpret)$ on PAFS terms. In the next
+of~PFS function symbols and a reduction pair
+$(\succeqinterpret,\succinterpret)$ on PFS terms. In the next
 section, we will show how a reduction pair may be used to prove
-termination of~PAFSs.
+termination of~PFSs.
 
 First, we precisely define the notion of a reduction pair. We fix
-a~PAFS~$A$.
+a~PFS~$A$.
 
 \begin{defn}
   A binary relation~$R$ on $A$-terms is \emph{monotonic} if $R(s, t)$
@@ -1193,7 +1240,7 @@ structure is not possible.
 \end{proof}
 
 Similarly, we employ a \emph{symbol mapping} as an aid to interpret
-PAFS terms.
+PFS terms.
 
 \begin{defn}
   A \emph{symbol mapping} is a function $\Termmap$ which assigns to
@@ -1357,14 +1404,14 @@ pair.
 \end{proof}
 
 \begin{example}\label{ex_fold_interpretation}
-  The following is a safe interpretation for the PAFS from
+  The following is a safe interpretation for the PFS from
   Example~\ref{ex_fold_pafs}: \LC{Cynthia: TODO}.
 \end{example}
 
 \section{Proving termination with rule removal}\label{sec_rule_removal}
 
 In this section we show how to use reduction pairs to prove
-termination of a PAFS. This is achieved by the method of rule removal.
+termination of a PFS. This is achieved by the method of rule removal.
 
 \begin{theorem}\label{thm:ruleremove}
   Let $\Rules = \Rules_1 \cup \Rules_2$, and suppose that
