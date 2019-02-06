@@ -51,6 +51,7 @@
 \newcommand{\FV}{\mathrm{FV}}
 \newcommand{\Tc}{\mathcal{T}}
 \newcommand{\Vc}{\mathcal{V}}
+\newcommand{\Xc}{\CKchange{\mathcal{X}}}
 
 \newcommand{\cl}{\mathcal{C}}
 \newcommand{\dom}{\mathrm{dom}}
@@ -134,17 +135,9 @@
   interpretations to a setting with impredicative
   polymorphism. Instead of using weakly monotonic functionals, we
   interpret terms in a suitable extension of System~$\Fomega$.
-  %CK: reformulating this because it's a long and rather hard-to-read
-  %sentence, and because I wanted to save a line.
-  %% LC: Yes, I do have a bit of this Slavic languages-influenced
-  %% habit, where you tend to write in long and complex sentences,
-  %% which nonetheless sounds good and doesn't compromise clarity,
-  %% because there is a very sophisticated grammar to disambiguate
-  %% things, unlike in English where precise complex grammatical
-  %% structures are almost non-existent ;)
   This enables a direct interpretation of rewrite rules which
-  make essential use of impredicative polymorphism.  Our
-  generalisation also eases the applicability of the method
+  make essential use of impredicative polymorphism.  In addition,
+  our generalisation eases the applicability of the method
   in the non-polymorphic setting by allowing for an encoding
   of inductive data types.
   As an illustration of
@@ -158,13 +151,6 @@
 Termination of higher-order term rewriting
 systems~\cite[Chapter~11]{Terese2003} has been an active area of
 research for several decades.
-%CK: _polynomial_ interpretations are not complete for first-order
-%rewriting! Algebra interpretations are. And Jaco never introduced
-%higher-order polynomials; that definition is mine.
-%% LC: Assuming you would correct me if wrong, I didn't check this
-%% (or think much about it -- in hidsight it's pretty stupid to claim
-%% polynomial interpretations are complete, especially that I actually
-%% learned about them at some point).
 One powerful method, introduced by v.d. Pol \cite{Pol1993,pol:96},
 interprets terms into \emph{weakly monotonic algebras}.  In later work
 \cite{FuhsKop2012,Kop2012}, these algebra interpetations are specialised
@@ -213,8 +199,8 @@ variables. The above example is not directly reducible to shallow
 polymorphism as used in the~ML programming language or the polymorphic
 higher-order rewriting formalisms of~\cite{jou:oka:91,jou:rub:99}.
 
-The technique we will develop in this paper can be used to handle
-systems like the one above.  However, termination of heterogeneous
+The technique we develop in this paper can be used to handle
+systems like the one above.  Since termination of heterogeneous
 fold can be shown in other ways (e.g., an encoding in
 System~$\mathtt{F}$). Hence, we will also study a more complex example
 in Section~\ref{sec:examples}: termination of a substantial fragment
@@ -225,8 +211,9 @@ proof theory to obtain ``good'' normal forms of natural deduction
 proofs, which satisfy e.g.~the subformula property. Termination proofs
 for systems with permutative conversions are notoriously tedious and
 difficult, with some incorrect claims in the literature and no uniform
-methodology. It is our goal to make termination proofs for systems
-like this substantially easier in the future.
+methodology. It is our goal to make such termination proofs
+%for systems like this
+substantially easier in the future.
 
 \section{Preliminaries}\label{sec_preliminaries}
 
@@ -278,9 +265,8 @@ of lambda calculi such as substitution and $\alpha$-conversion.
 
   The compatible closure of the rule $(\lambda\alpha.\varphi)\psi \to
   \varphi[\alpha := \psi]$ defines $\beta$-reduction on type
-  constructors. As type constructors are \LCchange{(essentially)} simply-typed
-  lambda-terms, their $\beta$-reduction
-  terminates
+  constructors. As type constructors are (essentially) simply-typed
+  lambda-terms, their $\beta$-reduction terminates
   and is confluent; hence every type constructor~$\tau$ has a unique
   $\beta$-normal form~$\nf_\beta(\tau)$. A \emph{type atom} is a type
   in $\beta$-normal form which is not an arrow $\tau_1\arrtype\tau_2$
@@ -303,7 +289,8 @@ of lambda calculi such as substitution and $\alpha$-conversion.
   once. We assume given a fixed set $\Sigma$ of \emph{function
     symbols}, each paired with a closed type, denoted $\mathtt{f} :
   \tau$.  Every function symbol $\mathtt{f}$ occurs only with one type
-  declaration. We use $\Gamma,x:\tau$ for $\Gamma \cup \{x:\tau\}$. We
+  declaration. We denote $\Gamma,x:\tau$ for $\Gamma \cup \{x:\tau\}$. We
+\pagebreak
   set $\FTV(\Gamma) = \bigcup\{\FV(\tau) \mid (x : \tau) \in
   \Gamma\}$.
 
@@ -329,8 +316,10 @@ of lambda calculi such as substitution and $\alpha$-conversion.
   The set of free variables of a preterm~$t$, denoted $\FV(t)$, is
   defined in the expected way. Analogously, we define the
   set~$\FTV(t)$ of type constructor variables occurring free
-  in~$t$. We say that $t$ is \emph{closed} if $\FV(t) = \emptyset$ and
-  $\FTV(t) = \emptyset$. If $\alpha$ is a type constructor variable of
+  in~$t$.
+  %We say that $t$ is \emph{closed} if $\FV(t) = \emptyset$ and
+  %$\FTV(t) = \emptyset$.
+  If $\alpha$ is a type constructor variable of
   kind~$\kappa$ then we use the notation $\tabs{\alpha:\kappa}{t}$.
   We define the equivalence relation~$\equiv$ by: $s \equiv t$ iff $s$
   and $t$ are identical modulo $\beta$-conversion in types.
@@ -341,22 +330,9 @@ of lambda calculi such as substitution and $\alpha$-conversion.
   \tau$.
 \end{lemma}
 
-\CK{If these are preliminaries, are there not actually proofs in the
-  literature that we could refer to? Or are you trying to keep the
-  reference list small?}
-\LC{This is problematic, because with System~$\Fomega$ it's a bit like
-  with higher-order rewriting -- it comes in many slightly different
-  variants, though unlike in rewriting all of them are essentially
-  equivalent. I don't think you'll find in the literature
-  \emph{exactly} the system we have here. The reference I give at the
-  beginning defines only a Curry-style variant, with no types in
-  terms. And few presentations are parameterised with type constructor
-  or function symbols. Nonetheless, I think we can just outcomment
-  this proof, as it is pretty trivial and clear to people who know
-  about System~$\Fomega$.}
-%\begin{proof}
-%  Induction on~$s$.
-%\end{proof}
+\begin{proof}
+  Induction on~$s$.
+\end{proof}
 
 \begin{defn}\label{def_terms}
   The set of \emph{terms} is the set of the equivalence classes
@@ -365,9 +341,15 @@ of lambda calculi such as substitution and $\alpha$-conversion.
 
 Because $\beta$-reduction on types is confluent and terminating, every
 term has a canonical preterm representative -- the one with all types
-occurring in it $\beta$-normalized. We say that a term is
-\emph{closed} if its canonical representative is. We define $\FTV(t)$
+occurring in it $\beta$-normalized.
+%We say that a term is
+%\emph{closed} if its canonical representative is.
+We define $\FTV(t)$
 as the value of~$\FTV$ on the canonical representative of~$t$.
+%CK: moved this to save a line, which allows 2.1 to start at the top of
+%page 3.
+\CKchange{We say that $t$ is \emph{closed} if both $\FTV(t) = \emptyset$
+and $\FV(t) = \emptyset$.}
 %
 Because typing and term formation operations (abstraction,
 application, \ldots) are invariant under~$\equiv$, we may denote terms
@@ -393,14 +375,15 @@ $\abs{a}{s}$ or $\tabs{a}{s}$.
   Induction on the typing derivation.
 \end{proof}
 
-\CK{In the following lemma, do you need $\sigma'$ at all other than in
-the first two cases? I would guess that for the rest, choosing $\sigma$
-suffices?}
-\LC{It doesn't because you can always do $\beta$-conversion on types using the last typing rule.}
+%\CK{In the following lemma, do you need $\sigma'$ at all other than in
+%the first two cases? I would guess that for the rest, choosing $\sigma$
+%suffices?}
+%\LC{It doesn't because you can always do $\beta$-conversion on types using the last typing rule.}
+
 \begin{lemma}[Generation lemma]
-  Assume $\Gamma \proves t : \sigma$ and let $\Vc = \FTV(t) \cup
+  Assume $\Gamma \proves t : \sigma$ and let $\Xc = \FTV(t) \cup
   \FTV(\Gamma)$. Then there is a type~$\sigma'$ such that $\sigma'
-  =_\beta \sigma$ and $\FV(\sigma') \subseteq \Vc$ and one of the
+  =_\beta \sigma$ and $\FV(\sigma') \subseteq \Xc$ and one of the
   following holds.
   \begin{itemize}
   \item $t \equiv x$ is a variable and $(x : \sigma') \in \Gamma$.
@@ -424,12 +407,13 @@ suffices?}
 
 \begin{proof}
   By induction on the derivation $\Gamma \proves t : \sigma$. To
-  ensure $\FV(\sigma') \subseteq \Vc$, note if $\alpha \notin \Vc$ is
-  of kind~$\kappa$ and~$\Gamma' \proves s : \sigma'$ with~$\FTV(s)
-  \cup \FTV(\Gamma') \subseteq \Vc$, then $\Gamma \proves s :
-  \sigma'[\subst{\alpha}{\chi_\kappa}]$ by the substitution lemma
-  (thus we can eliminate~$\alpha$).
-\CK{I do not understand this proof sketch. $\Vc$ is defined as a set of
+  ensure $\FV(\sigma') \subseteq \Xc$, note if $\alpha \notin \Xc$
+  is of kind~$\kappa$ and~$\Gamma' \proves s : \sigma'$
+  with~$\FTV(s) \cup \FTV(\Gamma') \subseteq \Xc$, then $\Gamma
+  \proves s : \sigma'[\subst{\alpha}{\chi_\kappa}]$ by the
+  substitution lemma (thus we can eliminate~$\alpha$).
+\CK{I do not understand this proof sketch. 
+$\Vc$ is defined as a set of
 term variables, so $\alpha$ cannot be an element, nor can any element
 of some $\FTV$.  I am also confused what $\chi_\kappa$ has to do with
 this; is it still part of the proof, or is it an observation about the
@@ -437,6 +421,14 @@ result?}
 \LC{$\Vc$ is a set of type constructor variables. $\FTV$ (Free Type
   Variables) is not $\FV$ (Free Variables). Maybe we should invent a
   better abbreviation and explain this more conspicuously?}
+\CK{But in Definition 2.3, $\Vc$ refers to the set of variables, not
+  type constructor variables.  I would rather use a different letter
+  here -- so I have now replaced it by $\Xc$.  However, I still do not
+  understand what is happening with the use of $\chi_\kappa$.  Where
+  does $\Gamma'$ come from?}
+\CK{Separately: I \emph{do} think it may be better to just consistently
+  use $\FTV$ for free type variables (also in types) and $\FV$ for term
+  variables.}
 \end{proof}
 
 For convenience, we sometimes assume without loss of generality that
@@ -464,24 +456,6 @@ The reader is advised to consult e.g.~\cite[Chapter~11]{Girard1989}
 for more background and explanations. Here, we only state standard
 abbreviations for a few inductive types used later. Type subscripts
 are dropped when clear or irrelevant.
-
-\CK{To limit the very formal feel of this subsection -- with constant
-definitions and lemmas -- it may be better to put a short explanation
-below each definition, and put the lemmas together (e.g., a lemma
-``all types are as you would expect them'' and a lemma ``all the
-reductions are as you would hope'').}
-
-\LC{I don't think we should be explaining here why we're defining the
-  encodings the way we do, because this is a standard construction and
-  someone who wants to learn more should consult the references. For
-  the rest of the paper, it matters only that the encodings have the
-  right properties expressed by the lemmas. And I see no point in
-  explaining what pairs or existentials are either (existentials are
-  needed only for the IPC2 system -- I think we have no space to
-  explain the rationale of IPC2 in detail). But I think saying birefly
-  what the lemmas do and putting them separately is a good idea.}
-
-\LC{I removed the lemmas mentioning $\succ$.}
 
 \begin{defn}[Product types]
   \[
@@ -517,7 +491,7 @@ reductions are as you would hope'').}
   \]
 \end{defn}
 
-All terms have the expected types.
+\CKchange{From the definition we immediately see that all encodings have the expected type:}
 
 \begin{lemma}\label{lem:encodings_types}
   \begin{enumerate}
@@ -539,15 +513,18 @@ All terms have the expected types.
   \end{enumerate}
 \end{lemma}
 
-The reductions are also as one would expect.
+\CKchange{In addition, $\beta$-reduction on terms and types -- that is, the
+relation $\leadsto_\beta$ generated by $(\abs{x}{s})t \leadsto_\beta s[x:=t]$
+and $(\tabs{\alpha}{s})\sigma \leadsto_\beta s[\alpha:=\sigma]$ -- provides
+the desired derivation rules:}
 
 \begin{lemma}\label{lem:encodings_reduce}
   \begin{enumerate}
-  \item $\pi^i(\pair{t_1}{t_2}) \leadsto^* t_i$.
-  \item $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \leadsto^*
+  \item $\pi^i(\pair{t_1}{t_2}) \leadsto_\beta^* t_i$.
+  \item $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \leadsto_\beta^*
     s[\subst{\alpha}{\tau}][\subst{x}{t}]$.
-  \item $\fold_\rho(f,a,\nil) \leadsto^* a$.
-  \item $\fold_\rho(f,a,\cons_\tau(h,t)) \leadsto^* f \tau h
+  \item $\fold_\rho(f,a,\nil) \leadsto_\beta^* a$.
+  \item $\fold_\rho(f,a,\cons_\tau(h,t)) \leadsto_\beta^* f \tau h
     (\fold_\rho(f,a,t))$.
   \end{enumerate}
 \end{lemma}
