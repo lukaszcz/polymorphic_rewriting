@@ -135,16 +135,14 @@
   We generalise the termination method of higher-order polynomial
   interpretations to a setting with impredicative
   polymorphism. Instead of using weakly monotonic functionals, we
-  interpret terms in a suitable extension of System~$\Fomega$.
-  This enables a direct interpretation of rewrite rules which
-  make essential use of impredicative polymorphism.  In addition,
-  our generalisation eases the applicability of the method
-  in the non-polymorphic setting by allowing for an encoding
-  of inductive data types.
-  As an illustration of
-  the potential of our method, we prove termination of a substantial
-  fragment of full intuitionistic second-order propositional logic
-  with permutative conversions.
+  interpret terms in a suitable extension of System~$\Fomega$. This
+  enables a direct interpretation of rewrite rules which make
+  essential use of impredicative polymorphism.  In addition, our
+  generalisation eases the applicability of the method in the
+  non-polymorphic setting by allowing for encoding of inductive data
+  types. As an illustration of the potential of our method, we prove
+  the termination of a substantial fragment of full intuitionistic
+  second-order propositional logic with permutative conversions.
 \end{abstract}
 
 \section{Introduction}
@@ -185,8 +183,8 @@ heterogenous lists.
 The above states that $\List$ is a type ($*$), gives the types of its
 two constructors $\nil$ and $\cons$, and defines the corresponding
 fold-left function~$\mathtt{foldl}$. Each element of a heterogenous
-list may have a different type. Together with the element, the
-function argument of~$\mathtt{foldl}$ receives the element's type. The
+list may have a different type. Together with the element, the function argument
+of~$\mathtt{foldl}$ receives the element's type. The
 $\forall$-quantifier binds type variables -- a term of type $\forall
 \alpha . \tau$ takes a type~$\rho$ as an argument and the result is a
 term of type~$\tau[\subst{\alpha}{\rho}]$.
@@ -273,10 +271,10 @@ of lambda calculi such as substitution and $\alpha$-conversion.
   in $\beta$-normal form which is not an arrow $\tau_1\arrtype\tau_2$
   or quantification $\forall\alpha.\tau$.
 
-  We define $\FV(\varphi)$ -- the set of free type constructor
+  We define $\FTV(\varphi)$ -- the set of free type constructor
   variables of the type constructor~$\varphi$ -- in an obvious way by
   induction on~$\varphi$. A type constructor~$\varphi$ is
-  \emph{closed} if $\FV(\varphi) = \emptyset$.
+  \emph{closed} if $\FTV(\varphi) = \emptyset$.
 
   We assume a fixed type symbol~$\chi_* \in
   \Sigma^T_\kappa$. For $\kappa=\kappa_1\arrkind\kappa_2$ we define
@@ -292,7 +290,7 @@ of lambda calculi such as substitution and $\alpha$-conversion.
   \tau$.  Every function symbol $\mathtt{f}$ occurs only with one type
   declaration. We denote $\Gamma,x:\tau$ for $\Gamma \cup \{x:\tau\}$. We
 \pagebreak
-  set $\FTV(\Gamma) = \bigcup\{\FV(\tau) \mid (x : \tau) \in
+  set $\FTV(\Gamma) = \bigcup\{\FTV(\tau) \mid (x : \tau) \in
   \Gamma\}$.
 
   The set of preterms consists of all expressions~$s$ such that
@@ -318,8 +316,6 @@ of lambda calculi such as substitution and $\alpha$-conversion.
   defined in the expected way. Analogously, we define the
   set~$\FTV(t)$ of type constructor variables occurring free
   in~$t$.
-  %We say that $t$ is \emph{closed} if $\FV(t) = \emptyset$ and
-  %$\FTV(t) = \emptyset$.
   If $\alpha$ is a type constructor variable of
   kind~$\kappa$ then we use the notation $\tabs{\alpha:\kappa}{t}$.
   We define the equivalence relation~$\equiv$ by: $s \equiv t$ iff $s$
@@ -343,14 +339,10 @@ of lambda calculi such as substitution and $\alpha$-conversion.
 Because $\beta$-reduction on types is confluent and terminating, every
 term has a canonical preterm representative -- the one with all types
 occurring in it $\beta$-normalized.
-%We say that a term is
-%\emph{closed} if its canonical representative is.
 We define $\FTV(t)$
 as the value of~$\FTV$ on the canonical representative of~$t$.
-%CK: moved this to save a line, which allows 2.1 to start at the top of
-%page 3.
-\CKchange{We say that $t$ is \emph{closed} if both $\FTV(t) = \emptyset$
-and $\FV(t) = \emptyset$.}
+We say that $t$ is \emph{closed} if both $\FTV(t) = \emptyset$
+and $\FV(t) = \emptyset$.
 %
 Because typing and term formation operations (abstraction,
 application, \ldots) are invariant under~$\equiv$, we may denote terms
@@ -376,15 +368,10 @@ $\abs{a}{s}$ or $\tabs{a}{s}$.
   Induction on the typing derivation.
 \end{proof}
 
-%\CK{In the following lemma, do you need $\sigma'$ at all other than in
-%the first two cases? I would guess that for the rest, choosing $\sigma$
-%suffices?}
-%\LC{It doesn't because you can always do $\beta$-conversion on types using the last typing rule.}
-
 \begin{lemma}[Generation lemma]\label{lem:generation}
   Assume $\Gamma \proves t : \sigma$ and let $\Xc = \FTV(t) \cup
   \FTV(\Gamma)$. Then there is a type~$\sigma'$ such that $\sigma'
-  =_\beta \sigma$ and $\FV(\sigma') \subseteq \Xc$ and one of the
+  =_\beta \sigma$ and $\FTV(\sigma') \subseteq \Xc$ and one of the
   following holds.
   \begin{itemize}
   \item $t \equiv x$ is a variable and $(x : \sigma') \in \Gamma$.
@@ -398,7 +385,7 @@ $\abs{a}{s}$ or $\tabs{a}{s}$.
     \notin \FTV(\Gamma)$.
   \item $t \equiv \app{t_1}{t_2}$ and
     $\Gamma \vdash t_1 : \tau \arrtype \sigma'$ and
-    $\Gamma \vdash t_2 : \tau$ and $\FV(\tau) \subseteq \Vc$.
+    $\Gamma \vdash t_2 : \tau$ and $\FTV(\tau) \subseteq \Vc$.
   \item $t \equiv \tapp{s}{\tau}$ and
     $\sigma' = \rho[\subst{\alpha}{\tau}]$ and
     $\Gamma \vdash s : \quant{(\alpha:\kappa)}{\rho}$ and~$\tau$ is a
@@ -407,29 +394,12 @@ $\abs{a}{s}$ or $\tabs{a}{s}$.
 \end{lemma}
 
 \begin{proof}
-  By induction on the derivation $\Gamma \proves t : \sigma$. To
-  ensure $\FV(\sigma') \subseteq \Xc$, note if $\alpha \notin \Xc$
-  is of kind~$\kappa$ and~$\Gamma' \proves s : \sigma'$
-  with~$\FTV(s) \cup \FTV(\Gamma') \subseteq \Xc$, then $\Gamma
-  \proves s : \sigma'[\subst{\alpha}{\chi_\kappa}]$ by the
+  By analysing the derivation $\Gamma \proves t : \sigma$. To
+  ensure $\FTV(\sigma') \subseteq \Xc$, note if $\alpha \notin \Xc$
+  is of kind~$\kappa$ and~$\Gamma \proves t : \sigma'$
+  with~$\FTV(t) \cup \FTV(\Gamma) \subseteq \Xc$, then $\Gamma
+  \proves t : \sigma'[\subst{\alpha}{\chi_\kappa}]$ by the
   substitution lemma (thus we can eliminate~$\alpha$).
-\CK{I do not understand this proof sketch. 
-$\Vc$ is defined as a set of
-term variables, so $\alpha$ cannot be an element, nor can any element
-of some $\FTV$.  I am also confused what $\chi_\kappa$ has to do with
-this; is it still part of the proof, or is it an observation about the
-result?}
-\LC{$\Vc$ is a set of type constructor variables. $\FTV$ (Free Type
-  Variables) is not $\FV$ (Free Variables). Maybe we should invent a
-  better abbreviation and explain this more conspicuously?}
-\CK{But in Definition 2.3, $\Vc$ refers to the set of variables, not
-  type constructor variables.  I would rather use a different letter
-  here -- so I have now replaced it by $\Xc$.  However, I still do not
-  understand what is happening with the use of $\chi_\kappa$.  Where
-  does $\Gamma'$ come from?}
-\CK{Separately: I \emph{do} think it may be better to just consistently
-  use $\FTV$ for free type variables (also in types) and $\FV$ for term
-  variables.}
 \end{proof}
 
 For convenience, we sometimes assume without loss of generality that
@@ -481,7 +451,6 @@ are dropped when clear or irrelevant.
 \end{defn}
 
 \begin{defn}[Heterogenous lists]
-  %CK: Here space saving will not work, as the cons is too large.
   \[
   \begin{array}{rcl}
     \List &=& \forall p . (\forall \alpha . \alpha \arrtype p \arrtype p) \arrtype p \arrtype p \\
@@ -492,7 +461,7 @@ are dropped when clear or irrelevant.
   \]
 \end{defn}
 
-\CKchange{From the definition we immediately see that all encodings have the expected type:}
+From the definition we immediately see that all encodings have the expected types:
 
 \begin{lemma}\label{lem:encodings_types}
   \begin{enumerate}
@@ -514,10 +483,10 @@ are dropped when clear or irrelevant.
   \end{enumerate}
 \end{lemma}
 
-\CKchange{In addition, $\beta$-reduction on terms and types -- that is, the
-relation $\leadsto_\beta$ generated by $(\abs{x}{s})t \leadsto_\beta s[x:=t]$
-and $(\tabs{\alpha}{s})\sigma \leadsto_\beta s[\alpha:=\sigma]$ -- provides
-the desired derivation rules:}
+In addition, $\beta$-reduction on terms and types -- that is, the
+relation $\leadsto_\beta$ generated by $(\abs{x}{s})t \leadsto_\beta
+s[x:=t]$ and $(\tabs{\alpha}{s})\sigma \leadsto_\beta
+s[\alpha:=\sigma]$ -- provides the desired derivation rules:
 
 \begin{lemma}\label{lem:encodings_reduce}
   \begin{enumerate}
@@ -532,12 +501,12 @@ the desired derivation rules:}
 
 \section{Polymorphic Functional Systems}\label{sec_systems}
 
-\CKchange{In this section, we will present a form of higher-order term rewriting
-systems based on $\Fomega$: \emph{Polymorphic Functional Systems (PFSs)}.
-Systems of interest, such as logic systems like ICP2 and higher-order
-TRSs with shallow or full polymorphism can be encoded into PFSs, and then proved
-terminating with the technique we will develop in Sections
-\ref{sec:World}--\ref{sec_rule_removal}.}
+In this section, we present a form of higher-order term rewriting
+systems based on $\Fomega$: \emph{Polymorphic Functional Systems
+  (PFSs)}. Systems of interest, such as logic systems like~ICP2 and
+higher-order TRSs with shallow or full polymorphism can be encoded
+into PFSs, and then proved terminating with the technique we will
+develop in Sections \ref{sec:World}--\ref{sec_rule_removal}.
 
 \begin{defn}\label{def_pafs_types_terms}
   \emph{Kinds}, \emph{type constructors} and \emph{types} are defined
@@ -545,17 +514,16 @@ terminating with the technique we will develop in Sections
   set~$\Sigma^T = \bigcup_{\kappa}\Sigma^T_\kappa$ of type constructor
   symbols.
 
-  %CK: space restructuring
-  \CKchange{We assume given a fixed set~$\Sigma$ of function symbols, such
+  We assume given a fixed set~$\Sigma$ of function symbols, such
   that for $\mathtt{f} : \sigma \in \Sigma$ we can write:
     \[
     \sigma = \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n : \kappa_n)
     . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype \tau
     \]
-  with $\tau$ a type atom,  We} define \emph{PFS
+  with $\tau$ a type atom. We define \emph{PFS
     terms} like in Definition~\ref{def_terms} (based on
-  Definition~\ref{def_preterms}) with the \CKchange{restriction that
-  for} any subterm $\app{s}{u}$ of a term~$t$, we have $s =
+  Definition~\ref{def_preterms}) with the restriction that
+  for any subterm $\app{s}{u}$ of a term~$t$, we have $s =
     \mathtt{f} \rho_1 \ldots \rho_n u_1 \ldots u_m$ where
     \[
     \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots
@@ -576,46 +544,43 @@ this?  I am fine with it, since I do not believe that it will be in the
 way of monotonicity, but I also do not need it.  Again, I did adapt the
 text to take into account that it is allowed.}
 
-\CKchange{Note that this definition does not allow for a variable or
+\LC{This definition is the weakest one I came up with such that the
+  proof of Lemma~\ref{lem_succinterpret_monotonic} can be carried out
+  inductively without too much hassle.}
+
+This definition does not allow for a variable or
 abstraction to occur at the head of an application, nor can we have
 terms of the form $s \cdot t * \tau \cdot q$ (although terms of the
-form $s \cdot t * \tau$, or $x * \tau$ with $x$ a variable, 
+form $s \cdot t * \tau$, or $x * \tau$ with $x$ a variable,
 \emph{are} allowed to occur).  To stress this restriction, we will
 use the notation
 $\mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\ldots,s_m)$ as an alternative
 way to denote
-$\mathtt{f} \rho_1 \ldots \rho_n s_1 \ldots s_k$ when
+$\mathtt{f} \rho_1 \ldots \rho_n s_1 \ldots s_m$ when
 $
   \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots
   \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
   \sigma_k \arrtype \tau
 $
-is} a function symbol in~$\Sigma$ with~$\tau$ a type atom \CKchange{and $m \leq k$.
-%CK: omitting this, because it is implied by
-%  $\mathtt{f} \rho_1 \ldots \rho_n s_1 \ldots s_k$ being a term in the
-%  first place.
-%and $\rho_i$
-%is a type constructor of kind $\kappa_i$ for $i=1,\ldots,k$, and
-%$\Gamma \proves s_i : \sigma_i[\alpha_1 := \rho_1]\ldots[\alpha_n :=
-%  \rho_n]$ for $i=1,\ldots,k$, for an appropriate~$\Gamma$.
+is a function symbol in~$\Sigma$ with~$\tau$ a type atom and $m \leq k$.
 This allows us to represent terms in a ``functional'' way, where
 application does not explicitly occur (only implicitly in the
-construction of $\mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\ldots,s_m)$).}
+construction of $\mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\ldots,s_m)$).
 
-\CKchange{The following result follows easily by induction on term
-structure:}
+The following result follows easily by induction on term
+structure:
 
 \begin{lemma}
   If $t,s$ are PFS terms then so is $t[\subst{x}{s}]$.
 \end{lemma}
 
-\CKchange{PFS terms will be rewritten through a reduction relation
-$\arr{\Rules}$ based on a (usually infinite) set of rewrite rules.
-To define this relation, we need two additional notions.}
+PFS terms will be rewritten through a reduction relation
+$\arr{\Rules}$ based on a (usually infinite) set of rewrite rules. To
+define this relation, we need two additional notions.
 
 \begin{defn}\label{def_replacement}
-  \CKchange{For a variable context $\Gamma$,
-  a} \emph{$\Gamma$-replacement} is a function $\delta = \gamma \circ
+  For a variable context $\Gamma$,
+  a \emph{$\Gamma$-replacement} is a function $\delta = \gamma \circ
   \omega$ satisfying:
   \begin{enumerate}
   \item $\omega$ is a type constructor substitution,
@@ -626,10 +591,8 @@ To define this relation, we need two additional notions.}
 
   For~$\tau$ a type constructor, we use $\delta(\tau)$ to denote
   $\omega(\tau)$. We use the notation $\delta[\subst{x}{t}] =
-  \gamma[\subst{x}{t}] \circ \omega$. Note that if $t \in \Iterms$ and
-  $\Gamma \proves t : \tau$ then $\delta(\Gamma) \proves \delta(t) :
-  \delta(\tau)$.
-  \CK{The set $\Iterms$ is not defined here; can you reformulate this?}
+  \gamma[\subst{x}{t}] \circ \omega$. Note that if $\Gamma \proves t :
+  \tau$ then $\delta(\Gamma) \proves \delta(t) : \delta(\tau)$.
 \end{defn}
 
 \begin{defn}\label{def:context}
@@ -640,7 +603,7 @@ To define this relation, we need two additional notions.}
   $\sigma$ subscripts when clear or irrelevant.
 \end{defn}
 
-\CKchange{Now, the} rewrite rules are simply a set of term pairs, whose
+Now, the rewrite rules are simply a set of term pairs, whose
 monotonic closure generates the rewrite relation. We fix a variable
 context~$\Gamma$.
 
@@ -663,11 +626,11 @@ context~$\Gamma$.
   $(\Sigma^T,\Sigma,\Rules)$ where~$\Sigma^T$ is a set of type
   constructor symbols, $\Sigma$ a set of function symbols (restricted
   as in Def.~\ref{def_pafs_types_terms}), and $\Rules$ is a set
-  of rules as in Definition~\ref{def_rules}. A term of \CKchange{a %given
-  PFS~$A$} is referred to as an $A$-term.
+  of rules as in Definition~\ref{def_rules}. A term of a
+  PFS~$A$ is referred to as an $A$-term.
 \end{defn}
 
-\CKchange{While PFS-terms are a restriction from the general terms
+While PFS-terms are a restriction from the general terms
 of system $\Fomega$, the reduction relation allows us to actually encode
 $\Fomega$ as a PFS: we can do so by including the symbol
 ${@} : \forall\alpha\forall\beta . (\alpha \arrtype \beta) \arrtype \alpha
@@ -684,7 +647,6 @@ symbol, but to apply the method from
 Sections \ref{sec:World}--\ref{sec_rule_removal}, it is often more
 convenient to include the symbol, since it will allow us to assign an
 arbitrary polynomial interpretation to type application.
-}
 
 \begin{example}[Fold on heterogenous lists]\label{ex_fold_pafs}
   The example from the introduction may be represented as a PFS with
@@ -703,7 +665,7 @@ arbitrary polynomial interpretation to type application.
   \[
   \begin{array}{rcl}
     @_{\sigma,\tau}(\abs{x:\sigma}{s},t) & \red & s[x:=t] \\
-    \CKchange{\mathtt{A}_{\abs{\alpha}{\sigma},\tau}}(\tabs{\alpha}{s}) & \red &
+    \mathtt{A}_{\abs{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \red &
     s[\alpha:=\tau] \\
     \mathtt{foldl}_\sigma(f,s,\nil) & \red & s \\
     \mathtt{foldl}_\sigma(f,s,\cons_\tau(h,t)) & \red & \mathtt{foldl}_\sigma(f,@_{\tau,\sigma}(@_{\sigma,\tau
@@ -711,12 +673,12 @@ arbitrary polynomial interpretation to type application.
   \end{array}
   \]
   Formally, the above represents an infinite set of rules, one rule for
-  each \CKchange{choice of types $\sigma,\tau$ and PFS terms $s$, $t$}, etc.
+  each choice of types $\sigma,\tau$ and PFS terms $s$, $t$, etc.
 \end{example}
 
 \section{A well-ordered set of interpretation terms}\label{sec:World}
 
-\CKchange{In polynomial interpretations of first-order term
+In polynomial interpretations of first-order term
 rewriting~\cite[Chapter 6.2]{Terese2003}, each term $s$ is mapped to a
 natural number $\interpret{s}$, such that $\interpret{s} > \interpret{t}$
 whenever $s \arr{\Rules} t$.  In higher-order rewriting, this is not
@@ -727,9 +689,16 @@ monotonic functions over natural numbers, terms with a $2$-order type to
 weakly monotonic functionals taking weakly monotonic functions as
 arguments, and so on).  In this paper, to account for full polymorphism,
 we will interpret PFS terms to a set $\Iterms$ of \emph{interpretation terms}
-in a specific extension of $\Fomega$.  This set is defined in Section
+in a specific extension of System~$\Fomega$.  This set is defined in Section
 \ref{subsec:I}; we provide a well-founded partial ordering $\succ$ on
-$\Iterms$ in Section \ref{subsec:succ}.}
+$\Iterms$ in Section \ref{subsec:succ}.
+
+\LC{The following paragraph should be rewritten, because it's
+  inaccurate. The whole point why we're using concrete terms in the
+  interpretations is that there is no way to interpret type
+  abstraction ($\Lambda \alpha$) ``set-theoretically''. It's therefore
+  not true that our interpretation terms correspond to ``functionals''
+  in the ordinary sense. They do if we disregard type abstractions.}
 
 \CKchange{By construction, our interpretation terms define weakly
 monotonic functionals. Our method does not allow for arbitrary functions
@@ -1689,7 +1658,7 @@ have type~$\tau$.
   constructors (respecting kinds). The mapping~$\omega$ extends in an
   obvious way to a mapping from type constructors to type
   constructors. A mapping~$\omega$ is \emph{closed for~$\sigma$} if
-  $\omega(\alpha)$ is closed for $\alpha \in \FV(\sigma)$ (then
+  $\omega(\alpha)$ is closed for $\alpha \in \FTV(\sigma)$ (then
   $\omega(\sigma)$ is closed).
 
   An \emph{$\omega$-valuation} is a mapping~$\xi$ from type
@@ -2145,7 +2114,7 @@ write~$\val{\varphi}{}{}$.
 
 \begin{lemma}\label{lem_val_subst}
   For any type constructors~$\sigma,\tau$ with $\alpha \notin
-  \FV(\tau)$, a mapping~$\omega$ closed for~$\sigma$ and for~$\tau$,
+  \FTV(\tau)$, a mapping~$\omega$ closed for~$\sigma$ and for~$\tau$,
   and an $\omega$-valuation~$\xi$, we have:
   \[
   \val{\sigma[\subst{\alpha}{\tau}]}{\xi}{\omega} =
@@ -2158,7 +2127,7 @@ write~$\val{\varphi}{}{}$.
   \xi[\subst{\alpha}{\val{\tau}{\xi}{\omega}}]$. First note
   that~$\omega$ is closed for~$\sigma[\subst{\alpha}{\tau}]$
   and~$\omega'$ is closed for~$\sigma$. We proceed by induction
-  on~$\sigma$. If $\alpha \notin \FV(\sigma)$ then the claim is
+  on~$\sigma$. If $\alpha \notin \FTV(\sigma)$ then the claim is
   obvious. If $\sigma = \alpha$ then
   $\val{\sigma[\subst{\alpha}{\tau}]}{\xi}{\omega} =
   \val{\tau}{\xi}{\omega} = \val{\sigma}{\xi'}{\omega'}$.
@@ -2265,7 +2234,7 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
   $\omega^*(t) : \omega(\sigma)$.
 
   By the generation lemma for $t : \sigma$ there is a type~$\sigma'$
-  such that $\sigma' =_\beta \sigma$ and $\FV(\sigma') \subseteq
+  such that $\sigma' =_\beta \sigma$ and $\FTV(\sigma') \subseteq
   \FTV(t)$ and one of the cases below holds. Note that~$\omega$ is
   closed for~$\sigma'$ because it is closed for~$\sigma$ and
   $\FTV(\omega(t)) = \emptyset$. By Lemma~\ref{lem_beta_val} it
@@ -2298,7 +2267,7 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
     $\omega^*(t) \in \val{\tau}{\xi}{\omega}$ by
     Lemma~\ref{lem_abstraction_computable}.
   \item If $t = t_1 t_2$ then $t_1 : \tau\arrtype\sigma'$ and $t_2 :
-    \tau$ and $\FV(\tau) \subseteq \FTV(t)$. Hence~$\omega$ is closed
+    \tau$ and $\FTV(\tau) \subseteq \FTV(t)$. Hence~$\omega$ is closed
     for~$\tau$ and for~$\tau\arrtype\sigma'$. By the inductive
     hypothesis $\omega^*(t_1) \in
     \val{\tau\arrtype\sigma'}{\xi}{\omega}$ and $\omega^*(t_2) \in
@@ -2416,7 +2385,7 @@ method of candidates from the termination proof.
   constructors (respecting kinds). The mapping~$\omega$ extends in an
   obvious way to a mapping from type constructors to type
   constructors. A mapping~$\omega$ is \emph{closed for~$\sigma$} if
-  $\omega(\alpha)$ is closed for $\alpha \in \FV(\sigma)$ (then
+  $\omega(\alpha)$ is closed for $\alpha \in \FTV(\sigma)$ (then
   $\omega(\sigma)$ is closed).
 
   An \emph{$\omega$-valuation} is a mapping~$\xi$ on type constructor
@@ -2652,7 +2621,7 @@ and~$\val{\tau}{}{}$.
 
 \begin{lemma}\label{lem_val_subst_wm}
   For any type constructors~$\sigma,\tau$ with $\alpha \notin
-  \FV(\tau)$, a mapping~$\omega$ closed for~$\sigma$ and for~$\tau$,
+  \FTV(\tau)$, a mapping~$\omega$ closed for~$\sigma$ and for~$\tau$,
   and an $\omega$-valuation~$\xi$, we have:
   \[
   \val{\sigma[\subst{\alpha}{\tau}]}{\xi}{\omega} =
@@ -2718,7 +2687,7 @@ each~$x : \tau$.
   $\delta_2=\gamma_2\circ\omega$ are replacements and~$\xi$ an
   $\omega$-valuation such that $\delta_1 \gteq{}{\xi}{\omega}
   \delta_2$ and $\omega$ is closed for~$\sigma$ and $\FTV(\omega(t)) =
-  \emptyset$ and for all $x^\tau \in \FV(t)$ we have $\delta_i(x) \in
+  \emptyset$ and for all $x^\tau \in \FTV(t)$ we have $\delta_i(x) \in
   \val{\tau}{\xi}{\omega}$. Then $\delta_i(t) \in
   \val{\sigma}{\xi}{\omega}$ and $\delta_1(t)
   \gteq{\sigma}{\xi}{\omega} \delta_2(t)$.
@@ -2727,7 +2696,7 @@ each~$x : \tau$.
 \begin{proof}
   Induction on the structure of~$t$. By the generation lemma for $t :
   \sigma$ there is a type~$\sigma'$ such that $\sigma' =_\beta \sigma$
-  and $\FV(\sigma') \subseteq \FTV(t)$ and one of the cases below
+  and $\FTV(\sigma') \subseteq \FTV(t)$ and one of the cases below
   holds. Note that $\omega$ is closed for~$\sigma'$, because it is
   closed for~$\sigma$ and $\FTV(\omega(t)) = \emptyset$. Hence by
   Lemma~\ref{lem_beta_val_wm} it suffices to show $\delta_i(t) \in
@@ -2800,7 +2769,7 @@ each~$x : \tau$.
     \gteq{\forall\alpha[\tau]}{\xi'}{\omega'}
     \delta_2(\tabs{\alpha}{u})$.
   \item If $t = t_1 t_2$ then $t_1 : \tau\arrtype\sigma'$ and $t_2 :
-    \tau$ and $\FV(\tau) \subseteq \FTV(t)$. Hence~$\omega$ is closed
+    \tau$ and $\FTV(\tau) \subseteq \FTV(t)$. Hence~$\omega$ is closed
     for~$\tau$ and for~$\tau\arrtype\sigma'$. By the inductive
     hypothesis $\delta_i(t_1) \in
     \val{\tau\arrtype\sigma'}{\xi}{\omega}$ and $\delta_i(t_2) \in
