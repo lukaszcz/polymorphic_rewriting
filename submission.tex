@@ -139,7 +139,9 @@
   enables a direct interpretation of rewrite rules which make
   essential use of impredicative polymorphism.  In addition, our
   generalisation eases the applicability of the method in the
-  non-polymorphic setting by allowing for encoding of inductive data
+  %CK "allowing for encoding of" sounds weird. Changing this, but
+  %feel free to reformulate.
+  non-polymorphic setting by allowing for \CKchange{the} encoding of inductive data
   types. As an illustration of the potential of our method, we prove
   the termination of a substantial fragment of full intuitionistic
   second-order propositional logic with permutative conversions.
@@ -230,7 +232,7 @@ of lambda calculi such as substitution and $\alpha$-conversion.
   kind~$*$ are \emph{type variables}. We assume a fixed
   set~$\Sigma^T_\kappa$ of \emph{type constructor symbols} paired with a
   kind~$\kappa$, denoted $c : \kappa$.
-  % CK: space, and this fits together well enough, I think.
+  %
   We define the set~$\Tc_\kappa$ of \emph{type constructors} of
   kind~$\kappa$ by the following grammar.
   Type constructors of kind~$*$ are \emph{types}.
@@ -385,7 +387,7 @@ $\abs{a}{s}$ or $\tabs{a}{s}$.
     \notin \FTV(\Gamma)$.
   \item $t \equiv \app{t_1}{t_2}$ and
     $\Gamma \vdash t_1 : \tau \arrtype \sigma'$ and
-    $\Gamma \vdash t_2 : \tau$ and $\FTV(\tau) \subseteq \Vc$.
+    $\Gamma \vdash t_2 : \tau$ and $\FTV(\tau) \subseteq \Xc$.
   \item $t \equiv \tapp{s}{\tau}$ and
     $\sigma' = \rho[\subst{\alpha}{\tau}]$ and
     $\Gamma \vdash s : \quant{(\alpha:\kappa)}{\rho}$ and~$\tau$ is a
@@ -395,7 +397,8 @@ $\abs{a}{s}$ or $\tabs{a}{s}$.
 
 \begin{proof}
   By analysing the derivation $\Gamma \proves t : \sigma$. To
-  ensure $\FTV(\sigma') \subseteq \Xc$, note if $\alpha \notin \Xc$
+  ensure $\FTV(\sigma') \subseteq \Xc$, note \CKchange{that} if
+  $\alpha \notin \Xc$
   is of kind~$\kappa$ and~$\Gamma \proves t : \sigma'$
   with~$\FTV(t) \cup \FTV(\Gamma) \subseteq \Xc$, then $\Gamma
   \proves t : \sigma'[\subst{\alpha}{\chi_\kappa}]$ by the
@@ -515,13 +518,14 @@ develop in Sections \ref{sec:World}--\ref{sec_rule_removal}.
   symbols.
 
   We assume given a fixed set~$\Sigma$ of function symbols, such
+\pagebreak
   that for $\mathtt{f} : \sigma \in \Sigma$ we can write:
     \[
     \sigma = \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n : \kappa_n)
     . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype \tau
     \]
   with $\tau$ a type atom. We define \emph{PFS
-    terms} like in Definition~\ref{def_terms} (based on
+    terms} as in Definition~\ref{def_terms} (based on
   Definition~\ref{def_preterms}) with the restriction that
   for any subterm $\app{s}{u}$ of a term~$t$, we have $s =
     \mathtt{f} \rho_1 \ldots \rho_n u_1 \ldots u_m$ where
@@ -532,21 +536,6 @@ develop in Sections \ref{sec:World}--\ref{sec_rule_removal}.
     \]
     with $\tau$ a type atom and $m < k$.
 \end{defn}
-
-\CK{Note: this definition \emph{does} allow us to have a subterm
-$\mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\ldots,s_m)$ with $m < k$ that
-does not occur at the head of an application.  I do not mind this at
-all.  However, it does mean I had to change the text below a little
-to allow for it, so if you feel that this should not be allowed,
-change the part with $m \leq k$.  The definition also allows us to
-have $s * \tau$ directly rather than encoded.  Are you happy to have
-this?  I am fine with it, since I do not believe that it will be in the
-way of monotonicity, but I also do not need it.  Again, I did adapt the
-text to take into account that it is allowed.}
-
-\LC{This definition is the weakest one I came up with such that the
-  proof of Lemma~\ref{lem_succinterpret_monotonic} can be carried out
-  inductively without too much hassle.}
 
 This definition does not allow for a variable or
 abstraction to occur at the head of an application, nor can we have
@@ -700,11 +689,15 @@ $\Iterms$ in Section \ref{subsec:succ}.
   not true that our interpretation terms correspond to ``functionals''
   in the ordinary sense. They do if we disregard type abstractions.}
 
-\CKchange{By construction, our interpretation terms define weakly
-monotonic functionals. Our method does not allow for arbitrary functions
-like the weakly monotonic algebras of \cite{pol:96}; however, it does
-strictly extend the \emph{polynomial interpretations} of
-\cite{FuhsKop2012}.}
+\CK{Is it accurate this way? (Please feel free to reformulate!)}
+
+\CKchange{We use concrete terms rather than functionals since type
+abstraction ($\Lambda \alpha$) cannot be interpreted in a set-theoretic
+way.  However, if type abstraction is disregarded, our interpretation
+terms define weakly monotonic functionals by construction.
+Our method does not allow for arbitrary functions like the weakly
+monotonic algebras of \cite{pol:96}, but does extend
+the \emph{polynomial interpretations} of \cite{FuhsKop2012}.}
 
 \subsection{Interpretation terms}\label{subsec:I}
 
