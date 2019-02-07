@@ -1081,16 +1081,11 @@ compatibility or transitivity.}
 \end{corollary}
 
 
-\section{Reduction pairs}\label{sec_reduction_pairs}
+\section{\CKchange{A reduction pair for PFS terms}}\label{sec_reduction_pairs}
 
-The goal of this section is to define an interpretation~$\Termmap$
-of~PFS function symbols and a reduction pair
-$(\succeqinterpret,\succinterpret)$ on PFS terms. In the next
-section, we will show how a reduction pair may be used to prove
-termination of~PFSs.
-
-First, we precisely define the notion of a reduction pair. We fix
-a~PFS~$A$.
+\CKchange{Recall that our goal is to prove termination of PFS terms.  To
+do so, in this section we will define a systematic way to generate
+\emph{reduction pairs}.}  We fix a~PFS~$A$\CKchange{, and define:}
 
 \begin{defn}
   A binary relation~$R$ on $A$-terms is \emph{monotonic} if $R(s, t)$
@@ -1102,10 +1097,33 @@ a~PFS~$A$.
   ordering~$\succ^A$ on $A$-terms such that:
   \begin{itemize}
   \item $\succeq^A$ and~$\succ^A$ are compatible, i.e., ${\succ^A}
-    \cdot {\succeq^A} \subseteq {\succ^A}$,
+    \cdot {\succeq^A} \subseteq {\succ^A}$
+    %CK: this is how compatibiility was defined before!
+    \CKchange{and ${\succeq^A} \cdot {\succ^A} \subseteq {\succ^A}$}
   \item $\succeq^A$ and~$\succ^A$ are both monotonic.
   \end{itemize}
 \end{defn}
+
+
+\CKchange{If we can generate such a pair with $\ell \succinterpret r$ for each
+rule $(\ell,r) \in \Rules$, then we easily see that the PFS $A$ is
+terminating.  (If we merely have $\ell \succinterpret r$ for \emph{some}
+rules and $\ell \succeqinterpret r$ for the rest, we can still progress
+with the termination proof, as we will discuss in Section
+\ref{sec_rule_removal}.)
+To generate this pair, we will define the notion of an
+\emph{interpretation} from the set of $A$-terms to the set $\Iterms$ of
+interpretation terms, and thus lift the ordering pair $(\succeq,\succ)$
+to $A$.
+}
+
+The goal of this section is to define an interpretation~$\Termmap$
+of~PFS function symbols \CKchange{with a corresponding pair
+$(\succeqinterpret,\succinterpret)$ on PFS terms, and to prove
+that $(\succeqinterpret,\succinterpret)$ is indeed a reduction pair
+(monotonicity is non-trivial).  In the next section, we will show how
+this reduction pair can be used in practice to prove termination
+of~PFSs.}
 
 \subsection{Weak monotonicity}
 
