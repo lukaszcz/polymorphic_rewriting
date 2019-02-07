@@ -135,16 +135,14 @@
   We generalise the termination method of higher-order polynomial
   interpretations to a setting with impredicative
   polymorphism. Instead of using weakly monotonic functionals, we
-  interpret terms in a suitable extension of System~$\Fomega$.
-  This enables a direct interpretation of rewrite rules which
-  make essential use of impredicative polymorphism.  In addition,
-  our generalisation eases the applicability of the method
-  in the non-polymorphic setting by allowing for an encoding
-  of inductive data types.
-  As an illustration of
-  the potential of our method, we prove termination of a substantial
-  fragment of full intuitionistic second-order propositional logic
-  with permutative conversions.
+  interpret terms in a suitable extension of System~$\Fomega$. This
+  enables a direct interpretation of rewrite rules which make
+  essential use of impredicative polymorphism.  In addition, our
+  generalisation eases the applicability of the method in the
+  non-polymorphic setting by allowing for encoding of inductive data
+  types. As an illustration of the potential of our method, we prove
+  the termination of a substantial fragment of full intuitionistic
+  second-order propositional logic with permutative conversions.
 \end{abstract}
 
 \section{Introduction}
@@ -185,8 +183,8 @@ heterogenous lists.
 The above states that $\List$ is a type ($*$), gives the types of its
 two constructors $\nil$ and $\cons$, and defines the corresponding
 fold-left function~$\mathtt{foldl}$. Each element of a heterogenous
-list may have a different type. Together with the element, the
-function argument of~$\mathtt{foldl}$ receives the element's type. The
+list may have a different type. Together with the element, the function argument
+of~$\mathtt{foldl}$ receives the element's type. The
 $\forall$-quantifier binds type variables -- a term of type $\forall
 \alpha . \tau$ takes a type~$\rho$ as an argument and the result is a
 term of type~$\tau[\subst{\alpha}{\rho}]$.
