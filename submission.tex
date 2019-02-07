@@ -716,16 +716,28 @@ arbitrary polynomial interpretation to type application.
 
 \section{A well-ordered set of interpretation terms}\label{sec:World}
 
-In this section we define the set~$\Iterms$ of interpretation terms,
-and the relations~$\succeq$ and~$\succ$ on~$\Iterms$. We also define
-the set~$\Iterms^f$ of final interpretation terms as the set of all
-closed interpretation terms normalized with a certain reduction
-relation. We will use interpretation terms from~$\Iterms$ to interpret
-terms of~PFSs. The pair $(\succeq,\succ)$ will be used as a reduction
-pair for the method of rule removal. In particular, the
-relation~$\succ$ will be well-founded.
+\CKchange{In polynomial interpretations of first-order term
+rewriting~\cite[Chapter 6.2]{Terese2003}, each term $s$ is mapped to a
+natural number $\interpret{s}$, such that $\interpret{s} > \interpret{t}$
+whenever $s \arr{\Rules} t$.  In higher-order rewriting, this is not
+practical; instead, following \cite{pol:96}, terms are mapped to weakly
+monotonic functionals according to their type (i.e., terms with a $0$-order
+type are mapped to natural numbers, terms with a $1$-order type to weakly
+monotonic functions over natural numbers, terms with a $2$-order type to
+weakly monotonic functionals taking weakly monotonic functions as
+arguments, and so on).  In this paper, to account for full polymorphism,
+we will interpret terms to a set $\Iterms$ of \emph{interpretation terms}
+in a specific extension of $\Fomega$.  This set is defined in Section
+\ref{subsec:I}; we provide a well-founded partial ordering $\succ$ on
+$\Iterms$ in Section \ref{subsec:succ}.}
 
-\subsection{Interpretation terms}
+\CKchange{By construction, our interpretation terms define weakly
+monotonic functionals. Our method does not allow for arbitrary functions
+like the weakly monotonic algebras of \cite{pol:96}; however, it does
+strictly extend the \emph{polynomial interpretations} of
+\cite{FuhsKop2012}.}
+
+\subsection{Interpretation terms}\label{subsec:I}
 
 \begin{defn}\label{def_iterms}
   The set~$\ITypes$ of \emph{interpretation types} is the set of types
@@ -862,7 +874,7 @@ w.r.t.~$\arrW$.
   numbers.
 \end{lemma}
 
-\subsection{The ordering pair $(\succeq,\succ)$}
+\subsection{The ordering pair $(\succeq,\succ)$}\label{subsec:succ}
 
 \begin{defn}\label{def_closure}
   A \emph{$\Gamma$-closure}~$\cl = \gamma \circ \omega$ is a
