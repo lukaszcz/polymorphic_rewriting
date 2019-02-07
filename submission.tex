@@ -682,22 +682,14 @@ in a specific extension of System~$\Fomega$.  This set is defined in Section
 \ref{subsec:I}; we provide a well-founded partial ordering $\succ$ on
 $\Iterms$ in Section \ref{subsec:succ}.
 
-\LC{The following paragraph should be rewritten, because it's
-  inaccurate. The whole point why we're using concrete terms in the
-  interpretations is that there is no way to interpret type
-  abstraction ($\Lambda \alpha$) ``set-theoretically''. It's therefore
-  not true that our interpretation terms correspond to ``functionals''
-  in the ordinary sense. They do if we disregard type abstractions.}
-
-\CK{Is it accurate this way? (Please feel free to reformulate!)}
-
-\CKchange{We use concrete terms rather than functionals since type
-abstraction ($\Lambda \alpha$) cannot be interpreted in a set-theoretic
-way.  However, if type abstraction is disregarded, our interpretation
-terms define weakly monotonic functionals by construction.
-Our method does not allow for arbitrary functions like the weakly
-monotonic algebras of \cite{pol:96}, but does extend
-the \emph{polynomial interpretations} of \cite{FuhsKop2012}.}
+%\CKchange{Although our world of interpretation terms is quite different
+%from the weakly monotonic functionals of \cite{pol:96}, there are many
+%similarities.  Most pertinently, every interpretation term $\abs{x}{s}$
+%essentially defines a weakly monotonic function from $\Iterms$ to
+%$\Iterms$.  This, and the use of both addition and multiplication in
+%the definition of $\Iterms$, allows us to lift all higher-order
+%polynomial interpretations \cite{FuhsKop2012} to our setting.  We will
+%prove weak monotonicity in Section \ref{subsec:weakmono}.}
 
 \subsection{Interpretation terms}\label{subsec:I}
 
@@ -1125,7 +1117,7 @@ that $(\succeqinterpret,\succinterpret)$ is indeed a reduction pair
 this reduction pair can be used in practice to prove termination
 of~PFSs.}
 
-\subsection{Weak monotonicity}
+\subsection{Weak monotonicity}\label{subsec:weakmono}
 
 We first return to our system of interpretation terms with an aim to
 show that $s \succeq s'$ implies $t[\subst{x}{s}] \succeq
