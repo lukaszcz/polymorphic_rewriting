@@ -16,7 +16,6 @@
 \newcommand{\Typevars}{\mathcal{A}}
 \newcommand{\Vars}{\mathcal{V}}
 \newcommand{\Rules}{\mathcal{R}}
-\newcommand{\World}{\mathcal{W}}
 \newcommand{\Iterms}{\mathcal{I}}
 \newcommand{\ITypes}{\mathcal{Y}}
 
@@ -141,6 +140,11 @@
   generalisation eases the applicability of the method in the
   %CK "allowing for encoding of" sounds weird. Changing this, but
   %feel free to reformulate.
+  %% LC: I think ``the'' is correct. According to grammarly.com,
+  %% ``encoding'' is uncountable in normal usage, so ``an'' doesn't
+  %% work. Though I guess that in this specialised context it could be
+  %% considered countable. In any case, ``the'' seems like a safe
+  %% choice.
   non-polymorphic setting by allowing for \CKchange{the} encoding of inductive data
   types. As an illustration of the potential of our method, we prove
   the termination of a substantial fragment of full intuitionistic
@@ -169,8 +173,7 @@ in functional programming practice, there do exist interesting
 examples of rewrite systems which require higher-rank impredicative
 polymorphism.
 
-For instance, in recent extensions of Haskell or in some type-theory
-based proof assistants (e.g.~Coq) one may define a type of
+For instance, in recent extensions of Haskell one may define a type of
 heterogenous lists.
 \[
 \begin{array}{ll}
@@ -185,11 +188,13 @@ heterogenous lists.
 The above states that $\List$ is a type ($*$), gives the types of its
 two constructors $\nil$ and $\cons$, and defines the corresponding
 fold-left function~$\mathtt{foldl}$. Each element of a heterogenous
-list may have a different type. Together with the element, the function argument
-of~$\mathtt{foldl}$ receives the element's type. The
-$\forall$-quantifier binds type variables -- a term of type $\forall
-\alpha . \tau$ takes a type~$\rho$ as an argument and the result is a
-term of type~$\tau[\subst{\alpha}{\rho}]$.
+list may have a different type. \LCchange{In practice, one would
+  constrain the type variable~$\alpha$ above with a type class to
+  guarantee the existence of some operations on list elements.}  The
+function argument of~$\mathtt{foldl}$ receives the element together
+with its type. The $\forall$-quantifier binds type variables -- a term
+of type $\forall \alpha . \tau$ takes a type~$\rho$ as an argument and
+the result is a term of type~$\tau[\subst{\alpha}{\rho}]$.
 
 Impredicativity of polymorphism means that the type itself may be
 substituted for its own type variable, e.g., if $\mathtt{f} : \forall
@@ -213,7 +218,6 @@ proofs, which satisfy e.g.~the subformula property. Termination proofs
 for systems with permutative conversions are notoriously tedious and
 difficult, with some incorrect claims in the literature and no uniform
 methodology. It is our goal to make such termination proofs
-%for systems like this
 substantially easier in the future.
 
 \section{Preliminaries}\label{sec_preliminaries}
@@ -396,7 +400,7 @@ $\abs{a}{s}$ or $\tabs{a}{s}$.
 
 \begin{proof}
   By analysing the derivation $\Gamma \proves t : \sigma$. To
-  ensure $\FTV(\sigma') \subseteq \Xc$, note \CKchange{that} if
+  ensure $\FTV(\sigma') \subseteq \Xc$, note that if
   $\alpha \notin \Xc$
   is of kind~$\kappa$ and~$\Gamma \proves t : \sigma'$
   with~$\FTV(t) \cup \FTV(\Gamma) \subseteq \Xc$, then $\Gamma
@@ -415,7 +419,7 @@ Church-style. We write $t : \tau$ if $t$ has type~$\tau$, in a fixed
 implicit context~$\Gamma$, or equivalently with~$t$ considered as an
 orthodox Church-style typed term.
 
-\subsection{Encodings of inductive types}\label{sec_encodings}
+\subsection{Encoding inductive types}\label{sec_encodings}
 
 The polymorphic lambda-calculus has a much greater expressive power
 than the simply-typed lambda-calculus. Arbitrary inductive data types
@@ -721,10 +725,10 @@ $\oplus_\sigma\,s\,(\oplus_\sigma\,t\,u)$ if $s$ has type $\sigma$.
 
 \paragraph*{Normalising interpretation terms}
 
-\CKchange{The set $\Iterms$ of interpretation terms can be reduced through
+The set $\Iterms$ of interpretation terms can be reduced through
 a relation $\arrW$, that we will define below.  This relation will
 be a powerful aid in defining the parial ordering $\succ$ in Section
-\ref{subsec:succ}.}
+\ref{subsec:succ}.
 
 \begin{defn}
   We define the relation $\arrW$ on interpretation terms as the
@@ -793,10 +797,10 @@ with a reduction rule $\mathtt{J} \tau \tau \leadsto \lambda x : \tau
 not allow such a definition. Note that the natural number constants
 are mutually indistinguishable inside our reduction system (e.g.~there
 is no test for zero). For the purposes of termination, the type~$\nat$
-may essentially be considered a singleton.
+may be considered a singleton.
 
 Now we state some properties of~$\arrW$, including strong
-normalisation. Because of space \CKchange{limitations}, most proofs are
+normalisation. Because of space limitations, most proofs are
 delegated to Appendix~\ref{app_proofs}.
 
 \begin{lemma}[Subject reduction]
@@ -811,14 +815,9 @@ delegated to Appendix~\ref{app_proofs}.
   Lemmas \ref{lem:substitution} and \ref{lem:generation}.
 \end{proof}
 
-%CK: delegated to the appendix, since we do not use \SN at all other
-%than in the theorem below, which can be reformulated.
-%By~$\SN$ we denote the set of all interpretation terms terminating
-%w.r.t.~$\arrW$.
-
 \begin{theorem}\label{thm_sn}
-  If $\Gamma \proves t : \sigma$ then %$t \in \SN$.
-  \CKchange{$t$ is terminating with respect to $\arrW$}.
+  If $\Gamma \proves t : \sigma$ then $t$ is terminating with respect
+  to $\arrW$.
 \end{theorem}
 
 \begin{lemma}\label{lem_unique_final}
@@ -827,9 +826,9 @@ delegated to Appendix~\ref{app_proofs}.
 \end{lemma}
 
 \begin{proof}
-  One \CKchange{easily}
-  checks that~$\arrW$ is locally confluent. Since \CKchange{the
-  relation} is
+  One easily
+  checks that~$\arrW$ is locally confluent. Since the
+  relation is
   terminating by Theorem~\ref{thm_sn}, it is confluent by Newman's
   lemma.
 \end{proof}
@@ -852,7 +851,7 @@ form.}
 
 \subsection{The ordering pair $(\succeq,\succ)$}\label{subsec:succ}
 
-\CKchange{With these ingredients, we are ready to define the well-founded
+With these ingredients, we are ready to define the well-founded
 partial ordering $\succ$ on $\Iterms$.  In fact, we will do more: rather
 than a single partial ordering, we will define an \emph{ordering pair}: a
 pair of a quasi-ordering $\succeq$ and a compatible well-founded ordering
@@ -860,12 +859,12 @@ $\succ$. The quasi-ordering $\succeq$ often makes it easier to prove
 %that
 $s \succ t$, since it suffices to show that $s \succeq s' \succ t'
 \succeq t$ for some interpretation terms $s',t'$.  Having $\succeq$ will
-also allow us to use rule removal (Theorem \ref{thm:ruleremove}).}
+also allow us to use rule removal (Theorem \ref{thm:ruleremove}).
 %instead of merely
 %orienting all rules with $\succ$.
 
-\CKchange{The ordering pair for \emph{closed} interpretation terms is
-defined using co-induction.}
+The ordering pair for \emph{closed} interpretation terms is
+defined using co-induction. \LCchange{For the following definitions, we fix an implict variable context~$\Gamma$.}
 
 \begin{defn}\label{def:succ}
   Let $R \in \{ \succ,\succeq \}$. For closed~$s,t\in\Iterms_\sigma$
@@ -883,17 +882,18 @@ defined using co-induction.}
   \succeq_\sigma s$.
 \end{defn}
 
-\CKchange{For \emph{open} interpretation terms, the definition is
-extended in a natural way:}
+For \emph{open} interpretation terms, the definition is
+  extended in a natural way:
+\LC{I'm unsure how to exactly phrase these definitions, because they all depend on an implict variable context~$\Gamma$ (including the definition above). I removed explicit references to~$\Gamma$ below to make things more uniform; change if you don't like it.}
 
 \begin{defn}\label{def_closure}
-  A \emph{$\Gamma$-closure}~$\cl = \gamma \circ \omega$ is a
-  $\Gamma$-replacement such that $\omega(\alpha)$ is closed for each
+  A \emph{closure}~$\cl = \gamma \circ \omega$ is a
+  replacement such that $\omega(\alpha)$ is closed for each
   type constructor variable~$\alpha$, and $\gamma(x)$ is closed for
   each term variable~$x$.
 
   For arbitrary types~$\sigma$ and arbitrary terms $s,t \in \Iterms$
-  we define $s \succ_\sigma t$ if for every \CKchange{$\Gamma$-closure~$\cl$} we can
+  we define $s \succ_\sigma t$ if for every \LCchange{closure~$\cl$} we can
   obtain $\cl(s) \succ_{\nf_\beta(\cl(\sigma))} \cl(t)$ coinductively
   with the above rules. The relations $\succeq_\sigma$ and
   $\approx_\sigma$ are extended analogously. We drop the type
@@ -918,7 +918,7 @@ may essentially be ignored.
 The coinductive definition of~$\succ$ and~$\succeq$ can be
 reformulated as follows.
 
-\begin{lemma}
+\begin{lemma}\label{lem_succ_explicit}
   $t \succeq s$ if and only if for every closure~$\cl$ and every
   sequence $u_1,\ldots,u_n$ of closed terms and closed type
   constructors such that $\cl(t) u_1 \ldots u_n : \nat$ we have
@@ -928,9 +928,8 @@ reformulated as follows.
 \end{lemma}
 
 \begin{proof}
-  %CK: space
-  The direction from left to right follows by induction on~$n$\CKchange{;
-  the other by coinduction.}
+  The direction from left to right follows by induction on~$n$; the
+  other by coinduction.
 \end{proof}
 
 In what follows, all proofs by coinduction could be reformulated to
@@ -938,11 +937,11 @@ instead use the characterisation of $\succ$, $\succeq$ and~$\approx$
 from the above lemma. However, this would arguably make the proofs
 less perspicuous.
 
-\medskip
-\CKchange{Our next task is to show that $\succeq$ and $\succ$ have the
+%\medskip Space?
+Our next task is to show that $\succeq$ and $\succ$ have the
 desired properties of an ordering pair; e.g., transitivity and
-compatibility.  We first state a simple lemma that will be used
-implicitly.}
+compatibility. We first state a simple lemma that will be used
+implicitly.
 
 \begin{lemma}
   If~$\tau$ is a closed interpretation type in $\beta$-normal form
@@ -977,10 +976,8 @@ ordering.
   $\tau[\subst{\alpha}{\chi_\kappa}]$ are created by the substitution
   and must have the form $\chi_\kappa u$. Hence, by the definition
   of~$\chi_\kappa$ (see Definition~\ref{def_types}) the
-  type~$\tau'$ is smaller than~$\tau$. This %is impossible by
-  \CKchange{contradicts} %CK: space
-  the
-  inductive hypothesis.
+  type~$\tau'$ is smaller than~$\tau$. This
+  contradicts the inductive hypothesis.
 \end{proof}
 
 \begin{lemma}\label{lem_transitive}
@@ -1040,9 +1037,14 @@ ordering.
   By coinduction.
 \end{proof}
 
-\CK{Would it not be simpler to just show straight away that $s \arrW t$
-implies $s \approx t$?  The other statements then immediately follow by
-compatibility or transitivity. And: doing this might save some space.}
+\begin{lemma}\label{lem_leadsto_to_approx}
+  If $t \arrW s$ then $t \approx s$.
+\end{lemma}
+
+\begin{proof}
+  Follows from Lemma~\ref{lem_succ_explicit}, noting that $t \arrW s$
+  implies $\cl(t) \arrW \cl(s)$ for all closures~$\cl$.
+\end{proof}
 
 \begin{lemma}\label{lem_succ_red}
   Assume $t \succ s$ (resp.~$t \succeq s$).
@@ -1055,27 +1057,8 @@ compatibility or transitivity. And: doing this might save some space.}
 \end{lemma}
 
 \begin{proof}
-  We show the first point assuming $t \leadsto t'$, other cases being
-  analogous. It suffices to show this for closed $t,t',s$ and the type
-  closed and in $\beta$-normal form, because $t \leadsto t'$ implies
-  $\cl(t) \leadsto \cl(t')$ for any closure~$\cl$.
-
-  We proceed by coinduction. If $t \succ_\nat s$ then $t\da = t'\da$
-  and the claim holds.
-
-  If $t \succ_{\sigma\arrtype\tau} s$ then for every $q \in
-  \Iterms^f_\sigma$ we have $\app{t}{q} \succ_\tau \app{s}{q}$. We
-  have $\app{t}{q} \leadsto \app{t'}{q}$. Hence $\app{t'}{q}
-  \succ_\tau \app{s}{q}$ by the coinductive hypothesis. Thus $t'
-  \succ_{\sigma\arrtype\tau} s$.
-
-  If $t \succ_{\forall(\alpha:\kappa)\sigma} s$ then for every closed
-  type constructor~$\tau$ of kind~$\kappa$ we have $\tapp{t}{\tau}
-  \succ_{\sigma'} \tapp{s}{\tau}$ where $\sigma' =
-  \nf_\beta(\sigma[\subst{\alpha}{\tau}])$. We have $\tapp{t}{\tau}
-  \leadsto \tapp{t'}{\tau}$. Hence $\tapp{t'}{\tau} \succ_{\sigma'}
-  \tapp{s}{\tau}$ by the coinductive hypothesis. Thus $t'
-  \succ_{\forall(\alpha:\kappa)\sigma} s$.
+  Follows from Lemma~\ref{lem_leadsto_to_approx}, transitivity and
+  compatibility.
 \end{proof}
 
 \begin{corollary}\label{cor_succ_da}
@@ -1624,8 +1607,8 @@ hold for orthodox Church-style typed terms.
 
 \subsection{Strong Normalisation of~$\arrW$}
 
-\CKchange{By~$\SN$ we denote the set of all interpretation terms terminating
-w.r.t.~$\arrW$.}
+By~$\SN$ we denote the set of all interpretation terms terminating
+w.r.t.~$\arrW$.
 
 For $t \in \SN$ by~$\nu(t)$ we denote the length of the longest
 reduction starting at~$t$. The following lemma is obvious, but worth
@@ -2376,9 +2359,9 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
   $t_1,t_2$ are final interpretation terms of type~$\nat$, hence
   natural numbers by the inductive hypothesis. But then $t$ contains a
   redex. Contradiction.
-  \CKchange{The case for $\mathtt{f} = \otimes$ is parallel.  If
+  The case for $\mathtt{f} = \otimes$ is parallel.  If
   $\mathtt{f} \in \{\flatten,\lift\}$ and $\sigma$ is closed, then
-  in all cases, $t$ is not in normal form.}
+  $n \ge 1$ and in all cases $t$ is not in normal form.
 \end{proof}
 
 \subsection{Weak monotonicity proof}\label{sec_weakly_monotone_proof}
@@ -2947,10 +2930,20 @@ numbers $n > 0$:
 
     If $\sigma = \tau_1\arrtype\tau_2$ then by the coinductive
     hypothesis $(s \oplus t) u_1 \ldots u_m q \succeq_{\tau_2} s u_1
-    \ldots u_m q$ for any $q \in \Iterms_{\tau_1}$. Hence $(s \oplus t)
-    u_1 \ldots u_m \succeq_\sigma s u_1 \ldots u_m$.
+    \ldots u_m q$ for any $q \in \Iterms_{\tau_1}^f$. Hence $(s \oplus
+    t) u_1 \ldots u_m \succeq_\sigma s u_1 \ldots u_m$.
 
-    \CK{TODO: check: I changed $\World$ to $\Iterms$ here.}
+    \CK{TODO: check: I changed $\mathcal{W}$ to $\Iterms$ here.}
+    \LC{It should be $\Iterms^f$ -- I forgot to change this when I
+      changed the notation from $\mathcal{W}$ to $\Iterms^f$ (my rationale
+      for changing the notation was that we really interpret by terms
+      in $\Iterms$, not by final interpretation terms $\Iterms^f$,
+      which are just a special case of $\Iterms$ used in the
+      proofs). In the coinductive definition you have $\Iterms^f$, not
+      $\Iterms$. This is why I say at the beginning that we consider
+      closed terms and types (which we can do because if $\succ$ holds
+      for closed terms and types, then it holds for all terms and
+      types, by how $\succ$ is defined on open terms)}
 
     If $\sigma = \forall(\alpha:\kappa)[\tau]$ then by the coinductive
     hypothesis $(s \oplus t) u_1 \ldots u_m \xi \succeq_{\sigma'} s
