@@ -179,7 +179,7 @@ heterogenous lists.
   \mathtt{nil} : \List &
   \mathtt{foldl}_\sigma(f,a,\cons_\tau(x,l)) \red \mathtt{foldl}_\sigma(f,f \tau a x,l) \\
   \mathtt{cons} : \forall \alpha . \alpha \arrtype \List \arrtype \List \quad\quad \\
-  \multicolumn{2}{l}{\mathtt{foldl} : \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \List}
+  \multicolumn{2}{l}{\mathtt{foldl} : \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \CKchange{\beta}}
 \end{array}
 \]
 The above states that $\List$ is a type ($*$), gives the types of its
@@ -291,7 +291,6 @@ of lambda calculi such as substitution and $\alpha$-conversion.
     symbols}, each paired with a closed type, denoted $\mathtt{f} :
   \tau$.  Every function symbol $\mathtt{f}$ occurs only with one type
   declaration. We denote $\Gamma,x:\tau$ for $\Gamma \cup \{x:\tau\}$. We
-\pagebreak
   set $\FTV(\Gamma) = \bigcup\{\FTV(\tau) \mid (x : \tau) \in
   \Gamma\}$.
 
@@ -420,16 +419,17 @@ orthodox Church-style typed term.
 
 The polymorphic lambda-calculus has a much greater expressive power
 than the simply-typed lambda-calculus. Arbitrary inductive data types
-may be encoded, together with their constructors and recursors with
+may be encoded, \CKchange{along} with their constructors and recursors with
 appropriate derived reduction rules. This makes the polynomial
 interpretation method easier to apply, even in the non-polymorphic
 setting, thanks to more sophisticated ``programming'' in the
 interpretations.
-
+%
 The reader is advised to consult e.g.~\cite[Chapter~11]{Girard1989}
-for more background and explanations. Here, we only state standard
-abbreviations for a few inductive types used later. Type subscripts
-are dropped when clear or irrelevant.
+for more background and explanations. Here, we state standard
+abbreviations for \CKchange{two inductive types used in Section
+\ref{sec:examples}.} Type subscripts are dropped when clear
+or irrelevant.
 
 \begin{defn}[Product types]
   \[
@@ -453,16 +453,16 @@ are dropped when clear or irrelevant.
   \]
 \end{defn}
 
-\begin{defn}[Heterogenous lists]
-  \[
-  \begin{array}{rcl}
-    \List &=& \forall p . (\forall \alpha . \alpha \arrtype p \arrtype p) \arrtype p \arrtype p \\
-    \nil &=& \tabs{p}{\abs{f:\forall \alpha . \alpha \arrtype p \arrtype p}{\abs{a : p}{a}}} \\
-    \cons_\rho(h,t) &=& \tabs{p}{\abs{f:\forall\alpha . \alpha \arrtype p \arrtype p}{\abs{a : p}{f \rho h (l p f a)}}} \\
-    \fold_\rho(f,a,l) &=& l \rho f a
-  \end{array}
-  \]
-\end{defn}
+%\begin{defn}[Heterogenous lists]
+%  \[
+%  \begin{array}{rcl}
+%    \List &=& \forall p . (\forall \alpha . \alpha \arrtype p \arrtype p) \arrtype p \arrtype p \\
+%    \nil &=& \tabs{p}{\abs{f:\forall \alpha . \alpha \arrtype p \arrtype p}{\abs{a : p}{a}}} \\
+%    \cons_\rho(h,t) &=& \tabs{p}{\abs{f:\forall\alpha . \alpha \arrtype p \arrtype p}{\abs{a : p}{f \rho h (l p f a)}}} \\
+%    \fold_\rho(f,a,l) &=& l \rho f a
+%  \end{array}
+%  \]
+%\end{defn}
 
 From the definition we immediately see that all encodings have the expected types:
 
@@ -477,12 +477,12 @@ From the definition we immediately see that all encodings have the expected type
   \item If $\Gamma \proves t : \Sigma \alpha . \sigma$ and
     $\Gamma,x:\sigma \proves s : \rho$ and $\alpha \notin
     \FTV(\Gamma,\rho)$ then $\xlet{}{t}{\alpha,x}{s} : \rho$.
-  \item $\Gamma \proves \nil : \List$.
-  \item If $\Gamma \proves h : \rho$ and $\Gamma \proves t : \List$
-    then $\Gamma \proves \cons_\rho(h,t) : \List$.
-  \item If $\Gamma \proves l : \List$ and $\Gamma \proves f : \forall
-    \alpha . \alpha \arrtype \rho \arrtype \rho$ and $a : \rho$ then
-    $\Gamma \proves \fold_\rho(f,a,l) : \rho$.
+%  \item $\Gamma \proves \nil : \List$.
+%  \item If $\Gamma \proves h : \rho$ and $\Gamma \proves t : \List$
+%    then $\Gamma \proves \cons_\rho(h,t) : \List$.
+%  \item If $\Gamma \proves l : \List$ and $\Gamma \proves f : \forall
+%    \alpha . \alpha \arrtype \rho \arrtype \rho$ and $a : \rho$ then
+%    $\Gamma \proves \fold_\rho(f,a,l) : \rho$.
   \end{enumerate}
 \end{lemma}
 
@@ -496,9 +496,9 @@ s[\alpha:=\sigma]$ -- provides the desired derivation rules:
   \item $\pi^i(\pair{t_1}{t_2}) \leadsto_\beta^* t_i$.
   \item $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \leadsto_\beta^*
     s[\subst{\alpha}{\tau}][\subst{x}{t}]$.
-  \item $\fold_\rho(f,a,\nil) \leadsto_\beta^* a$.
-  \item $\fold_\rho(f,a,\cons_\tau(h,t)) \leadsto_\beta^* f \tau h
-    (\fold_\rho(f,a,t))$.
+%  \item $\fold_\rho(f,a,\nil) \leadsto_\beta^* a$.
+%  \item $\fold_\rho(f,a,\cons_\tau(h,t)) \leadsto_\beta^* f \tau h
+%    (\fold_\rho(f,a,t))$.
   \end{enumerate}
 \end{lemma}
 
@@ -518,7 +518,6 @@ develop in Sections \ref{sec:World}--\ref{sec_rule_removal}.
   symbols.
 
   We assume given a fixed set~$\Sigma$ of function symbols, such
-\pagebreak
   that for $\mathtt{f} : \sigma \in \Sigma$ we can write:
     \[
     \sigma = \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n : \kappa_n)
@@ -647,7 +646,7 @@ arbitrary polynomial interpretation to type application.
     (\forall \gamma .\alpha \gamma) \arrtype \alpha \beta \\
     \mathtt{nil} & : & \List \\
     \mathtt{cons} & : & \forall \alpha . \alpha \arrtype \List \arrtype \List \\
-    \mathtt{foldl} & : & \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \List
+    \mathtt{foldl} & : & \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \CKchange{\beta}
   \end{array}
   \]
   and the following rules:
@@ -658,7 +657,8 @@ arbitrary polynomial interpretation to type application.
     s[\alpha:=\tau] \\
     \mathtt{foldl}_\sigma(f,s,\nil) & \red & s \\
     \mathtt{foldl}_\sigma(f,s,\cons_\tau(h,t)) & \red & \mathtt{foldl}_\sigma(f,@_{\tau,\sigma}(@_{\sigma,\tau
-    \arrtype\sigma}(\mathtt{A}_{\tabs{\alpha}{\sigma\arrtype\alpha\arrtype\sigma},\tau}(f),s),h),t)
+    \arrtype\sigma}(\mathtt{A}_{
+      \CKchange{\abs{\alpha}{\sigma\arrtype\alpha\arrtype\sigma}},\tau}(f),s),h),t)
   \end{array}
   \]
   Formally, the above represents an infinite set of rules, one rule for
@@ -682,14 +682,14 @@ in a specific extension of System~$\Fomega$.  This set is defined in Section
 \ref{subsec:I}; we provide a well-founded partial ordering $\succ$ on
 $\Iterms$ in Section \ref{subsec:succ}.
 
-%\CKchange{Although our world of interpretation terms is quite different
-%from the weakly monotonic functionals of \cite{pol:96}, there are many
-%similarities.  Most pertinently, every interpretation term $\abs{x}{s}$
-%essentially defines a weakly monotonic function from $\Iterms$ to
-%$\Iterms$.  This, and the use of both addition and multiplication in
-%the definition of $\Iterms$, allows us to lift all higher-order
-%polynomial interpretations \cite{FuhsKop2012} to our setting.  We will
-%prove weak monotonicity in Section \ref{subsec:weakmono}.}
+\CKchange{Although our world of interpretation terms is quite different
+from the weakly monotonic functionals of \cite{pol:96}, there are many
+similarities.  Most pertinently, every interpretation term $\abs{x}{s}$
+essentially defines a weakly monotonic function from $\Iterms$ to
+$\Iterms$.  This, and the use of both addition and multiplication in
+the definition of $\Iterms$, makes it possible to lift higher-order
+polynomial interpretations \cite{FuhsKop2012} to our setting.  We will
+prove weak monotonicity in Section \ref{subsec:weakmono}.}
 
 \subsection{Interpretation terms}\label{subsec:I}
 
@@ -719,7 +719,7 @@ notation, and omit the type denotation where it is clear from
 context. Thus, $s \oplus t \oplus u$ should be read as
 $\oplus_\sigma\,s\,(\oplus_\sigma\,t\,u)$ if $s$ has type $\sigma$.
 
-\subsubsection{Normalising interpretation terms}
+\paragraph*{Normalising interpretation terms}
 
 \CKchange{The set $\Iterms$ of interpretation terms can be reduced through
 a relation $\arrW$, that we will define below.  This relation will
@@ -838,6 +838,17 @@ delegated to Appendix~\ref{app_proofs}.
   The only final interpretation terms of type $\nat$ are the natural
   numbers.
 \end{lemma}
+
+\begin{example}\label{ex:arrWreduce}
+\CKchange{Let $s \in \Iterms_{\nat \arrtype \nat}$ and $t \in
+\Iterms_\nat$. Then we can reduce
+$(s \oplus \lift_{\nat \arrtype \nat}(1)) \cdot t \arrW
+(\abs{x}{s x \oplus \lift_{\nat \arrtype \nat}(1)x}) \cdot t \arrW
+s t \oplus \lift_{\nat \arrtype \nat}(1)t \arrW
+s t \oplus (\abs{y}{\lift_{\nat}(1))t}) \arrW
+s t \oplus 1$.  If $s$ and $t$ are variables, this term is in normal
+form.}
+\end{example}
 
 \subsection{The ordering pair $(\succeq,\succ)$}\label{subsec:succ}
 
@@ -1031,7 +1042,7 @@ ordering.
 
 \CK{Would it not be simpler to just show straight away that $s \arrW t$
 implies $s \approx t$?  The other statements then immediately follow by
-compatibility or transitivity.}
+compatibility or transitivity. And: doing this might save some space.}
 
 \begin{lemma}\label{lem_succ_red}
   Assume $t \succ s$ (resp.~$t \succeq s$).
@@ -1072,56 +1083,26 @@ compatibility or transitivity.}
   $s\downarrow\ R\ t\downarrow$.
 \end{corollary}
 
-
-\section{\CKchange{A reduction pair for PFS terms}}\label{sec_reduction_pairs}
-
-\CKchange{Recall that our goal is to prove termination of PFS terms.  To
-do so, in this section we will define a systematic way to generate
-\emph{reduction pairs}.}  We fix a~PFS~$A$\CKchange{, and define:}
-
-\begin{defn}
-  A binary relation~$R$ on $A$-terms is \emph{monotonic} if $R(s, t)$
-  implies $R(C[s], C[t])$ for every context~$C$ (we assume $s,t$ have
-  the same type~$\sigma$).
-
-  A \emph{reduction pair} is a pair~$(\succeq^A,\succ^A)$ of a
-  quasi-order~$\succeq^A$ on $A$-terms and a well-founded
-  ordering~$\succ^A$ on $A$-terms such that:
-  \begin{itemize}
-  \item $\succeq^A$ and~$\succ^A$ are compatible, i.e., ${\succ^A}
-    \cdot {\succeq^A} \subseteq {\succ^A}$
-    %CK: this is how compatibiility was defined before!
-    \CKchange{and ${\succeq^A} \cdot {\succ^A} \subseteq {\succ^A}$}
-  \item $\succeq^A$ and~$\succ^A$ are both monotonic.
-  \end{itemize}
-\end{defn}
-
-
-\CKchange{If we can generate such a pair with $\ell \succinterpret r$ for each
-rule $(\ell,r) \in \Rules$, then we easily see that the PFS $A$ is
-terminating.  (If we merely have $\ell \succinterpret r$ for \emph{some}
-rules and $\ell \succeqinterpret r$ for the rest, we can still progress
-with the termination proof, as we will discuss in Section
-\ref{sec_rule_removal}.)
-To generate this pair, we will define the notion of an
-\emph{interpretation} from the set of $A$-terms to the set $\Iterms$ of
-interpretation terms, and thus lift the ordering pair $(\succeq,\succ)$
-to $A$.
+\begin{example}\label{ex:plus1}
+\CKchange{We can prove that $x \oplus \lift_{\nat \arrtype \nat}(1)
+\succ x$: by
+definition, this holds if $s \oplus \lift_{nat \arrtype \nat}(1) \succ
+s$ for all closed $s$, so if $(s \oplus \lift_{nat \arrtype \nat})u
+\succ s u$ for all closed $s,u$.
+Following Example \ref{ex:arrWreduce} and Lemma \ref{lem_succ_red},
+this holds if $s u \oplus 1 \succ u$.  By definition, this is the
+case if $(s u \oplus 1)\downarrow > u\downarrow$ in the natural numbers,
+which is clearly the case for any $s,u$.
 }
-
-The goal of this section is to define an interpretation~$\Termmap$
-of~PFS function symbols \CKchange{with a corresponding pair
-$(\succeqinterpret,\succinterpret)$ on PFS terms, and to prove
-that $(\succeqinterpret,\succinterpret)$ is indeed a reduction pair
-(monotonicity is non-trivial).  In the next section, we will show how
-this reduction pair can be used in practice to prove termination
-of~PFSs.}
+\end{example}
 
 \subsection{Weak monotonicity}\label{subsec:weakmono}
 
-We first return to our system of interpretation terms with an aim to
+%We first return to our system of interpretation terms with an aim to
+\CKchange{We will now}
 show that $s \succeq s'$ implies $t[\subst{x}{s}] \succeq
-t[\subst{x}{s'}]$. For this purpose, we prove a few lemmas, many of
+t[\subst{x}{s'}]$ \CKchange{(weak monotonicity)}.
+For this purpose, we prove a few lemmas, many of
 which also apply to~$\succ$, stating the preservation of~$\succeq$
 under term formation operations. We will need these results to obtain
 a reduction pair.
@@ -1233,7 +1214,47 @@ structure is not possible.
   If $s \succeq s'$ then $t s \succeq t s'$.
 \end{corollary}
 
-\subsection{Interpretation mapping}
+
+\section{\CKchange{A reduction pair for PFS terms}}\label{sec_reduction_pairs}
+
+\CKchange{Recall that our goal is to prove termination of PFS terms.  To
+do so, in this section we will define a systematic way to generate
+\emph{reduction pairs}.}  We fix a~PFS~$A$\CKchange{, and define:}
+
+\begin{defn}
+  A binary relation~$R$ on $A$-terms is \emph{monotonic} if $R(s, t)$
+  implies $R(C[s], C[t])$ for every context~$C$ (we assume $s,t$ have
+  the same type~$\sigma$).
+
+  A \emph{reduction pair} is a pair~$(\succeq^A,\succ^A)$ of a
+  quasi-order~$\succeq^A$ on $A$-terms and a well-founded
+  ordering~$\succ^A$ on $A$-terms such that:
+  \begin{itemize}
+  \item $\succeq^A$ and~$\succ^A$ are compatible, i.e., ${\succ^A}
+    \cdot {\succeq^A} \subseteq {\succ^A}$
+    %CK: this is how compatibiility was defined before!
+    \CKchange{and ${\succeq^A} \cdot {\succ^A} \subseteq {\succ^A}$}
+  \item $\succeq^A$ and~$\succ^A$ are both monotonic.
+  \end{itemize}
+\end{defn}
+
+
+\CKchange{If we can generate such a pair with $\ell \succ^A r$ for each
+rule $(\ell,r) \in \Rules$, then we easily see that the PFS $A$ is
+terminating.  (If we merely have $\ell \succ^A r$ for \emph{some}
+rules and $\ell \succeq^A r$ for the rest, we can still progress
+with the termination proof, as we will discuss in Section
+\ref{sec_rule_removal}.)
+To generate this pair, we will define the notion of an
+\emph{interpretation} from the set of $A$-terms to the set $\Iterms$ of
+interpretation terms, and thus lift the ordering pair $(\succeq,\succ)$
+to $A$.
+In the next section, we will show how this reduction pair can be used
+in practice to prove termination of PFSs.}
+
+\medskip
+\CKchange{One of the core ingredients of our interpretation function is a
+mapping to translate types:}
 
 \begin{defn}
   A \emph{type constructor mapping} is a function $\Typemap$ which
@@ -1246,7 +1267,7 @@ structure is not possible.
   e.g.~$\typeinterpret{\quant{\alpha}{\sigma}} =
   \quant{\alpha}{\typeinterpret{\sigma}}$ and $\typeinterpret{\sigma
     \arrtype \tau} = \typeinterpret{\sigma} \arrtype
-  \typeinterpret{\tau}$. Interpretation type mapping is extended to
+  \typeinterpret{\tau}$. \CKchange{An i}nterpretation type mapping is extended to
   contexts: \( \itp{\Gamma} := \{ (x : \typeinterpret{\tau}) \mid (x :
   \tau) \in \Gamma \}.  \)
 \end{defn}
@@ -1269,20 +1290,23 @@ PFS terms.
   term $\Termmap(\mathtt{f})$ of type~$\typeinterpret{\rho}$. For a
   fixed symbol mapping $\Termmap$, we define the \emph{interpretation
     mapping} $\interpret{s}$ inductively:
-  \[
-    \begin{array}{rclcrcl}
+  \CKchange{\[
+    \begin{array}{rclcrclcrcl}
       \interpret{x} & = & x &\quad&
-      \interpret{\mathtt{f}} &=& \Termmap(\mathtt{f}) \\
       \interpret{\tabs{\alpha}{s}} & = & \tabs{\alpha}{\interpret{s}} &\quad&
+      \interpret{\app{t_1}{t_2}} &=& \app{\interpret{t_1}}{\interpret{t_2}} \\
+      \interpret{\mathtt{f}} &=& \Termmap(\mathtt{f}) & \quad &
       \interpret{\abs{x:\sigma}{s}} & = & \abs{x:\typeinterpret{\sigma}}{
-                                          \interpret{s}} \\
-      \interpret{\app{t_1}{t_2}} &=& \app{\interpret{t_1}}{\interpret{t_2}} &\quad&
-      \interpret{\tapp{t}{\tau}} &=& \tapp{\interpret{t}}{\typeinterpret{\tau}}
+                                          \interpret{s}} & \quad &
+      \interpret{\tapp{t}{\tau}} &=& \tapp{\interpret{t}}{\typeinterpret{\tau}} \\
     \end{array}
-  \]
+  \]}
 \end{defn}
 
-Interpretation mapping preserves typing:
+\CKchange{Essentially, $\interpret{\cdot}$ substitutes
+$\Typemap(\mathtt{c})$ for type constructor symbols $\mathtt{c}$, and
+$\Termmap(\mathtt{f})$ for function symbols $\mathtt{f}$, thus mapping
+$A$-terms to interpretation terms.  This translation preserves typing:}
 
 \begin{lemma}
   If $\Gamma \vdash s : \sigma$ then $\itp{\Gamma} \vdash
@@ -1316,9 +1340,40 @@ Interpretation mapping preserves typing:
   Induction on~$s$.
 \end{proof}
 
-We will show that, under certain conditions on~$\Termmap$, the
-interpretation pair $(\succeqinterpret,\succinterpret)$ is a reduction
-pair.
+\begin{example}\label{ex:notyetmono}
+\CKchange{Towards a termination proof of Example \ref{ex_fold_pafs}, we will
+adapt a standard interpretation of $\List$ and $\fold$ to System
+$\Fomega$ (see, e.g.,
+\cite[Chapter~11]{Girard1989} for more background and explanations).
+We set $\Typemap(\List) = \quant{\beta}{(\quant{\alpha}{\alpha \arrtype
+\beta \arrtype \beta}) \arrtype \beta \arrtype \beta}$ and
+$\Termmap(\nil) = \tabs{\beta}{\abs{f:\quant{\alpha}{\alpha \arrtype
+\beta \arrtype \beta}}{\abs{x:\beta}{x}}}$.  If we additionally choose
+$\Termmap(\mathtt{foldl}) = \tabs{\beta}{\abs{f}{\abs{x}{\abs{l}{l
+\beta f x}}} \oplus \lift_\beta(1)}$, we have
+$\interpret{\mathtt{foldl}_{\sigma}(f,s,\nil)} = (\tabs{\beta}{
+  \abs{f}{\abs{x}{\abs{l}{l \beta f x}}} \oplus \lift_\beta(1)})
+  \typeinterpret{\sigma} f s (\tabs{\beta}{\abs{f}{\abs{x}{x}}})
+  \leadsto^* s \oplus \lift_{\interpret{\sigma}}(1)$ by
+  $\beta$-reduction steps.
+With an extension of the proof used in Example \ref{ex:plus1},
+we can see that this term $\succ \interpret{s}$.
+Thus, we have oriented the third rule of Example \ref{ex_fold_pafs}.
+}
+\end{example}
+
+\CKchange{It is easy to see that $\succeqinterpret$ and
+$\succinterpret$ have desirable properties such as transitivty,
+reflexivity (for $\succeqinterpret$) and well-foundedness (for
+$\succinterpret$.  However, $\succinterpret$ is not necessarily
+monotonic.  Using the interpretation from Example \ref{ex:notyetmono},
+$\interpret{\mathtt{foldl}_{\sigma}(\abs{x}{s},t,\nil)} =
+\interpret{\mathtt{fold}_{\sigma}(\abs{x}{w},t,\nil)}$ regardless of
+$s$ and $w$, so a reduction in $s$ would not cause a decrease in
+$\succinterpret$.  To obtain a reduction pair, we must impose certain
+conditions on $\Termmap$; in particular, we will require that
+$\Termmap$ is \emph{safe}.
+}
 
 \begin{defn}\label{def_safe}
   If $s_1 \succ s_2$ implies $t[\subst{x}{s_1}] \succ
@@ -1413,10 +1468,10 @@ pair.
 \end{theorem}
 
 \begin{proof}
-  If follows from Lemma~\ref{lem_transitive} and
-  Lemma~\ref{lem_reflexive} that~$\succeqinterpret$ is a
-  quasi-order. Lemma~\ref{lem_well_founded} and
-  Lemma~\ref{lem_transitive} imply that~$\succinterpret$ is a
+  \CKchange{By Lemmas~\ref{lem_transitive} and~\ref{lem_reflexive},} 
+  $\succeqinterpret$ is a
+  quasi-order. \CKchange{Lemmas~\ref{lem_well_founded} 
+  and~\ref{lem_transitive}} imply that~$\succinterpret$ is a
   well-founded ordering. Compatibility follows from
   Lemma~\ref{lem:compatibility}. Monotonicity of~$\succeqinterpret$
   follows from Lemma~\ref{lem_succeq_subst}. Monotonicity
