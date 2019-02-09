@@ -51,7 +51,7 @@
 \newcommand{\FV}{\mathrm{FV}}
 \newcommand{\Tc}{\mathcal{T}}
 \newcommand{\Vc}{\mathcal{V}}
-\newcommand{\Xc}{\CKchange{\mathcal{X}}}
+\newcommand{\Xc}{\mathcal{X}}
 
 \newcommand{\cl}{\mathcal{C}}
 \newcommand{\dom}{\mathrm{dom}}
@@ -147,7 +147,7 @@
   %% choice.
   non-polymorphic setting by allowing for \CKchange{the} encoding of inductive data
   types. As an illustration of the potential of our method, we prove
-  the termination of a substantial fragment of full intuitionistic
+  termination of a substantial fragment of full intuitionistic
   second-order propositional logic with permutative conversions.
 \end{abstract}
 
@@ -182,7 +182,7 @@ heterogenous lists.
   \mathtt{nil} : \List &
   \mathtt{foldl}_\sigma(f,a,\cons_\tau(x,l)) \red \mathtt{foldl}_\sigma(f,f \tau a x,l) \\
   \mathtt{cons} : \forall \alpha . \alpha \arrtype \List \arrtype \List \quad\quad \\
-  \multicolumn{2}{l}{\mathtt{foldl} : \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \CKchange{\beta}}
+  \multicolumn{2}{l}{\mathtt{foldl} : \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \beta}
 \end{array}
 \]
 The above states that $\List$ is a type ($*$), gives the types of its
@@ -423,7 +423,7 @@ orthodox Church-style typed term.
 
 The polymorphic lambda-calculus has a much greater expressive power
 than the simply-typed lambda-calculus. Arbitrary inductive data types
-may be encoded, \CKchange{along} with their constructors and recursors with
+may be encoded, along with their constructors and recursors with
 appropriate derived reduction rules. This makes the polynomial
 interpretation method easier to apply, even in the non-polymorphic
 setting, thanks to more sophisticated ``programming'' in the
@@ -431,8 +431,8 @@ interpretations.
 %
 The reader is advised to consult e.g.~\cite[Chapter~11]{Girard1989}
 for more background and explanations. Here, we state standard
-abbreviations for \CKchange{two inductive types used in Section
-\ref{sec:examples}.} Type subscripts are dropped when clear
+abbreviations for two inductive types used in Section
+\ref{sec:examples}. Type subscripts are dropped when clear
 or irrelevant.
 
 \begin{defn}[Product types]
@@ -650,7 +650,7 @@ arbitrary polynomial interpretation to type application.
     (\forall \gamma .\alpha \gamma) \arrtype \alpha \beta \\
     \mathtt{nil} & : & \List \\
     \mathtt{cons} & : & \forall \alpha . \alpha \arrtype \List \arrtype \List \\
-    \mathtt{foldl} & : & \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \CKchange{\beta}
+    \mathtt{foldl} & : & \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \beta
   \end{array}
   \]
   and the following rules:
@@ -661,8 +661,7 @@ arbitrary polynomial interpretation to type application.
     s[\alpha:=\tau] \\
     \mathtt{foldl}_\sigma(f,s,\nil) & \red & s \\
     \mathtt{foldl}_\sigma(f,s,\cons_\tau(h,t)) & \red & \mathtt{foldl}_\sigma(f,@_{\tau,\sigma}(@_{\sigma,\tau
-    \arrtype\sigma}(\mathtt{A}_{
-      \CKchange{\abs{\alpha}{\sigma\arrtype\alpha\arrtype\sigma}},\tau}(f),s),h),t)
+    \arrtype\sigma}(\mathtt{A}_{\abs{\alpha}{\sigma\arrtype\alpha\arrtype\sigma},\tau}(f),s),h),t)
   \end{array}
   \]
   Formally, the above represents an infinite set of rules, one rule for
@@ -839,15 +838,15 @@ delegated to Appendix~\ref{app_proofs}.
 \end{lemma}
 
 \begin{example}\label{ex:arrWreduce}
-\CKchange{Let $s \in \Iterms_{\nat \arrtype \nat}$ and $t \in
+Let $s \in \Iterms_{\nat \arrtype \nat}$ and $t \in
 \Iterms_\nat$. Then we can reduce
 $(s \oplus \lift_{\nat \arrtype \nat}(1)) \cdot t \arrW
 (\abs{x}{s x \oplus \lift_{\nat \arrtype \nat}(1)x}) \cdot t \arrW
 s t \oplus \lift_{\nat \arrtype \nat}(1)t \arrW
 s t \oplus (\abs{y}{\lift_{\nat}(1)})t \arrW
 s t \oplus \lift_\nat(1) \arrW
-s t \oplus 1$.  If $s$ and $t$ are variables, this term is in normal
-form.}
+s t \oplus 1$. If $s$ and $t$ are variables, this term is in normal
+form.
 \end{example}
 
 \subsection{The ordering pair $(\succeq,\succ)$}\label{subsec:succ}
@@ -1068,28 +1067,24 @@ ordering.
 \end{corollary}
 
 \begin{example}\label{ex:plus1}
-\CKchange{We can prove that $x \oplus \lift_{\nat \arrtype \nat}(1)
+We can prove that $x \oplus \lift_{\nat \arrtype \nat}(1)
 \succ x$: by
-definition, this holds if $s \oplus \lift_{nat \arrtype \nat}(1) \succ
-s$ for all closed $s$, so if $(s \oplus \lift_{nat \arrtype \nat})u
+definition, this holds if $s \oplus \lift_{\nat \arrtype \nat}(1) \succ
+s$ for all closed $s$, so if $(s \oplus \lift_{\nat \arrtype \nat})u
 \succ s u$ for all closed $s,u$.
 Following Example \ref{ex:arrWreduce} and Lemma \ref{lem_succ_red},
 this holds if $s u \oplus 1 \succ u$.  By definition, this is the
 case if $(s u \oplus 1)\downarrow > u\downarrow$ in the natural numbers,
 which is clearly the case for any $s,u$.
-}
 \end{example}
 
 \subsection{Weak monotonicity}\label{subsec:weakmono}
 
-%We first return to our system of interpretation terms with an aim to
-\CKchange{We will now}
-show that $s \succeq s'$ implies $t[\subst{x}{s}] \succeq
-t[\subst{x}{s'}]$ \CKchange{(weak monotonicity)}.
+We will now show that $s \succeq s'$ implies $t[\subst{x}{s}] \succeq
+t[\subst{x}{s'}]$ (weak monotonicity).
 For this purpose, we prove a few lemmas, many of
 which also apply to~$\succ$, stating the preservation of~$\succeq$
-under term formation operations. We will need these results to obtain
-a reduction pair.
+under term formation operations. We will need these results in the next section.
 
 \begin{lemma}\label{lem_app_succ}
   If $t \succeq s$ (resp.~$t \succ s$) then $t u \succeq s u$
@@ -1199,11 +1194,11 @@ structure is not possible.
 \end{corollary}
 
 
-\section{\CKchange{A reduction pair for PFS terms}}\label{sec_reduction_pairs}
+\section{A reduction pair for PFS terms}\label{sec_reduction_pairs}
 
-\CKchange{Recall that our goal is to prove termination of PFS terms.  To
+Recall that our goal is to prove termination of PFS terms.  To
 do so, in this section we will define a systematic way to generate
-\emph{reduction pairs}.}  We fix a~PFS~$A$\CKchange{, and define:}
+\emph{reduction pairs}. We fix a~PFS~$A$, and define:
 
 \begin{defn}
   A binary relation~$R$ on $A$-terms is \emph{monotonic} if $R(s, t)$
@@ -1215,15 +1210,14 @@ do so, in this section we will define a systematic way to generate
   ordering~$\succ^A$ on $A$-terms such that:
   \begin{itemize}
   \item $\succeq^A$ and~$\succ^A$ are compatible, i.e., ${\succ^A}
-    \cdot {\succeq^A} \subseteq {\succ^A}$
-    %CK: this is how compatibiility was defined before!
-    \CKchange{and ${\succeq^A} \cdot {\succ^A} \subseteq {\succ^A}$}
+    \cdot {\succeq^A} \subseteq {\succ^A}$ and ${\succeq^A} \cdot
+          {\succ^A} \subseteq {\succ^A}$,
   \item $\succeq^A$ and~$\succ^A$ are both monotonic.
   \end{itemize}
 \end{defn}
 
 
-\CKchange{If we can generate such a pair with $\ell \succ^A r$ for each
+If we can generate such a pair with $\ell \succ^A r$ for each
 rule $(\ell,r) \in \Rules$, then we easily see that the PFS $A$ is
 terminating.  (If we merely have $\ell \succ^A r$ for \emph{some}
 rules and $\ell \succeq^A r$ for the rest, we can still progress
@@ -1234,11 +1228,11 @@ To generate this pair, we will define the notion of an
 interpretation terms, and thus lift the ordering pair $(\succeq,\succ)$
 to $A$.
 In the next section, we will show how this reduction pair can be used
-in practice to prove termination of PFSs.}
+in practice to prove termination of PFSs.
 
-\medskip
-\CKchange{One of the core ingredients of our interpretation function is a
-mapping to translate types:}
+%\medskip
+One of the core ingredients of our interpretation function is a
+mapping to translate types:
 
 \begin{defn}
   A \emph{type constructor mapping} is a function $\Typemap$ which
@@ -1251,7 +1245,7 @@ mapping to translate types:}
   e.g.~$\typeinterpret{\quant{\alpha}{\sigma}} =
   \quant{\alpha}{\typeinterpret{\sigma}}$ and $\typeinterpret{\sigma
     \arrtype \tau} = \typeinterpret{\sigma} \arrtype
-  \typeinterpret{\tau}$. \CKchange{An i}nterpretation type mapping is extended to
+  \typeinterpret{\tau}$. An interpretation type mapping is extended to
   contexts: \( \itp{\Gamma} := \{ (x : \typeinterpret{\tau}) \mid (x :
   \tau) \in \Gamma \}.  \)
 \end{defn}
@@ -1274,7 +1268,7 @@ PFS terms.
   term $\Termmap(\mathtt{f})$ of type~$\typeinterpret{\rho}$. For a
   fixed symbol mapping $\Termmap$, we define the \emph{interpretation
     mapping} $\interpret{s}$ inductively:
-  \CKchange{\[
+  \[
     \begin{array}{rclcrclcrcl}
       \interpret{x} & = & x &\quad&
       \interpret{\tabs{\alpha}{s}} & = & \tabs{\alpha}{\interpret{s}} &\quad&
@@ -1284,13 +1278,13 @@ PFS terms.
                                           \interpret{s}} & \quad &
       \interpret{\tapp{t}{\tau}} &=& \tapp{\interpret{t}}{\typeinterpret{\tau}} \\
     \end{array}
-  \]}
+  \]
 \end{defn}
 
-\CKchange{Essentially, $\interpret{\cdot}$ substitutes
+Essentially, $\interpret{\cdot}$ substitutes
 $\Typemap(\mathtt{c})$ for type constructor symbols $\mathtt{c}$, and
 $\Termmap(\mathtt{f})$ for function symbols $\mathtt{f}$, thus mapping
-$A$-terms to interpretation terms.  This translation preserves typing:}
+$A$-terms to interpretation terms.  This translation preserves typing:
 
 \begin{lemma}
   If $\Gamma \vdash s : \sigma$ then $\itp{\Gamma} \vdash
@@ -1325,11 +1319,11 @@ $A$-terms to interpretation terms.  This translation preserves typing:}
 \end{proof}
 
 \begin{example}\label{ex:notyetmono}
-\CKchange{As observed in Section \ref{sec_encodings}, inductive data
-types can be encoded in System $\Fomega$.  We can adapt such encodings
-to interpretations in our framework.  Example \ref{ex_fold_pafs}
-introduces an inductive type $\List$ and a $\mathtt{foldl}$ function.
-Following \cite[Chapter~11]{Girard1989},
+As observed in Section \ref{sec_encodings}, inductive data
+types can be encoded in System~$\Fomega$.  We can adapt such encodings
+to interpretations in our framework.  Example~\ref{ex_fold_pafs}
+introduces an inductive type~$\List$ and a~$\mathtt{foldl}$ function.
+Following~\cite[Chapter~11]{Girard1989},
 we set $\Typemap(\List) = \quant{\beta}{(\quant{\alpha}{\alpha \arrtype
 \beta \arrtype \beta}) \arrtype \beta \arrtype \beta}$ and
 $\Termmap(\nil) = \tabs{\beta}{\abs{f:\quant{\alpha}{\alpha \arrtype
@@ -1341,25 +1335,25 @@ $\interpret{\mathtt{foldl}_{\sigma}(f,s,\nil)} = (\tabs{\beta}{
   \typeinterpret{\sigma} f s (\tabs{\beta}{\abs{f}{\abs{x}{x}}})
   \leadsto^* s \oplus \lift_{\interpret{\sigma}}(1)$ by
   $\beta$-reduction steps.
-With an extension of the proof used in Example \ref{ex:plus1},
-%we can see that
+\LCchange{An} extension of the proof \LCchange{from} Example~\ref{ex:plus1} \LCchange{shows that}
 this term $\succ \interpret{s}$.
-%Thus, we have oriented the third rule of Example \ref{ex_fold_pafs}.
-}
 \end{example}
 
-\CKchange{It is easy to see that $\succeqinterpret$ and
+\LC{Above, the type of $\Termmap(\mathtt{foldl})$ doesn't match ($f$ should
+  have type $\forall \alpha . \beta \to \alpha \to \beta$). It looks
+  as if you're confusing foldl with foldr (or at least their types).}
+
+It is easy to see that $\succeqinterpret$ and
 $\succinterpret$ have desirable properties such as transitivty,
 reflexivity (for $\succeqinterpret$) and well-foundedness (for
 $\succinterpret$).  However, $\succinterpret$ is not necessarily
-monotonic.  Using the interpretation from Example \ref{ex:notyetmono},
+monotonic.  Using the interpretation from Example~\ref{ex:notyetmono},
 $\interpret{\mathtt{foldl}_{\sigma}(\abs{x}{s},t,\nil)} =
 \interpret{\mathtt{fold}_{\sigma}(\abs{x}{w},t,\nil)}$ regardless of
 $s$ and $w$, so a reduction in $s$ would not cause a decrease in
 $\succinterpret$.  To obtain a reduction pair, we must impose certain
 conditions on $\Termmap$; in particular, we will require that
 $\Termmap$ is \emph{safe}.
-}
 
 \begin{defn}\label{def_safe}
   If $s_1 \succ s_2$ implies $t[\subst{x}{s_1}] \succ
@@ -1392,8 +1386,7 @@ $\Termmap$ is \emph{safe}.
   \item If~$t$ is safe for~$x$ then so is~$\tabs{\alpha}{t}$
     and~$\abs{y}{t}$ ($y \ne x$).
   \item If $t$ is safe for~$x$ then so is~$\pi^1(t)$ and~$\pi^2(t)$.
-  \item If $t$ is safe for~$x$ then so is~$\xlet{}{t}{\alpha,\CKchange{y}}{s}$.
-%  \item If $t$ is safe for~$x$ then so is~$\fold_\rho(f,a,t)$.
+  \item If $t$ is safe for~$x$ then so is~$\xlet{}{t}{\alpha,y}{s}$.
   \end{enumerate}
 \end{lemma}
 
@@ -1454,10 +1447,10 @@ $\Termmap$ is \emph{safe}.
 \end{theorem}
 
 \begin{proof}
-  \CKchange{By Lemmas~\ref{lem_transitive} and~\ref{lem_reflexive},} 
+  By Lemmas~\ref{lem_transitive} and~\ref{lem_reflexive},
   $\succeqinterpret$ is a
-  quasi-order. \CKchange{Lemmas~\ref{lem_well_founded} 
-  and~\ref{lem_transitive}} imply that~$\succinterpret$ is a
+  quasi-order. Lemmas~\ref{lem_well_founded}
+  and~\ref{lem_transitive} imply that~$\succinterpret$ is a
   well-founded ordering. Compatibility follows from
   Lemma~\ref{lem:compatibility}. Monotonicity of~$\succeqinterpret$
   follows from Lemma~\ref{lem_succeq_subst}. Monotonicity
@@ -1466,19 +1459,19 @@ $\Termmap$ is \emph{safe}.
 \end{proof}
 
 \begin{example}\label{ex_fold_interpretation}
-  The following is a safe interpretation for the PFS \CKchange{from
+  The following is a safe interpretation for the PFS from
   Example~\ref{ex_fold_pafs}:
   \[
   \begin{array}{rcll}
     \Typemap(\List) & = & \multicolumn{2}{l}{
-      \quant{\beta}{(\quant{\alpha}{\alpha \arrtype
-      \beta \arrtype \beta}) \arrtype \beta \arrtype \beta}}\\
+      \quant{\beta}{(\quant{\alpha}{\LCchange{\beta \arrtype
+      \alpha \arrtype \beta}}) \arrtype \beta \arrtype \beta}}\\
   \Termmap(\mathtt{@}) & = & \Lambda \alpha.\Lambda\beta.
     \lambda f.\lambda x. &
     f \cdot x \oplus \lift_\beta(\flatten_\alpha(x)) \\
   \Termmap(\mathtt{A}) & = & \Lambda \alpha.\Lambda \beta.\lambda x. &
     x * \beta \\
-  \Termmap(\mathtt{nil}) & = & \Lambda \beta.\lambda f. & \abs{x}{x} \\
+  \Termmap(\mathtt{nil}) & = & & \LCchange{\Lambda \beta.\lambda f.} \abs{x}{x} \\
   \Termmap(\mathtt{cons}) & = & \Lambda \alpha.\lambda h.\lambda t. &
     \Lambda \beta.\lambda f.\lambda x.
     t \beta f (f \alpha x h \oplus x \oplus
@@ -1487,13 +1480,18 @@ $\Termmap$ is \emph{safe}.
     \lift_\beta(\flatten_\alpha(h) \oplus 1) \\
   \Termmap(\mathtt{foldl}) & = & \Lambda \beta.\lambda f. \lambda x.
     \lambda l. & l \beta f x \oplus \lift_\beta(\flatten_{\forall \alpha.
-    \alpha \arrtype \beta \arrtype \beta}(f) \oplus
+    \LCchange{\beta \arrtype \alpha \arrtype \beta}}(f) \oplus \\
+    & & & \phantom{ABCDEFGHIJ\ }
     \flatten_\beta(x) \oplus 1) \\
   \end{array}
   \]
 Note that $\Termmap(\mathtt{cons})$ is \emph{not} required to be safe
-for $x$, since $x$ is not an argument of $\mathtt{cons}$.}
+for $x$, since $x$ is not an argument of $\mathtt{cons}$.
 \end{example}
+
+\LC{Above, the types didn't match. You're essentially doing
+  ``fold-left'' encoding of a list, in contrast to the standard
+  ``fold-right'' encoding (that's why your cons is different).}
 
 \section{Proving termination with rule removal}\label{sec_rule_removal}
 
@@ -1604,8 +1602,8 @@ prove termination of a fragment of first-order logic with permutative
 conversions~\cite{PolSchwichtenberg1995}, in the hope of providing a
 more perspicuous proof of this well-known result. Notably, they did
 not treat disjunction. The paper~\cite{SorensenUrzyczyn2010} depends
-on termination of~IPC2, citing a proof from~\cite{Wojdyga2008}, which,
-however, later turned out to be incorrect. To our knowledge,
+on termination of~IPC2, citing a proof from~\cite{Wojdyga2008},
+which, however, later turned out to be incorrect. To our knowledge,
 termination of the full system~IPC2 remains an open problem.
 
 \LC{Cynthia: TODO}
