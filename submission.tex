@@ -36,6 +36,7 @@
 \newcommand{\arrW}{\leadsto}
 \newcommand{\arr}[1]{\longrightarrow_{#1}}
 \newcommand{\red}{\longrightarrow}
+\newcommand{\arrrbeta}{\arrW_\beta^*}
 
 \newcommand{\nat}{\mathtt{nat}}
 \newcommand{\flatten}{\mathtt{flatten}}
@@ -77,6 +78,7 @@
 \newcommand{\cons}{\mathtt{cons}}
 \newcommand{\fold}{\mathtt{fold}}
 \newcommand{\xlet}[4]{\mathtt{let}_{#1}\,#2\,\mathtt{be}\,[#3]\,\mathtt{in}\,#4}
+\newcommand{\proj}{\mathtt{pr}}
 
 \newcommand{\CK}[1]{\textcolor{violet}{CK: #1}}
 \newcommand{\CKchange}[1]{\textcolor{blue}{#1}}
@@ -1324,10 +1326,10 @@ types can be encoded in System~$\Fomega$.  We can adapt such encodings
 to interpretations in our framework.  Example~\ref{ex_fold_pafs}
 introduces an inductive type~$\List$ and a~$\mathtt{foldl}$ function.
 Following~\cite[Chapter~11]{Girard1989},
-we set $\Typemap(\List) = \quant{\beta}{(\quant{\alpha}{\alpha \arrtype
-\beta \arrtype \beta}) \arrtype \beta \arrtype \beta}$ and
-$\Termmap(\nil) = \tabs{\beta}{\abs{f:\quant{\alpha}{\alpha \arrtype
-\beta \arrtype \beta}}{\abs{x:\beta}{x}}}$.  If we additionally choose
+we set $\Typemap(\List) = \CKchange{\quant{\beta}{(\quant{\alpha}{\beta \arrtype
+\alpha \arrtype \beta})} \arrtype \beta \arrtype \beta}$ and
+$\Termmap(\nil) = \tabs{\beta}{\abs{f:\quant{\alpha}{\CKchange{\beta \arrtype
+\alpha \arrtype \beta}}}{\abs{x:\beta}{x}}}$.  If we additionally choose
 $\Termmap(\mathtt{foldl}) = \tabs{\beta}{\abs{f}{\abs{x}{\abs{l}{l
 \beta f x}}} \oplus \lift_\beta(1)}$, we have
 $\interpret{\mathtt{foldl}_{\sigma}(f,s,\nil)} = (\tabs{\beta}{
@@ -1335,13 +1337,14 @@ $\interpret{\mathtt{foldl}_{\sigma}(f,s,\nil)} = (\tabs{\beta}{
   \typeinterpret{\sigma} f s (\tabs{\beta}{\abs{f}{\abs{x}{x}}})
   \leadsto^* s \oplus \lift_{\interpret{\sigma}}(1)$ by
   $\beta$-reduction steps.
-\LCchange{An} extension of the proof \LCchange{from} Example~\ref{ex:plus1} \LCchange{shows that}
+An extension of the proof from Example~\ref{ex:plus1} shows that
 this term $\succ \interpret{s}$.
 \end{example}
 
 \LC{Above, the type of $\Termmap(\mathtt{foldl})$ doesn't match ($f$ should
   have type $\forall \alpha . \beta \to \alpha \to \beta$). It looks
   as if you're confusing foldl with foldr (or at least their types).}
+\CK{Indeed. Is it correct now?}
 
 It is easy to see that $\succeqinterpret$ and
 $\succinterpret$ have desirable properties such as transitivty,
@@ -1464,24 +1467,26 @@ $\Termmap$ is \emph{safe}.
   \[
   \begin{array}{rcll}
     \Typemap(\List) & = & \multicolumn{2}{l}{
-      \quant{\beta}{(\quant{\alpha}{\LCchange{\beta \arrtype
-      \alpha \arrtype \beta}}) \arrtype \beta \arrtype \beta}}\\
+      \quant{\beta}{(\quant{\alpha}{\beta \arrtype
+      \alpha \arrtype \beta}) \arrtype \beta \arrtype \beta}}\\
   \Termmap(\mathtt{@}) & = & \Lambda \alpha.\Lambda\beta.
     \lambda f.\lambda x. &
     f \cdot x \oplus \lift_\beta(\flatten_\alpha(x)) \\
   \Termmap(\mathtt{A}) & = & \Lambda \alpha.\Lambda \beta.\lambda x. &
     x * \beta \\
-  \Termmap(\mathtt{nil}) & = & & \LCchange{\Lambda \beta.\lambda f.} \abs{x}{x} \\
+  \Termmap(\mathtt{nil}) & = & & \Lambda \beta.\lambda f.\abs{x}{x} \\
   \Termmap(\mathtt{cons}) & = & \Lambda \alpha.\lambda h.\lambda t. &
-    \Lambda \beta.\lambda f.\lambda x.
-    t \beta f (f \alpha x h \oplus x \oplus
-    \lift_\beta(\flatten_\alpha(h)))\ \oplus \\
+    \CKchange{\Lambda \beta.\lambda f.\lambda x.
+    t \beta f (f \alpha x h \oplus \lift_\beta(\flatten_\beta(x)\ 
+    \oplus} \\
+    & & & \phantom{ABCDEFGHIJKLMNOP,} \CKchange{\flatten_\alpha(h)))\ \oplus}\  \\
     & & & \phantom{ABCDE\ }
-    \lift_\beta(\flatten_\alpha(h) \oplus 1) \\
+    \CKchange{\lift_\beta(\flatten_\beta(f\alpha h x) \oplus
+    \flatten_\alpha(h) \oplus 1)} \\
   \Termmap(\mathtt{foldl}) & = & \Lambda \beta.\lambda f. \lambda x.
     \lambda l. & l \beta f x \oplus \lift_\beta(\flatten_{\forall \alpha.
-    \LCchange{\beta \arrtype \alpha \arrtype \beta}}(f) \oplus \\
-    & & & \phantom{ABCDEFGHIJ\ }
+    \beta \arrtype \alpha \arrtype \beta}(f)\ \oplus \\
+    & & & \phantom{ABCDEFG\ \ }
     \flatten_\beta(x) \oplus 1) \\
   \end{array}
   \]
@@ -1489,14 +1494,17 @@ Note that $\Termmap(\mathtt{cons})$ is \emph{not} required to be safe
 for $x$, since $x$ is not an argument of $\mathtt{cons}$.
 \end{example}
 
-\LC{Above, the types didn't match. You're essentially doing
-  ``fold-left'' encoding of a list, in contrast to the standard
-  ``fold-right'' encoding (that's why your cons is different).}
-
 \section{Proving termination with rule removal}\label{sec_rule_removal}
 
-In this section we show how to use reduction pairs to prove
-termination of a PFS. This is achieved by the method of rule removal.
+\CKchange{A PFS $A$ is certainly terminating if its reduction relation
+$\arr{\Rules}$ is contained in a well-founded relation, which holds if
+$\ell \succinterpret r$ for all its rules $(\ell,r)$.  However,
+sometimes it is cumbersome to find an interpretation that orients all
+rules strictly. To illustrate, the interpretation of Example
+\ref{ex_fold_interpretation} gives $\ell \succinterpret r$ for two of
+the rules and $\ell \succeqinterpret r$ for the others (as we will see
+in Example \ref{ex_fold_final}). In such cases, proof progress is still
+achieved through \emph{rule removal}.}
 
 \begin{theorem}\label{thm:ruleremove}
   Let $\Rules = \Rules_1 \cup \Rules_2$, and suppose that
@@ -1523,44 +1531,97 @@ algorithm:
 \begin{enumerate}
 \item While $\Rules$ is non-empty:
   \begin{enumerate}
-  \item Orient all rules in $\Rules$ using $\succeq^\Rules$ or
-    $\succ^\Rules$; at least one of them must be oriented using
-    $\succ^\Rules$.
+  \item \CKchange{Construct a reduction pair $(\succeq^\Rules,\succ^\Rules)$
+    such that all rules in $\Rules$ are oriented by $\succeq^\Rules$ or
+    $\succ^\Rules$, and at least one of them is oriented using
+    $\succ^\Rules$.}
   \item Remove all rules ordered by $\succ^\Rules$ from $\Rules$.
   \end{enumerate}
 \end{enumerate}
 If this algorithm succeeds, we have proven termination.
 
-We propose using the pair $(\succeqinterpret,\succinterpret)$ from
-Section~\ref{sec_reduction_pairs}. To use this pair to prove
-termination of $\arr{\Rules}$ with rule removal, two things must be
-ensured:
-\begin{itemize}
-\item $\Termmap$ is safe;
-\item all rules in $\Rules$ can be oriented with $\succeqinterpret$ or
-  $\succinterpret$, and at least one with $\succinterpret$.
-\end{itemize}
-
+\medskip
+\CKchange{To use this algorithm with the pair $(\succeqinterpret,\succinterpret)$
+from Section~\ref{sec_reduction_pairs}, we should identify an
+interpretation $(\Typemap,\Termmap)$
+%CK: space
+%for which two things must be
+%ensured:
+%\begin{itemize}
+%\item $\Termmap$ is safe;
+%\item all rules in $\Rules$ can be oriented with $\succeqinterpret$ or
+%  $\succinterpret$, and at least one with $\succinterpret$.
+%\end{itemize}
+such that (a) $\Termmap$ is safe, (b) all rules can be oriented with
+$\succeqinterpret$ or $\succinterpret$, and (c) at least one rule is
+oriented with $\succinterpret$.}
+%
 The first requirement guarantees that
 $(\succeqinterpret,\succinterpret)$ is a reduction pair (by
 Theorem~\ref{thm_reduction_pair}). Lemma~\ref{lem_safe} provides some
-sufficient safety criteria. The second requirement has to be verified
-for every individual rule.
+sufficient safety criteria. The second \CKchange{and third
+requirements have} to be verified for \CKchange{each} individual rule.
 
-Now, we state a few lemmas which are helpful in showing rule
-orientation with~$\succeqinterpret$ and~$\succinterpret$. The proofs
-may be found in Appendix~\ref{app_proofs}.
+\begin{example}\label{ex_fold_intermediate}
+  We continue with our example of fold on heterogenous lists. We prove
+  termination by rule removal, using the symbol mapping from
+  Example~\ref{ex_fold_interpretation}.
+  \CKchange{We must show:
+  \[
+  \begin{array}{rcl}
+    @_{\sigma,\tau}(\abs{x:\sigma}{s},t) & \succeqinterpret & s[x:=t] \\
+    \mathtt{A}_{\abs{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) &
+      \succeqinterpret & s[\alpha:=\tau] \\
+    \mathtt{foldl}_\sigma(f,s,\nil) & \succinterpret & s \\
+    \mathtt{foldl}_\sigma(f,s,\cons_\tau(h,t)) & \succinterpret &
+    \mathtt{foldl}_\sigma(f,@_{\tau,\sigma}(@_{\sigma,\tau
+    \arrtype\sigma}(
+      \mathtt{A}_{\abs{\alpha}{\sigma\arrtype\alpha\arrtype\sigma},
+      \tau}(f),s),h),t) \\
+  \end{array}
+  \]
+%By definition, these inequalities hold if we have:
+%  \[
+%  \begin{array}{rcl}
+%    \interpret{@_{\sigma,\tau}(\abs{x:\sigma}{s},t)} & \succeq &
+%      \interpret{s[x:=t]} \\
+%    \interpret{\mathtt{A}_{\abs{\alpha}{\sigma},\tau}(\tabs{\alpha}{s})}
+%      & \succeq & \interpret{s[\alpha:=\tau]} \\
+%    \interpret{\mathtt{foldl}_\sigma(f,s,\nil)} & \succ & \interpret{s} \\
+%    \interpret{\mathtt{foldl}_\sigma(f,s,\cons_\tau(h,t))} & \succ &
+%    \interpret{\mathtt{foldl}_\sigma(f,@_{\tau,\sigma}(@_{\sigma,\tau
+%    \arrtype\sigma}(
+%      \mathtt{A}_{\abs{\alpha}{\sigma\arrtype\alpha\arrtype\sigma},
+%      \tau}(f),s),h),t)} \\
+%  \end{array}
+%  \]
+%Consider the first.
+Consider the first inequality; by definition it holds if
+$\interpret{@_{\sigma,\tau}(\abs{x:\sigma}{s},t)} \succeq
+\interpret{s[x:=t]}$.
+Since $\interpret{@_{\sigma,\tau}(\abs{x:
+\sigma}{s},t)} \arrW^* \interpret{s}[x:=\interpret{t}] \oplus
+\lift_{\typeinterpret{\tau}}(\flatten_{\typeinterpret{\sigma}}(
+\interpret{t}))$, and $\interpret{s}[x:=\interpret{t}] =
+\interpret{s[x:=t]}$ (by Lemma \ref{lem:substitutioninterpret}),
+it suffices by Lemma \ref{lem_leadsto_to_approx} if
+$\interpret{s[x:=t]} \oplus \lift_{\typeinterpret{\tau}}(\flatten_{\typeinterpret{\sigma}}(
+\interpret{t})) \succeq \interpret{s[x:=t]}$.
+This is an instance of the general rule $u \oplus w \succeq u$ that
+we will obtain below.}
+\end{example}
 
-\begin{lemma}\label{lem:plusparts}
-For all types $\sigma$, terms $s,t$ of type $\sigma$ and natural
-numbers $n > 0$:
-\begin{enumerate}
-\item $s \oplus_{\sigma} t \succeq s$ and $s \oplus_{\sigma} t \succeq
-  t$;
-\item $s \oplus_{\sigma} (\lift_{\sigma} n) \succ s$ and
-  $(\lift_{\sigma} n) \oplus_{\sigma} t \succ t$.
-\end{enumerate}
-\end{lemma}
+\CKchange{To prove inequalities $s \succ t$ and $s \succeq t$, we will often
+use that $\succ$ and $\succeq$ are transitive and compatible with each
+other (Lem.~\ref{lem_transitive} and\ref{lem:compatibility}), that
+$\arrW\:\subseteq\:\approx$ (Lem.~\ref{lem_leadsto_to_approx}),
+that $\succeq$ is monotonic (Lem.~\ref{lem_succeq_subst}),
+that both $\succ$ and $\succeq$ are monotonic over $\lift$ and $\flatten$
+(Lem.~\ref{lem:liftgreater} and \ref{lem_flatten_succ}) and that
+interpretations respect substitution
+(Lem.~\ref{lem:substitutioninterpret}).  In addition, we can use the
+calculation rules below.}  The proofs may be found in
+Appendix~\ref{app_proofs}.
 
 \begin{lemma}\label{lem:approxproperties}
 For all types $\sigma$ and all terms $s,t,u$ of type $\sigma$, we
@@ -1582,20 +1643,148 @@ have:
 
 \begin{lemma}\label{lem_lift_approx}
   \begin{enumerate}
-  \item $\lift_\sigma(n+m) \approx_\sigma (\lift_\sigma n)
-    \oplus_\sigma (\lift_\sigma n)$.
+  \item\label{lem_lift_approx:plussplit}
+    $\lift_\sigma(n+m) \approx_\sigma (\lift_\sigma n)
+    \oplus_\sigma (\lift_\sigma m)$;
   \item $\lift_\sigma(n m) \approx_\sigma (\lift_\sigma n)
-    \otimes_\sigma (\lift_\sigma n)$.
+    \otimes_\sigma (\lift_\sigma m)$;
+  \item \CKchange{$\flatten_\sigma(\lift_\sigma(n)) \approx n$.}
   \end{enumerate}
 \end{lemma}
 
-\begin{example}\label{ex_fold_orientation}
-  We continue with our example of fold on heterogenous lists. We prove
-  termination by rule removal, using the symbol mapping from
-  Example~\ref{ex_fold_interpretation}. \LC{Cynthia: TODO}
+\CK{I use that last one a lot in urzy\_emb, so that one also needs a
+proof!}
+
+\begin{lemma}\label{lem:plusparts}
+For all types $\sigma$, terms $s,t$ of type $\sigma$ and natural
+numbers $n > 0$:
+\begin{enumerate}
+\item\label{lem:plusparts:removefromsucceq}
+  $s \oplus_{\sigma} t \succeq s$ and $s \oplus_{\sigma} t \succeq
+  t$;
+\item \CKchange{if $s \succ t$ (resp.~$s \succeq t$) then also
+  $s \oplus_{\sigma} u \succ t \oplus_{\sigma} u$ (resp.~$s \oplus_{
+  \sigma} u \succeq t \oplus_{\sigma} u$);}
+\item $s \oplus_{\sigma} (\lift_{\sigma} n) \succ s$ and
+  $(\lift_{\sigma} n) \oplus_{\sigma} t \succ t$.
+\end{enumerate}
+\end{lemma}
+
+\CK{This addition, too, will need a proof!}
+
+\CKchange{Note that these calculation rules immediately give the
+inequality $x \oplus \lift_{nat \arrtype \nat}(1) \succ x$ from
+Example~\ref{ex:plus1}, and also that $\lift_\sigma(n) \succ
+\lift_\sigma(m)$ whenever $n > m$.  By Lemma~\ref{lem:plusparts} we
+can use \emph{absolute positiveness}: the property that
+(a) $s \succeq t$ if we can write $s \approx s_1 \oplus \dots \oplus
+s_n$ and $t \approx t_1 \oplus \dots \oplus t_k$ with $k \leq n$ and
+$s_i \succeq t_i$ for all $i \leq k$, and (b) if moreover $s_1 \succ
+t_1$ then $s \succ t$.  This property will be very useful in the
+examples.}
+
+\begin{example}\label{ex_fold_final}
+\CKchange{We now have the tools to finish the example of
+heterogeneous lists.  The proof obligation from Example
+\ref{ex_fold_intermediate}, that
+$\interpret{@_{\sigma,\tau}(\abs{x:\sigma}{s},t)} \succeq
+\interpret{s[x:=t]}$, is completed by
+Lemma \ref{lem:plusparts}(\ref{lem:plusparts:removefromsucceq}).
+We have $\interpret{\mathtt{A}_{\abs{\alpha}{\sigma},
+\tau}(\tabs{\alpha}{s})} \approx \interpret{\tabs{\alpha}{s}} *
+\typeinterpret{\tau} \approx \interpret{s[\alpha:=\tau]}$ by Lemma
+\ref{lem:substitutioninterpret}, and
+$\interpret{\mathtt{foldl}_\sigma(f,s,\nil)} =
+\interpret{\nil}*\typeinterpret{\sigma} \cdot \interpret{f} \cdot
+\interpret{s} \oplus \lift_{\typeinterpret{\sigma}}(\langle
+\text{something}\rangle\oplus 1) \approx \interpret{s} \oplus
+\lift_{\typeinterpret{\sigma}}(\langle\text{something}\rangle\oplus 1)
+\succ \interpret{s}$ by Lemmas
+\ref{lem_lift_approx}(\ref{lem_lift_approx:plussplit}) and
+\ref{lem:plusparts}(\ref{lem:plusparts:removefromsucceq}).
+}
+%
+\CKchange{For the last rule note that:
+\[
+\begin{array}{l}
+\interpret{\mathtt{foldl}_\sigma(f,s,\cons_\tau(h,t))} \approx \\
+\interpret{\cons_\tau(h,t))} * \typeinterpret{\sigma} \cdot \interpret{f}
+\cdot \interpret{s} \oplus \lift_{\typeinterpret{\sigma}}(
+\flatten(\interpret{f}) \oplus \flatten(\interpret{s}) \oplus 1) \approx \\
+(\ \interpret{t} * \typeinterpret{\sigma} \cdot \interpret{f} \cdot
+(\interpret{f} * \typeinterpret{\tau} \cdot \interpret{s}
+\cdot \interpret{h} \oplus
+\lift_{\typeinterpret{\sigma}}(\flatten(\interpret{s}) \oplus
+\flatten(\interpret{h})))\ \oplus \\
+\phantom{AB}
+\lift_{\typeinterpret{\sigma}}(\flatten(\interpret{f} *
+\typeinterpret{\tau} \cdot \interpret{s} \cdot \interpret{h}) \oplus
+\flatten(\interpret{h}) \oplus 1)\ )\ \oplus \\
+\phantom{A}
+ \lift_{\typeinterpret{\sigma}}(\flatten(\interpret{f}) \oplus
+ \flatten(\interpret{s}) \oplus 1) \approx \\
+\interpret{t} * \typeinterpret{\sigma} \cdot \interpret{f} \cdot
+(\ \interpret{f} * \typeinterpret{\tau} \cdot \interpret{s}
+\cdot \interpret{h} \oplus 
+\lift_{\typeinterpret{\sigma}}(\flatten(\interpret{s}) \oplus
+\flatten(\interpret{h}))\ )\ \oplus \\
+\phantom{A}
+\lift_{\typeinterpret{\sigma}}(\flatten(\interpret{f} * \typeinterpret{
+\tau} \cdot \interpret{s} \cdot \interpret{h}) \oplus
+\flatten(\interpret{h}) \oplus
+\flatten(\interpret{f}) \oplus\flatten(\interpret{s}) \oplus 2) \\
+\end{array}
+\]
+On the right-hand side of the inequality, noting that
+$\lift_{\sigma \arrtype \tau}(s) \cdot t \arrW^*
+\lift_{\tau}(s)$, we have:
+\[
+\begin{array}{l}
+\interpret{\mathtt{foldl}_\sigma(f,@_{\tau,\sigma}(@_{\sigma,\tau
+    \arrtype\sigma}(
+      \mathtt{A}_{\abs{\alpha}{\sigma\arrtype\alpha\arrtype\sigma},
+      \tau}(f),s),h),t)} \approx \\
+\Termmap(\mathtt{foldl})_\sigma(\interpret{f},\ 
+  \interpret{f} * \typeinterpret{\tau} \cdot \interpret{s} \cdot
+  \interpret{h} \oplus \lift_{\typeinterpret{\sigma}}(\flatten(s)
+  \oplus \flatten(h)),\ \interpret{t}) \approx \\
+\interpret{t} * \typeinterpret{\sigma} \cdot \interpret{f} \cdot
+  (\ \interpret{f} * \typeinterpret{\tau} \cdot \interpret{s} \cdot
+  \interpret{h} \oplus \lift_{\typeinterpret{\sigma}}(\flatten(s)
+  \oplus \flatten(h))\ )\ \oplus \\
+\phantom{A}
+  \lift_{\typeinterpret{\sigma}}(\flatten(\interpret{f}) \oplus
+  \flatten(\interpret{f} * \typeinterpret{\tau} \cdot \interpret{s} \cdot
+  \interpret{h}\ \oplus \\
+  \phantom{ABCDEFGHIJKLMNOPQRSt}
+  \lift_{\typeinterpret{\sigma}}(\flatten(s)
+  \oplus \flatten(h))) \oplus 1) \approx \\
+\interpret{t} * \typeinterpret{\sigma} \cdot \interpret{f} \cdot
+  (\ \interpret{f} * \typeinterpret{\tau} \cdot \interpret{s} \cdot
+  \interpret{h} \oplus \lift_{\typeinterpret{\sigma}}(\flatten(s)
+  \oplus \flatten(h))\ )\ \oplus \\
+\phantom{A}
+  \lift_{\typeinterpret{\sigma}}(\flatten(\interpret{f}) \oplus
+  \flatten(\interpret{f} * \typeinterpret{\tau} \cdot \interpret{s} \cdot
+  \interpret{h}) \oplus \flatten(s) \oplus \flatten(h) \oplus 1)
+\end{array}
+\]
+Now the right-hand side is the left-hand side $\oplus \lift(1)$.
+Clearly, the rule is oriented with $\succ$.  Thus, we may remove the
+last two rules, and continue the rule removal algorithm with only the
+first two, which together define $\beta$-reduction.  This is trivial,
+for instance with an interpretation
+$\Termmap(@) = \Lambda \alpha.\Lambda \beta.\lambda f.\lambda x.
+f \cdot x \oplus \lift_\beta(\flatten_\alpha(x) \oplus 1)$ and
+$\Termmap(\mathtt{A}) = \Lambda \alpha.\Lambda \beta.\lambda x.
+x * \beta \oplus \lift_{\alpha\beta}(1)$.
+}
+
 \end{example}
 
-\section{Larger examples}\label{sec:examples}
+\section{A larger example}\label{sec:examples}
+
+\CK{\L ukasz, can you write the intro to this section?}
 
 Pol and Schwichtenberg used higher-order polynomial interpretations to
 prove termination of a fragment of first-order logic with permutative
@@ -1606,9 +1795,223 @@ on termination of~IPC2, citing a proof from~\cite{Wojdyga2008},
 which, however, later turned out to be incorrect. To our knowledge,
 termination of the full system~IPC2 remains an open problem.
 
-\LC{Cynthia: TODO}
+\CK{I have not made the whole section blue, but from here on, everything
+is new!}
+
+The system can be seen as a PFS with type constructors:
+\[
+\begin{array}{c}
+\Sigma^T_\kappa = \{\quad
+  \bot : *,\quad
+  \mathtt{or} : * \arrkind * \arrkind *,\quad
+  \mathtt{and} : * \arrkind * \arrkind *,\quad
+  \exists : (* \arrkind *) \arrkind *
+  \}
+\end{array}
+\]
+
+We have the following function symbols:
+\[
+\begin{array}{rclcrcl}
+@ & : & \forall \alpha \forall \beta . (\alpha \arrtype \beta) \arrtype \alpha \arrtype \beta &
+\quad &
+\epsilon & : & \forall \alpha . \bot \arrtype \alpha \\
+
+\mathtt{tapp} & : & \forall \alpha : * \arrkind * . \forall \beta .
+  (\forall \beta [\alpha \beta]) \arrtype \alpha \beta &
+\quad &
+\proj^1 & : & \forall \alpha \forall \beta . \mathtt{and}\, \alpha\, \beta \arrtype \alpha \\
+
+\mathtt{pair} & : & \forall \alpha \forall \beta . \alpha \arrtype \beta \arrtype
+  \mathtt{and}\, \alpha\, \beta &
+\quad &
+\proj^2 & : & \forall \alpha \forall \beta . \mathtt{and}\, \alpha\, \beta \arrtype \beta \\
+
+\mathtt{case} & : & \forall \alpha \forall \beta \forall \gamma . \mathtt{or}\, \alpha\, \beta \arrtype
+  (\alpha \arrtype \gamma) \arrtype (\beta \arrtype \gamma) \arrtype \gamma &
+\quad &
+\mathtt{in}^1 & : & \forall \alpha \forall \beta . \alpha \arrtype
+  \mathtt{or}\, \alpha\, \beta \\
+
+\mathtt{let} & : & \forall \alpha : * \arrkind * . \forall \beta .
+  (\exists (\alpha)) \arrtype
+  (\forall \gamma . \alpha \gamma \arrtype \beta) \arrtype \beta &
+\quad &
+\mathtt{in}^2 & : & \forall \alpha \forall \beta . \beta \arrtype
+  \mathtt{or}\, \alpha\, \beta \\
+
+\mathtt{ext} & : & \forall \alpha : * \arrkind * . \forall \beta . \alpha \beta \arrtype
+  \exists (\alpha)
+\end{array}
+\]
+
+And a number of rules, including the following:
+\[
+\begin{array}{rclrcl}
+@_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] &
+\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{\sigma,\tau}(u),
+  \abs{x}{s},\abs{y}{t}) & \red & s[x:=u] \\
+
+\mathtt{tapp}_{\abs{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \red &
+  s[\alpha:=\tau] &
+\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^2_{\sigma,\tau}(u),
+  \abs{x}{s},\abs{y}{t}) & \red & t[x:=u] \\
+
+\proj^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & s &
+\mathtt{let}_{\varphi,\rho}(\mathtt{ext}_{\varphi,\tau}(s),\tabs{\alpha}{\abs{x}{t}}) & \red & t[\alpha:=\tau][x:=s] \\
+
+\proj^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & t \\
+\end{array}
+\]
+\[
+\begin{array}{rclrcl}
+\epsilon_\tau(\epsilon_\bot(s)) & \red & \epsilon_\tau(s) &
+@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) & \red &
+  \epsilon_\tau(s) \\
+
+\proj^1_{\sigma,\tau}(\epsilon_{\mathtt{and}\,\sigma\,\tau}(s)) & \red &
+  \epsilon_\sigma(s) &
+\mathtt{tapp}_{\varphi,\tau}(
+  \epsilon_{\quant{\alpha}{\varphi\alpha}}(s)) & \red &
+  \epsilon_{\varphi\tau}(s) \\
+
+\proj^2_{\sigma,\tau}(\epsilon_{\mathtt{and}\,\sigma\,\tau}(s)) & \red &
+  \epsilon_\tau(s) &
+\mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}\,\sigma\,\tau}(
+  u),\abs{x}{s},\abs{y}{t}) & \red & \epsilon_\rho(u) \\
+
+& & & 
+\mathtt{let}_{\varphi,\rho}(\epsilon_{\exists(\varphi)}(s),\tabs{\alpha}{\abs{x}{t}}) & \red &
+  \epsilon_\rho(s) \\
+\end{array}
+\]
+\[
+\begin{array}{l}
+\epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,\abs{x}{s},
+  \abs{y}{t})) \red
+  \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x}{\epsilon_\rho(s)},
+  \abs{y}{\epsilon_\rho(t)}) \\
+\mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,\tau,\mathtt{or}\,
+  \rho\,\pi}(u,\abs{x}{s},\abs{y}{t}),\abs{z}{v},
+  \abs{a}{w}) \red \\
+  \phantom{AB}
+  \mathtt{case}_{\sigma,\tau,\xi}(u,\abs{x}{\mathtt{case}_{
+  \rho,\pi,\xi}(s,\abs{z}{v},\abs{a}{w})},
+  \abs{y}{\mathtt{case}_{\rho,\pi,\xi}(t,\abs{z}{v},
+  \abs{a}{w})}) \\
+\mathtt{let}_{\varphi,\rho}(
+  \mathtt{case}_{\sigma,\tau,\exists\varphi}(
+  u,\abs{x}{s},\abs{y}{t}),v) \red
+  \mathtt{case}_{\sigma,\tau,\rho}(u,
+  \abs{x}{\mathtt{let}_{\varphi,\rho}(s,v)},
+  \abs{y}{\mathtt{let}_{\varphi,\rho}(t,v)}) \\
+\mathtt{let}_{\psi,\rho}(\mathtt{let}_{\varphi,\exists\psi}(s,
+  \tabs{\alpha}{\abs{x:\varphi\alpha}{t}}),u) \red
+  \mathtt{let}_{\varphi,\rho}(s,\tabs{\alpha}{\abs{x:
+  \varphi\alpha}{\mathtt{let}_{\psi,\rho}(t,u)}})
+  \hfill (*) \\
+\end{array}
+\]
+
+Most of these rules can be oriented strictly (so using $\succinterpret$)
+by the following interpretation:
+\[
+\begin{array}{rclcrcl}
+\Typemap(\bot) & = & \nat
+& \quad &
+\Typemap(\mathtt{and}) & = & \lambda\alpha_1\lambda\alpha_2 . \alpha_1\times\alpha_2 \\
+
+\Typemap(\exists) & = & \lambda(\alpha : * \arrkind *) . \Sigma \gamma . \alpha \gamma
+& \quad &
+\Typemap(\mathtt{or}) & = & \lambda\alpha_1\lambda\alpha_2 . \alpha_1\times\alpha_2 \\
+\end{array}
+\]
+\[
+\begin{array}{rcll}
+\Termmap(\epsilon) & = & \Lambda \alpha:* . \lambda x:\nat. &
+  \mathtt{lift}_\alpha(2 \otimes x \oplus 1) \\
+\Termmap(@) & = & \Lambda\alpha\Lambda\beta\lambda x: \alpha \arrtype \beta . \lambda y :
+  \alpha . \quad & \lift_\beta(2) \otimes (x \cdot y) \oplus
+  \lift_\beta(\flatten_\alpha(y)\ \oplus \\
+  & & & \phantom{AB}\flatten_{\alpha \arrtype \beta}(x) \otimes
+  \flatten_\beta(y) \oplus 1) \\
+\Termmap(\mathtt{tapp}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta . \lambda x : \quant{\gamma}{\alpha\gamma} . \quad &
+  \lift_{\alpha\beta}(2) \otimes
+  (x * \beta) \oplus \lift_{\alpha\beta}(1) \\
+\Termmap(\mathtt{ext}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta : * . \lambda x:\alpha\beta . &
+  \expair{\beta}{x} \oplus \lift_{\Sigma\gamma.\beta\gamma}(
+  \flatten_{\alpha\gamma}(x)) \\
+\Termmap(\mathtt{pair}) & = & \Lambda \alpha \Lambda \beta \lambda x :
+  \alpha, y : \beta.\quad & \pair{x}{y} \oplus \lift_{
+  \alpha \times \beta}(\flatten_\alpha(x) \oplus \flatten_{\beta}(y)) \\
+\Termmap(\proj^1) & = & \Lambda \alpha \Lambda \beta \lambda x :
+  \alpha \times \beta . \quad
+  & \lift_\alpha(2) \otimes \pi^1(x) \oplus \lift_{\alpha}(1) \\
+\Termmap(\proj^2) & = & \Lambda \alpha \Lambda \beta \lambda x :
+  \alpha\times\beta.\quad
+  & \lift_\beta(2) \otimes \pi^2(x) \oplus \lift_{\beta}(1) \\
+\Termmap(\mathtt{in}^1) & = & \Lambda \alpha \Lambda \beta
+  \lambda x : \alpha.\quad & \pair{x}{\lift_\beta(1)}
+  \oplus \lift_{\alpha
+  \times \beta}(\flatten_{\alpha}(x)) \\
+\Termmap(\mathtt{in}^2) & = & \Lambda \alpha \Lambda \beta
+  \lambda x : \beta.\quad & \pair{\lift_\alpha(1)}{x}
+  \oplus \lift_{\alpha \times \beta}(\flatten_{\beta}(x)) \\
+\end{array}
+\]
+\[
+\begin{array}{rcl}
+\Termmap(\mathtt{let}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta : * . \lambda x : \Sigma \xi . \alpha\xi,
+  y : \quant{\xi}{\alpha\xi \arrtype \beta}. \\
+  & & \lift_\beta(1) \oplus \lift_\beta(2) \otimes
+    (\xlet{\beta}{x}{\xi,z}{y\xi z})\ \oplus \\
+  & & \lift_\beta(\flatten_{\Sigma\gamma.\alpha\gamma}(x) \oplus 1)
+    \otimes (y * \nat \cdot \lift_{\alpha\nat}(0)) \\
+\Termmap(\mathtt{case}) & = & \Lambda \alpha,\beta,\xi . \lambda x :
+  \alpha \times \beta, y : (\alpha \arrtype \xi), z : (\beta \arrtype
+  \xi). \\
+  & & \quad
+  \lift_\xi(2) \oplus
+  \lift_\xi(3 \otimes \flatten_{\alpha \times \beta}(x)) \oplus \\
+  & & \quad\phantom{ABCDE}
+  \lift_\xi(\flatten_{\alpha \times \beta}(x) \oplus 1)
+    \otimes (y \cdot \pi^1(x) \oplus z \cdot \pi^2(x)) \\
+\end{array}
+\]
+
+The only rules that are not oriented with this interpretation -- also
+not using $\succeq$ -- are the ones of the form $f(\mathtt{let}(s,t),
+\dots) \red \mathtt{let}(s,f(t,\dots))$, like the rule marked (*) above.
+\CK{\L ukasz, you may want to say some words on why it's important
+that we \emph{did} get the rest!}
+
+The full set of rules and the proof that they are oriented is
+available in Appendix \ref{app_ineqs}.
 
 \section{Conclusions and future work}
+
+\CKchange{In this paper, we have laid the foundation for a powerful methodology
+to prove termination of higher-order rewriting with full impredicative
+polymorphism.}
+\CK{Probably write a few more sentences here explaining why what we did
+is totally awesome.}
+
+\CKchange{Readers may note that the method is currently not that easy to apply on
+larger systems: simplifying polynomials can be a lot of work,
+especially when interpretations multiply two variables (such as
+$\Termmap(\mathtt{case})$ in Section \ref{sec:examples}), and checking
+the proofs is tedious.  Hence, a natural direction for future work is
+to look into automation: both for automatic verification that a given
+interpretation suffices and -- building on existing termination provers
+for both first- and higher-order term rewriting -- automatically finding
+a suitable interpretation.}
+
+\CKchange{In addition, it would be worth exploring improvements of the method that
+would allow us to handle the remaining rules of IPC2, or extending
+other technique for higher-order termination. %like dependency pairs.
+%CK: problem: everything I want to say will require an additional
+%citation, which we may not have space for!
+}
 
 \addcontentsline{toc}{section}{References}
 \bibliography{references}
@@ -3033,5 +3436,2445 @@ have:
 \end{proof}
 
 \section{Proving the inequalities in \refsec{examples}}\label{app_ineqs}
+
+The system IPC2 can be seen as a PFS with the following type constructors:
+\[
+\begin{array}{c}
+\Sigma^T_\kappa = \{\quad
+  \bot : *,\quad
+  \mathtt{or} : * \arrkind * \arrkind *,\quad
+  \mathtt{and} : * \arrkind * \arrkind *,\quad
+  \exists : (* \arrkind *) \arrkind *
+  \}
+\end{array}
+\]
+We also have the following function symbols:
+\[
+\begin{array}{rclcrcl}
+@ & : & \forall \alpha \forall \beta . (\alpha \arrtype \beta) \arrtype \alpha \arrtype \beta &
+\quad &
+\epsilon & : & \forall \alpha . \bot \arrtype \alpha \\
+
+\mathtt{tapp} & : & \forall \alpha : * \arrkind * . \forall \beta .
+  (\forall \beta [\alpha \beta]) \arrtype \alpha \beta &
+\quad &
+\proj^1 & : & \forall \alpha \forall \beta . \mathtt{and}\, \alpha\, \beta \arrtype \alpha \\
+
+\mathtt{pair} & : & \forall \alpha \forall \beta . \alpha \arrtype \beta \arrtype
+  \mathtt{and}\, \alpha\, \beta &
+\quad &
+\proj^2 & : & \forall \alpha \forall \beta . \mathtt{and}\, \alpha\, \beta \arrtype \beta \\
+
+\mathtt{case} & : & \forall \alpha \forall \beta \forall \gamma . \mathtt{or}\, \alpha\, \beta \arrtype
+  (\alpha \arrtype \gamma) \arrtype (\beta \arrtype \gamma) \arrtype \gamma &
+\quad &
+\mathtt{in}^1 & : & \forall \alpha \forall \beta . \alpha \arrtype
+  \mathtt{or}\, \alpha\, \beta \\
+
+\mathtt{let} & : & \forall \alpha : * \arrkind * . \forall \beta .
+  (\exists (\alpha)) \arrtype
+  (\forall \gamma . \alpha \gamma \arrtype \beta) \arrtype \beta &
+\quad &
+\mathtt{in}^2 & : & \forall \alpha \forall \beta . \beta \arrtype
+  \mathtt{or}\, \alpha\, \beta \\
+
+\mathtt{ext} & : & \forall \alpha : * \arrkind * . \forall \beta . \alpha \beta \arrtype
+  \exists (\alpha)
+\end{array}
+\]
+
+The following are the \emph{core} rules:
+\[
+\begin{array}{rcl}
+@_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] \\
+\mathtt{tapp}_{\abs{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \red &
+  s[\alpha:=\tau] \\
+\proj^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & s \\
+\proj^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & t \\
+\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{\sigma,\tau}(u),
+  \abs{x}{s},\abs{y}{t}) & \red & s[x:=u] \\
+\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^2_{\sigma,\tau}(u),
+  \abs{x}{s},\abs{y}{t}) & \red & t[x:=u] \\
+\mathtt{let}_{\varphi,\rho}(\mathtt{ext}_{\varphi,\tau}(s),\tabs{\alpha}{\abs{x:\varphi \alpha}{t}}) & \red & t[\alpha:=\tau][x:=s] \\
+\end{array}
+\]
+
+Then these rule simplify proofs from contradiction:
+\[
+\begin{array}{rclrcl}
+\epsilon_\tau(\epsilon_\bot(s)) & \red & \epsilon_\tau(s) \\
+\proj^1_{\sigma,\tau}(\epsilon_{\mathtt{and}\,\sigma\,\tau}(s)) & \red &
+  \epsilon_\sigma(s) \\
+\proj^2_{\sigma,\tau}(\epsilon_{\mathtt{and}\,\sigma\,\tau}(s)) & \red &
+  \epsilon_\tau(s) \\
+@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) & \red &
+  \epsilon_\tau(s) \\
+\mathtt{tapp}_{\varphi,\tau}(
+  \epsilon_{\quant{\alpha}{\varphi\alpha}}(s)) & \red &
+  \epsilon_{\varphi\tau}(s) \\
+\mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}\,\sigma\,\tau}(
+  u),\abs{x:\sigma}{s},\abs{y:\tau}{t}) & \red & \epsilon_\rho(u) \\
+\mathtt{let}_{\varphi,\rho}(\epsilon_{\exists(\varphi)}(s),\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}) & \red &
+  \epsilon_\rho(s) \\
+\end{array}
+\]
+
+When a $\mathtt{case}$ occurs in a first argument, then it is shifted
+to the root of the term.
+\[
+\begin{array}{l}
+\epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,\abs{x:\sigma}{s},
+  \abs{y:\tau}{t})) \red
+  \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x:\sigma}{\epsilon_\rho(s)},
+  \abs{y:\tau}{\epsilon_\rho(t)}) \\
+@_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\rho \arrtype \pi}(u,
+  \abs{x:\sigma}{s},\abs{y:\tau}{t}),v) \red
+  \mathtt{case}_{\sigma,\tau,\pi}(u,
+  \abs{x:\sigma}{@_{\rho,\pi}(s,v)},\abs{y:\tau}{@_{\rho,\pi}(t,v)}) \\
+\mathtt{tapp}_{\varphi,\pi}(\mathtt{case}_{\sigma,\tau,
+  \quant{\alpha}{\varphi\alpha}}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t}))
+  \red
+  \mathtt{case}_{\sigma,\tau,\varphi\pi}(u,
+  \abs{x:\sigma}{\mathtt{tapp}_{\varphi,\pi}(s)},
+  \abs{y:\tau}{\mathtt{tapp}_{\varphi,\pi}(t)}) \\
+\proj^1_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}\,\rho\,\pi}(u,
+  \abs{x:\sigma}{s},\abs{y:\tau}{t})) \red
+  \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x:\sigma}{\proj^1_{\rho,\pi}(s)},
+  \abs{y:\tau}{\proj^1_{\rho,\pi}(t)}) \\
+\proj^2_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}\,\rho,\pi}(u,
+  \abs{x:\sigma}{s},\abs{y:\tau}{t}))\red
+  \mathtt{case}_{\sigma,\tau,\pi}(u,\abs{x:\sigma}{\proj^2_{\rho,\pi}(s)},
+  \abs{y:\tau}{\proj^2_{\rho,\pi}(t)}) \\
+\mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,\tau,\mathtt{or}\,
+  \rho\,\pi}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t}),\abs{z:\rho}{v},
+  \abs{a:\pi}{w}) \red \\
+\phantom{AB}
+  \mathtt{case}_{\sigma,\tau,\xi}(u,\abs{x:\sigma}{
+    \mathtt{case}_{\rho,\pi,\xi}(s,\abs{z:\rho}{v},\abs{a:\pi}{w})},
+    \abs{y:\tau}{\mathtt{case}_{\rho,\pi,\xi}(t,\abs{z:\rho}{v},
+    \abs{a:\pi}{w})}) \\
+\mathtt{let}_{\varphi,\rho}(
+  \mathtt{case}_{\sigma,\tau,\exists\varphi}(
+  u,\abs{x:\sigma}{s},\abs{y:\tau}{t}),v) \red \\
+\phantom{AB}
+  \mathtt{case}_{\sigma,\tau,\rho}(u,
+  \abs{x:\sigma}{\mathtt{let}_{\varphi,\rho}(s,v)},
+  \abs{y:\tau}{\mathtt{let}_{\varphi,\rho}(t,v)}) \\
+\end{array}
+\]
+
+And the same happens for the $\mathtt{let}$:
+\[
+\begin{array}{l}
+\epsilon_\tau(\mathtt{let}_{\varphi,\bot}(s,\tabs{\alpha}{
+  \abs{x:\varphi\alpha}{t}})) \red
+  \mathtt{let}_{\varphi,\tau}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{
+  \epsilon_\tau(t)}}) \\
+@_{\tau,\rho}(\mathtt{let}_{\varphi, \tau \arrtype
+  \rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}),u) \red
+  \mathtt{let}_{\varphi,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{
+  @_{\tau,\rho}(t,u)}}) \\
+\mathtt{tapp}_{\psi,\rho}(\mathtt{let}_{\varphi,
+  \forall\beta[\psi\beta]}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}))
+  \red 
+  \mathtt{let}_{\varphi,\psi\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{
+  \mathtt{tapp}_{\psi,\rho}(t)}}) \\
+\proj^1_{\tau,\rho}(\mathtt{let}_{\varphi,
+  \mathtt{and}\,\tau,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}))
+  \red
+  \mathtt{let}_{\varphi,\tau}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{
+  \proj^1_{\tau,\rho}(t)}}) \\
+\proj^2_{\tau,\rho}(\mathtt{let}_{\varphi,
+  \mathtt{and}\,\tau\,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}))
+  \red
+  \mathtt{let}_{\varphi,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{
+  \proj^2_{\tau,\rho}(t)}}) \\
+\mathtt{case}_{\tau,\rho,\pi}(
+  \mathtt{let}_{\varphi,\mathtt{or}\,\tau\,\rho}(s,\tabs{\alpha}{
+  \abs{x:\varphi\alpha}{t}}),\abs{x:\tau}{u},\abs{y:\rho}{v})
+  \red \\
+\phantom{AB}
+  \mathtt{let}_{\varphi,\pi}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{
+  \mathtt{case}_{\tau,\rho,\pi}(t,\abs{x:\tau}{u},\abs{y:\rho}{v})}}) \\
+\mathtt{let}_{\psi,\rho}(\mathtt{let}_{\varphi,\exists\psi}(s,
+  \tabs{\alpha}{\abs{x:\varphi\alpha}{t}}),u) \red
+  \mathtt{let}_{\varphi,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{
+  \mathtt{let}_{\psi,\rho}(t,u)}}) \\
+\end{array}
+\]
+
+It is this last group of rules that is not oriented by our method.
+For all other rules $\ell \red r$ we have $\interpret{\ell} \succ
+\interpret{r}$, as demonstrated below.
+
+\medskip
+In the proofs below, we will often use that $\lift(n) \otimes s \oplus
+t \succeq s$ if $n \geq 1$, which holds because $\lift(n) \otimes s
+\oplus t \approx \lift(1) \otimes s \oplus (\lift(n-1) \otimes s
+\oplus t) \approx s \oplus (\lift(n-1) \otimes s \oplus t) \succeq
+s$, using the calculation rules.  Having this, the core rules and the
+contradiction simplifications are all quite easy due to the choice of
+$\Termmap$:
+\begin{itemize}
+\item $\interpret{@_{\sigma,\tau}(\abs{x}{s},t)} \succ
+  \interpret{s[x:=t]}$ \\ We have 
+  $\interpret{@_{\sigma,\tau}(\abs{x:\sigma}{s},t)} \arrrbeta
+  \lift_{\typeinterpret{\tau}}(2) \otimes
+  (\ (\abs{x:\typeinterpret{\sigma}}{\interpret{s}}) \cdot
+  \interpret{t}\ ) \oplus
+  \lift_{\typeinterpret{\tau}}(\langle\text{something}\rangle \oplus
+  1) \leadsto
+  \lift(2) \otimes \interpret{s}[x:=\interpret{t}] \oplus
+  \lift(\langle\text{something}\rangle \oplus 1) \succ
+  \interpret{s}[x:=\interpret{t}]$, which equals $\interpret{s[x:=t]}$
+  by Lemma \ref{lem:substitutioninterpret}.
+%  Since, by Lemma \ref{lem_succ_red} $\leadsto \cdot \succ$ is
+%  contained in $\succ$ ,we have the required orientation of the rule.
+\item $\interpret{\mathtt{tapp}_{\abs{\alpha}{\sigma},\tau}(
+  \tabs{\alpha}{s})} \succ \interpret{s[\alpha:=\tau]}$ \\ We have 
+  $\interpret{\mathtt{tapp}_{\lambda \alpha.\sigma,\tau}(
+  \tabs{\alpha}{s})} \arrrbeta \lift_{(\abs{\alpha}{
+  \typeinterpret{\sigma}})\interpret{\tau}}(2) \otimes (
+  (\tabs{\alpha}{\interpret{s}}) * \beta) \oplus
+  \lift_{(\abs{\alpha}{\typeinterpret{\sigma}})\interpret{\tau}}(1)
+  \leadsto
+  \lift(2) \otimes \interpret{s}[\alpha:=\typeinterpret{\tau}] \oplus
+  \lift(1) \succ \interpret{s}[\alpha:=\typeinterpret{\tau}] =
+  \interpret{s[\alpha:=\tau]}$, using Lemma
+  \ref{lem:substitutioninterpret}.
+\item $\interpret{\proj^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t))}
+  \succ \interpret{s}$ \\ We have 
+  $\interpret{\mathtt{pair}_{\sigma,\tau}(s,t)} \arrrbeta
+  \pair{\interpret{s}}{\interpret{t}} \oplus \lift_{\typeinterpret{
+  \sigma} \times \typeinterpret{\tau}}(\flatten_{\typeinterpret{
+  \sigma}}(\interpret{s}) \oplus \flatten_{\typeinterpret{\tau}}(
+  \interpret{t}))$ and therefore
+  $\interpret{\proj^1_{\alpha,\beta}(\mathtt{pair}_{\alpha,\beta}(s,t))}
+  \arrrbeta \lift_{\typeinterpret{\sigma}}(2) \otimes 
+  \pi^1(\pair{\interpret{s}}{\interpret{t}} \oplus \langle
+  \text{something}\rangle) \oplus \lift_{\typeinterpret{\sigma}}(1)
+  \succeq \pi^1(\pair{\interpret{s}}{\interpret{t}}) \oplus
+  \lift_{\typeinterpret{\sigma}}(1)$,
+  which $\succ \interpret{s}$ by Lemma \ref{lem:encodings_reduce}.
+\item $\interpret{\pi^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t))}
+  \succ \interpret{t}$ \\ Analogous to the inequality above.
+\item $\interpret{\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{
+  \sigma,\tau}(u),\abs{x}{s},\abs{y}{t})} \succ \interpret{s[x:=u]}$ \\
+  Write $A := \lift_{\typeinterpret{\sigma} \times \typeinterpret{
+  \tau}}(\flatten_{\typeinterpret{\sigma}}(\interpret{u}))$;
+  then $\interpret{\mathtt{in}^1_{\sigma,\tau}(u)} =
+  \pair{\interpret{u}}{\lift_{\typeinterpret{\tau}}(1)} \oplus A$.
+  Let $B := \flatten_{\typeinterpret{\sigma} \times
+  \typeinterpret{\tau}}(\pair{\interpret{u}}{\lift_{\typeinterpret{
+  \tau}}(1)} \oplus A)$ and $C := \interpret{\abs{y}{t}} \cdot \pi^2(
+  \pair{\interpret{u}}{\lift_{\typeinterpret{\tau}}(1)} \oplus A)$.
+  Then we can write:
+  $\interpret{\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{
+  \sigma,\tau}(u),\abs{x}{s},\abs{y}{t})} = \lift_{\typeinterpret{
+  \rho}}(2) \oplus \lift_{\typeinterpret{\rho}}(3 \otimes B) \oplus
+  \lift_{\typeinterpret{\rho}}(B \oplus 1) \otimes (\ 
+  \interpret{\abs{x}{s}} \cdot \pi^1(\pair{\interpret{u}}{
+  \lift_{\typeinterpret{\tau}}(1)} \oplus A) \oplus C\ )$.
+  By splitting additive terms, distribution, neutrality of 1 and
+  absolute positiveness, this $\succ
+  \interpret{\abs{x}{s}} \cdot \pi^1(\pair{\interpret{u}}{
+  \lift_\tau(1)}) \leadsto^*
+  \interpret{\abs{x}{s}} \cdot \interpret{u}$ (by
+  Lemma \ref{lem:encodings_reduce}), $= (\abs{x}{\interpret{s}}) \cdot
+  \interpret{u} \arrrbeta \interpret{s}[x:=\interpret{u}] =
+  \interpret{s[x:=u]}$ by Lemma \ref{lem:substitutioninterpret}.
+\item $\interpret{\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^2_{
+  \sigma,\tau}(u),\abs{x}{s},\abs{y}{t})} \succ \interpret{s[x:=u]}$. \\
+  Analogous to the inequality above.
+\item $\interpret{\mathtt{let}_{\varphi,\rho}(
+  \mathtt{ext}_{\varphi,\tau}(s),
+  \tabs{\alpha}{\abs{x:\varphi\alpha}{t}})} \succ
+  \interpret{t[\alpha:=\tau][x:=s]}$. \\ We have
+  $\interpret{\mathtt{ext}_{\varphi,\tau}(s)} \succeq
+  \expair{\typeinterpret{\tau}}{\interpret{s}}$ by absolute positiveness.
+  Therefore, using monotonicity,
+  $\interpret{\mathtt{let}_{\varphi,\rho}(\mathtt{ext}_{\varphi,\tau}(
+  s),\tabs{\alpha}{\abs{x:\typeinterpret{\varphi} \alpha}{t}})} \succeq
+  \lift_{\typeinterpret{\rho}}(2) \otimes (\xlet{\typeinterpret{\rho}}{
+    \expair{\typeinterpret{\tau}}{\interpret{s}}
+  }{
+    \expair{\alpha}{x}
+  }{
+    \interpret{\tabs{\alpha}{\abs{x:\varphi \alpha}{t}}} * \alpha \cdot
+    x
+  }) \oplus
+  \langle\text{something}\rangle \oplus
+  \lift_{\typeinterpret{\rho}}(1)$.
+  Again by absolute positiveness, this $\succ
+  \xlet{\typeinterpret{\rho}}{\expair{\typeinterpret{\tau}}{
+  \interpret{s}}}{\expair{\alpha}{x}}{\interpret{\tabs{\alpha}{
+  \abs{x:\typeinterpret{\varphi}\alpha}{t}}} * \alpha \cdot x} \leadsto
+  \xlet{\typeinterpret{\rho}}{\expair{\typeinterpret{\tau}}{
+  \interpret{s}}}{\expair{\alpha}{x}}{\interpret{t}}$.
+  By Lemma \ref{lem:encodings_reduce}, this term
+  $\succeq \interpret{t}[\alpha:=\typeinterpret{\tau}][x:=\interpret{s}]$.
+  We complete by Lemma
+  \ref{lem:substitutioninterpret}.
+\end{itemize}
+
+\begin{itemize}
+\item $\interpret{\epsilon_\tau(\epsilon_\bot(s))} \succ
+  \interpret{\epsilon_\tau(s)}$. \\
+  We have $\interpret{\epsilon_\tau(\epsilon_\bot(s))} =
+  \lift_{\typeinterpret{\tau}}(2 \otimes \lift_\nat(2 \otimes
+  \interpret{s} \oplus 1) \oplus 1) \approx
+  \lift_{\typeinterpret{\tau}}(4 \otimes \interpret{s} \oplus 3)
+  \succ \lift_{\typeinterpret{\tau}}(2 \otimes \interpret{s} \oplus 1) =
+  \interpret{\epsilon_\tau(s)}$.
+\item $\interpret{@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),
+  t)} \succ \interpret{\epsilon_\tau(s)}$. \\
+  We have
+  $\interpret{@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t)}
+  = \lift_{\typeinterpret{\tau}}(2) \otimes (\ 
+  \lift_{\typeinterpret{\sigma} \arrtype \typeinterpret{\tau}}(
+  2 \otimes \interpret{s} \oplus 1) \cdot \interpret{t}\ )\ \oplus \\
+  \lift_{\typeinterpret{\tau}}(\langle\text{something}\rangle \oplus
+  1) \succ \lift_{\typeinterpret{\sigma} \arrtype \typeinterpret{\tau}}(
+  2 \otimes \interpret{s} \oplus 1) \cdot \interpret{t} \leadsto
+  \lift_{\typeinterpret{\tau}}(2 \otimes \interpret{s} \oplus 1) =
+  \interpret{\epsilon_\tau(s)}$.
+\item $\interpret{\mathtt{tapp}_{\varphi,\tau}(
+  \epsilon_{\quant{\alpha}{\varphi\alpha}}(s))} \succ
+  \interpret{\epsilon_{\varphi\tau}(s)}$ \\
+  We have $\interpret{\mathtt{tapp}_{\varphi,\tau}(
+  \epsilon_{\quant{\alpha}{\varphi\alpha}}(s))} =
+  \lift_{\typeinterpret{\varphi}\typeinterpret{\tau}}(2) \otimes (\ 
+  \lift_{\quant{\alpha}{\typeinterpret{\varphi}\alpha}}(2 \otimes
+  \interpret{s} \oplus 1) * \typeinterpret{\tau}\ ) \oplus \lift_{
+  \typeinterpret{\varphi}\typeinterpret{\tau}}(1) \succ
+  \lift_{\quant{\alpha}{\typeinterpret{\varphi}\alpha}}(2 \otimes
+  \interpret{s} \oplus 1) * \typeinterpret{\tau} =
+  (\tabs{\alpha}{\lift_{\typeinterpret{\varphi}\alpha}(2 \otimes
+  \interpret{s} \oplus 1)}) * \typeinterpret{\tau} \leadsto
+  \lift_{\typeinterpret{\varphi}\typeinterpret{\tau}}(2 \otimes
+  \interpret{s} \oplus 1) =
+  \lift_{\typeinterpret{\varphi\tau}}(2 \otimes \interpret{s} \oplus 1)
+  = \interpret{\epsilon_{\varphi\tau}(s)}$
+\item $\interpret{\proj^1_{\sigma,\tau}(\epsilon_{\mathtt{and}\,
+  \sigma\,\tau}(s))} \succ \interpret{\epsilon_\sigma(s)}$ \\ We have
+  $\interpret{\proj^1_{\sigma,\tau}(\epsilon_{\mathtt{and}\,
+  \sigma\,\tau}(s))} = \lift_{\typeinterpret{\sigma}}(2) \otimes
+  \pi^1(\lift_{\typeinterpret{\sigma} \times
+  \typeinterpret{\tau}}(2 \otimes \interpret{s} \oplus 1)) \oplus
+  \lift_{\typeinterpret{\sigma}}(1) \succ
+  \pi^1(\lift_{\typeinterpret{\sigma} \times
+  \typeinterpret{\tau}}(2 \otimes \interpret{s} \oplus 1)) =
+  \lift_{\forall p.(\typeinterpret{\sigma} \arrtype
+  \typeinterpret{\tau} \arrtype p) \arrtype p}(2 \otimes
+  \interpret{s} \oplus 1)) * \typeinterpret{\sigma} \cdot
+  (\lambda xy.x) =
+  (\tabs{p}{\lambda f.\lift_p(2 \otimes \interpret{s} \oplus 1)}) *
+  \typeinterpret{\sigma} \cdot (\lambda xy.x) \leadsto^*
+  \lift_{\typeinterpret{\sigma}}(2 \otimes \interpret{s} \oplus 1) =
+  \interpret{\epsilon_\sigma(s)}$.
+\item $\interpret{\proj^2_{\sigma,\tau}(\epsilon_{\mathtt{and}\,
+  \sigma\,\tau}(s))} \succ \interpret{\epsilon_\tau(s)}$ \\
+  Analogous to the inequality above.
+\item $\interpret{\mathtt{case}_{\sigma,\tau,\rho}(
+  \epsilon_{\mathtt{or}\,\sigma\,\tau}(u),\abs{x:\sigma}{s},
+  \abs{y:\tau}{t})} \succ \interpret{\epsilon_\rho(u)}$. \\
+  We have $\interpret{\mathtt{case}_{\sigma,\tau,\rho}(
+   \epsilon_{\mathtt{or}\,\sigma\,\tau}(u),\abs{x}{s},\abs{y}{t})} =\\
+  \lift_{\typeinterpret{\rho}}(2) \oplus
+  \lift_{\typeinterpret{\rho}}(3 \otimes
+    \flatten_{\interpret{\sigma} \times
+    \interpret{\tau}}(\lift_{\interpret{\sigma} \times
+    \interpret{\tau}}(2 \otimes \interpret{u} \oplus 1))) \oplus
+    \langle\text{something}\rangle \succ
+  \lift_{\typeinterpret{\rho}}(3 \otimes \flatten_{
+    \typeinterpret{\sigma} \times
+    \interpret{\tau}}(\lift_{\interpret{\sigma} \times
+    \interpret{\tau}}(2 \otimes \interpret{u} \oplus 1))) \succeq\\
+  \lift_{\typeinterpret{\rho}}(\flatten_{\interpret{\sigma} \times
+    \interpret{\tau}}(\lift_{\interpret{\sigma} \times
+    \interpret{\tau}}(2 \otimes \interpret{u} \oplus 1))) \approx
+  \lift_{\typeinterpret{\rho}}(2 \otimes \interpret{u} \oplus 1) =
+  \interpret{\epsilon_\rho(u)}$ because $\flatten_\sigma(\lift_\sigma(
+  n)) \approx n$ for all $\sigma,n$.
+\item $\interpret{\mathtt{let}_{\varphi,\rho}(
+  \epsilon_{\exists(\varphi)}(s),\tabs{\alpha}{\abs{x:\varphi\alpha}{
+  t}})} \succ \interpret{\epsilon_\rho(s)}$. \\
+  $\interpret{\mathtt{let}_{\varphi,\rho}(\epsilon_{
+    \exists(\varphi)}(s),\tabs{\alpha}{\abs{x}{t}})} =
+    \lift_{\typeinterpret{\rho}}(2) \otimes
+    (\xlet{\typeinterpret{\rho}}{\lift_{\Sigma \alpha.\typeinterpret{
+    \varphi}\alpha}(2 \otimes \interpret{s} \oplus 1)}{
+    \expair{\alpha}{x}}{  \\
+    (\tabs{\alpha}{\abs{x}{\interpret{t}}}) * \alpha \cdot x}) \oplus
+    \langle\text{something}\rangle \oplus
+    \lift_{\typeinterpret{\rho}}(1) \succ
+    \xlet{\typeinterpret{\rho}}{\lift_{\Sigma \alpha.\typeinterpret{
+    \varphi}\alpha}(2 \otimes \interpret{s} \oplus 1)}{
+    \expair{\alpha}{x}}{  \\
+    \interpret{t}} =
+    \lift_{\forall p.(\forall \alpha.\typeinterpret{\varphi}\alpha
+    \arrtype p) \arrtype p}(2 \otimes \interpret{s}
+    \oplus 1) * \typeinterpret{\rho} \cdot (\tabs{\alpha}{\abs{x}{
+    \interpret{t}}}) \leadsto^*
+    \lift_{\typeinterpret{\rho}}(2 \otimes \interpret{s} \oplus 1) =
+    \interpret{\epsilon_\rho(s)}$.
+\end{itemize}
+
+Unfortunately, the rules where $\mathtt{case}$ is shifted to the root
+are rather more complicated, largely due to the variable multiplication
+in $\Termmap(\mathtt{case})$ -- which we had to choose because these
+rule may duplicate variables.
+
+\begin{itemize}
+\item $\interpret{\epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,
+  \abs{x:\sigma}{s},\abs{y:\tau}{t}))} \succ
+  \interpret{\mathtt{case}_{\sigma,\tau,\rho}(u,
+  \abs{x:\sigma}{\epsilon_\rho(s)},\abs{y:\tau}{\epsilon_\rho(t)})}$ \\
+  On the left-hand side, we have:
+  \[
+  \begin{array}{l}
+  \interpret{\epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,
+  \abs{x:\sigma}{s},\abs{y:\tau}{t}))} \approx \\
+  \lift_{\typeinterpret{\rho}}(2 \otimes (
+  2\ \oplus \\
+  \phantom{ABCDEFG,}
+  3 \otimes \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u})\ \oplus \\
+  \phantom{ABCDEFG,}
+  (\flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}) \oplus 1) \otimes (\ 
+      \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+      \interpret{t}[y:=\pi^2(\interpret{u})]\ )
+  )\ \oplus \\
+  \phantom{ABCD,} 1) \approx \\
+  \lift_{\typeinterpret{\rho}}(
+  1 \oplus 4\ \oplus \\
+    \phantom{ABCDe}
+    6 \otimes \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u})\ \oplus \\
+    \phantom{ABCDe}
+  (2 \otimes \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}) \oplus 2) \otimes (\ 
+      \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+      \interpret{t}[y:=\pi^2(\interpret{u})]\ )) \approx \\
+  \lift_{\typeinterpret{\rho}}(5)\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(6 \otimes
+      \flatten_{\typeinterpret{\sigma} \times
+      \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(\ 
+      (\ 2 \otimes \flatten_{\typeinterpret{\sigma} \times
+      \typeinterpret{\tau}}(\interpret{u}) \oplus 2\ ) \otimes
+      (\ \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+      \interpret{t}[y:=\pi^2(\interpret{u})]\ )\ )
+  \end{array}
+  \]
+
+  On the right-hand side, we have:
+  \[
+  \begin{array}{l}
+  \interpret{\mathtt{case}_{\sigma,\tau,\rho}(u,
+  \abs{x:\sigma}{\epsilon_\rho(s)},\abs{y:\tau}{\epsilon_\rho(t)})}
+  \approx \\
+  \lift_{\typeinterpret{\rho}}(2)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(3 \otimes \flatten_{\typeinterpret{
+    \sigma} \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \oplus 1)\ \otimes \\
+  \phantom{ABC}
+    (\ \lift_{\typeinterpret{\rho}}(2 \otimes \interpret{s} \oplus 1)
+      [x:=\pi^1(\interpret{u})]
+      \oplus
+     \lift_{\typeinterpret{\rho}}(2 \otimes \interpret{t} \oplus 1)
+      [y:=\pi^2(\interpret{u})]
+    \ ) \approx \\
+  \lift_{\typeinterpret{\rho}}(2)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(3 \otimes \flatten_{\typeinterpret{
+    \sigma} \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(\ (\ \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \oplus 1\ )\ \otimes \\
+  \phantom{ABCDEF}
+    (\ 2 \otimes \interpret{s}[x:=\pi^1(\interpret{u})] \oplus 1
+       \oplus
+       2 \otimes \interpret{t}[y:=\pi^2(\interpret{u})] \oplus 1
+    \ )\ ) \approx \\
+  \lift_{\typeinterpret{\rho}}(2)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(3 \otimes \flatten_{\typeinterpret{
+    \sigma} \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}((\ 2 \otimes \flatten_{\typeinterpret{
+    \sigma} \times \typeinterpret{\tau}}(\interpret{u}) \oplus 2\ )
+    \otimes (\ \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+    \interpret{t}[y:=\pi^2(\interpret{u})]\ )\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}((\ \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \oplus 1\ ) \otimes 
+    (\ 1 \oplus 1\ )\ ) \approx \\
+  \lift_{\typeinterpret{\rho}}(2)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(3 \otimes \flatten_{\typeinterpret{
+    \sigma} \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}((\ 2 \otimes \flatten_{\typeinterpret{
+    \sigma} \times \typeinterpret{\tau}}(\interpret{u}) \oplus 2\ )
+    \otimes (\ \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+    \interpret{t}[y:=\pi^2(\interpret{u})]\ ))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(2 \otimes \flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(2) \approx \\
+  \lift_{\typeinterpret{\rho}}(4)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(5 \otimes \flatten_{\typeinterpret{
+    \sigma} \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}((\ 2 \otimes \flatten_{\typeinterpret{
+    \sigma} \times \typeinterpret{\tau}}(\interpret{u}) \oplus 2\ )
+    \otimes (\ \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+    \interpret{t}[y:=\pi^2(\interpret{u})]\ ) )
+  \end{array}
+  \]
+  By absolute positiveness, it is clear that the rule is oriented
+  with $\succeq$.
+\item $\interpret{@_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\rho
+  \arrtype \pi}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t}),v)} \succ
+  \interpret{\mathtt{case}_{\sigma,\tau,\pi}(u,\abs{x:\sigma}{
+  @_{\rho,\pi}(s,v)},\abs{y:\tau}{@_{\rho,\pi}(t,v)})}$ \\
+  On the left-hand side, we have:
+  \[
+  \begin{array}{l}
+  \interpret{@_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\rho \arrtype
+  \pi}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t}),v)} \approx \\
+  \lift_{\typeinterpret{\pi}}(2) \otimes (\\
+    \phantom{ABC}
+    (\ \lift_{\typeinterpret{\rho} \arrtype \typeinterpret{\pi}}(2)
+       \oplus \lift_{\typeinterpret{\rho} \arrtype
+       \typeinterpret{\pi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
+       \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+    \phantom{ABCD}
+      \lift_{\typeinterpret{\rho} \arrtype \typeinterpret{\pi}}(
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u}) \oplus 1) \otimes
+      (\interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+       \interpret{t}[y:=\pi^2(\interpret{u})]) \\
+    \phantom{ABC}
+    ) \cdot \interpret{v} \\
+    \phantom{A} ) \oplus \lift_{\typeinterpret{\pi}}(\\
+    \phantom{ABC}\flatten_{\typeinterpret{\sigma}}(\interpret{v})\ 
+      \oplus \\
+    \phantom{ABC}\flatten_{\typeinterpret{\sigma} \arrtype
+      \typeinterpret{\tau}}( \\
+      \phantom{ABCDE}
+       \lift_{\typeinterpret{\rho} \arrtype \typeinterpret{\pi}}(2)
+       \oplus \lift_{\typeinterpret{\rho} \arrtype
+       \typeinterpret{\pi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
+       \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+    \phantom{ABCDE}
+      \lift_{\typeinterpret{\rho} \arrtype \typeinterpret{\pi}}(
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u}) \oplus 1) \otimes
+      (\interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+       \interpret{t}[y:=\pi^2(\interpret{u})]) \\
+    \phantom{ABC} ) \otimes
+    \flatten_{\typeinterpret{\sigma}}(\interpret{v}) \oplus 1 \\
+    \phantom{A} )
+  \end{array}
+  \]
+  Using that for $\circ \in \{\oplus,\otimes\}$ we always have
+  $(s \circ t) \cdot v \approx (s \cdot v) \circ (t \cdot v)$ as well
+  as $\lift_{\alpha\arrtype \beta}(s) \cdot v \approx \lift_\beta(s)$,
+  and that always $\flatten_\alpha(\lift_\alpha(s)) \approx s)$, this
+  term $\approx$
+  \[
+  \begin{array}{l}
+  \lift_{\typeinterpret{\pi}}(2) \otimes (\\
+    \phantom{ABC}
+    (\ \lift_{\typeinterpret{\pi}}(2) \oplus
+       \lift_{\typeinterpret{\pi}}(3 \otimes
+          \flatten_{\typeinterpret{\sigma} \times
+          \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+    \phantom{ABCD}
+      \lift_{\typeinterpret{\pi}}(
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u}) \oplus 1) \otimes
+      (\interpret{s}[x:=\pi^1(\interpret{u})] \cdot \interpret{v} \oplus
+       \interpret{t}[y:=\pi^2(\interpret{u})] \cdot \interpret{v}) \\
+    \phantom{ABC}
+    )\\
+    \phantom{A} ) \oplus \lift_{\typeinterpret{\pi}}(\\
+    \phantom{ABC}\flatten_{\typeinterpret{\sigma}}(\interpret{v})\ 
+      \oplus \\
+    \phantom{ABC}(\ 2 \oplus 3 \otimes \flatten_{\typeinterpret{\sigma}
+      \times \typeinterpret{\tau}}(\interpret{u})\ \oplus \\
+    \phantom{ABCD}(\ 
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}) \oplus 1\ ) \otimes
+      \flatten_{\typeinterpret{\sigma} \arrtype
+      \typeinterpret{\tau}}(
+      \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+       \interpret{t}[y:=\pi^2(\interpret{u})]) \\
+    \phantom{ABC} ) \otimes
+    \flatten_{\typeinterpret{\sigma}}(\interpret{v}) \oplus 1 \\
+    \phantom{A} ) \approx \\
+  %
+  \lift_{\typeinterpret{\pi}}(4)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(6 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u})) \otimes
+    (\interpret{s}[x:=\pi^1(\interpret{u})] \cdot \interpret{v} \oplus
+     \interpret{t}[y:=\pi^2(\interpret{u})] \cdot \interpret{v})\ 
+     \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2) \otimes
+    (\interpret{s}[x:=\pi^1(\interpret{u})] \cdot \interpret{v} \oplus
+     \interpret{t}[y:=\pi^2(\interpret{u})] \cdot \interpret{v})\ 
+     \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(\flatten_{\typeinterpret{
+    \sigma}}(\interpret{v}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2 \otimes \flatten_{\typeinterpret{
+    \sigma}}(\interpret{v}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(3 \otimes \flatten_{\typeinterpret{
+    \sigma} \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\sigma}}(\interpret{v}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\sigma}}(\interpret{v})\ \otimes \\
+  \phantom{ABC}
+    \flatten_{\typeinterpret{\sigma} \arrtype \typeinterpret{\tau}}(
+    \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+    \interpret{t}[y:=\pi^2(\interpret{u})]))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(
+    \flatten_{\typeinterpret{\sigma}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\sigma} \arrtype \typeinterpret{\tau}}(
+    (\interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+    \interpret{t}[y:=\pi^2(\interpret{u})])))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(1)\ \approx \\
+  %
+  \lift_{\typeinterpret{\pi}}(5)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(6 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(3 \otimes \flatten_{\typeinterpret{
+    \sigma}}(\interpret{v}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(3 \otimes \flatten_{\typeinterpret{
+    \sigma} \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\sigma}}(\interpret{v}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(
+    \flatten_{\typeinterpret{\sigma}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\sigma} \arrtype \typeinterpret{\tau}}(
+    \interpret{s}[x:=\pi^1(\interpret{u})]))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(
+    \flatten_{\typeinterpret{\sigma}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\sigma} \arrtype \typeinterpret{
+    \tau}}(\interpret{t}[y:=\pi^2(\interpret{u})]))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\sigma}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\sigma} \arrtype \typeinterpret{\tau}}(
+    \interpret{s}[x:=\pi^1(\interpret{u})]))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\sigma}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\sigma} \arrtype \typeinterpret{\tau}}(
+    \interpret{t}[y:=\pi^2(\interpret{u})]))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2) \otimes
+    \interpret{s}[x:=\pi^1(\interpret{u})] \cdot \interpret{v}\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2) \otimes
+     \interpret{t}[y:=\pi^2(\interpret{u})] \cdot \interpret{v}\ 
+     \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u})) \otimes
+    \interpret{s}[x:=\pi^1(\interpret{u})] \cdot \interpret{v}\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u})) \otimes
+     \interpret{t}[y:=\pi^2(\interpret{u})] \cdot \interpret{v} \\
+  \end{array}
+  \]
+  And on the right-hand side, we have:
+  \[
+  \begin{array}{l}
+  \interpret{\mathtt{case}_{\sigma,\tau,\pi}(u,\abs{x:\sigma}{
+  @_{\rho,\pi}(s,v)},\abs{y:\tau}{@_{\rho,\pi}(t,v)})} \approx \\
+  %
+  \lift_{\typeinterpret{\pi}}(2)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \oplus 1)\ \otimes \\
+  \phantom{ABC}
+  (\ (\abs{x}{\interpret{@_{\rho,\pi}(s,v)}}) \cdot \pi^1(
+      \interpret{u}) \oplus
+     (\abs{y}{\interpret{@_{\rho,\pi}(t,v)}}) \cdot \pi^2(
+      \interpret{u})\ ) \approx \\
+  %
+  \lift_{\typeinterpret{\pi}}(2)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \oplus 1)\ \otimes \\
+  \phantom{ABC}
+  (\ (\abs{x}{\lift_{\typeinterpret{\pi}}(2) \otimes
+    \interpret{s} \cdot \interpret{v} \oplus
+    \lift_{\typeinterpret{\pi}}(\flatten_{
+    \typeinterpret{\rho}}(\interpret{v})\ \oplus \\
+  \phantom{ABCDEF}\flatten_{\typeinterpret{\rho} \arrtype
+    \typeinterpret{\pi}}(\interpret{s}) \otimes
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \oplus
+    1)}) \cdot \pi^1(\interpret{u})\ \oplus \\
+  \phantom{ABCD}
+     (\abs{y}{\lift_{\typeinterpret{\pi}}(2) \otimes
+     \interpret{t} \cdot \interpret{v} \oplus
+    \lift_{\typeinterpret{\pi}}(
+    \flatten_{\typeinterpret{\rho}}(\interpret{v})\ \oplus \\
+  \phantom{ABCDEF} \flatten_{\typeinterpret{\rho} \arrtype
+    \typeinterpret{\pi}}(\interpret{t}) \otimes
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \oplus 
+    1)}) \cdot \pi^2(\interpret{u}) \\
+  \phantom{ABC}) \approx \\
+  %
+  \lift_{\typeinterpret{\pi}}(2)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \oplus 1)\ \otimes \\
+  \phantom{ABC}
+  (\ \lift_{\typeinterpret{\pi}}(2) \otimes \interpret{s}[x:=\pi^1(
+    \interpret{u})] \cdot \interpret{v} \oplus
+    \lift_{\typeinterpret{\pi}}(\flatten_{
+    \typeinterpret{\rho}}(\interpret{v})\ \oplus \\
+  \phantom{ABCDE}\flatten_{\typeinterpret{\rho} \arrtype
+    \typeinterpret{\pi}}(\interpret{s}[x:=\pi^1(\interpret{u})]) \otimes
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \oplus
+    1)\ \oplus \\
+  \phantom{ABCD}
+  \lift_{\typeinterpret{\pi}}(2) \otimes \interpret{t}[y:=\pi^2(
+    \interpret{u})] \cdot \interpret{v} \oplus
+    \lift_{\typeinterpret{\pi}}(
+    \flatten_{\typeinterpret{\rho}}(\interpret{v})\ \oplus \\
+  \phantom{ABCDEF} \flatten_{\typeinterpret{\rho} \arrtype
+    \typeinterpret{\pi}}(\interpret{t}[y:=\pi^2(\interpret{u})]) \otimes
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \oplus 
+    1) \\
+  \phantom{ABC}) \approx \\
+  \lift_{\typeinterpret{\pi}}(2)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \oplus 1)\ \otimes \\
+  \phantom{ABC}
+  (\ \lift_{\typeinterpret{\pi}}(2) \otimes \interpret{s}[x:=\pi^1(
+    \interpret{u})] \cdot \interpret{v}\ \oplus \\
+  \phantom{ABCD}
+  \lift_{\typeinterpret{\pi}}(\flatten_{
+    \typeinterpret{\rho}}(\interpret{v}))\ \oplus \\
+  \phantom{ABCD}
+  \lift_{\typeinterpret{\pi}}(
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\rho} \arrtype \typeinterpret{\pi}}(
+    \interpret{s}[x:=\pi^1(\interpret{u})]))\ \oplus \\
+  \phantom{ABCD}
+  \lift_{\typeinterpret{\pi}}(1)\ \oplus \\
+  \phantom{ABCD}
+  \lift_{\typeinterpret{\pi}}(2) \otimes \interpret{t}[y:=\pi^2(
+    \interpret{u})] \cdot \interpret{v}\ \oplus \\
+  \phantom{ABCD}
+  \lift_{\typeinterpret{\pi}}(
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}))\ \oplus \\
+  \phantom{ABCD}
+  \lift_{\typeinterpret{\pi}}(
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\rho} \arrtype
+    \typeinterpret{\pi}}(\interpret{t}[y:=\pi^2(\interpret{u})]))\ 
+    \oplus\\
+  \phantom{ABCD}
+  \lift_{\typeinterpret{\pi}}(1) \\
+  \phantom{ABC}) \approx \\
+  \lift_{\typeinterpret{\pi}}(2)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \oplus 1)\ \otimes \\
+  \phantom{ABC}
+  (\ \lift_{\typeinterpret{\pi}}(2)\ \oplus \\
+  \phantom{ABCD}
+  \lift_{\typeinterpret{\pi}}(2 \otimes \flatten_{
+    \typeinterpret{\rho}}(\interpret{v}))\ \oplus \\
+  \phantom{ABCD}
+  \lift_{\typeinterpret{\pi}}(2) \otimes \interpret{s}[x:=\pi^1(
+    \interpret{u})] \cdot \interpret{v}\ \oplus \\
+  \phantom{ABCD}
+  \lift_{\typeinterpret{\pi}}(2) \otimes \interpret{t}[y:=\pi^2(
+    \interpret{u})] \cdot \interpret{v}\ \oplus \\
+  \phantom{ABCD}
+  \lift_{\typeinterpret{\pi}}(
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\rho} \arrtype \typeinterpret{\pi}}(
+    \interpret{s}[x:=\pi^1(\interpret{u})]))\ \oplus \\
+  \phantom{ABCD}
+  \lift_{\typeinterpret{\pi}}(
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\rho} \arrtype
+    \typeinterpret{\pi}}(\interpret{t}[y:=\pi^2(\interpret{u})])) \\
+  \phantom{ABC}) \approx \\
+  \lift_{\typeinterpret{\pi}}(2)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}\lift_{\typeinterpret{\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u})) \otimes
+    \interpret{s}[x:=\pi^1(\interpret{u})] \cdot \interpret{v}\ \oplus\\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u})) \otimes
+    \interpret{t}[y:=\pi^2(\interpret{u})] \cdot \interpret{v}\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\rho} \arrtype \typeinterpret{\pi}}(
+    \interpret{s}[x:=\pi^1(\interpret{u})]))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\rho} \arrtype \typeinterpret{\pi}}(
+    \interpret{t}[y:=\pi^2(\interpret{u})]))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2 \otimes \flatten_{
+    \typeinterpret{\rho}}(\interpret{v}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2) \otimes \interpret{s}[x:=\pi^1(
+    \interpret{u})] \cdot \interpret{v}\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2) \otimes \interpret{t}[y:=\pi^2(
+    \interpret{u})] \cdot \interpret{v}\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\rho} \arrtype \typeinterpret{\pi}}(
+    \interpret{s}[x:=\pi^1(\interpret{u})]))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\rho} \arrtype
+    \typeinterpret{\pi}}(\interpret{t}[y:=\pi^2(\interpret{u})])) \\
+  \end{array}
+  \]
+  This we can reorder to:
+  \[
+  \begin{array}{l}
+  \lift_{\typeinterpret{\pi}}(4)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(5 \otimes \flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2 \otimes \flatten_{
+    \typeinterpret{\rho}}(\interpret{v}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\rho} \arrtype \typeinterpret{\pi}}(
+    \interpret{s}[x:=\pi^1(\interpret{u})]))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\rho} \arrtype
+    \typeinterpret{\pi}}(\interpret{t}[y:=\pi^2(\interpret{u})]))\ 
+    \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\rho} \arrtype \typeinterpret{\pi}}(
+    \interpret{s}[x:=\pi^1(\interpret{u})]))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \otimes
+    \flatten_{\typeinterpret{\rho} \arrtype \typeinterpret{\pi}}(
+    \interpret{t}[y:=\pi^2(\interpret{u})]))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2) \otimes \interpret{s}[x:=\pi^1(
+    \interpret{u})] \cdot \interpret{v}\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2) \otimes \interpret{t}[y:=\pi^2(
+    \interpret{u})] \cdot \interpret{v}\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u})) \otimes
+    \interpret{s}[x:=\pi^1(\interpret{u})] \cdot \interpret{v}\ \oplus\\
+  \phantom{A}
+  \lift_{\typeinterpret{\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u})) \otimes
+    \interpret{t}[y:=\pi^2(\interpret{u})] \cdot \interpret{v} \\
+  \end{array}
+  \]
+  Using absolute positiveness, it is clear that the inequality is
+  oriented.
+\item $\interpret{\mathtt{tapp}_{\varphi,\pi}(\mathtt{case}_{\sigma,\tau,
+  \quant{\alpha}{\varphi\alpha}}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t}))}
+  \succ \\ \interpret{\mathtt{case}_{\sigma,\tau,\varphi\pi}(u,
+  \abs{x:\sigma}{\mathtt{tapp}_{\varphi,\pi}(s)},
+  \abs{y:\tau}{\mathtt{tapp}_{\varphi,\pi}(t)})}$ \\
+  On the left-hand side, we have
+  \[
+  \begin{array}{l}
+  \interpret{\mathtt{tapp}_{\varphi,\pi}(\mathtt{case}_{\sigma,\tau,
+  \quant{\alpha}{\varphi\alpha}}(u,\abs{x}{s},\abs{y}{t}))} \approx \\
+  %
+  \lift_{\typeinterpret{\varphi\pi}}(2) \otimes ( \\
+    \phantom{ABC}
+    \lift_{\quant{\alpha}{\typeinterpret{\varphi}\alpha}}(2) \oplus
+    \lift_{\quant{\alpha}{\typeinterpret{\varphi}\alpha}}(3 \otimes
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \oplus \\
+    \phantom{ABC}
+    \lift_{\quant{\alpha}{\typeinterpret{\varphi}\alpha}}(
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u}) \oplus 1) \otimes (
+      \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+      \interpret{t}[y:=\pi^2(\interpret{u})]) \\
+  \phantom{A}) * \typeinterpret{\pi} \oplus
+  \lift_{\typeinterpret{\varphi\pi}}(1) \approx \\
+  %
+  \lift_{\typeinterpret{\varphi\pi}}(4)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(6 \otimes
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    \interpret{s}[x:=\pi^1(\interpret{u})] * \typeinterpret{\pi}\ \oplus\\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    \interpret{t}[y:=\pi^2(\interpret{u})] * \typeinterpret{\pi}\ \oplus\\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \otimes \interpret{s}[x:=\pi^1(\interpret{u})]
+      * \typeinterpret{\pi}\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \otimes \interpret{t}[x:=\pi^2(\interpret{u})]
+      * \typeinterpret{\pi}\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(1) \approx \\
+  %
+  \lift_{\typeinterpret{\varphi\pi}}(5)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(6 \otimes
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    \interpret{s}[x:=\pi^1(\interpret{u})] * \typeinterpret{\pi}\ \oplus\\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    \interpret{t}[y:=\pi^2(\interpret{u})] * \typeinterpret{\pi}\ \oplus\\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \otimes \interpret{s}[x:=\pi^1(\interpret{u})]
+      * \typeinterpret{\pi}\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \otimes \interpret{t}[x:=\pi^2(\interpret{u})]
+      * \typeinterpret{\pi} \\
+  \end{array}
+  \]
+
+  On the right-hand side, we have:
+  \[
+  \begin{array}{l}
+  \interpret{\mathtt{case}_{\sigma,\tau,\varphi\pi}(u,
+    \abs{x:\sigma}{\mathtt{tapp}_{\varphi,\pi}(s)},
+    \abs{y:\tau}{\mathtt{tapp}_{\varphi,\pi}(t)})} \approx \\
+  %
+  \lift_{\typeinterpret{\varphi\pi}}(2)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(3 \otimes \flatten_{
+    \typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \oplus 1)\ \otimes \\
+  \phantom{ABC}(\ 
+    \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    (\typeinterpret{s}[x:=\pi^1(\interpret{u})]
+      * \typeinterpret{\pi}) \oplus
+    \lift_{\typeinterpret{\varphi\pi}}(1)\ \oplus \\
+  \phantom{ABCD}
+    \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    (\typeinterpret{t}[x:=\pi^2(\interpret{u})]
+      * \typeinterpret{\pi}) \oplus
+    \lift_{\typeinterpret{\varphi\pi}}(1)
+  \ ) \approx \\
+  %
+  \lift_{\typeinterpret{\varphi\pi}}(4)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(5 \otimes \flatten_{
+    \typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \oplus 1)\ \otimes \\
+  \phantom{ABC}(\ 
+    \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    (\typeinterpret{s}[x:=\pi^1(\interpret{u})]
+      * \typeinterpret{\pi})\ \oplus \\
+  \phantom{ABCD}
+    \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    (\typeinterpret{t}[x:=\pi^2(\interpret{u})]
+      * \typeinterpret{\pi})
+  \ ) \approx \\
+  %
+  \lift_{\typeinterpret{\varphi\pi}}(4)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(5 \otimes \flatten_{
+    \typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    \interpret{s}[x:=\pi^1(\interpret{u})] * \typeinterpret{\pi}\ \oplus\\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
+    \interpret{t}[y:=\pi^2(\interpret{u})] * \typeinterpret{\pi}\ \oplus\\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \otimes \interpret{s}[x:=\pi^1(\interpret{u})]
+      * \typeinterpret{\pi}\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\varphi\pi}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \otimes \interpret{t}[x:=\pi^2(\interpret{u})]
+      * \typeinterpret{\pi} \\
+  \end{array}
+  \]
+  Again, it is clear that the required inequality holds.
+
+\item $\interpret{\proj^1_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,
+  \mathtt{and}\,\rho\,\pi}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t}))} \succ \\
+  \interpret{\mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x:\sigma}{
+  \proj^1_{\rho,\pi}(s)},\abs{y:\tau}{\proj^1_{\rho,\pi}(t)})}$ \\
+  On the left-hand side, we have: \\
+  \[
+  \begin{array}{l}
+  \interpret{\proj^1_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,
+  \mathtt{and}\,\rho\,\pi}(u,\abs{x}{s},\abs{y}{t}))} \approx \\
+  \lift_{\typeinterpret{\rho}}(2) \otimes \pi^1( \\
+  \phantom{AB}
+    \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(2)\ \oplus \\
+  \phantom{AB}
+    \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(3 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{AB}
+    \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}) \oplus 1)\ \otimes \\
+  \phantom{ABCD}
+    (\interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+     \interpret{t}[y:=\pi^2(\interpret{u})]) \\
+  \phantom{A}) \oplus \lift_{\typeinterpret{\rho}}(1) \\
+  \end{array}
+  \]
+  Taking into account that $\typeinterpret{\rho} \times
+  \typeinterpret{\tau}$ is just shorthand notation for
+  $\quant{p}{(\typeinterpret{\rho} \arrtype \typeinterpret{\tau}
+  \arrtype p) \arrtype p}$, that $\pi^1(x) = x * \typeinterpret{\rho}
+  \cdot (\abs{xy}{x})$, and that $\lift_{\sigma \arrtype \tau}(x)
+  \cdot y \approx \lift_\tau(x)$, this term $\approx$
+  \[
+  \begin{array}{l}
+  \lift_{\typeinterpret{\rho}}(5)\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(6 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \oplus 2) \otimes
+    \pi^1(\interpret{s}[x:=\pi^1(\interpret{u})])\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \oplus 2) \otimes
+    \pi^1(\interpret{t}[y:=\pi^2(\interpret{u})]) \approx \\
+  \lift_{\typeinterpret{\rho}}(5)\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(6 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(2) \otimes
+    \pi^1(\interpret{s}[x:=\pi^1(\interpret{u})])\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(2) \otimes
+    \pi^1(\interpret{t}[y:=\pi^2(\interpret{u})])\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u})) \otimes
+    \pi^1(\interpret{s}[x:=\pi^1(\interpret{u})])\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u})) \otimes
+    \pi^1(\interpret{t}[y:=\pi^2(\interpret{u})])
+  \end{array}
+  \]
+  On the right-hand side, we have:
+  \[
+  \begin{array}{l}
+  \interpret{\mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x:\sigma}{
+  \proj^1_{\rho,\pi}(s)},\abs{y:\tau}{\proj^1_{\rho,\pi}(t)})} \approx \\
+  \lift_{\typeinterpret{\rho}}(2)\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(3 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}) \oplus 1)\ \otimes \\
+  \phantom{ABC}
+    (\ \lift_{\typeinterpret{\rho}}(2) \otimes \pi^1(\interpret{s})[
+    x:=\pi^1(\interpret{u})] \oplus \lift_{\typeinterpret{\rho}}(1)
+    \oplus \\
+  \phantom{ABCD}
+    \lift_{\typeinterpret{\rho}}(2) \otimes \pi^1(\interpret{t})[
+    y:=\pi^2(\interpret{u})] \oplus \lift_{\typeinterpret{\rho}}(1)
+    \ )
+  \end{array}
+  \]
+  Following the definition of $\pi^1$, we can pull the substitution
+  inside $\pi^1$, and rewrite this term to:
+  \[
+  \begin{array}{l}
+  \lift_{\typeinterpret{\rho}}(2)\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(3 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}) \oplus 1)\ \otimes \\
+  \phantom{ABC}
+    (\ \lift_{\typeinterpret{\rho}}(2) \otimes \pi^1(\interpret{s}[
+    x:=\pi^1(\interpret{u})])\ \oplus \\
+  \phantom{ABCD}
+    \lift_{\typeinterpret{\rho}}(2) \otimes \pi^1(\interpret{t}[
+    y:=\pi^2(\interpret{u})]) \oplus \lift_{\typeinterpret{\rho}}(2)
+    \ ) \approx \\
+  \lift_{\typeinterpret{\rho}}(4)\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(5 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}) \oplus 1)\ \otimes \\
+  \phantom{ABC}
+    (\ \lift_{\typeinterpret{\rho}}(2) \otimes \pi^1(\interpret{s}[
+    x:=\pi^1(\interpret{u})]) \oplus
+    \lift_{\typeinterpret{\rho}}(2) \otimes \pi^1(\interpret{t}[
+    y:=\pi^2(\interpret{u})])
+    \ ) \approx \\
+  \lift_{\typeinterpret{\rho}}(4)\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(5 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(2) \otimes \pi^1(\interpret{s}[
+    x:=\pi^1(\interpret{u})])\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(2) \otimes \pi^1(\interpret{t}[
+    y:=\pi^2(\interpret{u})])\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}) \otimes
+    \lift_{\typeinterpret{\rho}}(2) \otimes \pi^1(\interpret{s}[
+    x:=\pi^1(\interpret{u})])\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(2 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}) \otimes
+    \lift_{\typeinterpret{\rho}}(2) \otimes \pi^1(\interpret{t}[
+    y:=\pi^2(\interpret{u})])
+  \end{array}
+  \]
+  This is once more oriented by absolute positiveness.
+
+\item $\interpret{\proj^2_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,
+  \mathtt{and}\,\rho,\pi}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t}))}
+  \succ \interpret{\mathtt{case}_{\sigma,\tau,\pi}(u,\abs{x:
+  \sigma}{\proj^2_{\rho,\pi}(s)},\abs{y:\tau}{\proj^2_{\rho,\pi}(t)})}$ \\
+  Analogous to the inequality above.
+
+\item $\interpret{\mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,
+  \tau,\mathtt{or}\,\rho\,\pi}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t}),
+  \abs{z:\rho}{v},\abs{a:\pi}{w})} \succ \\
+  \interpret{\mathtt{case}_{\sigma,\tau,\xi}(u,\abs{x:\sigma}{
+  \mathtt{case}_{\rho,\pi,\xi}(s,\abs{z:\rho}{v},\abs{a:\pi}{w})},
+  \abs{y:\tau}{\mathtt{case}_{\rho,\pi,\xi}(t,\abs{z:\rho}{v},\abs{a:
+  \pi}{w})})}$ \\
+  This is the longest of the inequalities.  As before, we turn first
+  to the left-hand side.
+
+  \[
+  \begin{array}{l}
+  \interpret{\mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,
+  \tau,\mathtt{or}\,\rho\,\pi}(u,\abs{x:\sigma}{s},\abs{y:\tau}{t}),
+  \abs{z:\rho}{v},\abs{a:\pi}{w})} \approx \\
+  %
+  \mathcal{J}(\mathtt{case})_{\typeinterpret{\rho},\typeinterpret{\pi},
+    \typeinterpret{\xi}}(
+    \mathcal{J}(\mathtt{case})_{\typeinterpret{\sigma},
+    \typeinterpret{\tau},\typeinterpret{\rho} \times
+    \typeinterpret{pi}}(\interpret{u},\abs{x}{\interpret{s}},
+    \abs{y}{\interpret{t}}),\abs{z}{\interpret{v}},
+    \abs{a}{\interpret{w}}) \approx \\
+  %
+  \mathcal{J}(\mathtt{case})_{\typeinterpret{\rho},
+    \typeinterpret{\pi},\typeinterpret{\xi}}( \\
+  \phantom{ABC}
+    \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(2) \oplus
+    \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(3 \otimes
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u}))\ \oplus \\
+  \phantom{ABC}
+    \interpret{s}[x:=\pi^1(\interpret{u})] \oplus 
+    \interpret{t}[y:=\pi^2(\interpret{u})]\ \oplus \\
+  \phantom{ABC}
+    \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \otimes \interpret{s}[x:=\pi^1(\interpret{u})]
+      \oplus \\
+  \phantom{ABC}
+    \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \otimes \interpret{t}[y:=\pi^2(\interpret{u})] \\
+  \phantom{A}
+  , \abs{z}{\interpret{v}},\ \abs{a}{\interpret{w}}\ ) \\
+  \end{array}
+  \]
+  Once we start filling in the outer $\mathtt{case}$ interpretation,
+  this is going to get very messy indeed.  So, we will use the
+  following shorthand notation: \\
+  $su = \interpret{s}[x:=\pi^1(\interpret{u})]$ \\
+  $tu = \interpret{t}[y:=\pi^2(\interpret{u})]$ \\
+  $A = \\
+  \phantom{ABC}
+    \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(2) \oplus
+    \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(3 \otimes
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \oplus su \oplus tu\ \oplus \\
+  \phantom{ABC}
+    \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \otimes su\ \oplus \\
+  \phantom{ABC}
+    \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u})) \otimes\ tu \\
+  $ \\
+  Then, the left-hand side $\approx$
+  \[
+  \begin{array}{l}
+  \mathcal{J}(\mathtt{case})_{\typeinterpret{\rho},
+    \typeinterpret{\pi},\typeinterpret{\xi}}(A,
+      \abs{z}{\interpret{v}}, \abs{a}{\interpret{w}}\ ) \approx \\
+  \lift_{\typeinterpret{\xi}}(2) \oplus
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{
+    \typeinterpret{\rho} \times \typeinterpret{\pi}}(A))\ \oplus \\
+  \phantom{A}
+    \interpret{v}[z:=\pi^1(A)] \oplus
+    \interpret{w}[a:=\pi^2(A)]\ \oplus\ \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{
+    \typeinterpret{\rho} \times \typeinterpret{\pi}}(A)) \otimes
+    \interpret{v}[z:=\pi^1(A)]\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{
+    \typeinterpret{\rho} \times \typeinterpret{\pi}}(A)) \otimes
+    \interpret{w}[a:=\pi^2(A)] \approx \\
+  \lift_{\typeinterpret{\xi}}(2)\ \oplus \\
+  \phantom{A}
+     \lift_{\typeinterpret{\xi}}(6)\ \oplus \\
+  \phantom{A}
+     \lift_{\typeinterpret{\xi}}(9 \otimes
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(su))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(tu))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(su))\ 
+    \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))\ 
+    \oplus \\
+  \phantom{A}
+    \interpret{v}[z:=\pi^1(A)] \oplus
+    \interpret{w}[a:=\pi^2(A)]\ \oplus\ \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(2) \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u})) \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(su)) \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus\\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(tu)) \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(su))
+    \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))
+    \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(2) \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u})) \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(su)) \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus\\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(tu)) \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(su))
+    \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))
+    \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \\
+  \end{array}
+  \]
+  We can \emph{slightly} shorten this term by combining parts, but
+  the result is still quite long:
+  \[
+  \begin{array}{l}
+  \langle\text{the left-hand side}\rangle \approx \\
+  \lift_{\typeinterpret{\xi}}(8)\ \oplus \\
+  \phantom{A}
+     \lift_{\typeinterpret{\xi}}(9 \otimes
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(su))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(tu))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(su))\ 
+    \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))\ 
+    \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3) \otimes \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u})) \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(su)) \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus\\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(tu)) \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(su))
+    \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))
+    \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3) \otimes \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u})) \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(su)) \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus\\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(tu)) \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(su))
+    \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))
+    \otimes
+    \interpret{w}[a:=\pi^2(A)]
+  \end{array}
+  \]
+  Now, let us turn to the right-hand side.
+  \[
+  \begin{array}{l}
+  \interpret{\mathtt{case}_{\sigma,\tau,\xi}(u,\abs{x:\sigma}{
+  \mathtt{case}_{\rho,\pi,\xi}(s,\abs{z:\rho}{v},\abs{a:\pi}{w})},
+  \abs{y:\tau}{\mathtt{case}_{\rho,\pi,\xi}(t,\abs{z:\rho}{v},\abs{a:
+  \pi}{w})})} \approx \\
+  \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
+    \lift_{\typeinterpret{\xi}}(2) \oplus
+      \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{
+      \typeinterpret{\rho} \times \typeinterpret{\pi}}(\interpret{s}))\ 
+      \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      \interpret{v}[z:=\pi^1(\interpret{s})] \oplus
+      \interpret{w}[a:=\pi^2(\interpret{s})]\ \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+      \typeinterpret{\pi}}(\interpret{s}))
+      \otimes \interpret{v}[z:=\pi^1(\interpret{s})]\ 
+      \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
+      \times \typeinterpret{\pi}}(\interpret{s}))
+      \otimes \interpret{w}[a:=\pi^2(\interpret{s})]
+    },\ \\
+    \phantom{ABCDEFGHIJ}\abs{y}{
+    \lift_{\typeinterpret{\xi}}(2) \oplus
+      \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{
+      \typeinterpret{\rho} \times \typeinterpret{\pi}}(\interpret{t}))\ 
+      \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      \interpret{v}[z:=\pi^1(\interpret{t})] \oplus
+      \interpret{w}[a:=\pi^2(\interpret{t})]\ \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+      \typeinterpret{\pi}}(\interpret{t}))
+      \otimes \interpret{v}[z:=\pi^1(\interpret{t})]\ 
+      \oplus \\
+    \phantom{ABCDEFGHIJKL}
+      \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
+      \times \typeinterpret{\pi}}(\interpret{t}))
+      \otimes \interpret{w}[a:=\pi^2(\interpret{t})]
+    }\ )
+  \end{array}
+  \]
+  For brevity, we introduce another shorthand notation:
+  for a given term $q$: \\
+  $B_q =
+    \lift_{\typeinterpret{\xi}}(2) \oplus
+      \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{
+      \typeinterpret{\rho} \times \typeinterpret{\pi}}(q))\ \oplus \\
+    \phantom{ABC}
+      \interpret{v}[z:=\pi^1(q)] \oplus
+      \interpret{w}[a:=\pi^2(q)]\ \oplus \\
+    \phantom{ABC}
+      \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+      \typeinterpret{\pi}}(q))
+      \otimes \interpret{v}[z:=\pi^1(q)]\ 
+      \oplus \\
+    \phantom{ABC}
+      \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
+      \times \typeinterpret{\pi}}(q)) \otimes \interpret{w}[a:=\pi^2(q)]
+  $. \\
+  With this, we have:
+  \[
+  \begin{array}{l}
+  \langle\text{the right-hand side}\rangle \approx \\
+  \mathcal{J}(\mathtt{case})_{\typeinterpret{\sigma},
+  \typeinterpret{\tau},\typeinterpret{\xi}}(\interpret{u},\abs{x}{
+  B_{\interpret{s}}},\abs{y}{B_{\interpret{t}}}) \approx \\
+  \lift_{\typeinterpret{\xi}}(2) \oplus
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{\typeinterpret{
+    \sigma} \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+  B_{\interpret{s}}[x:=\pi^1(\interpret{u})] \oplus
+  B_{\interpret{t}}[x:=\pi^2(\interpret{u})]\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes
+    B_{\interpret{s}}[x:=\pi^1(\interpret{u})]\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes
+    B_{\interpret{t}}[x:=\pi^2(\interpret{u})]
+  \end{array}
+  \]
+  Note that $x$ is a bound variable in $s$ and $y$ a bound variable
+  in $t$; these variables do not occur in $B_q$.  So, we can rewrite
+  the above term to:
+  \[
+  \begin{array}{l}
+  \langle\text{the right-hand side}\rangle \approx \\
+  \lift_{\typeinterpret{\xi}}(2) \oplus
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{\typeinterpret{
+    \sigma} \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+  B_{su} \oplus
+  B_{tu}\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes
+    B_{su}\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes
+    B_{tu} \approx \\
+  \lift_{\typeinterpret{\xi}}(2)\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{\typeinterpret{
+    \sigma} \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(2)\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{
+    \typeinterpret{\rho} \times \typeinterpret{\pi}}(su))\ \oplus \\
+  \phantom{A}
+    \interpret{v}[z:=\pi^1(su)] \oplus
+    \interpret{w}[a:=\pi^2(su)]\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(su)) \otimes \interpret{v}[z:=\pi^1(su)]\ 
+    \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(su)) \otimes \interpret{w}[a:=\pi^2(su)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(2)\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{
+    \typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))\ \oplus \\
+  \phantom{A}
+    \interpret{v}[z:=\pi^1(tu)] \oplus
+    \interpret{w}[a:=\pi^2(tu)]\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(tu)) \otimes \interpret{v}[z:=\pi^1(tu)]\ 
+    \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(tu)) \otimes \interpret{w}[a:=\pi^2(tu)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(2 \otimes \flatten_{
+    \typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{
+    \typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}) \otimes \flatten_{
+    \typeinterpret{\rho} \times \typeinterpret{\pi}}(su))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes
+    \interpret{v}[z:=\pi^1(su)]\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes
+    \interpret{w}[a:=\pi^2(su)]\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(su)) \otimes \interpret{v}[z:=\pi^1(su)]\ 
+    \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(su)) \otimes \interpret{w}[a:=\pi^2(su)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(2 \otimes \flatten_{
+    \typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{
+    \typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}) \otimes \flatten_{
+    \typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes
+    \interpret{v}[z:=\pi^1(tu)]\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes
+    \interpret{w}[a:=\pi^2(tu)]\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(tu)) \otimes \interpret{v}[z:=\pi^1(tu)]\ 
+    \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(tu)) \otimes \interpret{w}[a:=\pi^2(tu)]
+  \end{array}
+  \]
+  Here, we can do some further combinations.
+  Let us denote:
+  \begin{itemize}
+  \item $vsu := \interpret{v}[z:=\pi^1(su)] =
+    \interpret{v}[z:=\pi^1(\interpret{s}[x:=\pi^1(\interpret{u})])]$
+  \item $wsu := \interpret{w}[a:=\pi^2(su)] =
+    \interpret{w}[a:=\pi^2(\interpret{s}[x:=\pi^1(\interpret{u})])]$
+  \item $vtu := \interpret{v}[z:=\pi^1(tu)] =
+    \interpret{v}[z:=\pi^1(\interpret{t}[y:=\pi^2(\interpret{u})])]$
+  \item $wtu := \interpret{w}[a:=\pi^1(tu)] =
+    \interpret{w}[a:=\pi^2(\interpret{t}[y:=\pi^2(\interpret{u})])]$
+  \end{itemize}
+  Then:
+  \[
+  \begin{array}{l}
+  \langle\text{the right-hand side}\rangle \approx \\
+  \lift_{\typeinterpret{\xi}}(6)\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(7 \otimes \flatten_{\typeinterpret{
+    \sigma} \times \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{
+    \typeinterpret{\rho} \times \typeinterpret{\pi}}(su))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{
+    \typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))\ \oplus \\
+  \phantom{A}
+    vsu \oplus wsu \oplus
+    vtu \oplus wtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(su)) \otimes vsu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(su)) \otimes wsu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(tu)) \otimes vtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(tu)) \otimes wtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{
+    \typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}) \otimes \flatten_{
+    \typeinterpret{\rho} \times \typeinterpret{\pi}}(su))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes vsu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes wsu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(su)) \otimes vsu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(su)) \otimes wsu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{
+    \typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u}) \otimes \flatten_{
+    \typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes vtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes wtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(tu)) \otimes vtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(tu)) \otimes wtu
+  \end{array}
+  \]
+
+  Now, if we strike out equal terms in the left-hand side and the
+  right-hand side (after splitting additive terms where needed)
+  the following inequality remains:
+  \[
+  \begin{array}{l}
+  \lift_{\typeinterpret{\xi}}(2)\ \oplus \\
+  \phantom{A}
+     \lift_{\typeinterpret{\xi}}(2 \otimes
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3) \otimes \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u})) \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(su)) \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus\\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(tu)) \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(su))
+    \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))
+    \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3) \otimes \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u})) \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(su)) \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus\\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(tu)) \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(su))
+    \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))
+    \otimes
+    \interpret{w}[a:=\pi^2(A)] \succ \\
+  vsu \oplus wsu \oplus
+    vtu \oplus wtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(su)) \otimes vsu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(su)) \otimes wsu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(tu)) \otimes vtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(tu)) \otimes wtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes vsu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes wsu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(su)) \otimes vsu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(su)) \otimes wsu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes vtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes wtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(tu)) \otimes vtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(tu)) \otimes wtu
+  \end{array}
+  \]
+  But now note that $A \succeq su$ and $A \succeq tu$.  Therefore, by
+  monotonicity, each term L$i \succeq$ R$i$ below:
+  \[
+  \begin{array}{l}
+  \lift_{\typeinterpret{\xi}}(2)\ \oplus \\
+  \phantom{A}
+     \lift_{\typeinterpret{\xi}}(2 \otimes
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3) \otimes \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u})) \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(su)) \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \hfill (L1) \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(tu)) \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \hfill (L2) \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(su))
+    \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \hfill (L3) \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))
+    \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \hfill (L4) \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3) \otimes \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u})) \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(su)) \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \hfill (L5) \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(tu)) \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \hfill (L6) \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(su))
+    \otimes
+    \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \hfill (L7) \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma} \times
+    \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))
+    \otimes
+    \interpret{w}[a:=\pi^2(A)] \hfill (L8) \\
+  \succ \\
+  vsu \oplus wsu \oplus
+    vtu \oplus wtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(su)) \otimes vsu\ \oplus
+    \hfill (R1) \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(su)) \otimes wsu\ \oplus
+    \hfill (R5) \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(tu)) \otimes vtu\ \oplus \hfill (R2) \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(tu)) \otimes wtu\ \oplus
+    \hfill (R6) \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes vsu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes wsu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(su)) \otimes vsu\ \oplus \hfill (R3) \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(su)) \otimes wsu\ \oplus \hfill (R7) \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes vtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes wtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho} \times
+    \typeinterpret{\pi}}(tu)) \otimes vtu\ \oplus \hfill (R4) \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u}) \otimes
+    \flatten_{\typeinterpret{\rho}
+    \times \typeinterpret{\pi}}(tu)) \otimes wtu \hfill (R8)
+  \end{array}
+  \]
+  This merely leaves the following proof obligation:
+  \[
+  \begin{array}{l}
+  \lift_{\typeinterpret{\xi}}(2)\ \oplus \\
+  \phantom{A}
+     \lift_{\typeinterpret{\xi}}(2 \otimes
+      \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+      \interpret{u}))\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3) \otimes \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u})) \otimes
+     \interpret{v}[z:=\pi^1(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3) \otimes \interpret{w}[a:=\pi^2(A)]
+    \ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(3 \otimes
+    \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
+    \interpret{u})) \otimes
+    \interpret{w}[a:=\pi^2(A)]
+  \succ \\
+  vsu \oplus wsu \oplus vtu \oplus wtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes vsu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes wsu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes vtu\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
+    \times \typeinterpret{\tau}}(\interpret{u})) \otimes wtu \\
+  \end{array}
+  \]
+  Since $\lift_{\typeinterpret{\xi}}(3) \otimes s \approx
+  s \oplus s \oplus s$, we can eliminate all remaining terms (for
+  example: $\lift_{\typeinterpret{\xi}}(3) \otimes
+  \interpret{v}[z:=\pi^1(A)] \approx
+  \interpret{v}[z:=\pi^1(A)] \oplus \interpret{v}[z:=\pi^1(A)] \oplus
+  \interpret{v}[z:=\pi^1(A)] \succeq vsu \oplus vtu$); thus, the
+  inequality holds.
+
+\item
+  $\interpret{\mathtt{let}_{\varphi,\rho}(
+  \mathtt{case}_{\sigma,\tau,\exists\varphi}(
+  u,\abs{x:\sigma}{s},\abs{y:\tau}{t}),v)} \succ \\
+  \interpret{\mathtt{case}_{\sigma,\tau,\rho}(u,
+  \abs{x:\sigma}{\mathtt{let}_{\varphi,\rho}(s,v)},
+  \abs{y:\tau}{\mathtt{let}_{\varphi,\rho}(t,v)})}$ \\
+
+  In the following, let us denote $v_N := 
+  \interpret{v} * \nat \cdot \lift_{\typeinterpret{\varphi}\nat}(0)$
+  and $u_f := \flatten_{\typeinterpret{\sigma} \times \typeinterpret{
+  \tau}}(\interpret{u})$.  With these abbreviations, we have the
+  following on the left-hand side:
+  \[
+  \begin{array}{l}
+  \interpret{\mathtt{let}_{\varphi,\rho}(
+    \mathtt{case}_{\sigma,\tau,\exists\varphi}(u,
+    \abs{x:\sigma}{s},\abs{y:\tau}{t}),v)} \approx \\
+  %
+  \lift_{\interpret{\rho}}(1)\ \oplus \\
+  \phantom{A}
+  \lift_{\interpret{\rho}}(2) \otimes
+    \interpret{\mathtt{case}_{\sigma,\tau,\exists\varphi}(u,
+    \abs{x}{s},\abs{y}{t})} * \typeinterpret{\rho} \cdot
+    (\tabs{\alpha}{\abs{z}{\interpret{v} * \alpha \cdot z}})\ \oplus \\
+  \phantom{A}
+  \lift_{\interpret{\rho}}(\flatten_{\Sigma\gamma.\typeinterpret{
+    \varphi}\gamma}(\interpret{\mathtt{case}_{\sigma,\tau,
+    \exists\varphi}(u,\abs{x}{s},\abs{y}{t})}) \oplus 1) \otimes
+    v_N \approx \\
+  %
+  \lift_{\interpret{\rho}}(1) \oplus v_N \oplus
+  \lift_{\interpret{\rho}}(2)\ \otimes \\
+  \phantom{A}
+  (\ \lift_{\Sigma\gamma.\typeinterpret{\varphi}\gamma}(2) \oplus
+    \lift_{\Sigma\gamma.\typeinterpret{\varphi}\gamma}(3 \otimes u_f)\ 
+    \oplus \\
+  \phantom{AB}
+     \lift_{\Sigma\gamma.\typeinterpret{\varphi}\gamma}(u_n \oplus 1)
+     \otimes
+     (\interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+      \interpret{t}[y:=\pi^2(\interpret{u})])
+  \\
+  \phantom{A}) * \typeinterpret{\rho} \cdot
+    (\tabs{\alpha}{\abs{z}{\interpret{v} * \alpha \cdot z}})\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(\flatten_{\Sigma\gamma.\typeinterpret{
+    \varphi}\gamma}( \\
+  \phantom{AB}
+  \lift_{\Sigma\gamma.\typeinterpret{\varphi}\gamma}(2) \oplus
+    \lift_{\Sigma\gamma.\typeinterpret{\varphi}\gamma}(3 \otimes
+    u_f)\ \oplus \\
+  \phantom{AB}
+     \lift_{\Sigma\gamma.\typeinterpret{\varphi}\gamma}(u_f \oplus 1)
+     \otimes
+     (\interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+      \interpret{t}[y:=\pi^2(\interpret{u})])
+  \\
+  \phantom{A})) \otimes v_N \approx \\
+  %
+  \lift_{\interpret{\rho}}(1) \oplus v_N
+    \oplus \lift_{\interpret{\rho}}(2)\ \otimes \\
+  \phantom{A}
+  (\ \lift_{\typeinterpret{\rho}}(2) \oplus
+    \lift_{\typeinterpret{\rho}}(3 \otimes u_f) \oplus
+     \lift_{\typeinterpret{\rho}}(u_f \oplus 1)\ \otimes \\
+  \phantom{ABC}(\ \interpret{s}[x:=\pi^1(\interpret{u})] *
+    \typeinterpret{\rho} \cdot
+    (\tabs{\alpha}{\abs{z}{\interpret{v} * \alpha \cdot z}})\ \oplus \\
+  \phantom{ABCD} \interpret{t}[y:=\pi^2(\interpret{u})] *
+    \typeinterpret{\rho} \cdot
+    (\tabs{\alpha}{\abs{z}{\interpret{v} * \alpha \cdot z}})\ ) \\
+  \phantom{A})\ \oplus \\
+  \phantom{A}(\ 
+  \lift_{\typeinterpret{\rho}}(2) \oplus
+    \lift_{\typeinterpret{\rho}}(3 \otimes u_f) \oplus
+  \lift_{\typeinterpret{\rho}}(u_f \oplus 1)\ \otimes \\
+  \phantom{ABC}
+    \lift_{\typeinterpret{\rho}}(\flatten_{\Sigma\gamma.\typeinterpret{
+    \varphi}\gamma}(\interpret{s}[x:=\pi^1(\interpret{u})] \oplus
+      \interpret{t}[y:=\pi^2(\interpret{u})])) \\
+  \phantom{A}) \otimes v_N \approx \\
+  %
+  \lift_{\interpret{\rho}}(1) \oplus v_N \oplus
+    \lift_{\interpret{\rho}}(4) \oplus
+    \lift_{\typeinterpret{\rho}}(6 \otimes u_f)\ \oplus \\
+  \phantom{A}
+  \lift_{\interpret{\rho}}(2) \otimes
+      (\interpret{s}[x:=\pi^1(\interpret{u})] * \typeinterpret{\rho} \cdot
+      (\tabs{\alpha}{\abs{z}{\interpret{v} * \alpha \cdot z}}))\ \oplus \\
+  \phantom{A}
+  \lift_{\interpret{\rho}}(2) \otimes
+      (\interpret{t}[y:=\pi^2(\interpret{u})] * \typeinterpret{\rho} \cdot
+      (\tabs{\alpha}{\abs{z}{\interpret{v} * \alpha \cdot z}}))\ \oplus \\
+  \phantom{A}
+  \lift_{\interpret{\rho}}(2 \otimes u_f) \otimes
+    (\interpret{s}[x:=\pi^1(\interpret{u})] *
+    \typeinterpret{\rho} \cdot
+    (\tabs{\alpha}{\abs{z}{\interpret{v} * \alpha \cdot z}}))\ \oplus \\
+  \phantom{A}
+  \lift_{\interpret{\rho}}(2 \otimes u_f) \otimes
+    (\interpret{t}[y:=\pi^2(\interpret{u})] *
+    \typeinterpret{\rho} \cdot
+    (\tabs{\alpha}{\abs{z}{\interpret{v} * \alpha \cdot z}}))\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(2) \otimes v_N\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(3 \otimes u_f) \otimes v_N\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(\flatten_{\Sigma\gamma.\typeinterpret{
+    \varphi}\gamma}(\interpret{s}[x:=\pi^1(\interpret{u})]))
+    \otimes v_N\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(\flatten_{\Sigma\gamma.\typeinterpret{
+    \varphi}\gamma}(\interpret{t}[y:=\pi^2(\interpret{u})]))
+    \otimes v_N\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(u_f \otimes
+    \flatten_{\Sigma\gamma.\typeinterpret{\varphi}\gamma}(
+    \interpret{s}[x:=\pi^1(\interpret{u})]))
+    \otimes v_N\ \oplus \\
+  \phantom{A} \lift_{\typeinterpret{\rho}}(u_f \otimes
+    \flatten_{\Sigma\gamma.\typeinterpret{
+    \varphi}\gamma}(\interpret{t}[y:=\pi^2(\interpret{u})])) \otimes
+    v_N \approx \\
+  %
+  \lift_{\interpret{\rho}}(5)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(6 \otimes u_f)\ \oplus \\
+  \phantom{A}
+  \lift_{\interpret{\rho}}(2) \otimes
+    (\xlet{\typeinterpret{\rho}}{\interpret{s}[x:=\pi^1(
+    \interpret{u})]}{\expair{\alpha}{z}}{\interpret{v} * \alpha
+    \cdot z})\ \oplus \\
+  \phantom{A}
+  \lift_{\interpret{\rho}}(2) \otimes
+    (\xlet{\typeinterpret{\rho}}{\interpret{y}[y:=\pi^2(
+    \interpret{u})]}{\expair{\alpha}{z}}{\interpret{v} * \alpha
+    \cdot z})\ \oplus \\
+  \phantom{A}
+  \lift_{\interpret{\rho}}(2 \otimes u_f) \otimes
+    (\xlet{\typeinterpret{\rho}}{\interpret{s}[x:=\pi^1(
+    \interpret{u})]}{\expair{\alpha}{z}}{\interpret{v} * \alpha
+    \cdot z})\ \oplus \\
+  \phantom{A}
+  \lift_{\interpret{\rho}}(2 \otimes u_f) \otimes
+    (\xlet{\typeinterpret{\rho}}{\interpret{y}[y:=\pi^2(
+    \interpret{u})]}{\expair{\alpha}{z}}{\interpret{v} * \alpha
+    \cdot z})\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(3) \otimes v_N\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(3 \otimes u_f) \otimes v_N\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(\flatten_{\Sigma\gamma.\typeinterpret{
+    \varphi}\gamma}(\interpret{s}[x:=\pi^1(\interpret{u})]))
+    \otimes v_N\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(\flatten_{\Sigma\gamma.\typeinterpret{
+    \varphi}\gamma}(\interpret{t}[y:=\pi^2(\interpret{u})]))
+    \otimes v_N\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(u_f \otimes
+    \flatten_{\Sigma\gamma.\typeinterpret{\varphi}\gamma}(
+    \interpret{s}[x:=\pi^1(\interpret{u})]))
+    \otimes v_N\ \oplus \\
+  \phantom{A} \lift_{\typeinterpret{\rho}}(u_f \otimes
+    \flatten_{\Sigma\gamma.\typeinterpret{
+    \varphi}\gamma}(\interpret{t}[y:=\pi^2(\interpret{u})])) \otimes
+    v_N \approx \\
+  \end{array}
+  \]
+
+  On the right-hand side, we have:
+  \[
+  \begin{array}{l}
+  \interpret{\mathtt{case}_{\sigma,\tau,\rho}(u,
+  \abs{x:\sigma}{\mathtt{let}_{\varphi,\rho}(s,v)},
+  \abs{y:\tau}{\mathtt{let}_{\varphi,\rho}(t,v)})} \approx \\
+  %
+  \lift_{\typeinterpret{\rho}}(2) \oplus
+  \lift_{\typeinterpret{\rho}}(3 \otimes u_f) \oplus
+  \lift_{\typeinterpret{\rho}}(u_f \oplus 1)\ \otimes \\
+  \phantom{AB}
+    (\interpret{\mathtt{let}_{\varphi,\rho}(s,v)}[x:=\pi^1(
+    \interpret{u})] \oplus
+    \interpret{\mathtt{let}_{\varphi,\rho}(t,v)}[y:=\pi^2(
+    \interpret{u})]) \approx \\
+  %
+  \lift_{\typeinterpret{\rho}}(2) \oplus
+  \lift_{\typeinterpret{\rho}}(3 \otimes u_f)\ \oplus \\
+  \phantom{A}
+  \interpret{\mathtt{let}_{\varphi,\rho}(s,v)}[x:=\pi^1(
+    \interpret{u})]\ \oplus \\
+  \phantom{A}
+    \interpret{\mathtt{let}_{\varphi,\rho}(t,v)}[y:=\pi^2(
+    \interpret{u})]\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(u_f) \otimes
+    \interpret{\mathtt{let}_{\varphi,\rho}(s,v)}[x:=\pi^1(
+    \interpret{u})]\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(u_f) \otimes
+    \interpret{\mathtt{let}_{\varphi,\rho}(t,v)}[y:=\pi^2(
+    \interpret{u})] \approx \\
+  %
+  \lift_{\typeinterpret{\rho}}(2) \oplus
+  \lift_{\typeinterpret{\rho}}(3 \otimes u_f)\ \oplus \\
+  \phantom{A}
+  (\ \lift_{\typeinterpret{\rho}}(1) \oplus
+    \lift_{\typeinterpret{\rho}}(2) \otimes
+    (\xlet{\typeinterpret{\rho}}{\interpret{s}}{\expair{\alpha}{z}}{
+      \interpret{v} * \alpha \cdot z})\ \oplus \\
+  \phantom{AB}
+    \lift_{\typeinterpret{\rho}}(\flatten(\interpret{s}) \oplus 1)
+    \otimes v_N\ )[x:=\pi^1(\interpret{u})]\ \oplus \\
+  \phantom{A}
+  (\ \lift_{\typeinterpret{\rho}}(1) \oplus
+    \lift_{\typeinterpret{\rho}}(2) \otimes
+    (\xlet{\typeinterpret{\rho}}{\interpret{t}}{\expair{\alpha}{z}}{
+      \interpret{v} * \alpha \cdot z})\ \oplus \\
+  \phantom{AB}
+    \lift_{\typeinterpret{\rho}}(\flatten(\interpret{t}) \oplus 1)
+    \otimes v_N\ )[y:=\pi^2(\interpret{u})]\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(u_f) \otimes
+  (\ \lift_{\typeinterpret{\rho}}(1) \oplus
+    \lift_{\typeinterpret{\rho}}(2) \otimes
+    (\xlet{\typeinterpret{\rho}}{\interpret{s}}{\expair{\alpha}{z}}{
+      \interpret{v} * \alpha \cdot z})\ \oplus \\
+  \phantom{ABCDEFGHIJ}
+    \lift_{\typeinterpret{\rho}}(\flatten(\interpret{s}) \oplus 1)
+    \otimes v_N\ )[x:=\pi^1(\interpret{u})]\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(u_f) \otimes
+  (\ \lift_{\typeinterpret{\rho}}(1) \oplus
+    \lift_{\typeinterpret{\rho}}(2) \otimes
+    (\xlet{\typeinterpret{\rho}}{\interpret{t}}{\expair{\alpha}{z}}{
+      \interpret{v} * \alpha \cdot z})\ \oplus \\
+  \phantom{ABCDEFGHIJ}
+    \lift_{\typeinterpret{\rho}}(\flatten(\interpret{t}) \oplus 1)
+    \otimes v_N\ )[y:=\pi^2(\interpret{u})] \approx \\
+  %
+  \lift_{\typeinterpret{\rho}}(2) \oplus
+  \lift_{\typeinterpret{\rho}}(3 \otimes u_f)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(1) \oplus
+  \lift_{\typeinterpret{\rho}}(2) \otimes
+  (\xlet{\typeinterpret{\rho}}{\interpret{s}[x:=\pi^1(\interpret{u})}{
+    \expair{\alpha}{z}}{\interpret{v} * \alpha \cdot z})\ \oplus \\
+  \phantom{A}
+  v_N \oplus \lift_{\typeinterpret{\rho}}(\flatten(\interpret{s}[x:=
+    \pi^1(\interpret{u}))) \otimes v_N\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(1) \oplus
+    \lift_{\typeinterpret{\rho}}(2) \otimes
+    (\xlet{\typeinterpret{\rho}}{\interpret{t}[y:=\pi^2(\interpret{u})]}{
+    \expair{\alpha}{z}}{\interpret{v} * \alpha \cdot z})\ \oplus \\
+  \phantom{A}
+  v_N \oplus \lift_{\typeinterpret{\rho}}(\flatten(\interpret{t}[y:=
+    \pi^2(\interpret{u})])) \otimes v_N\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(u_f) \oplus
+    \lift_{\typeinterpret{\rho}}(2 \otimes u_f) \otimes
+    (\xlet{\typeinterpret{\rho}}{\interpret{s}[x:=\pi^1(
+    \interpret{u})]}{\expair{\alpha}{z}}{
+      \interpret{v} * \alpha \cdot z})\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(u_f) \otimes v_N \oplus
+    \lift_{\typeinterpret{\rho}}(u_f \otimes
+    \flatten(\interpret{s}[x:=\pi^1(\interpret{u})])) \otimes v_N\ 
+    \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(u_f) \oplus
+    \lift_{\typeinterpret{\rho}}(2 \otimes u_f) \otimes
+    (\xlet{\typeinterpret{\rho}}{\interpret{t}[y:=\pi^2(
+    \interpret{u})]}{\expair{\alpha}{z}}{\interpret{v} * \alpha
+    \cdot z})\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(u_f) \otimes v_N \oplus
+    \lift_{\typeinterpret{\rho}}(u_f \otimes\flatten(\interpret{t}[y:=
+    \pi^2(\interpret{u})])) \otimes v_N \\
+  \end{array}
+  \]
+  The last step follows because $x$ occurs only in $s$, and $y$ occurs
+  only in $t$.  This term can now be reordered to:
+  \[
+  \begin{array}{l}
+  \lift_{\typeinterpret{\rho}}(4)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(5 \otimes u_f)\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(2) \otimes
+  (\xlet{\typeinterpret{\rho}}{\interpret{s}[x:=\pi^1(\interpret{u})}{
+    \expair{\alpha}{z}}{\interpret{v} * \alpha \cdot z})\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(2) \otimes
+    (\xlet{\typeinterpret{\rho}}{\interpret{t}[y:=\pi^2(\interpret{u})]}{
+    \expair{\alpha}{z}}{\interpret{v} * \alpha \cdot z})\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(2 \otimes u_f) \otimes
+    (\xlet{\typeinterpret{\rho}}{\interpret{s}[x:=\pi^1(
+    \interpret{u})]}{\expair{\alpha}{z}}{
+    \interpret{v} * \alpha \cdot z})\ \oplus \\
+  \phantom{A}
+    \lift_{\typeinterpret{\rho}}(2 \otimes u_f) \otimes
+    (\xlet{\typeinterpret{\rho}}{\interpret{t}[y:=\pi^2(
+    \interpret{u})]}{\expair{\alpha}{z}}{
+    \interpret{v} * \alpha \cdot z})\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(2) \otimes v_N\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(2 \otimes u_f) \otimes v_N\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(\flatten(\interpret{s}[x:=
+    \pi^1(\interpret{u}))) \otimes v_N\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(\flatten(\interpret{t}[y:=
+    \pi^2(\interpret{u})])) \otimes v_N\ \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(u_f \otimes
+    \flatten(\interpret{s}[x:=\pi^1(\interpret{u})])) \otimes v_N\ 
+    \oplus \\
+  \phantom{A}
+  \lift_{\typeinterpret{\rho}}(u_f \otimes\flatten(\interpret{t}[y:=
+    \pi^2(\interpret{u})])) \otimes v_N \\
+  \end{array}
+  \]
+  We conclude once more by absolute positiveness.
+\end{itemize}
+
 
 \end{document}
