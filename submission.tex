@@ -325,7 +325,7 @@ of lambda calculi such as substitution and $\alpha$-conversion.
   the type annotations, denoting the above term by~$\lambda x . x
   y$. Type substitution is defined in the expected way except that it
   needs to change the types of variables. Formally, a type
-  substitution changes the type paired to variables in~$\Vars$. We
+  substitution changes the types associated to variables in~$\Vars$. We
   define the equivalence relation~$\equiv$ by: $s \equiv t$ iff $s$
   and $t$ are identical modulo $\beta$-conversion in types.
 \end{defn}
@@ -1145,8 +1145,8 @@ mapping to translate types:
   Induction on~$\sigma$.
 \end{proof}
 
-Similarly, we employ a \emph{symbol mapping} as \CKchange{the key
-ingredient} to interpret PFS terms.
+Similarly, we employ a \emph{symbol mapping} as the key
+ingredient to interpret PFS terms.
 
 \begin{defn}
   A \emph{symbol mapping} is a function $\Termmap$ which assigns to
@@ -1190,14 +1190,14 @@ $A$-terms to interpretation terms.  This translation preserves typing:
 \end{defn}
 
 \begin{lemma}\label{lem:substitutioninterpret}
-  \CKchange{For all $s,t,x,\alpha,\tau$:
+  For all $s,t,x,\alpha,\tau$:
   %\begin{enumerate}
   %\item\label{lem:substitutioninterpret:mixed}
     $\interpret{s}[\alpha:=\typeinterpret{\tau}] =
     \interpret{s[\alpha:=\tau]}$
   and
   %\item\label{lem:substitutioninterpret:terms}
-    $\interpret{s}[x:=\interpret{t}] = \interpret{s[x:=t]}$.}
+    $\interpret{s}[x:=\interpret{t}] = \interpret{s[x:=t]}$.
   %\end{enumerate}
 \end{lemma}
 
@@ -1209,19 +1209,18 @@ $A$-terms to interpretation terms.  This translation preserves typing:
 The polymorphic lambda-calculus has a much greater expressive power
 than the simply-typed lambda-calculus. Arbitrary inductive data types
 may be encoded, along with their constructors and recursors with
-appropriate derived reduction rules. This makes %the polynomial
-\CKchange{our}
+appropriate derived reduction rules. This makes
+our
 interpretation method easier to apply, even in the non-polymorphic
 setting, thanks to more
 sophisticated ``programming'' in the interpretations.
 % LC: I don't think we have any "programming" to speak of in the types
 % (and I don't think we need it).
 The reader is advised to consult e.g.~\cite[Chapter~11]{Girard1989}
-for more background and explanations. \CKchange{We} demonstrate the idea
-by presenting an encoding for the recursive type $\List$ and \CKchange{its}
-%corresponding
-fold-left function \CKchange{(see also
-Ex.~\ref{ex_fold_interpretation}).}
+for more background and explanations. We demonstrate the idea
+by presenting an encoding for the recursive type $\List$ and its
+fold-left function (see also
+Ex.~\ref{ex_fold_interpretation}).
 \end{remark}
 
 \begin{example}\label{ex:notyetmono}
@@ -1258,14 +1257,13 @@ $\Termmap$ is \emph{safe}.
   If $s_1 \succ s_2$ implies $t[\subst{x}{s_1}] \succ
   t[\subst{x}{s_2}]$, then the interpretation term~$t$ is \emph{safe
     for~$x$}. A symbol mapping~$\Termmap$ is \emph{safe} if for all
-  %symbols
-  \CKchange{$
+  $
 %  \[
   \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n
   : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype
   \tau
 %  \]
-$}
+$
   with~$\tau$ a type atom we have: $\Termmap(\mathtt{f}) =
   \tabs{\alpha_1 \dots \alpha_n}{\abs{x_1 \dots x_k}{t}}$ with $t$
   safe for each~$x_i$.
@@ -1274,17 +1272,17 @@ $}
 \begin{lemma}\label{lem_safe}
   \begin{enumerate}
   \item $x u_1 \ldots u_m$ is safe for~$x$.
-  \item If $t$ is safe for~$x$ then so \CKchange{are}~$\lift(t)$
+  \item If $t$ is safe for~$x$ then so are~$\lift(t)$
     and~$\flatten(t)$.
   \item If $s_1$ is safe for~$x$ or $s_2$ is safe for~$x$ then $s_1
     \oplus s_2$ is safe for~$x$.
   \item If either
     %\begin{itemize}
     %\item
-      \CKchange{(a)}
+      (a)
       $s_1$ is safe for~$x$ and $s_2 \succeq \lift(1)$, or
     %\item
-      \CKchange{(b)}
+      (b)
       $s_2$ is safe for~$x$ and $s_1 \succeq \lift(1)$,
     %\end{itemize}
     then $s_1 \otimes s_2$ is safe for~$x$.
@@ -1300,7 +1298,7 @@ $}
   Each point follows from one of the lemmas proven before,
   Lemma~\ref{lem_succ_to_succeq}, Lemma~\ref{lem_succeq_subst},
   Lemma~\ref{lem:compatibility} and the transitivity of~$\succeq$. For
-  instance, \CKchange{for the first,} assume $s_1 \succ s_2$ and let
+  instance, for the first, assume $s_1 \succ s_2$ and let
   $u_i^j=u_i[\subst{x}{s_j}]$. Then $(x u_1 \ldots
   u_m)[\subst{x}{s_1}] = s_1 u_1^1 \ldots u_m^1$. By
   Lemma~\ref{lem_app_succ} we have $s_1 u_1^1 \ldots u_m^1 \succ s_2
@@ -1318,26 +1316,24 @@ $}
 \end{lemma}
 
 \begin{proof}
-  Assume $s_1 \succinterpret s_2$. By induction on %the structure of
-  \CKchange{a}
-  context~$C$ we show $C[s_1] \succinterpret C[s_2]$. If $C=\Box$ then
+  Assume $s_1 \succinterpret s_2$. By induction on
+  a context~$C$ we show $C[s_1] \succinterpret C[s_2]$. If $C=\Box$ then
   this is obvious. If $C = \abs{x}{C'}$ or $C = \tabs{\alpha}{C'}$
   then $C'[s_1] \succinterpret C'[s_2]$ by the inductive hypothesis,
   and thus $C[s_1] \succinterpret C[s_2]$ follows from
   Lemma~\ref{lem_abs_succ} and definitions. If $C = C' t$ then
   $C'[s_1] \succinterpret C'[s_2]$ by the inductive hypothesis,
-  %and thus
-  \CKchange{so} $C[s_1] \succinterpret C[s_2]$ follows from definitions.
+  so $C[s_1] \succinterpret C[s_2]$ follows from definitions.
 
   Finally, assume $C = \app{t}{C'}$. Then $t = \mathtt{f} \rho_1
   \ldots \rho_n t_1 \ldots t_m$ where
 %  \[
-\CKchange{$
+$
   \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n
   : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype
   \tau
 %  \]
-$}
+$
   with~$\tau$ a type atom, $m < k$, and $\Termmap(\mathtt{f}) =
   \tabs{\alpha_1 \dots \alpha_n}{\abs{x_1 \dots x_k}{u}}$ with $u$
   safe for each~$x_i$. Without loss of generality assume $m=k-1$. Then
@@ -1419,7 +1415,7 @@ achieved through \emph{rule removal}.
   $\Rules_2\subseteq{\succeq^\Rules}$ for a reduction pair
   $(\succeq^\Rules,\succ^\Rules)$. Then $\arr{\Rules}$ is terminating
   if and only if $\arr{\Rules_2}$ is
-  \CKchange{(so certainly if $\Rules_2 = \emptyset$).}
+  (so certainly if $\Rules_2 = \emptyset$).
   %In particular, $\arr{\Rules}$ is
   %terminating if $\Rules_2 = \emptyset$.
 \end{theorem}
@@ -1468,7 +1464,7 @@ requirements have to be verified for each individual rule.
   We continue with our example of fold on heterogenous lists. We prove
   termination by rule removal, using the symbol mapping from
   Example~\ref{ex_fold_interpretation}.
-  We \CKchange{will} show:
+  We will show:
   \[
   \begin{array}{rcl}
     @_{\sigma,\tau}(\abs{x:\sigma}{s},t) & \succeqinterpret & s[x:=t] \\
@@ -1505,9 +1501,9 @@ that $\succeq$ is monotonic (Lem.~\ref{lem_succeq_subst}),
 that both $\succ$ and $\succeq$ are monotonic over $\lift$ and $\flatten$
 (Lem.~\ref{lem:liftgreater} and \ref{lem_flatten_succ}) and that
 interpretations respect substitution
-(Lem.~\ref{lem:substitutioninterpret}).  \CKchange{We will also use
+(Lem.~\ref{lem:substitutioninterpret}). We will also use
 Lemma \ref{lem:plustimesmonotonic} which states (among other things)
-that $s \succ t$ implies that $s \oplus u \succ t \oplus u$.}
+that $s \succ t$ implies that $s \oplus u \succ t \oplus u$.
 In addition, we can use the
 calculation rules below. The proofs may be found in
 Appendix~\ref{app_proofs}.
@@ -1557,14 +1553,14 @@ Note that these calculation rules immediately give the
 inequality $x \oplus \lift_{nat \arrtype \nat}(1) \succ x$ from
 Example~\ref{ex:plus1}, and also that $\lift_\sigma(n) \succ
 \lift_\sigma(m)$ whenever $n > m$.  By
-\CKchange{Lemmas~\ref{lem:plustimesmonotonic} and}~\ref{lem:plusparts} we
+Lemmas~\ref{lem:plustimesmonotonic} and~\ref{lem:plusparts} we
 can use \emph{absolute positiveness}: the property that
 (a) $s \succeq t$ if we can write $s \approx s_1 \oplus \dots \oplus
 s_n$ and $t \approx t_1 \oplus \dots \oplus t_k$ with $k \leq n$ and
 $s_i \succeq t_i$ for all $i \leq k$, and (b) if moreover $s_1 \succ
-t_1$ then $s \succ t$.  This property \CKchange{is typically very
+t_1$ then $s \succ t$.  This property is typically very
 useful to dispense the obligations obtained in a termination proof with
-polynomial interpretations.}
+polynomial interpretations.
 
 \begin{example}\label{ex_fold_final}
 We now have the tools to finish the example of
@@ -1673,7 +1669,7 @@ terms to natural deduction proofs. The remaining connectives may be
 encoded in~$\mathtt{F}$, but the permutative conversion rules do not
 hold~\cite{Girard1989}.
 
-\CKchange{In this section we show}
+In this section we show
 termination of the system IPC2
 (see~\cite{SorensenUrzyczyn2010}) of intuitionistic second-order
 propositional logic with all connectives and permutative conversions,
@@ -1686,12 +1682,12 @@ in~\cite{Tatsuta2007}. To our knowledge, termination of the full
 system~IPC2 remains an open problem, strictly speaking.
 
 \begin{remark}
-\CKchange{Our method builds on the work of Pol and Schwichtenberg,}
-who have also used higher-order polynomial interpretations to prove
+Our method builds on the work of Pol and Schwichtenberg,
+who used higher-order polynomial interpretations to prove
 termination of a fragment of intuitionistic first-order logic with
 permutative conversions~\cite{PolSchwichtenberg1995}, in the hope of
 providing a more perspicuous proof of this well-known result. Notably,
-they did not treat disjunction\CKchange{, as we will do}. Also, their method
+they did not treat disjunction, as we will do. \LCchange{More fundamentally}, their method
 cannot handle impredicative polymorphism necessary for second-order
 logic.
 \end{remark}
@@ -1743,7 +1739,7 @@ We have the following function symbols:
 \end{array}
 \]
 
-And 28 reduction rules, including the following (the full set of rules is in \CKchange{Appendix \ref{app_ineqs}}):
+And 28 reduction rules, including the following (the full set of rules is in Appendix \ref{app_ineqs}):
 \[
 \begin{array}{rclrcl}
 @_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] &
@@ -1785,10 +1781,10 @@ And 28 reduction rules, including the following (the full set of rules is in \CK
 %\]
 \[
 \begin{array}{l}
-\CKchange{@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) \red
-  \epsilon_\tau(s)} \\
-\CKchange{\mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}\,\sigma\,\tau}(
-  u),\abs{x}{s},\abs{y}{t}) \red \epsilon_\rho(u)} \\
+@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) \red
+  \epsilon_\tau(s) \\
+\mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}\,\sigma\,\tau}(
+  u),\abs{x}{s},\abs{y}{t}) \red \epsilon_\rho(u) \\
 \epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,\abs{x}{s},
   \abs{y}{t})) \red
   \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x}{\epsilon_\rho(s)},
@@ -1815,7 +1811,7 @@ And 28 reduction rules, including the following (the full set of rules is in \CK
 \end{array}
 \]
 
-To define an intepretation for~IPC2, we \CKchange{will use the}
+To define an intepretation for~IPC2, we will use the
 standard encoding of
 product and existential types (see~\cite[Chapter~11]{Girard1989} for
 more details).
@@ -1833,7 +1829,7 @@ more details).
   \]
 
 Now, most of the rules can be oriented strictly (so using $\succinterpret$)
-by the interpretation:
+by the \LCchange{safe} interpretation:
 \[
 \begin{array}{rclcrcl}
 \Typemap(\bot) & = & \nat
@@ -1898,20 +1894,19 @@ by the interpretation:
 \end{array}
 \]
 
-\CKchange{The derivations to orient rules with these
+The derivations to orient rules with these
 \pagebreak
-interpretations are also given in Appendix \ref{app_ineqs}.}
+interpretations are also given in Appendix \ref{app_ineqs}.
 
-The only rules that are not oriented with this interpretation -- also
-not using $\succeq$ -- are the ones of the form
+The only rules that are not oriented with this interpretation -- not
+with~$\succeq$ either -- are the ones of the form
 $f(\mathtt{let}(s,t), \dots) \red \mathtt{let}(s,f(t,\dots))$, like
 the rule marked (*) above. Nonetheless, this is already a significant
-step toward an extensible methodology of termination proofs for IPC2
-and similar systems of higher-order logic. Verifying the orientations
-is still tedious, but our method raises hope for at least partial
-automation in the future, as was done with polynomial interpretations
-for non-polymorphic (\LC{Cynthia: shallowly polymorphic?}\CK{No.})
-higher-order rewriting~\cite{FuhsKop2012}.
+step toward a systematic, extensible methodology of termination proofs
+for IPC2 and similar systems of higher-order logic. Verifying the
+orientations is still tedious, but our method raises hope for at least
+partial automation, as was done with polynomial interpretations for
+non-polymorphic higher-order rewriting~\cite{FuhsKop2012}.
 
 \section{Conclusions and future work}
 
@@ -1921,14 +1916,8 @@ polymorphism.
 \CK{Probably write a few more sentences here explaining why what we did
 is totally awesome.}
 
-\CKchange{As the method is not that easy to apply manually for larger
-systems,}
-%Readers may note that the method is currently not that easy to apply on
-%larger systems: simplifying polynomials can be a lot of work,
-%especially when interpretations multiply two variables (such as
-%$\Termmap(\mathtt{case})$ in Section \ref{sec:examples}), and checking
-%the proofs is tedious.  Hence,
-a natural direction for future work is
+As the method is not that easy to apply manually for larger
+systems, a natural direction for future work is
 to look into automation: both for automatic verification that a given
 interpretation suffices and -- building on existing termination provers
 for both first- and higher-order term rewriting -- automatically finding
@@ -3335,7 +3324,7 @@ have:
 
 \begin{proof}
   It suffices to show this for closed~$\sigma$ in $\beta$-normal
-  form. For the first two point, one proves by induction on~$\sigma$
+  form. For the first two points, one proves by induction on~$\sigma$
   that
   $(\lift_\sigma(n+m))\da = (\lift_\sigma n \oplus_\sigma \lift_\sigma
   n)\da$ (analogously for multiplication). This suffices by
