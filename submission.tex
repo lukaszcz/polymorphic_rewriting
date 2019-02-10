@@ -65,8 +65,6 @@
 \newcommand{\val}[3]{\ensuremath{\llbracket#1\rrbracket_{#2}^{#3}}}
 \newcommand{\gteq}[3]{\ensuremath{\ge_{#1}^{#2,#3}}}
 
-\newcommand{\proves}{\vdash}
-
 \newcommand{\Typemap}{\mathcal{T\!M}}
 \newcommand{\Termmap}{\mathcal{J}}
 \newcommand{\succinterpret}{\succ^{\Termmap}}
@@ -291,49 +289,49 @@ of lambda calculi such as substitution and $\alpha$-conversion.
 \end{defn}
 
 \begin{defn}\label{def_preterms}
-  We assume given an infinite set $\Vars$ of variables, and let
-  $\Gamma$ refer to a variable context -- a set of pairs $x : \tau$ of
-  a variable and a type, such that each variable occurs at most
-  once. We assume given a fixed set $\Sigma$ of \emph{function
-    symbols}, each paired with a closed type, denoted $\mathtt{f} :
-  \tau$.  Every function symbol $\mathtt{f}$ occurs only with one type
-  declaration. We denote $\Gamma,x:\tau$ for $\Gamma \cup \{x:\tau\}$. We
-  set $\FTV(\Gamma) = \bigcup\{\FTV(\tau) \mid (x : \tau) \in
-  \Gamma\}$.
-  \pagebreak
+  We assume given an infinite set $\Vars$ of variables, each paired
+  with a type, denoted $x : \tau$. We assume given a fixed set
+  $\Sigma$ of \emph{function symbols}, each paired with a closed type,
+  denoted $\mathtt{f} : \tau$. Every variabe~$x$ and every function
+  symbol $\mathtt{f}$ occurs only with one type declaration.
 
-  The set of preterms consists of all expressions~$s$ such that
-  $\Gamma \vdash s : \sigma$ can be inferred for some type $\sigma$
-  and context $\Gamma$ by the following clauses:
+  The set of \emph{preterms} consists of all expressions~$s$ such that
+  $s : \sigma$ can be inferred for some type $\sigma$ by the following
+  clauses:
   \begin{itemize}
-  \item $\Gamma \vdash x : \sigma$ for every $(x : \sigma) \in \Gamma$.
-  \item $\Gamma \vdash \mathtt{f} : \sigma$ for all
+  \item $x : \sigma$ for $(x : \sigma) \in \Vars$.
+  \item $\mathtt{f} : \sigma$ for all
     $(\mathtt{f} : \sigma) \in \Sigma$.
-  \item $\Gamma \vdash \abs{x:\sigma}{s} : \sigma \arrtype \tau$ if $x
-    \in \Vars$ and $\Gamma, x : \sigma \vdash s : \tau$.
-  \item $\Gamma \vdash \tabs{\alpha:\kappa}{s} : \quant{\alpha:\kappa}{\sigma}$ if
-    $\Gamma \vdash s : \sigma$ and $\alpha \notin \FTV(\Gamma)$.
-  \item $\Gamma \vdash \app{s}{t} : \tau$ if $\Gamma \vdash s : \sigma
-    \arrtype \tau$ and $\Gamma \vdash t : \sigma$
-  \item $\Gamma \vdash \tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$
-    if $\Gamma \vdash s : \quant{\alpha:\kappa}{\sigma}$ and~$\tau$ is
-    a type constructor of kind~$\kappa$,
-  \item $\Gamma \vdash s : \tau$ if $\Gamma \vdash s : \tau'$ and
-    $\tau =_\beta \tau'$.
+  \item $\abs{x:\sigma}{s} : \sigma \arrtype \tau$ if
+    $(x : \sigma) \in \Vars$.
+  \item $\tabs{\alpha:\kappa}{s} : \quant{\alpha:\kappa}{\sigma}$ if
+    $s : \sigma$ and $\alpha$ does not occur free in the type of a
+    free variable of~$s$.
+  \item $\app{s}{t} : \tau$ if $s : \sigma \arrtype \tau$ and
+    $t : \sigma$
+  \item $\tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$ if
+    $s : \quant{\alpha:\kappa}{\sigma}$ and~$\tau$ is a type
+    constructor of kind~$\kappa$,
+  \item $s : \tau$ if $s : \tau'$ and $\tau =_\beta \tau'$.
   \end{itemize}
   The set of free variables of a preterm~$t$, denoted $\FV(t)$, is
   defined in the expected way. Analogously, we define the
-  set~$\FTV(t)$ of type constructor variables occurring free
-  in~$t$.
-  If $\alpha$ is a type constructor variable of
-  kind~$\kappa$ then we use the notation $\tabs{\alpha:\kappa}{t}$.
-  We define the equivalence relation~$\equiv$ by: $s \equiv t$ iff $s$
+  set~$\FTV(t)$ of type constructor variables occurring free in~$t$.
+  If $\alpha$ is a type then we use the notation $\tabs{\alpha}{t}$.
+  We denote an occurrence of a variable~$x$ of type~$\tau$
+  by~$x^\tau$,
+  e.g.~$\lambda x : \tau\arrtype\sigma
+  . x^{\tau\arrtype\sigma}y^\tau$. When clear or irrelevant, we omit
+  the type annotations, denoting the above term by~$\lambda x . x
+  y$. Type substitution is defined in the expected way except that it
+  needs to change the types of variables. Formally, a type
+  substitution changes the type paired to variables in~$\Vars$. We
+  define the equivalence relation~$\equiv$ by: $s \equiv t$ iff $s$
   and $t$ are identical modulo $\beta$-conversion in types.
 \end{defn}
 
 \begin{lemma}
-  If $\Gamma \vdash s : \tau$ and $s \equiv t$ then $\Gamma \vdash t :
-  \tau$.
+  If $s : \tau$ and $s \equiv t$ then $t : \tau$.
 \end{lemma}
 
 \begin{proof}
@@ -365,11 +363,10 @@ $\abs{a}{s}$ or $\tabs{a}{s}$.
 
 \begin{lemma}[Substitution lemma]\label{lem:substitution}
   \begin{enumerate}
-  \item If $\Gamma, x : \sigma \proves s : \tau$ and $\Gamma \proves t
-    : \sigma$ then $\Gamma \proves s[\subst{x}{t}] : \tau$.
-  \item If $\Gamma \proves t : \sigma$ then
-    $\Gamma[\subst{\alpha}{\tau}] \proves t[\subst{\alpha}{\tau}] :
-    \sigma[\subst{\alpha}{\tau}]$.
+  \item If $s : \tau$ and $x : \sigma$ and $t : \sigma$ then
+    $s[\subst{x}{t}] : \tau$.
+  \item If $t : \sigma$ then
+    $t[\subst{\alpha}{\tau}] : \sigma[\subst{\alpha}{\tau}]$.
   \end{enumerate}
 \end{lemma}
 
@@ -378,50 +375,35 @@ $\abs{a}{s}$ or $\tabs{a}{s}$.
 \end{proof}
 
 \begin{lemma}[Generation lemma]\label{lem:generation}
-  Assume $\Gamma \proves t : \sigma$ and let $\Xc = \FTV(t) \cup
-  \FTV(\Gamma)$. Then there is a type~$\sigma'$ such that $\sigma'
-  =_\beta \sigma$ and $\FTV(\sigma') \subseteq \Xc$ and one of the
-  following holds.
+  If $t : \sigma$ and there is a type~$\sigma'$ such that
+  $\sigma' =_\beta \sigma$ and $\FTV(\sigma') \subseteq \FTV(t)$ and
+  one of the following holds.
   \begin{itemize}
-  \item $t \equiv x$ is a variable and $(x : \sigma') \in \Gamma$.
-  \item $t \equiv \mathtt{f}$ is a function symbol with $\mathtt{f} :
-    \sigma'$ in $\Sigma$.
+  \item $t \equiv x$ is a variable with $(x : \sigma') \in \Vars$.
+  \item $t \equiv \mathtt{f}$ is a function symbol with
+    $\mathtt{f} : \sigma'$ in $\Sigma$.
   \item $t \equiv \abs{x:\tau_1}{s}$ and
-    $\sigma'=\tau_1\arrtype\tau_2$ and $\Gamma, x : \tau_1 \vdash s :
-    \tau_2$.
-  \item $t \equiv \tabs{\alpha:\kappa}{s}$ and $\sigma' =
-    \quant{\alpha:\kappa}{\tau}$ and $\Gamma \vdash s : \tau$ and $\alpha
-    \notin \FTV(\Gamma)$.
-  \item $t \equiv \app{t_1}{t_2}$ and
-    $\Gamma \vdash t_1 : \tau \arrtype \sigma'$ and
-    $\Gamma \vdash t_2 : \tau$ and $\FTV(\tau) \subseteq \Xc$.
+    $\sigma'=\tau_1\arrtype\tau_2$ and $s : \tau_2$.
+  \item $t \equiv \tabs{\alpha:\kappa}{s}$ and
+    $\sigma' = \quant{\alpha:\kappa}{\tau}$ and $s : \tau$ and
+    $\alpha$ does not occur free in the type of a free variable
+    of~$s$.
+  \item $t \equiv \app{t_1}{t_2}$ and $t_1 : \tau \arrtype \sigma'$
+    and $t_2 : \tau$ and $\FTV(\tau) \subseteq \FTV(t)$.
   \item $t \equiv \tapp{s}{\tau}$ and
     $\sigma' = \rho[\subst{\alpha}{\tau}]$ and
-    $\Gamma \vdash s : \quant{(\alpha:\kappa)}{\rho}$ and~$\tau$ is a
-    type constructor of kind~$\kappa$.
+    $s : \quant{(\alpha:\kappa)}{\rho}$ and~$\tau$ is a type
+    constructor of kind~$\kappa$.
   \end{itemize}
 \end{lemma}
 
 \begin{proof}
-  By analysing the derivation $\Gamma \proves t : \sigma$. To
-  ensure $\FTV(\sigma') \subseteq \Xc$, note that if
-  $\alpha \notin \Xc$
-  is of kind~$\kappa$ and~$\Gamma \proves t : \sigma'$
-  with~$\FTV(t) \cup \FTV(\Gamma) \subseteq \Xc$, then $\Gamma
-  \proves t : \sigma'[\subst{\alpha}{\chi_\kappa}]$ by the
-  substitution lemma (thus we can eliminate~$\alpha$).
+  By analysing the derivation $t : \sigma$. To ensure
+  $\FTV(\sigma') \subseteq \FTV(t)$, note that if
+  $\alpha \notin \FTV(t)$ is of kind~$\kappa$ and~$t : \sigma'$, then
+  $t : \sigma'[\subst{\alpha}{\chi_\kappa}]$ by the substitution lemma
+  (thus we can eliminate~$\alpha$).
 \end{proof}
-
-For convenience, we sometimes assume without loss of generality that
-the terms are given in orthodox Church-style, i.e., instead of using
-contexts we assume that each variable occurrence is annotated with a
-type (where two occurrences of the same variable must be annotated
-with the same type). Note that given a context~$\Gamma$ under which
-all considered terms are typable, there is a natural isomorphism
-between typed terms as defined above and terms given in orthodox
-Church-style. We write $t : \tau$ if $t$ has type~$\tau$, in a fixed
-implicit context~$\Gamma$, or equivalently with~$t$ considered as an
-orthodox Church-style typed term.
 
 \section{Polymorphic Functional Systems}\label{sec_systems}
 
@@ -489,20 +471,19 @@ $\arr{\Rules}$ based on a (usually infinite) set of rewrite rules. To
 define this relation, we need two additional notions.
 
 \begin{defn}\label{def_replacement}
-  For a variable context $\Gamma$,
-  a \emph{$\Gamma$-replacement} is a function $\delta = \gamma \circ
-  \omega$ satisfying:
+  A \emph{replacement} is a function $\delta = \gamma \circ \omega$
+  satisfying:
   \begin{enumerate}
   \item $\omega$ is a type constructor substitution,
-  \item $\gamma$ is a term substitution such that $\omega(\Gamma)
-    \proves \gamma(x) : \omega(\tau)$ for every $(x : \tau) \in
-    \Gamma$.
+  \item $\gamma$ is a term substitution such that
+    $\gamma(\omega(x)) : \omega(\tau)$ for every
+    $(x : \tau) \in \Vars$.
   \end{enumerate}
 
   For~$\tau$ a type constructor, we use $\delta(\tau)$ to denote
-  $\omega(\tau)$. We use the notation $\delta[\subst{x}{t}] =
-  \gamma[\subst{x}{t}] \circ \omega$. Note that if $\Gamma \proves t :
-  \tau$ then $\delta(\Gamma) \proves \delta(t) : \delta(\tau)$.
+  $\omega(\tau)$. We use the notation
+  $\delta[\subst{x}{t}] = \gamma[\subst{x}{t}] \circ \omega$. Note
+  that if $t : \tau$ then $\delta(t) : \delta(\tau)$.
 \end{defn}
 
 \begin{defn}\label{def:context}
@@ -514,17 +495,15 @@ define this relation, we need two additional notions.
 \end{defn}
 
 Now, the rewrite rules are simply a set of term pairs, whose
-monotonic closure generates the rewrite relation. We fix a variable
-context~$\Gamma$.
+monotonic closure generates the rewrite relation.
 
 \begin{defn}\label{def_rules}
   A set $\Rules$ of term pairs $(\ell,r)$ is a set of \emph{rewrite
-    rules} if: (a)
-  $\FV(r) \subseteq \FV(\ell) \subseteq \mathit{keys}(\Gamma)$;
-  (b)$\ell$ and $r$ have the same type under $\Gamma$; and (c) if
-  $(\ell,r) \in \Rules$ then $(\delta(\ell),\delta(r)) \in \Rules$ for
-  any replacement~$\delta$.
-  The reduction relation $\arr{\Rules}$ is defined by:
+    rules} if: (a) $\FV(r) \subseteq \FV(\ell)$; (b) $\ell$ and $r$
+  have the same type; and (c) if $(\ell,r) \in \Rules$
+  then $(\delta(\ell),\delta(r)) \in \Rules$ for any
+  replacement~$\delta$.  The reduction relation $\arr{\Rules}$ is
+  defined by:
   
 \begin{center}
   $t \arr{\Rules}
@@ -701,7 +680,7 @@ be a powerful aid in defining the parial ordering $\succ$ in Section
   with respect to $\arrW$.  We let $\Iterms^f$ be the set of all final
   interpretation terms. By~$\Iterms_\tau$ ($\Iterms^f_\tau$) we denote
   the set of all (final) interpretation terms of interpretation
-  type~$\tau$ (in a fixed implicit context~$\Gamma$).
+  type~$\tau$.
 \end{defn}
 
 An important difference with System~$\Fomega$ and related ones is that
@@ -727,8 +706,7 @@ normalisation. Because of space limitations, most proofs are
 delegated to Appendix~\ref{app_proofs}.
 
 \begin{lemma}[Subject reduction]
-  If $\Gamma \proves t : \tau$ and $t \arrW t'$ then $\Gamma \proves
-  t' : \tau$.
+  If $t : \tau$ and $t \arrW t'$ then $t' : \tau$.
 \end{lemma}
 
 \begin{proof}
@@ -739,8 +717,7 @@ delegated to Appendix~\ref{app_proofs}.
 \end{proof}
 
 \begin{theorem}\label{thm_sn}
-  If $\Gamma \proves t : \sigma$ then $t$ is terminating with respect
-  to $\arrW$.
+  If $t : \sigma$ then $t$ is terminating with respect to $\arrW$.
 \end{theorem}
 
 \begin{lemma}\label{lem_unique_final}
@@ -786,9 +763,6 @@ $s \succ t$, since it suffices to show that $s \succeq s' \succ t'
 also allow us to use rule removal (Theorem \ref{thm:ruleremove}).
 %instead of merely
 %orienting all rules with $\succ$.
-
-For the following definition, we fix an
-implict variable context~$\Gamma$.
 
 \begin{defn}\label{def:succ}
             \label{def_closure}
@@ -1054,7 +1028,7 @@ under term formation operations. We will need these results in the next section.
 \end{lemma}
 
 \begin{proof}
-  Assume $t \succeq_\tau s$ and $\Gamma \proves x : \sigma$. Let~$\cl$
+  Assume $t \succeq_\tau s$ and $x : \sigma$. Let~$\cl$
   be a closure. We need to show
   $\cl(\abs{x}{t}) \succeq_{\cl(\sigma\arrtype\tau)}
   \cl(\abs{x}{s})$. Let $u \in \Iterms^f_{\cl(\sigma)}$. Then
@@ -1159,10 +1133,7 @@ mapping to translate types:
   e.g.~$\typeinterpret{\quant{\alpha}{\sigma}} =
   \quant{\alpha}{\typeinterpret{\sigma}}$ and $\typeinterpret{\sigma
     \arrtype \tau} = \typeinterpret{\sigma} \arrtype
-  \typeinterpret{\tau}$. An interpretation type mapping is extended to
-  \pagebreak
-  contexts: \( \itp{\Gamma} := \{ (x : \typeinterpret{\tau}) \mid (x :
-  \tau) \in \Gamma \}.  \)
+  \typeinterpret{\tau}$.
 \end{defn}
 
 \begin{lemma}\label{lem:substitutioninterpret:types}
@@ -1202,8 +1173,7 @@ $\Termmap(\mathtt{f})$ for function symbols $\mathtt{f}$, thus mapping
 $A$-terms to interpretation terms.  This translation preserves typing:
 
 \begin{lemma}
-  If $\Gamma \vdash s : \sigma$ then $\itp{\Gamma} \vdash
-  \interpret{s} : \typeinterpret{\sigma}$.
+  If $s : \sigma$ then $\interpret{s} : \typeinterpret{\sigma}$.
 \end{lemma}
 
 \begin{proof}
@@ -1947,19 +1917,6 @@ other techniques for higher-order termination. %like dependency pairs.
 
 \section{Complete proofs}\label{app_proofs}
 
-In many proofs below we assume the terms to be given in orthodox
-Church-style (see the discussion at the end of
-Section~\ref{sec_preliminaries}). We denote an occurrence of a
-variable~$x$ annotated with a type~$\tau$ by~$x^\tau$. So now
-e.g.~$\lambda x : \tau\arrtype\sigma . x^{\tau\arrtype\sigma}y^\tau$
-is an orthodox Church-style typed term. When clear or irrelevant, we
-omit the type annotations for readability, denoting the above term
-by~$\lambda x : \tau\arrtype\sigma . x y$ or even~$\lambda x . x
-y$. Note that now type substitution also needs to change the type
-annotations. Also, each term has a unique type modulo
-$\beta$-conversion. The generation and subject reduction lemmas still
-hold for orthodox Church-style typed terms.
-
 \subsection{Strong Normalisation of~$\arrW$}
 
 By~$\SN$ we denote the set of all interpretation terms terminating
@@ -2270,7 +2227,7 @@ write~$\val{\varphi}{}{}$.
     \end{itemize}
     We have thus shown that if $t u \arrW t''$ then $t'' \in
     \val{\tau_2}{\xi}{\omega}$. By the (main) inductive hypothesis
-    $\val{\tau_2}{\omega,\xi}{\Gamma}$ is a candidate. Because $t u$
+    $\val{\tau_2}{\xi}{\omega}$ is a candidate. Because $t u$
     is neutral, the above implies $t u \in
     \val{\tau_2}{\xi}{\omega}$. Since $u \in
     \val{\tau_1}{\xi}{\omega}$ was arbitrary with $u :
@@ -2395,7 +2352,7 @@ write~$\val{\varphi}{}{}$.
     immediate with the induction hypotheses. The only remaining case
     is when $s'=\tabs{\alpha}{\circ_{\omega(\tau)} (t_1 \alpha) (t_2
       \alpha)}$.  For all closed type constructors $\varphi$ of
-    kind~$\kappa$ and all $X \in \Cb_{\varphi}^\Gamma$ we have both
+    kind~$\kappa$ and all $X \in \Cb_{\varphi}$ we have both
     $t_1 \varphi$ and $t_2 \varphi$ in
     $\val{\tau}{\xi[\subst{\alpha}{X}]}{\omega[\subst{\alpha}{\varphi}]}$
     (by definition of $t_1,t_2 \in
@@ -2682,7 +2639,7 @@ annotations of variable occurrences, e.g.~$\omega(\lambda x : \alpha
 
 { \renewcommand{\thetheorem}{\ref{thm_sn}}
 \begin{theorem}
-  If $\Gamma \proves t : \sigma$ then $t \in \SN$.
+  If $t : \sigma$ then $t \in \SN$.
 \end{theorem}
 \addtocounter{theorem}{-1}}
 
