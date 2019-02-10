@@ -197,6 +197,7 @@ function argument of~$\mathtt{foldl}$ receives the element together
 with its type. The $\forall$-quantifier binds type variables -- a term
 of type $\forall \alpha . \tau$ takes a type~$\rho$ as an argument and
 the result is a term of type~$\tau[\subst{\alpha}{\rho}]$.
+\pagebreak
 
 Impredicativity of polymorphism means that the type itself may be
 substituted for its own type variable, e.g., if $\mathtt{f} : \forall
@@ -208,7 +209,7 @@ polymorphism as used in the~ML programming language or the polymorphic
 higher-order rewriting formalisms of~\cite{jou:oka:91,jou:rub:99}.
 
 The technique we develop in this paper can be used to handle
-systems like the one above.  Since termination of heterogeneous
+systems like the one above.  \CKchange{However,} termination of heterogeneous
 fold can be shown in other ways (e.g., an encoding in
 System~$\mathtt{F}$). Hence, we will also study a more complex example
 in Section~\ref{sec:examples}: termination of a substantial fragment
@@ -299,6 +300,7 @@ of lambda calculi such as substitution and $\alpha$-conversion.
   declaration. We denote $\Gamma,x:\tau$ for $\Gamma \cup \{x:\tau\}$. We
   set $\FTV(\Gamma) = \bigcup\{\FTV(\tau) \mid (x : \tau) \in
   \Gamma\}$.
+  \pagebreak
 
   The set of preterms consists of all expressions~$s$ such that
   $\Gamma \vdash s : \sigma$ can be inferred for some type $\sigma$
@@ -498,14 +500,17 @@ s[x:=t]$ and $(\tabs{\alpha}{s})\sigma \leadsto_\beta
 s[\alpha:=\sigma]$ -- provides the desired derivation rules:
 
 \begin{lemma}\label{lem:encodings_reduce}
-  \begin{enumerate}
-  \item $\pi^i(\pair{t_1}{t_2}) \leadsto_\beta^* t_i$.
-  \item $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \leadsto_\beta^*
+%  \begin{enumerate}
+%  \item
+  $\pi^i(\pair{t_1}{t_2}) \leadsto_\beta^* t_i$
+  \CKchange{and}
+%  \item
+  $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \leadsto_\beta^*
     s[\subst{\alpha}{\tau}][\subst{x}{t}]$.
-%  \item $\fold_\rho(f,a,\nil) \leadsto_\beta^* a$.
-%  \item $\fold_\rho(f,a,\cons_\tau(h,t)) \leadsto_\beta^* f \tau h
-%    (\fold_\rho(f,a,t))$.
-  \end{enumerate}
+%%  \item $\fold_\rho(f,a,\nil) \leadsto_\beta^* a$.
+%%  \item $\fold_\rho(f,a,\cons_\tau(h,t)) \leadsto_\beta^* f \tau h
+%%    (\fold_\rho(f,a,t))$.
+%  \end{enumerate}
 \end{lemma}
 
 \section{Polymorphic Functional Systems}\label{sec_systems}
@@ -528,18 +533,19 @@ develop in Sections \ref{sec:World}--\ref{sec_rule_removal}.
     \[
     \sigma = \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n : \kappa_n)
     . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype \tau
+    \CKchange{\quad\quad (\text{with}\ \tau\ \text{a type atom})}
     \]
-  with $\tau$ a type atom. We define \emph{PFS
+  We define \emph{PFS
     terms} as in Definition~\ref{def_terms} (based on
   Definition~\ref{def_preterms}) with the restriction that
   for any subterm $\app{s}{u}$ of a term~$t$, we have $s =
-    \mathtt{f} \rho_1 \ldots \rho_n u_1 \ldots u_m$ where
+    \mathtt{f} \rho_1 \ldots \rho_n u_1 \ldots u_m$ where:
     \[
     \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots
     \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
     \sigma_k \arrtype \tau
+    \CKchange{\quad\quad (\text{with}\ \tau\ \text{a type atom and}\ m < k)}
     \]
-    with $\tau$ a type atom and $m < k$.
 \end{defn}
 
 This definition does not allow for a variable or
@@ -559,6 +565,7 @@ $
 is a function symbol in~$\Sigma$ with~$\tau$ a type atom and $m \leq k$.
 This allows us to represent terms in a ``functional'' way, where
 application does not explicitly occur (only implicitly in the
+\pagebreak
 construction of $\mathtt{f}_{\rho_1,\ldots,\rho_n}(s_1,\ldots,s_m)$).
 
 The following result follows easily by induction on term
