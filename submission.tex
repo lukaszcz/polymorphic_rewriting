@@ -854,7 +854,6 @@ instead use the characterisation of $\succ$, $\succeq$ and~$\approx$
 from the above lemma. However, this would arguably make the proofs
 less perspicuous.
 
-%\medskip Space?
 Our next task is to show that $\succeq$ and $\succ$ have the
 desired properties of an ordering pair; e.g., transitivity and
 compatibility. We first state a simple lemma that will be used
@@ -1691,8 +1690,10 @@ propositional logic with all connectives and permutative conversions,
 minus a few of the permutative conversion rules for the existential
 quantifier. The paper~\cite{SorensenUrzyczyn2010} depends on
 termination of~IPC2, citing a proof from~\cite{Wojdyga2008}, which,
-however, later turned out to be incorrect. To our knowledge,
-termination of the full system~IPC2 remains an open problem.
+however, later turned out to be incorrect. Termination of
+Curry-style~IPC2 without~$\bot$ as primitive was shown
+in~\cite{Tatsuta2007}. To our knowledge, termination of the full
+system~IPC2 remains an open problem, strictly speaking.
 
 In related work, Pol and Schwichtenberg used higher-order polynomial
 interpretations to prove termination of a fragment of intuitionistic
@@ -1902,13 +1903,13 @@ by the interpretation:
 The only rules that are not oriented with this interpretation -- also
 not using $\succeq$ -- are the ones of the form
 $f(\mathtt{let}(s,t), \dots) \red \mathtt{let}(s,f(t,\dots))$, like
-the rule marked (*) above. Nonetheless, this is already a substatial
-step toward proving termination of IPC2 and similar systems of
-higher-order logic. Verifying the orientations is still tedious, but
-we introduced a general method, raising hope for at least partial
-automation in the future, as was done with polynomial interpretations
-for non-polymorphic (\LC{Cynthia: shallowly polymorphic?})
-higher-order rewriting.
+the rule marked (*) above. Nonetheless, this is already a significant
+step toward proving an extensible methodology of termination proofs
+for IPC2 and similar systems of higher-order logic. Verifying the
+orientations is still tedious, but our method raises hope for at least
+partial automation in the future, as was done with polynomial
+interpretations for non-polymorphic (\LC{Cynthia: shallowly
+  polymorphic?})  higher-order rewriting. \LC{Cynthia: reference}
 
 The full set of rules and the proof that they are oriented is
 available in Appendix \ref{app_ineqs}.
@@ -3421,7 +3422,7 @@ The following are the \emph{core} rules \LCchange{($\beta$-reductions)}:
 \end{array}
 \]
 
-Then these rule simplify proofs from contradiction:
+Then these rules simplify proofs from contradiction:
 \[
 \begin{array}{rclrcl}
 \epsilon_\tau(\epsilon_\bot(s)) & \red & \epsilon_\tau(s) \\
