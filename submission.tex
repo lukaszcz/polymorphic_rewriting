@@ -808,7 +808,7 @@ implict variable context~$\Gamma$.
   replacement such that $\omega(\alpha)$ is closed for each
   type constructor variable~$\alpha$, and $\gamma(x)$ is closed for
   each term variable~$x$.
-
+  %
   For arbitrary types~$\sigma$ and arbitrary terms $s,t \in \Iterms$
   we define $s \succ_\sigma t$ if for every closure~$\cl$ we can
   obtain $\cl(s) \succ_{\nf_\beta(\cl(\sigma))} \cl(t)$ coinductively
@@ -850,8 +850,9 @@ reformulated as follows.
 \end{proof}
 
 In what follows, all proofs by coinduction could be reformulated to
-instead use the characterisation of $\succ$, $\succeq$ and~$\approx$
-from the above lemma. However, this would arguably make the proofs
+instead use the %characterisation of $\succ$, $\succeq$ and~$\approx$
+%from the above lemma
+lemma above. However, this would arguably make the proofs
 less perspicuous.
 
 %\medskip Space?
@@ -861,13 +862,16 @@ compatibility. We first state a simple lemma that will be used
 implicitly.
 
 \begin{lemma}
-  If~$\tau$ is a closed interpretation type in $\beta$-normal form
-  then $\tau = \nat$ or $\tau = \tau_1\arrtype\tau_2$ or $\tau =
-  \forall\alpha\sigma$.
+%  If~$\tau$ is a closed interpretation type in $\beta$-normal form
+%  then $\tau = \nat$ or $\tau = \tau_1\arrtype\tau_2$ or $\tau =
+%  \forall\alpha\sigma$.
+  \CKchange{If $\tau \in \ITypes$ is closed and $\beta$-normal, then
+  $\tau = \nat$ or $\tau = \tau_1\arrtype\tau_2$ or
+  $\tau = \forall\alpha\sigma$.}
 \end{lemma}
 
-The most important property of~$\succ$ is that it is a well-founded
-ordering.
+%The most important property of~$\succ$ is that it is a well-founded
+%ordering.
 
 \begin{lemma}\label{lem_well_founded}
   $\succ$ is well-founded.
@@ -883,7 +887,6 @@ ordering.
   $\beta$-normal type~$\tau$ (with size measured as the number of
   occurrences of~$\forall$ and~$\arrtype$) one proves that there does
   not exist an infinite sequence $t_1 \succ_\tau t_2 \succ_\tau t_3
-  \pagebreak
   \succ_\tau \ldots$ For instance, if $\alpha$ has kind~$\kappa$ and
   $t_1 \succ_{\forall\alpha\tau} t_2 \succ_{\forall\alpha\tau} t_3
   \succ_{\forall\alpha\tau} \ldots$ then $\tapp{t_1}{\chi_\kappa}
@@ -921,10 +924,12 @@ ordering.
   \succ_{\forall(\alpha:\kappa)\sigma}t_2\succ_{\forall(\alpha:\kappa)\sigma}t_3$
   then
   $\tapp{t_1}{\tau}\succ_{\sigma'}\tapp{t_2}{\tau}\succ_{\sigma'}\tapp{t_3}{\tau}$
-  for any closed type constructor~$\tau$ of kind~$\kappa$, where
-  $\sigma' = \nf_\beta(\sigma[\subst{\alpha}{\tau}])$. Hence
-  $\tapp{t_1}{\tau}\succ_{\sigma'}\tapp{t_3}{\tau}$ by the coinductive
-  hypothesis. Thus $t_1\succ_{\forall\alpha\sigma} t_3$.
+  for any closed %type constructor~
+  $\tau$ of kind~$\kappa$, where
+  $\sigma' = \nf_\beta(\sigma[\subst{\alpha}{\tau}])$. \CKchange{By the
+  coinductive hypothesis}
+  $\tapp{t_1}{\tau}\succ_{\sigma'}\tapp{t_3}{\tau}$\CKchange{; thus}
+  $t_1\succ_{\forall\alpha\sigma} t_3$.
 \end{proof}
 
 \begin{lemma}\label{lem_reflexive}
@@ -966,12 +971,14 @@ ordering.
 
 \begin{lemma}\label{lem_succ_red}
   Assume $t \succ s$ (resp.~$t \succeq s$).
-  \begin{enumerate}
-  \item If $t \leadsto t'$ or $t' \leadsto t$ then $t' \succ s$
+  %\begin{enumerate}
+  %\item
+  \CKchange{If $t \leadsto t'$ or $t' \leadsto t$ then $t' \succ s$
     (resp.~$t' \succeq s$).
-  \item If $s \leadsto s'$ or $s' \leadsto s$ then $t \succ s'$
-    (resp.~$t \succeq s'$).
-  \end{enumerate}
+  %\item
+  If $s \leadsto s'$ or $s' \leadsto s$ then $t \succ s'$
+    (resp.~$t \succeq s'$).}
+  %\end{enumerate}
 \end{lemma}
 
 \begin{proof}
@@ -1005,8 +1012,8 @@ which also apply to~$\succ$, stating the preservation of~$\succeq$
 under term formation operations. We will need these results in the next section.
 
 \begin{lemma}\label{lem_app_succ}
-  If $t \succeq s$ (resp.~$t \succ s$) then $t u \succeq s u$
-  (resp.~$t u \succ s u$) with $u$ a term or type constructor.
+  \CKchange{For $R \in \{\succeq,\succ\}$:
+  if $t\:R\:s$ then $t u\:R\:s u$ with $u$ a term or type constructor.}
 \end{lemma}
 
 \begin{proof}
@@ -1014,9 +1021,12 @@ under term formation operations. We will need these results in the next section.
 \end{proof}
 
 \begin{lemma}\label{lem:liftgreater}
-  If $n \geq m$ (resp.~$n > m$) then $\lift_\sigma n \succeq
-  \lift_\sigma m$ (resp.~$\lift_\sigma n \succ \lift_\sigma m$) for
-  all types $\sigma$.
+  \CKchange{For $R \in \{\succeq,\succ\}$:
+  %If $n \geq m$ (resp.~$n > m$) then $\lift_\sigma n \succeq
+  %\lift_\sigma m$ (resp.~$\lift_\sigma n \succ \lift_\sigma m$) for
+  %all types $\sigma$.
+  If $n\:R\:m$ then $\lift_\sigma n\:R\:\lift_\sigma m$ for all types
+  $\sigma$.}
 \end{lemma}
 
 \begin{proof}
@@ -1024,8 +1034,8 @@ under term formation operations. We will need these results in the next section.
   $\beta$-normal form. By coinduction we show $\lift(n) u_1 \ldots u_k
   \succeq \lift(m) u_1 \ldots u_k$ for closed $u_1,\ldots,u_k$. First
   note that $(\lift\,t) u_1 \ldots u_k \leadsto^* \lift(t)$ (with a
-  different type subscript in~$\lift$ on the right side, omitted here
-  for conciseness). If $\sigma = \nat$ then $(\lift(n) u_1 \ldots
+  different type subscript in~$\lift$ on the right side, omitted %here
+  \CKchange{for} conciseness). If $\sigma = \nat$ then $(\lift(n) u_1 \ldots
   u_k)\da = n \ge m = (\lift(m) u_1 \ldots u_k)\da$. If $\sigma =
   \tau_1\arrtype\tau_2$ then by the coinductive hypothesis $\lift(n)
   u_1 \ldots u_k q \succeq_{\tau_2} \lift(m) u_1 \ldots u_k q$ for any
@@ -1035,27 +1045,30 @@ under term formation operations. We will need these results in the next section.
   $\lift(n) u_1 \ldots u_k \xi \succeq_{\sigma'} \lift(m) u_1 \ldots
   u_k \xi$ for any closed $\xi \in \Tc_\kappa$, where $\sigma' =
   \tau[\subst{\alpha}{\xi}]$. Hence $\lift(n) u_1 \ldots u_k
-  \succeq_{\sigma} \lift(m) u_1 \ldots u_k$ by definition
+  \pagebreak
+  \succeq_{\sigma} \lift(m) u_1 \ldots u_k$ by definition.
 \end{proof}
 
 \begin{lemma}\label{lem_flatten_succ}
-  If $t \succeq_\sigma s$ then $\flatten_\sigma t \succeq_\nat
-  \flatten_\sigma s$ for all types $\sigma$. The same holds
-  with~$\succ$ instead of~$\succeq$.
+  \CKchange{For $R \in \{\succeq,\succ\}$:
+  f $t\:R_\sigma\:s$ then $\flatten_\sigma t\:R_\nat\:
+  \flatten_\sigma s$ for all types $\sigma$.}
 \end{lemma}
 
 \begin{proof}
   Without loss of generality we may assume~$\sigma$ is closed and in
-  $\beta$-normal form. Using Lemma~\ref{lem_succ_red}, one shows by
-  induction on~$\sigma$ that if $t \succeq_\sigma s$ then
-  $\flatten_\sigma t \succeq_\nat \flatten_\sigma s$ (the proof
-  for~$\succ$ is analogous).
+  $\beta$-normal form.
+  Using Lemma~\ref{lem_succ_red}, %one shows by
+  %induction on~$\sigma$ that if $t \succeq_\sigma s$ then
+  %$\flatten_\sigma t \succeq_\nat \flatten_\sigma s$ (the proof
+  %for~$\succ$ is analogous).
+  \CKchange{the lemma follows by induction on~$\sigma$.}
 \end{proof}
 
 \begin{lemma}\label{lem_abs_succ}
-  If $t \succeq s$ then $\abs{x}{t} \succeq \abs{x}{s}$ and
-  $\tabs{\alpha}{t} \succeq \tabs{\alpha}{s}$. The same holds
-  for~$\succ$.
+  \CKchange{For $R \in \{\succeq,\succ\}$:
+  if $t\:R\:s$ then $\abs{x}{t}\:R\:\abs{x}{s}$ and
+  $\tabs{\alpha}{t}\:R\:\tabs{\alpha}{s}$.}
 \end{lemma}
 
 \begin{proof}
@@ -1068,7 +1081,7 @@ under term formation operations. We will need these results in the next section.
   Lemma~\ref{lem_succ_red} this implies $\cl(\abs{x}{t}) u
   \succeq_{\cl(\tau)} \cl(\abs{x}{s}) u$. Therefore $\cl(\abs{x}{t})
   \succeq_{\cl(\sigma\arrtype\tau)} \cl(\abs{x}{s})$. The proof for
-  the second part is analogous.
+  \CKchange{$\succ$} is analogous.
 \end{proof}
 
 \begin{lemma}\label{lem:plustimesmonotonic}
@@ -1090,10 +1103,10 @@ under term formation operations. We will need these results in the next section.
   It suffices to prove this for closed $s,t,u$ and closed $\sigma$ in
   $\beta$-normal form. The proof is similar to the proof of
   Lemma~\ref{lem:liftgreater}. For instance, we show by coinduction
-  that for closed $w_1,\ldots,w_n$ if $s w_1 \ldots w_n \succ t w_1
-  \ldots w_n$ and $u w_1 \ldots w_n \succeq \lift(1) w_1 \ldots w_n$
-  then $(s \otimes u) w_1 \ldots w_n \succ (t \otimes u) w_1 \ldots
-  w_n$.
+  that for closed $w_1,\ldots,w_n$ \CKchange{(denoted $\vec{w}$):
+  if $s \vec{w} \succ t \vec{w}$ and $u \vec{w} \succeq \lift(1)
+  \vec{w}$
+  then $(s \otimes u) \vec{w} \succ (t \otimes u) \vec{w}$.}
 \end{proof}
 
 The following lemma depends on the lemmas above. The full proof may be
@@ -1123,12 +1136,16 @@ do so, in this section we will define a systematic way to generate
   A \emph{reduction pair} is a pair~$(\succeq^A,\succ^A)$ of a
   quasi-order~$\succeq^A$ on $A$-terms and a well-founded
   ordering~$\succ^A$ on $A$-terms such that:
-  \begin{itemize}
-  \item $\succeq^A$ and~$\succ^A$ are compatible, i.e., ${\succ^A}
+  %\begin{itemize}
+  %\item
+  \CKchange{(a)}
+  $\succeq^A$ and~$\succ^A$ are compatible, i.e., ${\succ^A}
     \cdot {\succeq^A} \subseteq {\succ^A}$ and ${\succeq^A} \cdot
           {\succ^A} \subseteq {\succ^A}$,
-  \item $\succeq^A$ and~$\succ^A$ are both monotonic.
-  \end{itemize}
+  \CKchange{and (b)}
+  %\item
+  $\succeq^A$ and~$\succ^A$ are both monotonic.
+  %\end{itemize}
 \end{defn}
 
 
@@ -1151,7 +1168,7 @@ mapping to translate types:
 
 \begin{defn}
   A \emph{type constructor mapping} is a function $\Typemap$ which
-  maps a type constructor symbol to a closed interpretation type
+  maps \CKchange{each} type constructor symbol to a closed interpretation type
   constructor of the same kind. A fixed type constructor mapping
   $\Typemap$ is extended inductively to a function from type
   constructors to closed interpretation type constructors in the
@@ -1161,6 +1178,7 @@ mapping to translate types:
   \quant{\alpha}{\typeinterpret{\sigma}}$ and $\typeinterpret{\sigma
     \arrtype \tau} = \typeinterpret{\sigma} \arrtype
   \typeinterpret{\tau}$. An interpretation type mapping is extended to
+  \pagebreak
   contexts: \( \itp{\Gamma} := \{ (x : \typeinterpret{\tau}) \mid (x :
   \tau) \in \Gamma \}.  \)
 \end{defn}
