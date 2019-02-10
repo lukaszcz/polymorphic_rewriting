@@ -1145,8 +1145,8 @@ mapping to translate types:
   Induction on~$\sigma$.
 \end{proof}
 
-Similarly, we employ a \emph{symbol mapping} as an aid to interpret
-PFS terms.
+Similarly, we employ a \emph{symbol mapping} as \CKchange{the key
+ingredient} to interpret PFS terms.
 
 \begin{defn}
   A \emph{symbol mapping} is a function $\Termmap$ which assigns to
@@ -1190,13 +1190,15 @@ $A$-terms to interpretation terms.  This translation preserves typing:
 \end{defn}
 
 \begin{lemma}\label{lem:substitutioninterpret}
-  \begin{enumerate}
-  \item\label{lem:substitutioninterpret:mixed}
+  \CKchange{For all $s,t,x,\alpha,\tau$:
+  %\begin{enumerate}
+  %\item\label{lem:substitutioninterpret:mixed}
     $\interpret{s}[\alpha:=\typeinterpret{\tau}] =
-    \interpret{s[\alpha:=\tau]}$.
-  \item\label{lem:substitutioninterpret:terms}
-    $\interpret{s}[x:=\interpret{t}] = \interpret{s[x:=t]}$.
-  \end{enumerate}
+    \interpret{s[\alpha:=\tau]}$
+  and
+  %\item\label{lem:substitutioninterpret:terms}
+    $\interpret{s}[x:=\interpret{t}] = \interpret{s[x:=t]}$.}
+  %\end{enumerate}
 \end{lemma}
 
 \begin{proof}
@@ -1207,16 +1209,19 @@ $A$-terms to interpretation terms.  This translation preserves typing:
 The polymorphic lambda-calculus has a much greater expressive power
 than the simply-typed lambda-calculus. Arbitrary inductive data types
 may be encoded, along with their constructors and recursors with
-appropriate derived reduction rules. This makes the polynomial
+appropriate derived reduction rules. This makes %the polynomial
+\CKchange{our}
 interpretation method easier to apply, even in the non-polymorphic
-setting, thanks to more sophisticated ``programming'' in the interpretations.
+setting, thanks to more
+sophisticated ``programming'' in the interpretations.
 % LC: I don't think we have any "programming" to speak of in the types
 % (and I don't think we need it).
 The reader is advised to consult e.g.~\cite[Chapter~11]{Girard1989}
-for more background and explanations. Here, we demonstrate the idea
-by presenting an encoding for the recursive type $\List$ and the
-corresponding fold-left function, to be completed in
-Example~\ref{ex_fold_interpretation}.
+for more background and explanations. \CKchange{We} demonstrate the idea
+by presenting an encoding for the recursive type $\List$ and \CKchange{its}
+%corresponding
+fold-left function \CKchange{(see also
+Ex.~\ref{ex_fold_interpretation}).}
 \end{remark}
 
 \begin{example}\label{ex:notyetmono}
@@ -1238,7 +1243,7 @@ this term $\succ \interpret{s}$.
 \end{example}
 
 It is easy to see that $\succeqinterpret$ and
-$\succinterpret$ have desirable properties such as transitivty,
+$\succinterpret$ have desirable properties such as transitivity,
 reflexivity (for $\succeqinterpret$) and well-foundedness (for
 $\succinterpret$).  However, $\succinterpret$ is not necessarily
 monotonic.  Using the interpretation from Example~\ref{ex:notyetmono},
@@ -1253,12 +1258,14 @@ $\Termmap$ is \emph{safe}.
   If $s_1 \succ s_2$ implies $t[\subst{x}{s_1}] \succ
   t[\subst{x}{s_2}]$, then the interpretation term~$t$ is \emph{safe
     for~$x$}. A symbol mapping~$\Termmap$ is \emph{safe} if for all
-  symbols
-  \[
+  %symbols
+  \CKchange{$
+%  \[
   \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n
   : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype
   \tau
-  \]
+%  \]
+$}
   with~$\tau$ a type atom we have: $\Termmap(\mathtt{f}) =
   \tabs{\alpha_1 \dots \alpha_n}{\abs{x_1 \dots x_k}{t}}$ with $t$
   safe for each~$x_i$.
@@ -1267,20 +1274,25 @@ $\Termmap$ is \emph{safe}.
 \begin{lemma}\label{lem_safe}
   \begin{enumerate}
   \item $x u_1 \ldots u_m$ is safe for~$x$.
-  \item If $t$ is safe for~$x$ then so is~$\lift(t)$
+  \item If $t$ is safe for~$x$ then so \CKchange{are}~$\lift(t)$
     and~$\flatten(t)$.
   \item If $s_1$ is safe for~$x$ or $s_2$ is safe for~$x$ then $s_1
     \oplus s_2$ is safe for~$x$.
-  \item If either:
-    \begin{itemize}
-    \item $s_1$ is safe for~$x$ and $s_2 \succeq \lift(1)$, or
-    \item $s_2$ is safe for~$x$ and $s_1 \succeq \lift(1)$,
-    \end{itemize}
+  \item If either
+    %\begin{itemize}
+    %\item
+      \CKchange{(a)}
+      $s_1$ is safe for~$x$ and $s_2 \succeq \lift(1)$, or
+    %\item
+      \CKchange{(b)}
+      $s_2$ is safe for~$x$ and $s_1 \succeq \lift(1)$,
+    %\end{itemize}
     then $s_1 \otimes s_2$ is safe for~$x$.
   \item If~$t$ is safe for~$x$ then so is~$\tabs{\alpha}{t}$
     and~$\abs{y}{t}$ ($y \ne x$).
-  \item If $t$ is safe for~$x$ then so is~$\pi^1(t)$ and~$\pi^2(t)$.
-  \item If $t$ is safe for~$x$ then so is~$\xlet{}{t}{\alpha,y}{s}$.
+\pagebreak
+%  \item If $t$ is safe for~$x$ then so is~$\pi^1(t)$ and~$\pi^2(t)$.
+%  \item If $t$ is safe for~$x$ then so is~$\xlet{}{t}{\alpha,y}{s}$.
   \end{enumerate}
 \end{lemma}
 
@@ -1288,7 +1300,7 @@ $\Termmap$ is \emph{safe}.
   Each point follows from one of the lemmas proven before,
   Lemma~\ref{lem_succ_to_succeq}, Lemma~\ref{lem_succeq_subst},
   Lemma~\ref{lem:compatibility} and the transitivity of~$\succeq$. For
-  instance, assume $s_1 \succ s_2$ and let
+  instance, \CKchange{for the first,} assume $s_1 \succ s_2$ and let
   $u_i^j=u_i[\subst{x}{s_j}]$. Then $(x u_1 \ldots
   u_m)[\subst{x}{s_1}] = s_1 u_1^1 \ldots u_m^1$. By
   Lemma~\ref{lem_app_succ} we have $s_1 u_1^1 \ldots u_m^1 \succ s_2
@@ -1306,22 +1318,26 @@ $\Termmap$ is \emph{safe}.
 \end{lemma}
 
 \begin{proof}
-  Assume $s_1 \succinterpret s_2$. By induction on the structure of a
+  Assume $s_1 \succinterpret s_2$. By induction on %the structure of
+  \CKchange{a}
   context~$C$ we show $C[s_1] \succinterpret C[s_2]$. If $C=\Box$ then
   this is obvious. If $C = \abs{x}{C'}$ or $C = \tabs{\alpha}{C'}$
   then $C'[s_1] \succinterpret C'[s_2]$ by the inductive hypothesis,
   and thus $C[s_1] \succinterpret C[s_2]$ follows from
   Lemma~\ref{lem_abs_succ} and definitions. If $C = C' t$ then
-  $C'[s_1] \succinterpret C'[s_2]$ by the inductive hypothesis, and
-  thus $C[s_1] \succinterpret C[s_2]$ follows from definitions.
+  $C'[s_1] \succinterpret C'[s_2]$ by the inductive hypothesis,
+  %and thus
+  \CKchange{so} $C[s_1] \succinterpret C[s_2]$ follows from definitions.
 
   Finally, assume $C = \app{t}{C'}$. Then $t = \mathtt{f} \rho_1
   \ldots \rho_n t_1 \ldots t_m$ where
-  \[
+%  \[
+\CKchange{$
   \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n
   : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype
   \tau
-  \]
+%  \]
+$}
   with~$\tau$ a type atom, $m < k$, and $\Termmap(\mathtt{f}) =
   \tabs{\alpha_1 \dots \alpha_n}{\abs{x_1 \dots x_k}{u}}$ with $u$
   safe for each~$x_i$. Without loss of generality assume $m=k-1$. Then
@@ -1372,7 +1388,7 @@ $\Termmap$ is \emph{safe}.
     \oplus \\
     & & & \phantom{ABCDEFGHIJKLMNOP,} \flatten_\alpha(h)))\ \oplus\  \\
     & & & \phantom{ABCDE\ }
-    \lift_\beta(\flatten_\beta(\LCchange{f\alpha x h}) \oplus
+    \lift_\beta(\flatten_\beta(f\alpha x h) \oplus
     \flatten_\alpha(h) \oplus 1) \\
   \Termmap(\mathtt{foldl}) & = & \Lambda \beta.\lambda f. \lambda x.
     \lambda l. & l \beta f x \oplus \lift_\beta(\flatten_{\forall \alpha.
@@ -1402,8 +1418,10 @@ achieved through \emph{rule removal}.
   $\Rules_1\subseteq{\succ^\Rules}$ and
   $\Rules_2\subseteq{\succeq^\Rules}$ for a reduction pair
   $(\succeq^\Rules,\succ^\Rules)$. Then $\arr{\Rules}$ is terminating
-  if and only if $\arr{\Rules_2}$ is. In particular, $\arr{\Rules}$ is
-  terminating if $\Rules_2 = \emptyset$.
+  if and only if $\arr{\Rules_2}$ is
+  \CKchange{(so certainly if $\Rules_2 = \emptyset$).}
+  %In particular, $\arr{\Rules}$ is
+  %terminating if $\Rules_2 = \emptyset$.
 \end{theorem}
 
 \begin{proof}
@@ -1414,6 +1432,7 @@ achieved through \emph{rule removal}.
   By well-foundedness of $\succ^\Rules$, compatibility
   of~$\succeq^\Rules$ and~$\succ^\Rules$, and transitivity
   of~$\succeq^\Rules$, every infinite $\arr{\Rules}$ sequence can
+  \pagebreak
   contain only finitely many $\arr{\Rules_1}$ steps.
 \end{proof}
 
