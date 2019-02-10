@@ -724,14 +724,16 @@ prove weak monotonicity in Section \ref{subsec:weakmono}.}
   from Definition~\ref{def_terms} (see also
   Definition~\ref{def_preterms}) where as types we take the
   interpretation types and for the set~$\Sigma$ of function symbols we
-  take $\Sigma = \{ n : \nat \mid n \in \Nbb \} \cup \Sigma_f$, where:
-  \[
+  take $\Sigma = \{ n : \nat \mid n \in \Nbb \} \cup \Sigma_f$, where
+%  \[
+\CKchange{$
       \Sigma_f = \{ \oplus : \forall \alpha . \alpha \arrtype
                  \alpha \arrtype \alpha, \otimes : \forall \alpha . \alpha \arrtype \alpha
                  \arrtype \alpha, \flatten : \forall \alpha . \alpha \arrtype
                  \nat, \lift : \forall \alpha . \nat \arrtype \alpha
                  \}
-  \]
+$.}
+%  \]
 \end{defn}
 
 For easier presentation, we write $\oplus_\tau$, $\otimes_\tau$, etc.,
@@ -762,11 +764,16 @@ be a powerful aid in defining the parial ordering $\succ$ in Section
     $\tapp{s}{\sigma} \arrW \tapp{t}{\sigma}$
   \item\label{arrW:beta:abs} $\app{(\abs{x:\sigma}{s})}{t} \arrW
     s[\subst{x}{t}]$
-  \item\label{arrW:beta:tabs} $\tapp{(\tabs{\alpha}{s})}{\sigma}
-    \arrW s[\subst{\alpha}{\sigma}]$.
+  %\item\label{arrW:beta:tabs}
+    \CKchange{and}
+    $\tapp{(\tabs{\alpha}{s})}{\sigma}
+    \arrW s[\subst{\alpha}{\sigma}]$
+    \CKchange{($\beta$-reduction)}
   \item\label{arrW:plus:base}
     $\app{\app{\oplus_{\nat}}{n}}{m} \arrW (n+m)$
-  \item\label{arrW:times:base} $\app{\app{\otimes_{\nat}}{n}}{m}
+  %\item\label{arrW:times:base}
+    \CKchange{and}
+    $\app{\app{\otimes_{\nat}}{n}}{m}
     \arrW (n \cdot m)$
   \item\label{arrW:circ:arrow} $\app{\app{\circ_{\sigma \arrtype
         \tau}}{s}}{t} \arrW
@@ -792,7 +799,7 @@ be a powerful aid in defining the parial ordering $\succ$ in Section
   a relation on interpretation terms -- the equivalence classes
   of~$\equiv$. We say that $s$ is a \emph{redex} if $s$ reduces by one
   of the rules 4--15.
-
+%
   A \emph{final interpretation term} is an interpretation term $s \in
   \Iterms$ such that (a) $s$ is closed, and (b) $s$ is in normal form
   with respect to $\arrW$.  We let $\Iterms^f$ be the set of all final
@@ -814,8 +821,10 @@ with a reduction rule $\mathtt{J} \tau \tau \leadsto \lambda x : \tau
 . x$ makes the system non-terminating~\cite{Girard1971}. Our rules do
 not allow such a definition. Note that the natural number constants
 are mutually indistinguishable inside our reduction system (e.g.~there
-is no test for zero). For the purposes of termination, the type~$\nat$
-may be considered a singleton.
+is no test for zero).
+%SPACE
+%For the purposes of termination, the type~$\nat$
+%may be considered a singleton.
 
 Now we state some properties of~$\arrW$, including strong
 normalisation. Because of space limitations, most proofs are
@@ -882,31 +891,40 @@ also allow us to use rule removal (Theorem \ref{thm:ruleremove}).
 %instead of merely
 %orienting all rules with $\succ$.
 
-The ordering pair for \emph{closed} interpretation terms is
-defined using co-induction. For the following definitions, we fix an
+%The ordering pair for \emph{closed} interpretation terms is
+%defined using co-induction.
+\CKchange{For the following definition}, we fix an
 implict variable context~$\Gamma$.
 
 \begin{defn}\label{def:succ}
-  Let $R \in \{ \succ,\succeq \}$. For closed~$s,t\in\Iterms_\sigma$
+            \label{def_closure}
+  Let $R \in \{ \succ,\succeq \}$. For \emph{closed}~$s,t\in\Iterms_\sigma$
   and closed~$\sigma$ in $\beta$-normal form, the relation
-  $s\ R_{\sigma}\ t$ is defined coinductively by the following rules.
+  $s\ R_{\sigma}\ t$ is defined coinductively by the following \CKchange{rules.
   \[
-  \begin{array}{cc}
-    \infer={s\ R_\nat\ t}{s\da\ R\ t\da \text{ in natural numbers}} \quad&\quad
-    \infer={s\ R_{\sigma\arrtype\tau}\ t}{\app{s}{q}\ R_{\tau}\ \app{t}{q} \text{ for all } q \in \Iterms^f_\sigma} \\ \\
-    \multicolumn{2}{c}{
-    \infer={s\ R_{\forall(\alpha:\kappa)[\sigma]}\ t}{\tapp{s}{\tau}\ R_{\nf_\beta(\sigma[\subst{\alpha}{\tau}])}\ \tapp{t}{\tau} \text{ for all closed } \tau \in \Tc_{\kappa}}}
+%  \begin{array}{cc}
+%    \infer={s\ R_\nat\ t}{s\da\ R\ t\da \text{ in natural numbers}} \quad&\quad
+%    \infer={s\ R_{\sigma\arrtype\tau}\ t}{\app{s}{q}\ R_{\tau}\ \app{t}{q} \text{ for all } q \in \Iterms^f_\sigma} \\ \\
+%    \multicolumn{2}{c}{
+%    \infer={s\ R_{\forall(\alpha:\kappa)[\sigma]}\ t}{\tapp{s}{\tau}\ R_{\nf_\beta(\sigma[\subst{\alpha}{\tau}])}\ \tapp{t}{\tau} \text{ for all closed } \tau \in \Tc_{\kappa}}}
+%  \end{array}
+%  \]
+  \begin{array}{ccc}
+    \infer={s\ R_\nat\ t}{s\da\ R\ t\da \text{ in }\mathbb{N}} \quad&\quad
+    \infer={s\ R_{\sigma\arrtype\tau}\ t}{\app{s}{q}\ R_{\tau}\ \app{t}{q} \text{ for all } q \in \Iterms^f_\sigma} &
+    \infer={s\ R_{\forall(\alpha:\kappa)[\sigma]}\ t}{\tapp{s}{\tau}\ R_{\nf_\beta(\sigma[\subst{\alpha}{\tau}])}\ \tapp{t}{\tau} \text{ for all closed } \tau \in \Tc_{\kappa}}
   \end{array}
   \]
-  We define $s \approx_\sigma t$ if both $s \succeq_\sigma t$ and $t
+  We} define $s \approx_\sigma t$ if both $s \succeq_\sigma t$ and $t
   \succeq_\sigma s$.
-\end{defn}
-
-For \emph{open} interpretation terms, the definition is
-  extended in a natural way:
-
-\begin{defn}\label{def_closure}
-  A \emph{closure}~$\cl = \gamma \circ \omega$ is a
+%\end{defn}
+%
+\CKchange{For \emph{open} interpretation terms,
+%the definition is extended in a natural way:
+%
+%\begin{defn}\label{def_closure}
+%  A \emph{closure}~$\cl = \gamma \circ \omega$ is a
+we define a \emph{closure}~$\cl = \gamma \circ \omega$ to be a}
   replacement such that $\omega(\alpha)$ is closed for each
   type constructor variable~$\alpha$, and $\gamma(x)$ is closed for
   each term variable~$x$.
@@ -916,6 +934,7 @@ For \emph{open} interpretation terms, the definition is
   obtain $\cl(s) \succ_{\nf_\beta(\cl(\sigma))} \cl(t)$ coinductively
   with the above rules. The relations $\succeq_\sigma$ and
   $\approx_\sigma$ are extended analogously. We drop the type
+\pagebreak
   subscripts when clear or irrelevant.
 \end{defn}
 
