@@ -3350,6 +3350,10 @@ have:
   Lemma~\ref{lem_succ_red}.
 \end{proof}
 
+%CK: Let's start this on a new page. This is going to be a lot of
+%paying attention how page endings work, and I don't want to block any
+%future changes to Appendix A!
+\newpage
 \section{Proving the inequalities in \refsec{examples}}\label{app_ineqs}
 
 The system IPC2 can be seen as a PFS with the following type constructors:
@@ -3398,23 +3402,27 @@ We also have the following function symbols:
 \end{array}
 \]
 
-The following are the \emph{core} rules \LCchange{($\beta$-reductions)}:
+The following are the \emph{core} rules ($\beta$-reductions):
 \[
-\begin{array}{rcl}
-@_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] \\
-\mathtt{tapp}_{\abs{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \red &
-  s[\alpha:=\tau] \\
-\proj^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & s \\
-\proj^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & t \\
+\begin{array}{rclrcl}
+@_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] &
 \mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{\sigma,\tau}(u),
   \abs{x}{s},\abs{y}{t}) & \red & s[x:=u] \\
+
+\mathtt{tapp}_{\abs{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \red &
+  s[\alpha:=\tau] &
 \mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^2_{\sigma,\tau}(u),
   \abs{x}{s},\abs{y}{t}) & \red & t[x:=u] \\
-\mathtt{let}_{\varphi,\rho}(\mathtt{ext}_{\varphi,\tau}(s),\tabs{\alpha}{\abs{x:\varphi \alpha}{t}}) & \red & t[\alpha:=\tau][x:=s] \\
+
+\proj^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & s &
+\mathtt{let}_{\varphi,\rho}(\mathtt{ext}_{\varphi,\tau}(s),
+  \tabs{\alpha}{\abs{x:\varphi \alpha}{t}}) & \red & t[\alpha:=\tau][x:=s] \\
+
+\proj^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & t \\
 \end{array}
 \]
 
-Then these rules simplify proofs from contradiction:
+Then the next rules simplify proofs from contradiction:
 \[
 \begin{array}{rclrcl}
 \epsilon_\tau(\epsilon_\bot(s)) & \red & \epsilon_\tau(s) \\
@@ -3514,7 +3522,8 @@ And the same happens for the $\mathtt{let}$:
 \mathtt{let}_{\psi,\rho}(\mathtt{let}_{\varphi,\exists\psi}(s,
   \tabs{\alpha}{\abs{x:\varphi\alpha}{t}}),u) \red
   \mathtt{let}_{\varphi,\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{
-  \mathtt{let}_{\psi,\rho}(t,u)}}) \\
+  \mathtt{let}_{\psi,\rho}(t,u)}})
+  \phantom{ABCDEFGHIJ}
 \end{array}
 \]
 
@@ -3639,8 +3648,6 @@ $\Termmap$:
   We complete by Lemma
   \ref{lem:substitutioninterpret}.
 \end{itemize}
-
-\LC{TODO: The formatting (spacing) gets pretty screwed up below.}
 
 \begin{itemize}
 \item $\interpret{\epsilon_\tau(\epsilon_\bot(s))} \succ
@@ -3841,6 +3848,10 @@ rule may duplicate variables.
   \lift_{\typeinterpret{\rho}}((\ \flatten_{\typeinterpret{\sigma} \times
     \typeinterpret{\tau}}(\interpret{u}) \oplus 1\ ) \otimes 
     (\ 1 \oplus 1\ )\ ) \approx \\
+  \end{array}
+  \]
+  \[
+  \begin{array}{l}
   \lift_{\typeinterpret{\rho}}(2)\ \oplus \\
   \phantom{A}
   \lift_{\typeinterpret{\rho}}(3 \otimes \flatten_{\typeinterpret{
@@ -3992,6 +4003,10 @@ rule may duplicate variables.
     \interpret{t}[y:=\pi^2(\interpret{u})])))\ \oplus \\
   \phantom{A}
   \lift_{\typeinterpret{\pi}}(1)\ \approx \\
+  \end{array}
+  \]
+  \[
+  \begin{array}{l}
   %
   \lift_{\typeinterpret{\pi}}(5)\ \oplus \\
   \phantom{A}
@@ -4118,6 +4133,7 @@ rule may duplicate variables.
     \flatten_{\typeinterpret{\rho}}(\interpret{v}) \oplus 
     1) \\
   \phantom{ABC}) \approx \\
+  %
   \lift_{\typeinterpret{\pi}}(2)\ \oplus \\
   \phantom{A}
   \lift_{\typeinterpret{\pi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
@@ -4153,6 +4169,11 @@ rule may duplicate variables.
   \phantom{ABCD}
   \lift_{\typeinterpret{\pi}}(1) \\
   \phantom{ABC}) \approx \\
+  %
+  \end{array}
+  \]
+  \[
+  \begin{array}{l}
   \lift_{\typeinterpret{\pi}}(2)\ \oplus \\
   \phantom{A}
   \lift_{\typeinterpret{\pi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
@@ -4323,6 +4344,10 @@ rule may duplicate variables.
   \phantom{A}) * \typeinterpret{\pi} \oplus
   \lift_{\typeinterpret{\varphi\pi}}(1) \approx \\
   %
+  \end{array}
+  \]
+  \[
+  \begin{array}{l}
   \lift_{\typeinterpret{\varphi\pi}}(4)\ \oplus \\
   \phantom{A}
   \lift_{\typeinterpret{\varphi\pi}}(6 \otimes
@@ -4618,7 +4643,6 @@ rule may duplicate variables.
   \pi}{w})})}$ \\
   This is the longest of the inequalities.  As before, we turn first
   to the left-hand side.
-
   \[
   \begin{array}{l}
   \interpret{\mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,
@@ -4640,6 +4664,10 @@ rule may duplicate variables.
     \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(3 \otimes
       \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
       \interpret{u}))\ \oplus \\
+  \end{array}
+  \]
+  \[
+  \begin{array}{l}
   \phantom{ABC}
     \interpret{s}[x:=\pi^1(\interpret{u})] \oplus 
     \interpret{t}[y:=\pi^2(\interpret{u})]\ \oplus \\
@@ -4661,8 +4689,7 @@ rule may duplicate variables.
   following shorthand notation: \\
   $su = \interpret{s}[x:=\pi^1(\interpret{u})]$ \\
   $tu = \interpret{t}[y:=\pi^2(\interpret{u})]$ \\
-  $A = \\
-  \phantom{ABC}
+  $A = \,
     \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(2) \oplus
     \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(3 \otimes
       \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
@@ -4821,6 +4848,10 @@ rule may duplicate variables.
   \phantom{A}
     \lift_{\typeinterpret{\xi}}(3) \otimes \interpret{v}[z:=\pi^1(A)]
     \ \oplus \\
+  \end{array}
+  \]
+  \[
+  \begin{array}{l}
   \phantom{A}
     \lift_{\typeinterpret{\xi}}(3 \otimes
     \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
@@ -5011,6 +5042,10 @@ rule may duplicate variables.
     \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
     \times \typeinterpret{\pi}}(su)) \otimes \interpret{w}[a:=\pi^2(su)]
     \ \oplus \\
+  \end{array}
+  \]
+  \[
+  \begin{array}{l}
   \phantom{A}
     \lift_{\typeinterpret{\xi}}(2)\ \oplus \\
   \phantom{A}
@@ -5098,6 +5133,8 @@ rule may duplicate variables.
   \item $wtu := \interpret{w}[a:=\pi^1(tu)] =
     \interpret{w}[a:=\pi^2(\interpret{t}[y:=\pi^2(\interpret{u})])]$
   \end{itemize}
+
+  \medskip
   Then:
   \[
   \begin{array}{l}
@@ -5380,6 +5417,7 @@ rule may duplicate variables.
     \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
     \times \typeinterpret{\pi}}(su)) \otimes wsu\ \oplus
     \hfill (R5) \\
+  \end{array}\]\[\begin{array}{l}
   \phantom{A}
     \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
     \typeinterpret{\pi}}(tu)) \otimes vtu\ \oplus \hfill (R2) \\
@@ -5543,6 +5581,7 @@ rule may duplicate variables.
     \typeinterpret{\rho} \cdot
     (\tabs{\alpha}{\abs{z}{\interpret{v} * \alpha \cdot z}})\ ) \\
   \phantom{A})\ \oplus \\
+  \end{array}\]\[\begin{array}{l}
   \phantom{A}(\ 
   \lift_{\typeinterpret{\rho}}(2) \oplus
     \lift_{\typeinterpret{\rho}}(3 \otimes u_f) \oplus
@@ -5712,6 +5751,7 @@ rule may duplicate variables.
   \phantom{ABCDEFGHIJ}
     \lift_{\typeinterpret{\rho}}(\flatten(\interpret{t}) \oplus 1)
     \otimes v_N\ )[y:=\pi^2(\interpret{u})] \approx \\
+  \end{array}\]\[\begin{array}{l}
   %
   \lift_{\typeinterpret{\rho}}(2) \oplus
   \lift_{\typeinterpret{\rho}}(3 \otimes u_f)\ \oplus \\
