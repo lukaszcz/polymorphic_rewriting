@@ -1,6 +1,32 @@
 % A museum of no-longer-needed lemmas and such (fragments of proofs of
 % which may however become useful later)
 
+From the definition we immediately see that all encodings have the expected types:
+
+\begin{lemma}\label{lem:encodings_types}
+  \begin{enumerate}
+  \item If $\Gamma \proves t_1 : \sigma$ and $\Gamma \proves t_2 :
+    \tau$ then $\Gamma \proves \pair{t_1}{t_2} : \sigma \times \tau$.
+  \item If $\Gamma \proves t : \tau_1 \times \tau_2$ then $\Gamma
+    \proves \pi^i(t) : \tau_i$.
+  \item If $\Gamma \proves t : \sigma[\subst{\alpha}{\tau}]$ then
+    $\Gamma \proves \expair{\tau}{t} : \Sigma \alpha . \sigma$.
+  \item If $\Gamma \proves t : \Sigma \alpha . \sigma$ and
+    $\Gamma,x:\sigma \proves s : \rho$ and $\alpha \notin
+    \FTV(\Gamma,\rho)$ then $\xlet{}{t}{\alpha,x}{s} : \rho$.
+  \end{enumerate}
+\end{lemma}
+
+In addition, $\beta$-reduction provides the desired reduction rules:
+
+\begin{lemma}\label{lem:encodings_reduce}
+  $\pi^i(\pair{t_1}{t_2}) \leadsto_\beta^* t_i$ and
+  $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \leadsto_\beta^*
+  s[\subst{\alpha}{\tau}][\subst{x}{t}]$.
+\end{lemma}
+
+
+
 Polymorphism in type theory is parametric, which means that a
 polymorphic function behaves uniformly with respect to its generic
 arguments, not depending on their actual types. This makes it

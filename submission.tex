@@ -147,7 +147,7 @@
   %% work. Though I guess that in this specialised context it could be
   %% considered countable. In any case, ``the'' seems like a safe
   %% choice.
-  non-polymorphic setting by allowing for \CKchange{the} encoding of inductive data
+  non-polymorphic setting by allowing for the encoding of inductive data
   types. As an illustration of the potential of our method, we prove
   termination of a substantial fragment of full intuitionistic
   second-order propositional logic with permutative conversions.
@@ -209,7 +209,7 @@ polymorphism as used in the~ML programming language or the polymorphic
 higher-order rewriting formalisms of~\cite{jou:oka:91,jou:rub:99}.
 
 The technique we develop in this paper can be used to handle
-systems like the one above.  \CKchange{However,} termination of heterogeneous
+systems like the one above. However, termination of heterogeneous
 fold can be shown in other ways (e.g., an encoding in
 System~$\mathtt{F}$). Hence, we will also study a more complex example
 in Section~\ref{sec:examples}: termination of a substantial fragment
@@ -443,7 +443,7 @@ develop in Sections \ref{sec:World}--\ref{sec_rule_removal}.
     \[
     \sigma = \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n : \kappa_n)
     . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype \tau
-    \CKchange{\quad\quad (\text{with}\ \tau\ \text{a type atom})}
+    \quad\quad (\text{with}\ \tau\ \text{a type atom})
     \]
   We define \emph{PFS
     terms} as in Definition~\ref{def_terms} (based on
@@ -454,7 +454,7 @@ develop in Sections \ref{sec:World}--\ref{sec_rule_removal}.
     \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots
     \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
     \sigma_k \arrtype \tau
-    \CKchange{\quad\quad (\text{with}\ \tau\ \text{a type atom and}\ m < k)}
+    \quad\quad (\text{with}\ \tau\ \text{a type atom and}\ m < k)
     \]
 \end{defn}
 
@@ -519,19 +519,11 @@ context~$\Gamma$.
 
 \begin{defn}\label{def_rules}
   A set $\Rules$ of term pairs $(\ell,r)$ is a set of \emph{rewrite
-    rules} if:
-%  \begin{itemize}
-%  \item
-  \CKchange{(a)}
-    $\FV(r) \subseteq \FV(\ell) \subseteq \mathit{keys}(\Gamma)$;
-%  \item
-  \CKchange{(b)}
-    $\ell$ and $r$ have the same type under $\Gamma$;
-%  \item
-  \CKchange{and (c)}
-    if $(\ell,r) \in \Rules$ then $(\delta(\ell),\delta(r)) \in
-    \Rules$ for any replacement~$\delta$.
-%  \end{itemize}
+    rules} if: (a)
+  $\FV(r) \subseteq \FV(\ell) \subseteq \mathit{keys}(\Gamma)$;
+  (b)$\ell$ and $r$ have the same type under $\Gamma$; and (c) if
+  $(\ell,r) \in \Rules$ then $(\delta(\ell),\delta(r)) \in \Rules$ for
+  any replacement~$\delta$.
   The reduction relation $\arr{\Rules}$ is defined by:
   
 \begin{center}
@@ -562,16 +554,12 @@ by including a symbol
 $\mathtt{A} : \forall \alpha : * \arrkind * . \forall \beta . (\forall
 \gamma.\alpha \gamma) \arrtype \alpha \beta$ and rules
 $\mathtt{A}_{\varphi,\sigma}(\abs{\alpha}{s}) \red s[\alpha:=\sigma]$.
-\CKchange{We can also use rules}
+We can also use rules
 $(\tabs{\alpha}{s})*\tau \red s[\alpha:=\tau]$ without the extra
-symbol, but to apply \CKchange{our method} it may be
-%the method from
-%Sections \ref{sec:World}--\ref{sec_rule_removal}, it is often more
+symbol, but to apply our method it may be
 convenient
 to use the extra symbol, as
-\CKchange{it creates more liberty in choosing an interpretation}.
-%it will allow us to assign an
-%arbitrary polynomial interpretation to type application.
+it creates more liberty in choosing an interpretation.
 
 \begin{example}[Fold on heterogenous lists]\label{ex_fold_pafs}
   The example from the introduction may be represented as a PFS with
@@ -586,9 +574,9 @@ to use the extra symbol, as
     \mathtt{foldl} & : & \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \beta
   \end{array}
   \]
-  and the following rules \CKchange{(which formally represents an
+  and the following rules (which formally represents an
   infinite set of rules: one rule for each choice of types $\sigma,
-  \tau$ and PFS terms $s$, $t$, etc.):}
+  \tau$ and PFS terms $s$, $t$, etc.):
   \[
   \begin{array}{rcl}
     @_{\sigma,\tau}(\abs{x:\sigma}{s},t) & \red & s[x:=t] \\
@@ -618,14 +606,14 @@ in a specific extension of System~$\Fomega$.  This set is defined in Section
 \ref{subsec:I}; we provide a well-founded partial ordering $\succ$ on
 $\Iterms$ in Section \ref{subsec:succ}.
 
-\CKchange{Although our world of interpretation terms is quite different
+Although our world of interpretation terms is quite different
 from the weakly monotonic functionals of \cite{pol:96}, there are many
 similarities.  Most pertinently, every interpretation term $\abs{x}{s}$
 essentially defines a weakly monotonic function from $\Iterms$ to
 $\Iterms$.  This, and the use of both addition and multiplication in
 the definition of $\Iterms$, makes it possible to lift higher-order
-polynomial interpretations \cite{FuhsKop2012} to our setting.  We %will
-prove weak monotonicity in Section \ref{subsec:weakmono}.}
+polynomial interpretations \cite{FuhsKop2012} to our setting.  We
+prove weak monotonicity in Section \ref{subsec:weakmono}.
 
 \subsection{Interpretation terms}\label{subsec:I}
 
@@ -639,15 +627,10 @@ prove weak monotonicity in Section \ref{subsec:weakmono}.}
   Definition~\ref{def_preterms}) where as types we take the
   interpretation types and for the set~$\Sigma$ of function symbols we
   take $\Sigma = \{ n : \nat \mid n \in \Nbb \} \cup \Sigma_f$, where
-%  \[
-\CKchange{$
-      \Sigma_f = \{ \oplus : \forall \alpha . \alpha \arrtype
-                 \alpha \arrtype \alpha, \otimes : \forall \alpha . \alpha \arrtype \alpha
-                 \arrtype \alpha, \flatten : \forall \alpha . \alpha \arrtype
-                 \nat, \lift : \forall \alpha . \nat \arrtype \alpha
-                 \}
-$.}
-%  \]
+  $ \Sigma_f = \{ \oplus : \forall \alpha . \alpha \arrtype \alpha
+  \arrtype \alpha, \otimes : \forall \alpha . \alpha \arrtype \alpha
+  \arrtype \alpha, \flatten : \forall \alpha . \alpha \arrtype \nat,
+  \lift : \forall \alpha . \nat \arrtype \alpha \} $.
 \end{defn}
 
 For easier presentation, we write $\oplus_\tau$, $\otimes_\tau$, etc.,
@@ -679,15 +662,13 @@ be a powerful aid in defining the parial ordering $\succ$ in Section
     $\tapp{s}{\sigma} \arrW \tapp{t}{\sigma}$
   \item\label{arrW:beta:abs} $\app{(\abs{x:\sigma}{s})}{t} \arrW
     s[\subst{x}{t}]$
-  %\item\label{arrW:beta:tabs}
-    \CKchange{and}
+    and
     $\tapp{(\tabs{\alpha}{s})}{\sigma}
     \arrW s[\subst{\alpha}{\sigma}]$
-    \CKchange{($\beta$-reduction)}
+    ($\beta$-reduction)
   \item\label{arrW:plus:base}
     $\app{\app{\oplus_{\nat}}{n}}{m} \arrW (n+m)$
-  %\item\label{arrW:times:base}
-    \CKchange{and}
+    and
     $\app{\app{\otimes_{\nat}}{n}}{m}
     \arrW (n \cdot m)$
   \item\label{arrW:circ:arrow} $\app{\app{\circ_{\sigma \arrtype
@@ -806,40 +787,24 @@ also allow us to use rule removal (Theorem \ref{thm:ruleremove}).
 %instead of merely
 %orienting all rules with $\succ$.
 
-%The ordering pair for \emph{closed} interpretation terms is
-%defined using co-induction.
-\CKchange{For the following definition}, we fix an
+For the following definition, we fix an
 implict variable context~$\Gamma$.
 
 \begin{defn}\label{def:succ}
             \label{def_closure}
   Let $R \in \{ \succ,\succeq \}$. For \emph{closed}~$s,t\in\Iterms_\sigma$
   and closed~$\sigma$ in $\beta$-normal form, the relation
-  $s\ R_{\sigma}\ t$ is defined coinductively by the following \CKchange{rules.
+  $s\ R_{\sigma}\ t$ is defined coinductively by the following rules.
   \[
-%  \begin{array}{cc}
-%    \infer={s\ R_\nat\ t}{s\da\ R\ t\da \text{ in natural numbers}} \quad&\quad
-%    \infer={s\ R_{\sigma\arrtype\tau}\ t}{\app{s}{q}\ R_{\tau}\ \app{t}{q} \text{ for all } q \in \Iterms^f_\sigma} \\ \\
-%    \multicolumn{2}{c}{
-%    \infer={s\ R_{\forall(\alpha:\kappa)[\sigma]}\ t}{\tapp{s}{\tau}\ R_{\nf_\beta(\sigma[\subst{\alpha}{\tau}])}\ \tapp{t}{\tau} \text{ for all closed } \tau \in \Tc_{\kappa}}}
-%  \end{array}
-%  \]
   \begin{array}{ccc}
     \infer={s\ R_\nat\ t}{s\da\ R\ t\da \text{ in }\mathbb{N}} \quad&\quad
     \infer={s\ R_{\sigma\arrtype\tau}\ t}{\app{s}{q}\ R_{\tau}\ \app{t}{q} \text{ for all } q \in \Iterms^f_\sigma} &
     \infer={s\ R_{\forall(\alpha:\kappa)[\sigma]}\ t}{\tapp{s}{\tau}\ R_{\nf_\beta(\sigma[\subst{\alpha}{\tau}])}\ \tapp{t}{\tau} \text{ for all closed } \tau \in \Tc_{\kappa}}
   \end{array}
   \]
-  We} define $s \approx_\sigma t$ if both $s \succeq_\sigma t$ and $t
+  We define $s \approx_\sigma t$ if both $s \succeq_\sigma t$ and $t
   \succeq_\sigma s$.
-%\end{defn}
-%
-\CKchange{For \emph{open} interpretation terms,
-%the definition is extended in a natural way:
-%
-%\begin{defn}\label{def_closure}
-%  A \emph{closure}~$\cl = \gamma \circ \omega$ is a
-we define a \emph{closure}~$\cl = \gamma \circ \omega$ to be a}
+  A \emph{closure}~$\cl = \gamma \circ \omega$ is a
   replacement such that $\omega(\alpha)$ is closed for each
   type constructor variable~$\alpha$, and $\gamma(x)$ is closed for
   each term variable~$x$.
@@ -1134,9 +1099,7 @@ under term formation operations. We will need these results in the next section.
 The following lemma depends on the lemmas above. The full proof may be
 found in Appendix~\ref{app_proofs}. The proof is actually quite
 complex, and uses a method similar to Girard's method of candidates
-for the termination proof. The difficulty comes from the fact that due
-to the impredicativity of polymorphism direct induction on type
-structure is not possible.
+for the termination proof.
 
 \begin{lemma}[Weak monotonicity]\label{lem_succeq_subst}
   If $s \succeq s'$ then $t[\subst{x}{s}] \succeq t[\subst{x}{s'}]$.
@@ -1276,23 +1239,23 @@ than the simply-typed lambda-calculus. Arbitrary inductive data types
 may be encoded, along with their constructors and recursors with
 appropriate derived reduction rules. This makes the polynomial
 interpretation method easier to apply, even in the non-polymorphic
-setting, thanks to more sophisticated ``programming'' in \CKchange{both
-type and function symbol} interpretations.
-%
+setting, thanks to more sophisticated ``programming'' in the interpretations.
+% LC: I don't think we have any "programming" to speak of in the types
+% (and I don't think we need it).
 The reader is advised to consult e.g.~\cite[Chapter~11]{Girard1989}
-for more background and explanations.  \CKchange{Here, we demonstrate the idea
+for more background and explanations. Here, we demonstrate the idea
 by presenting an encoding for the recursive type $\List$ and the
 corresponding fold-left function, to be completed in
-Example \ref{ex_fold_interpretation}.}
+Example~\ref{ex_fold_interpretation}.
 \end{remark}
 
 \begin{example}\label{ex:notyetmono}
 Towards a termination proof of Example~\ref{ex_fold_pafs},
-we set \CKchange{$\Typemap(\List) = \forall \beta. (\forall \alpha.
+we set $\Typemap(\List) = \forall \beta. (\forall \alpha.
 \beta \arrtype \alpha \arrtype \beta) \arrtype \beta
-\arrtype \beta$} and
-$\Termmap(\nil) = \tabs{\beta}{\abs{f:\quant{\alpha}{\CKchange{\beta \arrtype
-\alpha \arrtype \beta}}}{\abs{x:\beta}{x}}}$.  If we additionally choose
+\arrtype \beta$ and
+$\Termmap(\nil) = \tabs{\beta}{\abs{f:\quant{\alpha}{\beta \arrtype
+\alpha \arrtype \beta}}{\abs{x:\beta}{x}}}$.  If we additionally choose
 $\Termmap(\mathtt{foldl}) = \tabs{\beta}{\abs{f}{\abs{x}{\abs{l}{l
 \beta f x}}} \oplus \lift_\beta(1)}$, we have
 $\interpret{\mathtt{foldl}_{\sigma}(f,s,\nil)} = (\tabs{\beta}{
@@ -1303,11 +1266,6 @@ $\interpret{\mathtt{foldl}_{\sigma}(f,s,\nil)} = (\tabs{\beta}{
 An extension of the proof from Example~\ref{ex:plus1} shows that
 this term $\succ \interpret{s}$.
 \end{example}
-
-\LC{Above, the type of $\Termmap(\mathtt{foldl})$ doesn't match ($f$ should
-  have type $\forall \alpha . \beta \to \alpha \to \beta$). It looks
-  as if you're confusing foldl with foldr (or at least their types).}
-\CK{Indeed. Is it correct now?}
 
 It is easy to see that $\succeqinterpret$ and
 $\succinterpret$ have desirable properties such as transitivty,
@@ -1439,13 +1397,13 @@ $\Termmap$ is \emph{safe}.
     x * \beta \\
   \Termmap(\mathtt{nil}) & = & & \Lambda \beta.\lambda f.\abs{x}{x} \\
   \Termmap(\mathtt{cons}) & = & \Lambda \alpha.\lambda h.\lambda t. &
-    \CKchange{\Lambda \beta.\lambda f.\lambda x.
+    \Lambda \beta.\lambda f.\lambda x.
     t \beta f (f \alpha x h \oplus \lift_\beta(\flatten_\beta(x)\ 
-    \oplus} \\
-    & & & \phantom{ABCDEFGHIJKLMNOP,} \CKchange{\flatten_\alpha(h)))\ \oplus}\  \\
+    \oplus \\
+    & & & \phantom{ABCDEFGHIJKLMNOP,} \flatten_\alpha(h)))\ \oplus\  \\
     & & & \phantom{ABCDE\ }
-    \CKchange{\lift_\beta(\flatten_\beta(f\alpha h x) \oplus
-    \flatten_\alpha(h) \oplus 1)} \\
+    \lift_\beta(\flatten_\beta(\LCchange{f\alpha x h}) \oplus
+    \flatten_\alpha(h) \oplus 1) \\
   \Termmap(\mathtt{foldl}) & = & \Lambda \beta.\lambda f. \lambda x.
     \lambda l. & l \beta f x \oplus \lift_\beta(\flatten_{\forall \alpha.
     \beta \arrtype \alpha \arrtype \beta}(f)\ \oplus \\
@@ -1459,7 +1417,7 @@ for $x$, since $x$ is not an argument of $\mathtt{cons}$.
 
 \section{Proving termination with rule removal}\label{sec_rule_removal}
 
-\CKchange{A PFS $A$ is certainly terminating if its reduction relation
+A PFS $A$ is certainly terminating if its reduction relation
 $\arr{\Rules}$ is contained in a well-founded relation, which holds if
 $\ell \succinterpret r$ for all its rules $(\ell,r)$.  However,
 sometimes it is cumbersome to find an interpretation that orients all
@@ -1467,7 +1425,7 @@ rules strictly. To illustrate, the interpretation of Example
 \ref{ex_fold_interpretation} gives $\ell \succinterpret r$ for two of
 the rules and $\ell \succeqinterpret r$ for the others (as we will see
 in Example \ref{ex_fold_final}). In such cases, proof progress is still
-achieved through \emph{rule removal}.}
+achieved through \emph{rule removal}.
 
 \begin{theorem}\label{thm:ruleremove}
   Let $\Rules = \Rules_1 \cup \Rules_2$, and suppose that
@@ -1494,42 +1452,34 @@ algorithm:
 \begin{enumerate}
 \item While $\Rules$ is non-empty:
   \begin{enumerate}
-  \item \CKchange{Construct a reduction pair $(\succeq^\Rules,\succ^\Rules)$
+  \item Construct a reduction pair $(\succeq^\Rules,\succ^\Rules)$
     such that all rules in $\Rules$ are oriented by $\succeq^\Rules$ or
     $\succ^\Rules$, and at least one of them is oriented using
-    $\succ^\Rules$.}
+    $\succ^\Rules$.
   \item Remove all rules ordered by $\succ^\Rules$ from $\Rules$.
   \end{enumerate}
 \end{enumerate}
 If this algorithm succeeds, we have proven termination.
 
 \medskip
-\CKchange{To use this algorithm with the pair $(\succeqinterpret,\succinterpret)$
+To use this algorithm with the pair $(\succeqinterpret,\succinterpret)$
 from Section~\ref{sec_reduction_pairs}, we should identify an
 interpretation $(\Typemap,\Termmap)$
-%CK: space
-%for which two things must be
-%ensured:
-%\begin{itemize}
-%\item $\Termmap$ is safe;
-%\item all rules in $\Rules$ can be oriented with $\succeqinterpret$ or
-%  $\succinterpret$, and at least one with $\succinterpret$.
-%\end{itemize}
 such that (a) $\Termmap$ is safe, (b) all rules can be oriented with
 $\succeqinterpret$ or $\succinterpret$, and (c) at least one rule is
-oriented with $\succinterpret$.}
+oriented with $\succinterpret$.
 %
 The first requirement guarantees that
 $(\succeqinterpret,\succinterpret)$ is a reduction pair (by
 Theorem~\ref{thm_reduction_pair}). Lemma~\ref{lem_safe} provides some
-sufficient safety criteria. The second \CKchange{and third
-requirements have} to be verified for \CKchange{each} individual rule.
+sufficient safety criteria. The second and third
+requirements have to be verified for each individual rule.
 
 \begin{example}\label{ex_fold_intermediate}
   We continue with our example of fold on heterogenous lists. We prove
   termination by rule removal, using the symbol mapping from
   Example~\ref{ex_fold_interpretation}.
-  \CKchange{We must show:
+  We must show:
   \[
   \begin{array}{rcl}
     @_{\sigma,\tau}(\abs{x:\sigma}{s},t) & \succeqinterpret & s[x:=t] \\
@@ -1543,22 +1493,6 @@ requirements have} to be verified for \CKchange{each} individual rule.
       \tau}(f),s),h),t) \\
   \end{array}
   \]
-%By definition, these inequalities hold if we have:
-%  \[
-%  \begin{array}{rcl}
-%    \interpret{@_{\sigma,\tau}(\abs{x:\sigma}{s},t)} & \succeq &
-%      \interpret{s[x:=t]} \\
-%    \interpret{\mathtt{A}_{\abs{\alpha}{\sigma},\tau}(\tabs{\alpha}{s})}
-%      & \succeq & \interpret{s[\alpha:=\tau]} \\
-%    \interpret{\mathtt{foldl}_\sigma(f,s,\nil)} & \succ & \interpret{s} \\
-%    \interpret{\mathtt{foldl}_\sigma(f,s,\cons_\tau(h,t))} & \succ &
-%    \interpret{\mathtt{foldl}_\sigma(f,@_{\tau,\sigma}(@_{\sigma,\tau
-%    \arrtype\sigma}(
-%      \mathtt{A}_{\abs{\alpha}{\sigma\arrtype\alpha\arrtype\sigma},
-%      \tau}(f),s),h),t)} \\
-%  \end{array}
-%  \]
-%Consider the first.
 Consider the first inequality; by definition it holds if
 $\interpret{@_{\sigma,\tau}(\abs{x:\sigma}{s},t)} \succeq
 \interpret{s[x:=t]}$.
@@ -1566,15 +1500,15 @@ Since $\interpret{@_{\sigma,\tau}(\abs{x:
 \sigma}{s},t)} \arrW^* \interpret{s}[x:=\interpret{t}] \oplus
 \lift_{\typeinterpret{\tau}}(\flatten_{\typeinterpret{\sigma}}(
 \interpret{t}))$, and $\interpret{s}[x:=\interpret{t}] =
-\interpret{s[x:=t]}$ (by Lemma \ref{lem:substitutioninterpret}),
-it suffices by Lemma \ref{lem_leadsto_to_approx} if
+\interpret{s[x:=t]}$ (by Lemma~\ref{lem:substitutioninterpret}),
+it suffices by Lemma~\ref{lem_leadsto_to_approx} if
 $\interpret{s[x:=t]} \oplus \lift_{\typeinterpret{\tau}}(\flatten_{\typeinterpret{\sigma}}(
 \interpret{t})) \succeq \interpret{s[x:=t]}$.
 This is an instance of the general rule $u \oplus w \succeq u$ that
-we will obtain below.}
+we will obtain below.
 \end{example}
 
-\CKchange{To prove inequalities $s \succ t$ and $s \succeq t$, we will often
+To prove inequalities $s \succ t$ and $s \succeq t$, we will often
 use that $\succ$ and $\succeq$ are transitive and compatible with each
 other (Lem.~\ref{lem_transitive} and\ref{lem:compatibility}), that
 $\arrW\:\subseteq\:\approx$ (Lem.~\ref{lem_leadsto_to_approx}),
@@ -1583,7 +1517,7 @@ that both $\succ$ and $\succeq$ are monotonic over $\lift$ and $\flatten$
 (Lem.~\ref{lem:liftgreater} and \ref{lem_flatten_succ}) and that
 interpretations respect substitution
 (Lem.~\ref{lem:substitutioninterpret}).  In addition, we can use the
-calculation rules below.}  The proofs may be found in
+calculation rules below. The proofs may be found in
 Appendix~\ref{app_proofs}.
 
 \begin{lemma}\label{lem:approxproperties}
@@ -1611,12 +1545,9 @@ have:
     \oplus_\sigma (\lift_\sigma m)$;
   \item $\lift_\sigma(n m) \approx_\sigma (\lift_\sigma n)
     \otimes_\sigma (\lift_\sigma m)$;
-  \item \CKchange{$\flatten_\sigma(\lift_\sigma(n)) \approx n$.}
+  \item $\flatten_\sigma(\lift_\sigma(n)) \approx n$.
   \end{enumerate}
 \end{lemma}
-
-\CK{I use that last one a lot in urzy\_emb, so that one also needs a
-proof!}
 
 \begin{lemma}\label{lem:plusparts}
 For all types $\sigma$, terms $s,t$ of type $\sigma$ and natural
@@ -1635,7 +1566,10 @@ numbers $n > 0$:
 
 \CK{This addition, too, will need a proof!}
 
-\CKchange{Note that these calculation rules immediately give the
+\LC{This is already proved in Lemma~\ref{lem:plustimesmonotonic}! And
+  we need it for the proof of Lemma~\ref{lem_safe}}
+
+Note that these calculation rules immediately give the
 inequality $x \oplus \lift_{nat \arrtype \nat}(1) \succ x$ from
 Example~\ref{ex:plus1}, and also that $\lift_\sigma(n) \succ
 \lift_\sigma(m)$ whenever $n > m$.  By Lemma~\ref{lem:plusparts} we
@@ -1644,10 +1578,10 @@ can use \emph{absolute positiveness}: the property that
 s_n$ and $t \approx t_1 \oplus \dots \oplus t_k$ with $k \leq n$ and
 $s_i \succeq t_i$ for all $i \leq k$, and (b) if moreover $s_1 \succ
 t_1$ then $s \succ t$.  This property will be very useful in the
-examples.}
+examples.
 
 \begin{example}\label{ex_fold_final}
-\CKchange{We now have the tools to finish the example of
+We now have the tools to finish the example of
 heterogeneous lists.  The proof obligation from Example
 \ref{ex_fold_intermediate}, that
 $\interpret{@_{\sigma,\tau}(\abs{x:\sigma}{s},t)} \succeq
@@ -1665,9 +1599,8 @@ $\interpret{\mathtt{foldl}_\sigma(f,s,\nil)} =
 \succ \interpret{s}$ by Lemmas
 \ref{lem_lift_approx}(\ref{lem_lift_approx:plussplit}) and
 \ref{lem:plusparts}(\ref{lem:plusparts:removefromsucceq}).
-}
 %
-\CKchange{For the last rule note that:
+For the last rule note that:
 \[
 \begin{array}{l}
 \interpret{\mathtt{foldl}_\sigma(f,s,\cons_\tau(h,t))} \approx \\
@@ -1699,8 +1632,8 @@ $\interpret{\mathtt{foldl}_\sigma(f,s,\nil)} =
 \end{array}
 \]
 On the right-hand side of the inequality, noting that
-$\lift_{\sigma \arrtype \tau}(s) \cdot t \arrW^*
-\lift_{\tau}(s)$, we have:
+$\lift_{\sigma \arrtype \tau}(u) \cdot w \arrW^*
+\lift_{\tau}(u)$, we have:
 \[
 \begin{array}{l}
 \interpret{\mathtt{foldl}_\sigma(f,@_{\tau,\sigma}(@_{\sigma,\tau
@@ -1709,27 +1642,27 @@ $\lift_{\sigma \arrtype \tau}(s) \cdot t \arrW^*
       \tau}(f),s),h),t)} \approx \\
 \Termmap(\mathtt{foldl})_\sigma(\interpret{f},\ 
   \interpret{f} * \typeinterpret{\tau} \cdot \interpret{s} \cdot
-  \interpret{h} \oplus \lift_{\typeinterpret{\sigma}}(\flatten(s)
-  \oplus \flatten(h)),\ \interpret{t}) \approx \\
+  \interpret{h} \oplus \lift_{\typeinterpret{\sigma}}(\flatten(\interpret{s})
+  \oplus \flatten(\interpret{h})),\ \interpret{t}) \approx \\
 \interpret{t} * \typeinterpret{\sigma} \cdot \interpret{f} \cdot
   (\ \interpret{f} * \typeinterpret{\tau} \cdot \interpret{s} \cdot
-  \interpret{h} \oplus \lift_{\typeinterpret{\sigma}}(\flatten(s)
-  \oplus \flatten(h))\ )\ \oplus \\
+  \interpret{h} \oplus \lift_{\typeinterpret{\sigma}}(\flatten(\interpret{s})
+  \oplus \flatten(\interpret{h}))\ )\ \oplus \\
 \phantom{A}
   \lift_{\typeinterpret{\sigma}}(\flatten(\interpret{f}) \oplus
   \flatten(\interpret{f} * \typeinterpret{\tau} \cdot \interpret{s} \cdot
   \interpret{h}\ \oplus \\
   \phantom{ABCDEFGHIJKLMNOPQRSt}
-  \lift_{\typeinterpret{\sigma}}(\flatten(s)
-  \oplus \flatten(h))) \oplus 1) \approx \\
+  \lift_{\typeinterpret{\sigma}}(\flatten(\interpret{s})
+  \oplus \flatten(\interpret{h}))) \oplus 1) \approx \\
 \interpret{t} * \typeinterpret{\sigma} \cdot \interpret{f} \cdot
   (\ \interpret{f} * \typeinterpret{\tau} \cdot \interpret{s} \cdot
-  \interpret{h} \oplus \lift_{\typeinterpret{\sigma}}(\flatten(s)
-  \oplus \flatten(h))\ )\ \oplus \\
+  \interpret{h} \oplus \lift_{\typeinterpret{\sigma}}(\flatten(\interpret{s})
+  \oplus \flatten(\interpret{h}))\ )\ \oplus \\
 \phantom{A}
   \lift_{\typeinterpret{\sigma}}(\flatten(\interpret{f}) \oplus
   \flatten(\interpret{f} * \typeinterpret{\tau} \cdot \interpret{s} \cdot
-  \interpret{h}) \oplus \flatten(s) \oplus \flatten(h) \oplus 1)
+  \interpret{h}) \oplus \flatten(\interpret{s}) \oplus \flatten(\interpret{h}) \oplus 1)
 \end{array}
 \]
 Now the right-hand side is the left-hand side $\oplus \lift(1)$.
@@ -1741,113 +1674,35 @@ $\Termmap(@) = \Lambda \alpha.\Lambda \beta.\lambda f.\lambda x.
 f \cdot x \oplus \lift_\beta(\flatten_\alpha(x) \oplus 1)$ and
 $\Termmap(\mathtt{A}) = \Lambda \alpha.\Lambda \beta.\lambda x.
 x * \beta \oplus \lift_{\alpha\beta}(1)$.
-}
-
 \end{example}
 
 \section{A larger example}\label{sec:examples}
 
-\CK{\L ukasz, can you write the intro to this section?}
-
-Pol and Schwichtenberg used higher-order polynomial interpretations to
-prove termination of a fragment of first-order logic with permutative
-conversions~\cite{PolSchwichtenberg1995}, in the hope of providing a
-more perspicuous proof of this well-known result. Notably, they did
-not treat disjunction. The paper~\cite{SorensenUrzyczyn2010} depends
-on termination of~IPC2, citing a proof from~\cite{Wojdyga2008},
-which, however, later turned out to be incorrect. To our knowledge,
+System~$\mathtt{F}$ is System~$\Fomega$ where no higher kinds are
+allowed, i.e., there are no type constructors except types. By the
+Curry-Howard isomorphism~$\mathtt{F}$ corresponds to the
+universal-implicational fragment of intuitionistic second-order
+propositional logic, with the types corresponding to formulas and
+terms to natural deduction proofs. The remaining connectives may be
+encoded in~$\mathtt{F}$, but the permutative conversion rules do not
+hold~\cite{Girard1989}. We show termination of the system IPC2
+(see~\cite{SorensenUrzyczyn2010}) of intuitionistic second-order
+propositional logic with all connectives and permutative conversions,
+minus a few of the permutative conversion rules for the existential
+quantifier. The paper~\cite{SorensenUrzyczyn2010} depends on
+termination of~IPC2, citing a proof from~\cite{Wojdyga2008}, which,
+however, later turned out to be incorrect. To our knowledge,
 termination of the full system~IPC2 remains an open problem.
 
-\CK{TODO: shorten the following and move it somewhere.}
+In related work, Pol and Schwichtenberg used higher-order polynomial
+interpretations to prove termination of a fragment of intuitionistic
+first-order logic with permutative
+conversions~\cite{PolSchwichtenberg1995}, in the hope of providing a
+more perspicuous proof of this well-known result. Notably, they did not
+treat disjunction. Also, their method cannot handle impredicative
+polymorphism necessary for second-order logic.
 
-----------
-
-Here, we state standard abbreviations for two inductive types
-used later in this section. Type subscripts are dropped when clear
-or irrelevant.
-
-\begin{defn}[Product types]
-  \[
-  \begin{array}{rclcrcl}
-    \sigma \times \tau &=& \forall p . (\sigma \arrtype \tau \arrtype p) \arrtype p & \quad &
-    \pi^1_{\sigma,\tau}(t) &=& t \sigma (\abs{x:\sigma}{\abs{y:\tau}{x}}) \\
-    \pair{t_1}{t_2}_{\sigma,\tau} &=& \tabs{p}{\abs{x:\sigma\arrtype\tau\arrtype p}{x t_1 t_2}} & &
-    \pi^2_{\sigma,\tau}(t) &=& t \tau (\abs{x:\sigma}{\abs{y:\tau}{y}}) \\
-  \end{array}
-  \]
-\end{defn}
-
-\begin{defn}[Existential types]
-  \[
-  \begin{array}{rclcrcl}
-    \Sigma \alpha . \sigma &=& \forall p . (\forall \alpha . \sigma \arrtype p) \arrtype p & \quad &
-    \expair{\tau}{t}_{\Sigma\alpha.\sigma} &=& \tabs{p}{\abs{x:\forall\alpha.\sigma\arrtype p}{x \tau t}} \\
-    & & & &
-    \xlet{\rho}{t}{\alpha,x:\sigma}{s} &=& t \rho (\tabs{\alpha}{\abs{x:\sigma}{s}}) \\
-  \end{array}
-  \]
-\end{defn}
-
-%\begin{defn}[Heterogenous lists]
-%  \[
-%  \begin{array}{rcl}
-%    \List &=& \forall p . (\forall \alpha . \alpha \arrtype p \arrtype p) \arrtype p \arrtype p \\
-%    \nil &=& \tabs{p}{\abs{f:\forall \alpha . \alpha \arrtype p \arrtype p}{\abs{a : p}{a}}} \\
-%    \cons_\rho(h,t) &=& \tabs{p}{\abs{f:\forall\alpha . \alpha \arrtype p \arrtype p}{\abs{a : p}{f \rho h (l p f a)}}} \\
-%    \fold_\rho(f,a,l) &=& l \rho f a
-%  \end{array}
-%  \]
-%\end{defn}
-
-From the definition we immediately see that all encodings have the expected types:
-
-\begin{lemma}\label{lem:encodings_types}
-  \begin{enumerate}
-  \item If $\Gamma \proves t_1 : \sigma$ and $\Gamma \proves t_2 :
-    \tau$ then $\Gamma \proves \pair{t_1}{t_2} : \sigma \times \tau$.
-  \item If $\Gamma \proves t : \tau_1 \times \tau_2$ then $\Gamma
-    \proves \pi^i(t) : \tau_i$.
-  \item If $\Gamma \proves t : \sigma[\subst{\alpha}{\tau}]$ then
-    $\Gamma \proves \expair{\tau}{t} : \Sigma \alpha . \sigma$.
-  \item If $\Gamma \proves t : \Sigma \alpha . \sigma$ and
-    $\Gamma,x:\sigma \proves s : \rho$ and $\alpha \notin
-    \FTV(\Gamma,\rho)$ then $\xlet{}{t}{\alpha,x}{s} : \rho$.
-%  \item $\Gamma \proves \nil : \List$.
-%  \item If $\Gamma \proves h : \rho$ and $\Gamma \proves t : \List$
-%    then $\Gamma \proves \cons_\rho(h,t) : \List$.
-%  \item If $\Gamma \proves l : \List$ and $\Gamma \proves f : \forall
-%    \alpha . \alpha \arrtype \rho \arrtype \rho$ and $a : \rho$ then
-%    $\Gamma \proves \fold_\rho(f,a,l) : \rho$.
-  \end{enumerate}
-\end{lemma}
-
-In addition, $\beta$-reduction on terms and types -- that is, the
-relation $\leadsto_\beta$ generated by $(\abs{x}{s})t \leadsto_\beta
-s[x:=t]$ and $(\tabs{\alpha}{s})\sigma \leadsto_\beta
-s[\alpha:=\sigma]$ -- provides the desired derivation rules:
-
-\begin{lemma}\label{lem:encodings_reduce}
-%  \begin{enumerate}
-%  \item
-  $\pi^i(\pair{t_1}{t_2}) \leadsto_\beta^* t_i$
-  \CKchange{and}
-%  \item
-  $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \leadsto_\beta^*
-    s[\subst{\alpha}{\tau}][\subst{x}{t}]$.
-%%  \item $\fold_\rho(f,a,\nil) \leadsto_\beta^* a$.
-%%  \item $\fold_\rho(f,a,\cons_\tau(h,t)) \leadsto_\beta^* f \tau h
-%%    (\fold_\rho(f,a,t))$.
-%  \end{enumerate}
-\end{lemma}
-
-----------
-
-
-
-\CK{I have not made the whole section blue, but from here on, everything
-is new!}
-
-The system can be seen as a PFS with type constructors:
+The system IPC2 can be seen as a PFS with type constructors:
 \[
 \begin{array}{c}
 \Sigma^T_\kappa = \{\quad
@@ -1894,7 +1749,7 @@ We have the following function symbols:
 \end{array}
 \]
 
-And a number of rules, including the following:
+And 28 reduction rules, including the following (the full set of rules is in the appendix):
 \[
 \begin{array}{rclrcl}
 @_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] &
@@ -1962,8 +1817,24 @@ And a number of rules, including the following:
 \end{array}
 \]
 
-Most of these rules can be oriented strictly (so using $\succinterpret$)
-by the following interpretation:
+To define an intepretation for~IPC2, we need the standard encoding of
+product and existential types (see~\cite[Chapter~11]{Girard1989} for
+more details).
+  \[
+  \begin{array}{rclcrcl}
+    \sigma \times \tau &=& \forall p . (\sigma \arrtype \tau \arrtype p) \arrtype p & \quad &
+    \pi^1_{\sigma,\tau}(t) &=& t \sigma (\abs{x:\sigma}{\abs{y:\tau}{x}}) \\
+    \pair{t_1}{t_2}_{\sigma,\tau} &=& \tabs{p}{\abs{x:\sigma\arrtype\tau\arrtype p}{x t_1 t_2}} & &
+    \pi^2_{\sigma,\tau}(t) &=& t \tau (\abs{x:\sigma}{\abs{y:\tau}{y}}) \\
+    \Sigma \alpha . \sigma &=& \forall p . (\forall \alpha . \sigma \arrtype p) \arrtype p & \quad &
+    \expair{\tau}{t}_{\Sigma\alpha.\sigma} &=& \tabs{p}{\abs{x:\forall\alpha.\sigma\arrtype p}{x \tau t}} \\
+    & & & &
+    \xlet{\rho}{t}{\alpha,x:\sigma}{s} &=& t \rho (\tabs{\alpha}{\abs{x:\sigma}{s}}) \\
+  \end{array}
+  \]
+
+Now, most of the rules can be oriented strictly (so using $\succinterpret$)
+by the interpretation:
 \[
 \begin{array}{rclcrcl}
 \Typemap(\bot) & = & \nat
@@ -2029,23 +1900,28 @@ by the following interpretation:
 \]
 
 The only rules that are not oriented with this interpretation -- also
-not using $\succeq$ -- are the ones of the form $f(\mathtt{let}(s,t),
-\dots) \red \mathtt{let}(s,f(t,\dots))$, like the rule marked (*) above.
-\CK{\L ukasz, you may want to say some words on why it's important
-that we \emph{did} get the rest!}
+not using $\succeq$ -- are the ones of the form
+$f(\mathtt{let}(s,t), \dots) \red \mathtt{let}(s,f(t,\dots))$, like
+the rule marked (*) above. Nonetheless, this is already a substatial
+step toward proving termination of IPC2 and similar systems of
+higher-order logic. Verifying the orientations is still tedious, but
+we introduced a general method, raising hope for at least partial
+automation in the future, as was done with polynomial interpretations
+for non-polymorphic (\LC{Cynthia: shallowly polymorphic?})
+higher-order rewriting.
 
 The full set of rules and the proof that they are oriented is
 available in Appendix \ref{app_ineqs}.
 
 \section{Conclusions and future work}
 
-\CKchange{In this paper, we have laid the foundation for a powerful methodology
+In this paper, we have laid the foundation for a powerful methodology
 to prove termination of higher-order rewriting with full impredicative
-polymorphism.}
+polymorphism.
 \CK{Probably write a few more sentences here explaining why what we did
 is totally awesome.}
 
-\CKchange{Readers may note that the method is currently not that easy to apply on
+Readers may note that the method is currently not that easy to apply on
 larger systems: simplifying polynomials can be a lot of work,
 especially when interpretations multiply two variables (such as
 $\Termmap(\mathtt{case})$ in Section \ref{sec:examples}), and checking
@@ -2053,14 +1929,13 @@ the proofs is tedious.  Hence, a natural direction for future work is
 to look into automation: both for automatic verification that a given
 interpretation suffices and -- building on existing termination provers
 for both first- and higher-order term rewriting -- automatically finding
-a suitable interpretation.}
+a suitable interpretation.
 
-\CKchange{In addition, it would be worth exploring improvements of the method that
+In addition, it would be worth exploring improvements of the method that
 would allow us to handle the remaining rules of IPC2, or extending
-other technique for higher-order termination. %like dependency pairs.
+other techniques for higher-order termination. %like dependency pairs.
 %CK: problem: everything I want to say will require an additional
 %citation, which we may not have space for!
-}
 
 \addcontentsline{toc}{section}{References}
 \bibliography{references}
@@ -3411,18 +3286,6 @@ numbers $n > 0$:
     \ldots u_m q$ for any $q \in \Iterms_{\tau_1}^f$. Hence $(s \oplus
     t) u_1 \ldots u_m \succeq_\sigma s u_1 \ldots u_m$.
 
-    \CK{TODO: check: I changed $\mathcal{W}$ to $\Iterms$ here.}
-    \LC{It should be $\Iterms^f$ -- I forgot to change this when I
-      changed the notation from $\mathcal{W}$ to $\Iterms^f$ (my rationale
-      for changing the notation was that we really interpret by terms
-      in $\Iterms$, not by final interpretation terms $\Iterms^f$,
-      which are just a special case of $\Iterms$ used in the
-      proofs). In the coinductive definition you have $\Iterms^f$, not
-      $\Iterms$. This is why I say at the beginning that we consider
-      closed terms and types (which we can do because if $\succ$ holds
-      for closed terms and types, then it holds for all terms and
-      types, by how $\succ$ is defined on open terms)}
-
     If $\sigma = \forall(\alpha:\kappa)[\tau]$ then by the coinductive
     hypothesis $(s \oplus t) u_1 \ldots u_m \xi \succeq_{\sigma'} s
     u_1 \ldots u_m \xi$ for any closed $\xi \in \Tc_\kappa$, where
@@ -3472,16 +3335,26 @@ have:
     \oplus_\sigma (\lift_\sigma n)$.
   \item $\lift_\sigma(n m) \approx_\sigma (\lift_\sigma n)
     \otimes_\sigma (\lift_\sigma n)$.
+  \item $\flatten_\sigma(\lift_\sigma(n)) \approx n$.
   \end{enumerate}
 \end{lemma}
 \addtocounter{theorem}{-1}}
 
 \begin{proof}
   It suffices to show this for closed~$\sigma$ in $\beta$-normal
-  form. Then one proves by induction on~$\sigma$ that
+  form. For the first two point, one proves by induction on~$\sigma$
+  that
   $(\lift_\sigma(n+m))\da = (\lift_\sigma n \oplus_\sigma \lift_\sigma
   n)\da$ (analogously for multiplication). This suffices by
   Corollary~\ref{cor_succ_da} and the reflexivity of~$\approx$.
+
+  For the third point, one proceeds by induction on~$\sigma$. For
+  example, if $\sigma = \sigma_1\to\sigma_2$ then
+  $\flatten_\sigma(\lift_\sigma(n)) \leadsto^*
+  \flatten_{\sigma_2}((\lambda x . \lift_{\sigma_2} n)
+  (\lift_{\sigma_1} 0)) \leadsto \flatten_{\sigma_2} (\lift_{\sigma_1}
+  n)$. Then the claim follows from the inductive hypothesis and
+  Lemma~\ref{lem_succ_red}.
 \end{proof}
 
 \section{Proving the inequalities in \refsec{examples}}\label{app_ineqs}
@@ -3532,7 +3405,7 @@ We also have the following function symbols:
 \end{array}
 \]
 
-The following are the \emph{core} rules:
+The following are the \emph{core} rules \LCchange{($\beta$-reductions)}:
 \[
 \begin{array}{rcl}
 @_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] \\
@@ -3656,12 +3529,20 @@ It is this last group of rules that is not oriented by our method.
 For all other rules $\ell \red r$ we have $\interpret{\ell} \succ
 \interpret{r}$, as demonstrated below.
 
-\medskip
+We will use the fact that $\beta$-reduction provides the derived
+reduction rules for $\pi^i$ and $\mathtt{let}$.
+
+\begin{lemma}\label{lem:encodings_reduce}
+  $\pi^i(\pair{t_1}{t_2}) \leadsto_\beta^* t_i$ and
+  $\xlet{}{\expair{\tau}{t}}{\alpha,x}{s} \leadsto_\beta^*
+  s[\subst{\alpha}{\tau}][\subst{x}{t}]$.
+\end{lemma}
+
 In the proofs below, we will often use that $\lift(n) \otimes s \oplus
 t \succeq s$ if $n \geq 1$, which holds because $\lift(n) \otimes s
 \oplus t \approx \lift(1) \otimes s \oplus (\lift(n-1) \otimes s
 \oplus t) \approx s \oplus (\lift(n-1) \otimes s \oplus t) \succeq
-s$, using the calculation rules.  Having this, the core rules and the
+s$, using the calculation rules. Having this, the core rules and the
 contradiction simplifications are all quite easy due to the choice of
 $\Termmap$:
 \begin{itemize}
@@ -3765,6 +3646,8 @@ $\Termmap$:
   We complete by Lemma
   \ref{lem:substitutioninterpret}.
 \end{itemize}
+
+\LC{TODO: The formatting (spacing) gets pretty screwed up below.}
 
 \begin{itemize}
 \item $\interpret{\epsilon_\tau(\epsilon_\bot(s))} \succ
