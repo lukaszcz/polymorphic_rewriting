@@ -1515,7 +1515,7 @@ requirements have to be verified for each individual rule.
   We continue with our example of fold on heterogenous lists. We prove
   termination by rule removal, using the symbol mapping from
   Example~\ref{ex_fold_interpretation}.
-  We must show:
+  We \CKchange{will} show:
   \[
   \begin{array}{rcl}
     @_{\sigma,\tau}(\abs{x:\sigma}{s},t) & \succeqinterpret & s[x:=t] \\
@@ -1546,13 +1546,16 @@ we will obtain below.
 
 To prove inequalities $s \succ t$ and $s \succeq t$, we will often
 use that $\succ$ and $\succeq$ are transitive and compatible with each
-other (Lem.~\ref{lem_transitive} and\ref{lem:compatibility}), that
+other (Lem.~\ref{lem_transitive} and~\ref{lem:compatibility}), that
 $\arrW\:\subseteq\:\approx$ (Lem.~\ref{lem_leadsto_to_approx}),
 that $\succeq$ is monotonic (Lem.~\ref{lem_succeq_subst}),
 that both $\succ$ and $\succeq$ are monotonic over $\lift$ and $\flatten$
 (Lem.~\ref{lem:liftgreater} and \ref{lem_flatten_succ}) and that
 interpretations respect substitution
-(Lem.~\ref{lem:substitutioninterpret}).  In addition, we can use the
+(Lem.~\ref{lem:substitutioninterpret}).  \CKchange{We will also use
+Lemma \ref{lem:plustimesmonotonic} which states (among other things)
+that $s \succ t$ implies that $s \oplus u \succ t \oplus u$.}
+In addition, we can use the
 calculation rules below. The proofs may be found in
 Appendix~\ref{app_proofs}.
 
@@ -1592,29 +1595,23 @@ numbers $n > 0$:
 \item\label{lem:plusparts:removefromsucceq}
   $s \oplus_{\sigma} t \succeq s$ and $s \oplus_{\sigma} t \succeq
   t$;
-\item \CKchange{if $s \succ t$ (resp.~$s \succeq t$) then also
-  $s \oplus_{\sigma} u \succ t \oplus_{\sigma} u$ (resp.~$s \oplus_{
-  \sigma} u \succeq t \oplus_{\sigma} u$);}
 \item $s \oplus_{\sigma} (\lift_{\sigma} n) \succ s$ and
   $(\lift_{\sigma} n) \oplus_{\sigma} t \succ t$.
 \end{enumerate}
 \end{lemma}
 
-\CK{This addition, too, will need a proof!}
-
-\LC{This is already proved in Lemma~\ref{lem:plustimesmonotonic}! And
-  we need it for the proof of Lemma~\ref{lem_safe}}
-
 Note that these calculation rules immediately give the
 inequality $x \oplus \lift_{nat \arrtype \nat}(1) \succ x$ from
 Example~\ref{ex:plus1}, and also that $\lift_\sigma(n) \succ
-\lift_\sigma(m)$ whenever $n > m$.  By Lemma~\ref{lem:plusparts} we
+\lift_\sigma(m)$ whenever $n > m$.  By
+\CKchange{Lemmas~\ref{lem:plustimesmonotonic} and}~\ref{lem:plusparts} we
 can use \emph{absolute positiveness}: the property that
 (a) $s \succeq t$ if we can write $s \approx s_1 \oplus \dots \oplus
 s_n$ and $t \approx t_1 \oplus \dots \oplus t_k$ with $k \leq n$ and
 $s_i \succeq t_i$ for all $i \leq k$, and (b) if moreover $s_1 \succ
-t_1$ then $s \succ t$.  This property will be very useful in the
-examples.
+t_1$ then $s \succ t$.  This property \CKchange{is typically very
+useful to dispense the obligations obtained in a termination proof with
+polynomial interpretations.}
 
 \begin{example}\label{ex_fold_final}
 We now have the tools to finish the example of
@@ -1701,7 +1698,7 @@ $\lift_{\sigma \arrtype \tau}(u) \cdot w \arrW^*
   \interpret{h}) \oplus \flatten(\interpret{s}) \oplus \flatten(\interpret{h}) \oplus 1)
 \end{array}
 \]
-Now the right-hand side is the left-hand side $\oplus \lift(1)$.
+Now the right-hand side is the left-hand side $\oplus\ \lift(1)$.
 Clearly, the rule is oriented with $\succ$.  Thus, we may remove the
 last two rules, and continue the rule removal algorithm with only the
 first two, which together define $\beta$-reduction.  This is trivial,
@@ -1721,7 +1718,10 @@ universal-implicational fragment of intuitionistic second-order
 propositional logic, with the types corresponding to formulas and
 terms to natural deduction proofs. The remaining connectives may be
 encoded in~$\mathtt{F}$, but the permutative conversion rules do not
-hold~\cite{Girard1989}. We show termination of the system IPC2
+hold~\cite{Girard1989}.
+
+\CKchange{In this section we show}
+termination of the system IPC2
 (see~\cite{SorensenUrzyczyn2010}) of intuitionistic second-order
 propositional logic with all connectives and permutative conversions,
 minus a few of the permutative conversion rules for the existential
@@ -1732,13 +1732,16 @@ Curry-style~IPC2 without~$\bot$ as primitive was shown
 in~\cite{Tatsuta2007}. To our knowledge, termination of the full
 system~IPC2 remains an open problem, strictly speaking.
 
-In related work, Pol and Schwichtenberg used higher-order polynomial
-interpretations to prove termination of a fragment of intuitionistic
-first-order logic with permutative
-conversions~\cite{PolSchwichtenberg1995}, in the hope of providing a
-more perspicuous proof of this well-known result. Notably, they did not
-treat disjunction. Also, their method cannot handle impredicative
-polymorphism necessary for second-order logic.
+\begin{remark}
+\CKchange{Our method builds on the work of Pol and Schwichtenberg,}
+who have also used higher-order polynomial interpretations to prove
+termination of a fragment of intuitionistic first-order logic with
+permutative conversions~\cite{PolSchwichtenberg1995}, in the hope of
+providing a more perspicuous proof of this well-known result. Notably,
+they did not treat disjunction\CKchange{, as we will do}. Also, their method
+cannot handle impredicative polymorphism necessary for second-order
+logic.
+\end{remark}
 
 The system IPC2 can be seen as a PFS with type constructors:
 \[
@@ -1787,7 +1790,7 @@ We have the following function symbols:
 \end{array}
 \]
 
-And 28 reduction rules, including the following (the full set of rules is in the appendix):
+And 28 reduction rules, including the following (the full set of rules is in \CKchange{Appendix \ref{app_ineqs}}):
 \[
 \begin{array}{rclrcl}
 @_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] &
@@ -1805,30 +1808,34 @@ And 28 reduction rules, including the following (the full set of rules is in the
 \proj^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & t \\
 \end{array}
 \]
-\[
-\begin{array}{rclrcl}
-\epsilon_\tau(\epsilon_\bot(s)) & \red & \epsilon_\tau(s) &
-@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) & \red &
-  \epsilon_\tau(s) \\
-
-\proj^1_{\sigma,\tau}(\epsilon_{\mathtt{and}\,\sigma\,\tau}(s)) & \red &
-  \epsilon_\sigma(s) &
-\mathtt{tapp}_{\varphi,\tau}(
-  \epsilon_{\quant{\alpha}{\varphi\alpha}}(s)) & \red &
-  \epsilon_{\varphi\tau}(s) \\
-
-\proj^2_{\sigma,\tau}(\epsilon_{\mathtt{and}\,\sigma\,\tau}(s)) & \red &
-  \epsilon_\tau(s) &
-\mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}\,\sigma\,\tau}(
-  u),\abs{x}{s},\abs{y}{t}) & \red & \epsilon_\rho(u) \\
-
-& & & 
-\mathtt{let}_{\varphi,\rho}(\epsilon_{\exists(\varphi)}(s),\tabs{\alpha}{\abs{x}{t}}) & \red &
-  \epsilon_\rho(s) \\
-\end{array}
-\]
+%\[
+%\begin{array}{rclrcl}
+%\epsilon_\tau(\epsilon_\bot(s)) & \red & \epsilon_\tau(s) &
+%@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) & \red &
+%  \epsilon_\tau(s) \\
+%
+%\proj^1_{\sigma,\tau}(\epsilon_{\mathtt{and}\,\sigma\,\tau}(s)) & \red &
+%  \epsilon_\sigma(s) &
+%\mathtt{tapp}_{\varphi,\tau}(
+%  \epsilon_{\quant{\alpha}{\varphi\alpha}}(s)) & \red &
+%  \epsilon_{\varphi\tau}(s) \\
+%
+%\proj^2_{\sigma,\tau}(\epsilon_{\mathtt{and}\,\sigma\,\tau}(s)) & \red &
+%  \epsilon_\tau(s) &
+%\mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}\,\sigma\,\tau}(
+%  u),\abs{x}{s},\abs{y}{t}) & \red & \epsilon_\rho(u) \\
+%
+%& & & 
+%\mathtt{let}_{\varphi,\rho}(\epsilon_{\exists(\varphi)}(s),\tabs{\alpha}{\abs{x}{t}}) & \red &
+%  \epsilon_\rho(s) \\
+%\end{array}
+%\]
 \[
 \begin{array}{l}
+\CKchange{@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) \red
+  \epsilon_\tau(s)} \\
+\CKchange{\mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}\,\sigma\,\tau}(
+  u),\abs{x}{s},\abs{y}{t}) \red \epsilon_\rho(u)} \\
 \epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,\abs{x}{s},
   \abs{y}{t})) \red
   \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x}{\epsilon_\rho(s)},
@@ -1855,7 +1862,8 @@ And 28 reduction rules, including the following (the full set of rules is in the
 \end{array}
 \]
 
-To define an intepretation for~IPC2, we need the standard encoding of
+To define an intepretation for~IPC2, we \CKchange{will use the}
+standard encoding of
 product and existential types (see~\cite[Chapter~11]{Girard1989} for
 more details).
   \[
@@ -1937,6 +1945,10 @@ by the interpretation:
 \end{array}
 \]
 
+\CKchange{The derivations to orient rules with these
+\pagebreak
+interpretations are also given in Appendix \ref{app_ineqs}.}
+
 The only rules that are not oriented with this interpretation -- also
 not using $\succeq$ -- are the ones of the form
 $f(\mathtt{let}(s,t), \dots) \red \mathtt{let}(s,f(t,\dots))$, like
@@ -1945,11 +1957,8 @@ step toward an extensible methodology of termination proofs for IPC2
 and similar systems of higher-order logic. Verifying the orientations
 is still tedious, but our method raises hope for at least partial
 automation in the future, as was done with polynomial interpretations
-for non-polymorphic (\LC{Cynthia: shallowly polymorphic?})
-higher-order rewriting. \LC{Cynthia: reference}
-
-The full set of rules and the proof that they are oriented is
-available in Appendix \ref{app_ineqs}.
+for non-polymorphic (\LC{Cynthia: shallowly polymorphic?}\CK{No.})
+higher-order rewriting~\cite{FuhsKop2012}.
 
 \section{Conclusions and future work}
 
@@ -1959,11 +1968,14 @@ polymorphism.
 \CK{Probably write a few more sentences here explaining why what we did
 is totally awesome.}
 
-Readers may note that the method is currently not that easy to apply on
-larger systems: simplifying polynomials can be a lot of work,
-especially when interpretations multiply two variables (such as
-$\Termmap(\mathtt{case})$ in Section \ref{sec:examples}), and checking
-the proofs is tedious.  Hence, a natural direction for future work is
+\CKchange{As the method is not that easy to apply manually for larger
+systems,}
+%Readers may note that the method is currently not that easy to apply on
+%larger systems: simplifying polynomials can be a lot of work,
+%especially when interpretations multiply two variables (such as
+%$\Termmap(\mathtt{case})$ in Section \ref{sec:examples}), and checking
+%the proofs is tedious.  Hence,
+a natural direction for future work is
 to look into automation: both for automatic verification that a given
 interpretation suffices and -- building on existing termination provers
 for both first- and higher-order term rewriting -- automatically finding
@@ -1971,9 +1983,12 @@ a suitable interpretation.
 
 In addition, it would be worth exploring improvements of the method that
 would allow us to handle the remaining rules of IPC2, or extending
-other techniques for higher-order termination. %like dependency pairs.
-%CK: problem: everything I want to say will require an additional
-%citation, which we may not have space for!
+other techniques for higher-order termination such as path orderings
+(see, e.g., \cite{jou:rub:99}) or dependency pairs (e.g.,
+\cite[Chapter 6,7]{Kop2012}).
+\CK{If space happens to permit, we can replace the pointer to my thesis by
+cite\{kop:raa:12,suz:kus:bla:11\}, but this does require 4 extra lines
+of references.}
 
 \addcontentsline{toc}{section}{References}
 \bibliography{references}
