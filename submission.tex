@@ -138,13 +138,6 @@
   enables a direct interpretation of rewrite rules which make
   essential use of impredicative polymorphism.  In addition, our
   generalisation eases the applicability of the method in the
-  %CK "allowing for encoding of" sounds weird. Changing this, but
-  %feel free to reformulate.
-  %% LC: I think ``the'' is correct. According to grammarly.com,
-  %% ``encoding'' is uncountable in normal usage, so ``an'' doesn't
-  %% work. Though I guess that in this specialised context it could be
-  %% considered countable. In any case, ``the'' seems like a safe
-  %% choice.
   non-polymorphic setting by allowing for the encoding of inductive data
   types. As an illustration of the potential of our method, we prove
   termination of a substantial fragment of full intuitionistic
@@ -504,7 +497,7 @@ monotonic closure generates the rewrite relation.
   then $(\delta(\ell),\delta(r)) \in \Rules$ for any
   replacement~$\delta$.  The reduction relation $\arr{\Rules}$ is
   defined by:
-  
+
 \begin{center}
   $t \arr{\Rules}
   s$ iff $t = C[\ell]$ and $s = C[r]$ for some $(\ell,r)\in\Rules$ and
@@ -1380,7 +1373,7 @@ $
   \Termmap(\mathtt{nil}) & = & & \Lambda \beta.\lambda f.\abs{x}{x} \\
   \Termmap(\mathtt{cons}) & = & \Lambda \alpha.\lambda h.\lambda t. &
     \Lambda \beta.\lambda f.\lambda x.
-    t \beta f (f \alpha x h \oplus \lift_\beta(\flatten_\beta(x)\ 
+    t \beta f (f \alpha x h \oplus \lift_\beta(\flatten_\beta(x)\
     \oplus \\
     & & & \phantom{ABCDEFGHIJKLMNOP,} \flatten_\alpha(h)))\ \oplus\  \\
     & & & \phantom{ABCDE\ }
@@ -1503,7 +1496,7 @@ that both $\succ$ and $\succeq$ are monotonic over $\lift$ and $\flatten$
 interpretations respect substitution
 (Lem.~\ref{lem:substitutioninterpret}). We will also use
 Lemma \ref{lem:plustimesmonotonic} which states (among other things)
-that $s \succ t$ implies that $s \oplus u \succ t \oplus u$.
+that $s \succ t$ implies $s \oplus u \succ t \oplus u$.
 In addition, we can use the
 calculation rules below. The proofs may be found in
 Appendix~\ref{app_proofs}.
@@ -1603,7 +1596,7 @@ For the last rule note that:
  \flatten(\interpret{s}) \oplus 1) \approx \\
 \interpret{t} * \typeinterpret{\sigma} \cdot \interpret{f} \cdot
 (\ \interpret{f} * \typeinterpret{\tau} \cdot \interpret{s}
-\cdot \interpret{h} \oplus 
+\cdot \interpret{h} \oplus
 \lift_{\typeinterpret{\sigma}}(\flatten(\interpret{s}) \oplus
 \flatten(\interpret{h}))\ )\ \oplus \\
 \phantom{A}
@@ -1622,7 +1615,7 @@ $\lift_{\sigma \arrtype \tau}(u) \cdot w \arrW^*
     \arrtype\sigma}(
       \mathtt{A}_{\abs{\alpha}{\sigma\arrtype\alpha\arrtype\sigma},
       \tau}(f),s),h),t)} \approx \\
-\Termmap(\mathtt{foldl})_\sigma(\interpret{f},\ 
+\Termmap(\mathtt{foldl})_\sigma(\interpret{f},\
   \interpret{f} * \typeinterpret{\tau} \cdot \interpret{s} \cdot
   \interpret{h} \oplus \lift_{\typeinterpret{\sigma}}(\flatten(\interpret{s})
   \oplus \flatten(\interpret{h})),\ \interpret{t}) \approx \\
@@ -1682,12 +1675,12 @@ in~\cite{Tatsuta2007}. To our knowledge, termination of the full
 system~IPC2 remains an open problem, strictly speaking.
 
 \begin{remark}
-Our method builds on the work of Pol and Schwichtenberg,
-who used higher-order polynomial interpretations to prove
-termination of a fragment of intuitionistic first-order logic with
-permutative conversions~\cite{PolSchwichtenberg1995}, in the hope of
-providing a more perspicuous proof of this well-known result. Notably,
-they did not treat disjunction, as we will do. \LCchange{More fundamentally}, their method
+Our method builds on the work of Pol and Schwichtenberg, who used
+higher-order polynomial interpretations to prove termination of a
+fragment of intuitionistic first-order logic with permutative
+conversions~\cite{PolSchwichtenberg1995}, in the hope of providing a
+more perspicuous proof of this well-known result. Notably, they did
+not treat disjunction, as we will do. More fundamentally, their method
 cannot handle impredicative polymorphism necessary for second-order
 logic.
 \end{remark}
@@ -1757,28 +1750,6 @@ And 28 reduction rules, including the following (the full set of rules is in App
 \proj^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & t \\
 \end{array}
 \]
-%\[
-%\begin{array}{rclrcl}
-%\epsilon_\tau(\epsilon_\bot(s)) & \red & \epsilon_\tau(s) &
-%@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) & \red &
-%  \epsilon_\tau(s) \\
-%
-%\proj^1_{\sigma,\tau}(\epsilon_{\mathtt{and}\,\sigma\,\tau}(s)) & \red &
-%  \epsilon_\sigma(s) &
-%\mathtt{tapp}_{\varphi,\tau}(
-%  \epsilon_{\quant{\alpha}{\varphi\alpha}}(s)) & \red &
-%  \epsilon_{\varphi\tau}(s) \\
-%
-%\proj^2_{\sigma,\tau}(\epsilon_{\mathtt{and}\,\sigma\,\tau}(s)) & \red &
-%  \epsilon_\tau(s) &
-%\mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}\,\sigma\,\tau}(
-%  u),\abs{x}{s},\abs{y}{t}) & \red & \epsilon_\rho(u) \\
-%
-%& & & 
-%\mathtt{let}_{\varphi,\rho}(\epsilon_{\exists(\varphi)}(s),\tabs{\alpha}{\abs{x}{t}}) & \red &
-%  \epsilon_\rho(s) \\
-%\end{array}
-%\]
 \[
 \begin{array}{l}
 @_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) \red
@@ -1829,7 +1800,7 @@ more details).
   \]
 
 Now, most of the rules can be oriented strictly (so using $\succinterpret$)
-by the \LCchange{safe} interpretation:
+by the safe interpretation:
 \[
 \begin{array}{rclcrcl}
 \Typemap(\bot) & = & \nat
@@ -1910,27 +1881,23 @@ non-polymorphic higher-order rewriting~\cite{FuhsKop2012}.
 
 \section{Conclusions and future work}
 
-In this paper, we have laid the foundation for a powerful methodology
-to prove termination of higher-order rewriting with full impredicative
-polymorphism.
-\CK{Probably write a few more sentences here explaining why what we did
-is totally awesome.}
+We introduced a powerful and systematic methodology to prove
+termination of higher-order rewriting with full impredicative
+polymorphism. To use the method one just needs to invent safe
+interpretations and verify the orientation of the rules with the
+calculation rules.
 
-As the method is not that easy to apply manually for larger
-systems, a natural direction for future work is
-to look into automation: both for automatic verification that a given
-interpretation suffices and -- building on existing termination provers
-for both first- and higher-order term rewriting -- automatically finding
-a suitable interpretation.
+As the method is tedious to apply manually for larger systems, a
+natural direction for future work is to look into automation: both for
+automatic verification that a given interpretation suffices and --
+building on existing termination provers for first- and higher-order
+term rewriting -- for automatically finding a suitable interpretation.
 
-In addition, it would be worth exploring improvements of the method that
-would allow us to handle the remaining rules of IPC2, or extending
-other techniques for higher-order termination such as path orderings
-(see, e.g., \cite{jou:rub:99}) or dependency pairs (e.g.,
-\cite[Chapter 6,7]{Kop2012}).
-\CK{If space happens to permit, we can replace the pointer to my thesis by
-cite\{kop:raa:12,suz:kus:bla:11\}, but this does require 4 extra lines
-of references.}
+In addition, it would be worth exploring improvements of the method
+that would allow us to handle the remaining rules of IPC2, or
+extending other techniques for higher-order termination such as path
+orderings (see, e.g., \cite{jou:rub:99}) or dependency pairs
+(e.g.,~\cite{kop:raa:12,suz:kus:bla:11}).
 
 \addcontentsline{toc}{section}{References}
 \bibliography{references}
@@ -3342,7 +3309,7 @@ have:
 %CK: Let's start this on a new page. This is going to be a lot of
 %paying attention how page endings work, and I don't want to block any
 %future changes to Appendix A!
-\newpage
+\clearpage
 \section{Proving the inequalities in \refsec{examples}}\label{app_ineqs}
 
 The system IPC2 can be seen as a PFS with the following type constructors:
@@ -3488,7 +3455,7 @@ And the same happens for the $\mathtt{let}$:
   @_{\tau,\rho}(t,u)}}) \\
 \mathtt{tapp}_{\psi,\rho}(\mathtt{let}_{\varphi,
   \forall\beta[\psi\beta]}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{t}}))
-  \red 
+  \red
   \mathtt{let}_{\varphi,\psi\rho}(s,\tabs{\alpha}{\abs{x:\varphi\alpha}{
   \mathtt{tapp}_{\psi,\rho}(t)}}) \\
 \proj^1_{\tau,\rho}(\mathtt{let}_{\varphi,
@@ -3538,7 +3505,7 @@ contradiction simplifications are all quite easy due to the choice of
 $\Termmap$:
 \begin{itemize}
 \item $\interpret{@_{\sigma,\tau}(\abs{x}{s},t)} \succ
-  \interpret{s[x:=t]}$ \\ We have 
+  \interpret{s[x:=t]}$ \\ We have
   $\interpret{@_{\sigma,\tau}(\abs{x:\sigma}{s},t)} \arrrbeta
   \lift_{\typeinterpret{\tau}}(2) \otimes
   (\ (\abs{x:\typeinterpret{\sigma}}{\interpret{s}}) \cdot
@@ -3552,7 +3519,7 @@ $\Termmap$:
 %  Since, by Lemma \ref{lem_succ_red} $\leadsto \cdot \succ$ is
 %  contained in $\succ$ ,we have the required orientation of the rule.
 \item $\interpret{\mathtt{tapp}_{\abs{\alpha}{\sigma},\tau}(
-  \tabs{\alpha}{s})} \succ \interpret{s[\alpha:=\tau]}$ \\ We have 
+  \tabs{\alpha}{s})} \succ \interpret{s[\alpha:=\tau]}$ \\ We have
   $\interpret{\mathtt{tapp}_{\lambda \alpha.\sigma,\tau}(
   \tabs{\alpha}{s})} \arrrbeta \lift_{(\abs{\alpha}{
   \typeinterpret{\sigma}})\interpret{\tau}}(2) \otimes (
@@ -3564,20 +3531,20 @@ $\Termmap$:
   \interpret{s[\alpha:=\tau]}$, using Lemma
   \ref{lem:substitutioninterpret}.
 \item $\interpret{\proj^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t))}
-  \succ \interpret{s}$ \\ We have 
+  \succ \interpret{s}$ \\ We have
   $\interpret{\mathtt{pair}_{\sigma,\tau}(s,t)} \arrrbeta
   \pair{\interpret{s}}{\interpret{t}} \oplus \lift_{\typeinterpret{
   \sigma} \times \typeinterpret{\tau}}(\flatten_{\typeinterpret{
   \sigma}}(\interpret{s}) \oplus \flatten_{\typeinterpret{\tau}}(
   \interpret{t}))$ and therefore
   $\interpret{\proj^1_{\alpha,\beta}(\mathtt{pair}_{\alpha,\beta}(s,t))}
-  \arrrbeta \lift_{\typeinterpret{\sigma}}(2) \otimes 
+  \arrrbeta \lift_{\typeinterpret{\sigma}}(2) \otimes
   \pi^1(\pair{\interpret{s}}{\interpret{t}} \oplus \langle
   \text{something}\rangle) \oplus \lift_{\typeinterpret{\sigma}}(1)
   \succeq \pi^1(\pair{\interpret{s}}{\interpret{t}}) \oplus
   \lift_{\typeinterpret{\sigma}}(1)$,
   which $\succ \interpret{s}$ by Lemma \ref{lem:encodings_reduce}.
-\item $\interpret{\pi^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t))}
+\item $\interpret{\proj^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t))}
   \succ \interpret{t}$ \\ Analogous to the inequality above.
 \item $\interpret{\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{
   \sigma,\tau}(u),\abs{x}{s},\abs{y}{t})} \succ \interpret{s[x:=u]}$ \\
@@ -3593,7 +3560,7 @@ $\Termmap$:
   $\interpret{\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{
   \sigma,\tau}(u),\abs{x}{s},\abs{y}{t})} = \lift_{\typeinterpret{
   \rho}}(2) \oplus \lift_{\typeinterpret{\rho}}(3 \otimes B) \oplus
-  \lift_{\typeinterpret{\rho}}(B \oplus 1) \otimes (\ 
+  \lift_{\typeinterpret{\rho}}(B \oplus 1) \otimes (\
   \interpret{\abs{x}{s}} \cdot \pi^1(\pair{\interpret{u}}{
   \lift_{\typeinterpret{\tau}}(1)} \oplus A) \oplus C\ )$.
   By splitting additive terms, distribution, neutrality of 1 and
@@ -3651,7 +3618,7 @@ $\Termmap$:
   t)} \succ \interpret{\epsilon_\tau(s)}$. \\
   We have
   $\interpret{@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t)}
-  = \lift_{\typeinterpret{\tau}}(2) \otimes (\ 
+  = \lift_{\typeinterpret{\tau}}(2) \otimes (\
   \lift_{\typeinterpret{\sigma} \arrtype \typeinterpret{\tau}}(
   2 \otimes \interpret{s} \oplus 1) \cdot \interpret{t}\ )\ \oplus \\
   \lift_{\typeinterpret{\tau}}(\langle\text{something}\rangle \oplus
@@ -3664,7 +3631,7 @@ $\Termmap$:
   \interpret{\epsilon_{\varphi\tau}(s)}$ \\
   We have $\interpret{\mathtt{tapp}_{\varphi,\tau}(
   \epsilon_{\quant{\alpha}{\varphi\alpha}}(s))} =
-  \lift_{\typeinterpret{\varphi}\typeinterpret{\tau}}(2) \otimes (\ 
+  \lift_{\typeinterpret{\varphi}\typeinterpret{\tau}}(2) \otimes (\
   \lift_{\quant{\alpha}{\typeinterpret{\varphi}\alpha}}(2 \otimes
   \interpret{s} \oplus 1) * \typeinterpret{\tau}\ ) \oplus \lift_{
   \typeinterpret{\varphi}\typeinterpret{\tau}}(1) \succ
@@ -3742,9 +3709,9 @@ $\Termmap$:
 \end{itemize}
 
 Unfortunately, the rules where $\mathtt{case}$ is shifted to the root
-are rather more complicated, largely due to the variable multiplication
-in $\Termmap(\mathtt{case})$ -- which we had to choose because these
-rule may duplicate variables.
+are rather more complicated, largely due to the variable
+multiplication in $\Termmap(\mathtt{case})$ -- which we had to choose
+because these rules may duplicate variables.
 
 \begin{itemize}
 \item $\interpret{\epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,
@@ -3763,7 +3730,7 @@ rule may duplicate variables.
     \typeinterpret{\tau}}(\interpret{u})\ \oplus \\
   \phantom{ABCDEFG,}
   (\flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
-    \interpret{u}) \oplus 1) \otimes (\ 
+    \interpret{u}) \oplus 1) \otimes (\
       \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
       \interpret{t}[y:=\pi^2(\interpret{u})]\ )
   )\ \oplus \\
@@ -3775,7 +3742,7 @@ rule may duplicate variables.
     \typeinterpret{\tau}}(\interpret{u})\ \oplus \\
     \phantom{ABCDe}
   (2 \otimes \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
-    \interpret{u}) \oplus 2) \otimes (\ 
+    \interpret{u}) \oplus 2) \otimes (\
       \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
       \interpret{t}[y:=\pi^2(\interpret{u})]\ )) \approx \\
   \lift_{\typeinterpret{\rho}}(5)\ \oplus \\
@@ -3784,7 +3751,7 @@ rule may duplicate variables.
       \flatten_{\typeinterpret{\sigma} \times
       \typeinterpret{\tau}}(\interpret{u}))\ \oplus \\
   \phantom{A}
-    \lift_{\typeinterpret{\rho}}(\ 
+    \lift_{\typeinterpret{\rho}}(\
       (\ 2 \otimes \flatten_{\typeinterpret{\sigma} \times
       \typeinterpret{\tau}}(\interpret{u}) \oplus 2\ ) \otimes
       (\ \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
@@ -3835,7 +3802,7 @@ rule may duplicate variables.
     \interpret{t}[y:=\pi^2(\interpret{u})]\ )\ \oplus \\
   \phantom{A}
   \lift_{\typeinterpret{\rho}}((\ \flatten_{\typeinterpret{\sigma} \times
-    \typeinterpret{\tau}}(\interpret{u}) \oplus 1\ ) \otimes 
+    \typeinterpret{\tau}}(\interpret{u}) \oplus 1\ ) \otimes
     (\ 1 \oplus 1\ )\ ) \approx \\
   \end{array}
   \]
@@ -3892,7 +3859,7 @@ rule may duplicate variables.
     \phantom{ABC}
     ) \cdot \interpret{v} \\
     \phantom{A} ) \oplus \lift_{\typeinterpret{\pi}}(\\
-    \phantom{ABC}\flatten_{\typeinterpret{\sigma}}(\interpret{v})\ 
+    \phantom{ABC}\flatten_{\typeinterpret{\sigma}}(\interpret{v})\
       \oplus \\
     \phantom{ABC}\flatten_{\typeinterpret{\sigma} \arrtype
       \typeinterpret{\tau}}( \\
@@ -3934,11 +3901,11 @@ rule may duplicate variables.
     \phantom{ABC}
     )\\
     \phantom{A} ) \oplus \lift_{\typeinterpret{\pi}}(\\
-    \phantom{ABC}\flatten_{\typeinterpret{\sigma}}(\interpret{v})\ 
+    \phantom{ABC}\flatten_{\typeinterpret{\sigma}}(\interpret{v})\
       \oplus \\
     \phantom{ABC}(\ 2 \oplus 3 \otimes \flatten_{\typeinterpret{\sigma}
       \times \typeinterpret{\tau}}(\interpret{u})\ \oplus \\
-    \phantom{ABCD}(\ 
+    \phantom{ABCD}(\
     \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
     \interpret{u}) \oplus 1\ ) \otimes
       \flatten_{\typeinterpret{\sigma} \arrtype
@@ -3959,12 +3926,12 @@ rule may duplicate variables.
     \flatten_{\typeinterpret{\sigma} \times \typeinterpret{\tau}}(
     \interpret{u})) \otimes
     (\interpret{s}[x:=\pi^1(\interpret{u})] \cdot \interpret{v} \oplus
-     \interpret{t}[y:=\pi^2(\interpret{u})] \cdot \interpret{v})\ 
+     \interpret{t}[y:=\pi^2(\interpret{u})] \cdot \interpret{v})\
      \oplus \\
   \phantom{A}
   \lift_{\typeinterpret{\pi}}(2) \otimes
     (\interpret{s}[x:=\pi^1(\interpret{u})] \cdot \interpret{v} \oplus
-     \interpret{t}[y:=\pi^2(\interpret{u})] \cdot \interpret{v})\ 
+     \interpret{t}[y:=\pi^2(\interpret{u})] \cdot \interpret{v})\
      \oplus \\
   \phantom{A}
   \lift_{\typeinterpret{\pi}}(\flatten_{\typeinterpret{
@@ -4036,7 +4003,7 @@ rule may duplicate variables.
     \interpret{s}[x:=\pi^1(\interpret{u})] \cdot \interpret{v}\ \oplus \\
   \phantom{A}
   \lift_{\typeinterpret{\pi}}(2) \otimes
-     \interpret{t}[y:=\pi^2(\interpret{u})] \cdot \interpret{v}\ 
+     \interpret{t}[y:=\pi^2(\interpret{u})] \cdot \interpret{v}\
      \oplus \\
   \phantom{A}
   \lift_{\typeinterpret{\pi}}(2 \otimes
@@ -4092,7 +4059,7 @@ rule may duplicate variables.
     \flatten_{\typeinterpret{\rho}}(\interpret{v})\ \oplus \\
   \phantom{ABCDEF} \flatten_{\typeinterpret{\rho} \arrtype
     \typeinterpret{\pi}}(\interpret{t}) \otimes
-    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \oplus 
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \oplus
     1)}) \cdot \pi^2(\interpret{u}) \\
   \phantom{ABC}) \approx \\
   %
@@ -4119,7 +4086,7 @@ rule may duplicate variables.
     \flatten_{\typeinterpret{\rho}}(\interpret{v})\ \oplus \\
   \phantom{ABCDEF} \flatten_{\typeinterpret{\rho} \arrtype
     \typeinterpret{\pi}}(\interpret{t}[y:=\pi^2(\interpret{u})]) \otimes
-    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \oplus 
+    \flatten_{\typeinterpret{\rho}}(\interpret{v}) \oplus
     1) \\
   \phantom{ABC}) \approx \\
   %
@@ -4153,7 +4120,7 @@ rule may duplicate variables.
   \lift_{\typeinterpret{\pi}}(
     \flatten_{\typeinterpret{\rho}}(\interpret{v}) \otimes
     \flatten_{\typeinterpret{\rho} \arrtype
-    \typeinterpret{\pi}}(\interpret{t}[y:=\pi^2(\interpret{u})]))\ 
+    \typeinterpret{\pi}}(\interpret{t}[y:=\pi^2(\interpret{u})]))\
     \oplus\\
   \phantom{ABCD}
   \lift_{\typeinterpret{\pi}}(1) \\
@@ -4273,7 +4240,7 @@ rule may duplicate variables.
   \lift_{\typeinterpret{\pi}}(
     \flatten_{\typeinterpret{\rho}}(\interpret{v}) \otimes
     \flatten_{\typeinterpret{\rho} \arrtype
-    \typeinterpret{\pi}}(\interpret{t}[y:=\pi^2(\interpret{u})]))\ 
+    \typeinterpret{\pi}}(\interpret{t}[y:=\pi^2(\interpret{u})]))\
     \oplus \\
   \phantom{A}
   \lift_{\typeinterpret{\pi}}(\flatten_{\typeinterpret{\sigma} \times
@@ -4400,7 +4367,7 @@ rule may duplicate variables.
   \phantom{A}
   \lift_{\typeinterpret{\varphi\pi}}(\flatten_{\typeinterpret{\sigma}
     \times \typeinterpret{\tau}}(\interpret{u}) \oplus 1)\ \otimes \\
-  \phantom{ABC}(\ 
+  \phantom{ABC}(\
     \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
     (\typeinterpret{s}[x:=\pi^1(\interpret{u})]
       * \typeinterpret{\pi}) \oplus
@@ -4420,7 +4387,7 @@ rule may duplicate variables.
   \phantom{A}
   \lift_{\typeinterpret{\varphi\pi}}(\flatten_{\typeinterpret{\sigma}
     \times \typeinterpret{\tau}}(\interpret{u}) \oplus 1)\ \otimes \\
-  \phantom{ABC}(\ 
+  \phantom{ABC}(\
     \lift_{\typeinterpret{\varphi\pi}}(2) \otimes
     (\typeinterpret{s}[x:=\pi^1(\interpret{u})]
       * \typeinterpret{\pi})\ \oplus \\
@@ -4658,7 +4625,7 @@ rule may duplicate variables.
   \[
   \begin{array}{l}
   \phantom{ABC}
-    \interpret{s}[x:=\pi^1(\interpret{u})] \oplus 
+    \interpret{s}[x:=\pi^1(\interpret{u})] \oplus
     \interpret{t}[y:=\pi^2(\interpret{u})]\ \oplus \\
   \phantom{ABC}
     \lift_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(
@@ -4728,12 +4695,12 @@ rule may duplicate variables.
   \phantom{A}
     \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
     \times \typeinterpret{\tau}}(\interpret{u}) \otimes
-    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(su))\ 
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(su))\
     \oplus \\
   \phantom{A}
     \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
     \times \typeinterpret{\tau}}(\interpret{u}) \otimes
-    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))\ 
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))\
     \oplus \\
   \phantom{A}
     \interpret{v}[z:=\pi^1(A)] \oplus
@@ -4827,12 +4794,12 @@ rule may duplicate variables.
   \phantom{A}
     \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
     \times \typeinterpret{\tau}}(\interpret{u}) \otimes
-    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(su))\ 
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(su))\
     \oplus \\
   \phantom{A}
     \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{\typeinterpret{\sigma}
     \times \typeinterpret{\tau}}(\interpret{u}) \otimes
-    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))\ 
+    \flatten_{\typeinterpret{\rho} \times \typeinterpret{\pi}}(tu))\
     \oplus \\
   \phantom{A}
     \lift_{\typeinterpret{\xi}}(3) \otimes \interpret{v}[z:=\pi^1(A)]
@@ -4915,7 +4882,7 @@ rule may duplicate variables.
   \mathcal{J}(\mathtt{case})_{\sigma,\tau,\xi}(\interpret{u},\abs{x}{
     \lift_{\typeinterpret{\xi}}(2) \oplus
       \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{
-      \typeinterpret{\rho} \times \typeinterpret{\pi}}(\interpret{s}))\ 
+      \typeinterpret{\rho} \times \typeinterpret{\pi}}(\interpret{s}))\
       \oplus \\
     \phantom{ABCDEFGHIJKL}
       \interpret{v}[z:=\pi^1(\interpret{s})] \oplus
@@ -4923,7 +4890,7 @@ rule may duplicate variables.
     \phantom{ABCDEFGHIJKL}
       \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
       \typeinterpret{\pi}}(\interpret{s}))
-      \otimes \interpret{v}[z:=\pi^1(\interpret{s})]\ 
+      \otimes \interpret{v}[z:=\pi^1(\interpret{s})]\
       \oplus \\
     \phantom{ABCDEFGHIJKL}
       \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
@@ -4933,7 +4900,7 @@ rule may duplicate variables.
     \phantom{ABCDEFGHIJ}\abs{y}{
     \lift_{\typeinterpret{\xi}}(2) \oplus
       \lift_{\typeinterpret{\xi}}(3 \otimes \flatten_{
-      \typeinterpret{\rho} \times \typeinterpret{\pi}}(\interpret{t}))\ 
+      \typeinterpret{\rho} \times \typeinterpret{\pi}}(\interpret{t}))\
       \oplus \\
     \phantom{ABCDEFGHIJKL}
       \interpret{v}[z:=\pi^1(\interpret{t})] \oplus
@@ -4941,7 +4908,7 @@ rule may duplicate variables.
     \phantom{ABCDEFGHIJKL}
       \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
       \typeinterpret{\pi}}(\interpret{t}))
-      \otimes \interpret{v}[z:=\pi^1(\interpret{t})]\ 
+      \otimes \interpret{v}[z:=\pi^1(\interpret{t})]\
       \oplus \\
     \phantom{ABCDEFGHIJKL}
       \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
@@ -4962,7 +4929,7 @@ rule may duplicate variables.
     \phantom{ABC}
       \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
       \typeinterpret{\pi}}(q))
-      \otimes \interpret{v}[z:=\pi^1(q)]\ 
+      \otimes \interpret{v}[z:=\pi^1(q)]\
       \oplus \\
     \phantom{ABC}
       \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
@@ -5025,7 +4992,7 @@ rule may duplicate variables.
     \interpret{w}[a:=\pi^2(su)]\ \oplus \\
   \phantom{A}
     \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
-    \typeinterpret{\pi}}(su)) \otimes \interpret{v}[z:=\pi^1(su)]\ 
+    \typeinterpret{\pi}}(su)) \otimes \interpret{v}[z:=\pi^1(su)]\
     \oplus \\
   \phantom{A}
     \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
@@ -5045,7 +5012,7 @@ rule may duplicate variables.
     \interpret{w}[a:=\pi^2(tu)]\ \oplus \\
   \phantom{A}
     \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho} \times
-    \typeinterpret{\pi}}(tu)) \otimes \interpret{v}[z:=\pi^1(tu)]\ 
+    \typeinterpret{\pi}}(tu)) \otimes \interpret{v}[z:=\pi^1(tu)]\
     \oplus \\
   \phantom{A}
     \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\rho}
@@ -5072,7 +5039,7 @@ rule may duplicate variables.
     \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
     \times \typeinterpret{\tau}}(\interpret{u}) \otimes
     \flatten_{\typeinterpret{\rho} \times
-    \typeinterpret{\pi}}(su)) \otimes \interpret{v}[z:=\pi^1(su)]\ 
+    \typeinterpret{\pi}}(su)) \otimes \interpret{v}[z:=\pi^1(su)]\
     \oplus \\
   \phantom{A}
     \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
@@ -5101,7 +5068,7 @@ rule may duplicate variables.
     \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
     \times \typeinterpret{\tau}}(\interpret{u}) \otimes
     \flatten_{\typeinterpret{\rho} \times
-    \typeinterpret{\pi}}(tu)) \otimes \interpret{v}[z:=\pi^1(tu)]\ 
+    \typeinterpret{\pi}}(tu)) \otimes \interpret{v}[z:=\pi^1(tu)]\
     \oplus \\
   \phantom{A}
     \lift_{\typeinterpret{\xi}}(\flatten_{\typeinterpret{\sigma}
@@ -5505,7 +5472,7 @@ rule may duplicate variables.
   \abs{x:\sigma}{\mathtt{let}_{\varphi,\rho}(s,v)},
   \abs{y:\tau}{\mathtt{let}_{\varphi,\rho}(t,v)})}$ \\
 
-  In the following, let us denote $v_N := 
+  In the following, let us denote $v_N :=
   \interpret{v} * \nat \cdot \lift_{\typeinterpret{\varphi}\nat}(0)$
   and $u_f := \flatten_{\typeinterpret{\sigma} \times \typeinterpret{
   \tau}}(\interpret{u})$.  With these abbreviations, we have the
@@ -5532,7 +5499,7 @@ rule may duplicate variables.
   \lift_{\interpret{\rho}}(2)\ \otimes \\
   \phantom{A}
   (\ \lift_{\Sigma\gamma.\typeinterpret{\varphi}\gamma}(2) \oplus
-    \lift_{\Sigma\gamma.\typeinterpret{\varphi}\gamma}(3 \otimes u_f)\ 
+    \lift_{\Sigma\gamma.\typeinterpret{\varphi}\gamma}(3 \otimes u_f)\
     \oplus \\
   \phantom{AB}
      \lift_{\Sigma\gamma.\typeinterpret{\varphi}\gamma}(u_n \oplus 1)
@@ -5571,7 +5538,7 @@ rule may duplicate variables.
     (\tabs{\alpha}{\abs{z}{\interpret{v} * \alpha \cdot z}})\ ) \\
   \phantom{A})\ \oplus \\
   \end{array}\]\[\begin{array}{l}
-  \phantom{A}(\ 
+  \phantom{A}(\
   \lift_{\typeinterpret{\rho}}(2) \oplus
     \lift_{\typeinterpret{\rho}}(3 \otimes u_f) \oplus
   \lift_{\typeinterpret{\rho}}(u_f \oplus 1)\ \otimes \\
@@ -5769,7 +5736,7 @@ rule may duplicate variables.
   \phantom{A}
   \lift_{\typeinterpret{\rho}}(u_f) \otimes v_N \oplus
     \lift_{\typeinterpret{\rho}}(u_f \otimes
-    \flatten(\interpret{s}[x:=\pi^1(\interpret{u})])) \otimes v_N\ 
+    \flatten(\interpret{s}[x:=\pi^1(\interpret{u})])) \otimes v_N\
     \oplus \\
   \phantom{A}
   \lift_{\typeinterpret{\rho}}(u_f) \oplus
@@ -5820,7 +5787,7 @@ rule may duplicate variables.
     \pi^2(\interpret{u})])) \otimes v_N\ \oplus \\
   \phantom{A}
   \lift_{\typeinterpret{\rho}}(u_f \otimes
-    \flatten(\interpret{s}[x:=\pi^1(\interpret{u})])) \otimes v_N\ 
+    \flatten(\interpret{s}[x:=\pi^1(\interpret{u})])) \otimes v_N\
     \oplus \\
   \phantom{A}
   \lift_{\typeinterpret{\rho}}(u_f \otimes\flatten(\interpret{t}[y:=
