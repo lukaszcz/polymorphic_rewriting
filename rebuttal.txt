@@ -1,0 +1,21 @@
+We thank the reviewers for their thorough reading of the article and 
+for their valuable feedback.  We shall apply the reviewers' comments
+to improve the article for the final version.
+
+On the reviewers' main concerns:
+
+R1: TODO
+
+R2: TODO
+
+
+R3 notes that we do not define a dependency pair notion or any automation.
+
+These two points are currently named as lines for future work.  We believe
+that it would not benefit the present work to do too much at once.
+Automation is challenging because it requires the development of several new
+ideas; setting up a dependency pair approach would be a full, mostly separate
+line of research.  (However, it is worth noting that a future definition of
+dependency pairs is likely to benefit greatly from the existence of a
+reduction pair, like the one we define here).
+
