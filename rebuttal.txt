@@ -26,12 +26,12 @@ their type arguments, e.g., a function (\alpha : * . t) cannot check
 if alpha is equal to some other type or inspect it in any way. When an
 extension breaks this property, this often results in
 non-termination. The extension with J tau tau -> \x : tau . x breaks
-parametricity because the rule being non-left-linear it can
+parametricity because the rule, being non-left-linear, can
 effectively compare two arbitrary types, including type
 variables. This cannot be defined in our system; \tau : * . \x : tau
 . lift tau (flatten tau x) seems like such a definition, but it's not
 -- it doesn't work for arbitrary types, only for tau=nat; it gets
-"stuck" on type variables, and is not an identify for
+"stuck" on type variables, and is not an identity for
 tau/=nat. Moreover, the natural numbers cannot be distinguished
 "inside" the system. In other words, we could replace all natural
 number constants with 0 and this wouldn't change the reduction
@@ -80,8 +80,8 @@ Not in general, I don't think so.
 R2 l.435
 
 cons has type forall alpha . alpha -> List -> List, so only the first
-three lambda-abstractions count as arguments, the others are just the
-details of the encoding of lists in our system.
+two non-type lambda-abstractions count as arguments, the others are
+just the details of the encoding of lists in our system.
 
 R2 why not add 2^x to the basic functions
 
