@@ -1,13 +1,94 @@
-We thank the reviewers for their thorough reading of the article and 
+We thank the reviewers for their thorough reading of the article and
 for their valuable feedback.  We shall apply the reviewers' comments
 to improve the article for the final version.
 
 On the reviewers' main concerns:
 
-R1: TODO
+R1 additional references
 
-R2: TODO
+Thank you for making us aware of more related work; we will include
+the references.
 
+R2  why F-omega
+
+In F-omega there are type constructors, which we need to express
+e.g. type application A (l.177) and existentials (let, ext). Having
+type constructors in the system makes the whole presentation more
+uniform with little cost to the complexity of the proofs.
+
+R2 concern about the J tau tau counterexample
+
+The termination proof method for the system in section 4.1 is indeed
+standard, but the question itself is quite subtle, as briefly
+mentioned in lines 230-239. The crucial property of system F-omega is
+parametricity -- that functions behave "uniformly" with respect to
+their type arguments, e.g., a function (\alpha : * . t) cannot check
+if alpha is equal to some other type or inspect it in any way. When an
+extension breaks this property, this often results in
+non-termination. The extension with J tau tau -> \x : tau . x breaks
+parametricity because the rule being non-left-linear it can
+effectively compare two arbitrary types, including type
+variables. This cannot be defined in our system; \tau : * . \x : tau
+. lift tau (flatten tau x) seems like such a definition, but it's not
+-- it doesn't work for arbitrary types, only for tau=nat; it gets
+"stuck" on type variables, and is not an identify for
+tau/=nat. Moreover, the natural numbers cannot be distinguished
+"inside" the system. In other words, we could replace all natural
+number constants with 0 and this wouldn't change the reduction
+behaviour of terms. So for the purposes of termination, the type nat
+is essentially a singleton. This implies that, while we have
+polymorphic functions between an arbitrary type alpha and nat which
+are not constant when seen "from outside" the system, they are
+constant for the purposes of reduction "inside" the system (as they
+would have to be in a parametric system). Intuitively, these
+properties of our system ensure that it stays "close enough" to
+F-omega so that the standard termination proof still generalises.
+
+R1/R2 question about coinduction
+
+A definition by coinduction simply seemed most natural to the
+authors. Lemma 4.9 stating a non-coinductive reformulation of this
+definition was added as an afterthought. The non-coinductive
+reformulation of the proofs is straightforward enough that we could do
+it for the final version of the paper, if the reviewers so
+desire. Only the "easy" proofs of basic properties of > use
+coinduction, later the details of the definition don't matter, only
+that the lemmas hold. One advantage of coinduction in this setting,
+and this ties in with the question about formalisation, is that the
+current definition is more precise in a sense. The coinductive proofs
+could be typed into a proof assistant almost as they stand. When
+reformulated in an alternative manner, they would be harder to
+formalise. In fact, the easiest way to formalise them would probably
+be to reformulate them back in a coinductive way.
+
+R1 l273. Shouldn't the domain of C be the free variables of t and s?
+
+This is equivalent, because the value of C on variables not free in
+t,s doesn't matter.
+
+R2 avoid introducing the constants flatten, ..., and instead DEFINE those with induction
+
+Induction doesn't work because of impredicative polymorphism. We can
+have e.g. "\alpha : * . flatten alpha t". Then how to define "flatten
+alpha t" by induction when alpha is a type variable? Note that when
+applied to an arbitrary type tau this will reduce to "flatten tau t".
+
+R2 is "s>t" computable?
+
+Not in general, I don't think so.
+
+R2 l.435
+
+cons has type forall alpha . alpha -> List -> List, so only the first
+three lambda-abstractions count as arguments, the others are just the
+details of the encoding of lists in our system.
+
+R2 why not add 2^x to the basic functions
+
+This could be done without any fundamental problems, but wouldn't help
+with interpreting the few remaining rules, where the problem is the
+limitation of the current encoding of impredicative existential
+quantification, which makes certain terms incomparable.
 
 R3 notes that we do not define a dependency pair notion or any automation.
 
@@ -18,4 +99,3 @@ ideas; setting up a dependency pair approach would be a full, mostly separate
 line of research.  (However, it is worth noting that a future definition of
 dependency pairs is likely to benefit greatly from the existence of a
 reduction pair, like the one we define here).
-
