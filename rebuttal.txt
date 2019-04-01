@@ -29,8 +29,6 @@ alternative manner, they would be harder to formalise. (And in fact,
 the easiest way to formalise them would probably be to reformulate
 them back in a coinductive way.)
 
->>> CK: added this one! <<<
-
 * R1 notes that we do not discuss differences with v.d. Pol's work.
 
 It is true that our definitions are, in a sense, less general than
@@ -89,12 +87,10 @@ have, e.g., "\alpha : * . flatten alpha t". But then how to define
 that when applied to an arbitrary type tau this will reduce to
 "flatten tau t".
 
->>> CK: I don't actually understand this question, so I don't know how best to rephrase it in the form "R2 asks" or whatnot. <<
->>> LC: I reformulated it the way I interpret it.
+* R2 asks if the following problem is decidable: given two
+interpretation terms s,t, does s>t hold?
 
-* R2 asks if the following problem is decidable: given two interpretation terms s,t, does s>t hold?
-
-Not in general, I don't think so. However, one can come up with
+Not in general, we believe. However, one can come up with
 calculation rules like in Lemmas 6.3-6.5 to automatically handle
 common cases in practice.
 
@@ -125,27 +121,3 @@ full, mostly separate line of research.
 pairs is likely to benefit greatly from the existence of a reduction
 pair, like the one we define here).
 
-
-
-CK: Things we have not discussed so far:
-
-* R1 observes that we do not discuss the decidability of our main
-ordering.
-
-CK: no-op on this one? We did respond to the comments about
-co-induction.
-
-LC: I think this is the s>t question
-
-* R1 asks us to put an intuition of the proof for Theorem 4.4
-in the paper's body, and questions whether some termination criterion
-could be applied here.
-
-CK: the first is simple ("sure, if space permits") and probably
-doesn't need to be explicitly addressed (we have already promised to
-improve things before the final version, which will include the
-presentation). For the second, I don't know what the reviewer means...
-
-LC: Termination criterion for that one? I don't think so -- it
-crucially depends on impredicative polymorphism, and we're just
-introducing methods for it!
