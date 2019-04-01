@@ -90,10 +90,13 @@ that when applied to an arbitrary type tau this will reduce to
 "flatten tau t".
 
 >>> CK: I don't actually understand this question, so I don't know how best to rephrase it in the form "R2 asks" or whatnot. <<
+>>> LC: I reformulated it the way I interpret it.
 
-* R2 is "s>t" computable?
+* R2 asks if the following problem is decidable: given two interpretation terms s,t, does s>t hold?
 
-Not in general, I don't think so.
+Not in general, I don't think so. However, one can come up with
+calculation rules like in Lemmas 6.3-6.5 to automatically handle
+common cases in practice.
 
 * R2 asks for a better explanation of l.435.
 
@@ -101,7 +104,7 @@ Since cons has type forall alpha . alpha -> List -> List, only the
 first two non-type lambda-abstractions count as arguments; the others
 are just the details of the encoding of lists in our system.
 
-* R2 questions whether we could add 2^x to the basic functions, and
+* R2 asks whether we could add 2^x to the basic functions, and
 whether it would be helpful to complete our "larger example".
 
 This could be done without any fundamental problems, but wouldn't help
@@ -132,7 +135,9 @@ ordering.
 CK: no-op on this one? We did respond to the comments about
 co-induction.
 
-* R1 wonders asks us to put an intuition of the proof for Theorem 4.4
+LC: I think this is the s>t question
+
+* R1 asks us to put an intuition of the proof for Theorem 4.4
 in the paper's body, and questions whether some termination criterion
 could be applied here.
 
@@ -141,3 +146,6 @@ doesn't need to be explicitly addressed (we have already promised to
 improve things before the final version, which will include the
 presentation). For the second, I don't know what the reviewer means...
 
+LC: Termination criterion for that one? I don't think so -- it
+crucially depends on impredicative polymorphism, and we're just
+introducing methods for it!
