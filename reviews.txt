@@ -1,0 +1,282 @@
+> * Your paper can be up to 17 pages, excluding the bibliography as well
+>   as the front page (including the extended metadata of the paper,
+>   like title, abstract, authors, ...)
+
+CK: So... We need a separate front page where we put the title and everything? I did not get this from the author instructions... Do you know what they mean here?
+
+> * If needed, you can use an appendix of at most 5 pages.
+
+CK: That's substantially less than what we need. I would normally say: let's put up a separate version as a technical report with the full appendix. However, if I recall correctly, submission to FSCD happens by submitting first to arxiv. (Although I don't think I've seen instructions yet...) If that is the case, then we cannot also have a separate version with a longer appendix, as Arxiv will complain about two very similar versions of the same paper. What to do with that?
+
+
+CK: Note: I have started some of the changes in final.tex.
+
+> ----------------------- REVIEW 1 ---------------------
+
+> The paper may be sometimes difficult to follow. For instance, in the Definition 4.8 of the ordering on the interpretation set I, which is probably the most delicate and important point of the paper, the authors use co-induction. More explanations on the validity of this definition and how to prove s > t would be welcome: the authors do not discuss the decidability of this ordering, and not everyone is familiar with co-induction.
+ 
+> No details are given in the paper concerning the proof of Theorem 4.4, the termination of the relation defined in Definition 4.2 page 6, which is an important ingredient of the criterion. The result seems correct though and the proof given in the appendix, based on Girard's reducibility candidates, standard. Mentioning this would be a minimum. We may also wander whether some termination criterion could not be applied here.
+ 
+> The lack of short notations make it difficult to read the example 6.6 page 13 and the interpretation of IPC2 page 14, and grasp the essence of these interpretations, since no intuition is given concerning these interpretations and how the authors found them.
+ 
+> All together, I find the result very interesting and useful, and as the authors can probably improve the presentation before the deadline, I am in favor of acceptance.
+
+
+> *) l29. It is mentioned that polymorphic rewriting frameworks are usually restricted to rank-1 polymorphism, and no references are given either for frameworks with rank-1 polymorphism or for more general frameworks. I think that this statement is incorrect, and that the authors should provide some references like:
+> 
+> For rank-1 polymorphism:
+> 
+> - Polymorphic higher-order recursive path orderings, by J.-P. Jouannaud and A. Rubio, JACM 2007. http://doi.org/10.1145/1206035.1206037
+> 
+> - Normal higher-order termination, by J.-P. Jouannaud and A. Rubio, TOCL 2015. http://doi.org/10.1145/2699913
+> 
+> - Dependent type theory with first-order parameterized data types and well-founded recursion, by David Wahlstedt, PhD, Chalmers University of Technology, 2007.
+> 
+> - Polymorphic Rewrite Rules: Confluence, Type Inference, and Instance Validation, by M. Hamana, best paper award at FLOPS 2018, https://doi.org/10.1007/978-3-319-90686-7_7, web interface on http://www.cs.gunma-u.ac.jp/hamana/polysol/
+> 
+> For full polymorphism:
+> 
+> - Termination of rewriting in the calculus of constructions, D. Walukiewicz-Chrząszcz, JFP 2003, http://doi.org/10.1017/S0956796802004641
+> 
+> - Definitions by rewriting in the calculus of constructions, F. Blanqui, MSCS 2005, http://doi.org/10.1017/S0960129504004426
+> 
+> - The Dedukti system (https://deducteam.github.io/), developed since many years now, although based on dependent types only can encode full polymorphism by using type-level rewriting.
+> 
+> - Embedding pure type systems in the lambda-Pi-calculus modulo, D. Cousineau and G. Dowek, TLCA 2007, http://doi.org/10.1007/978-3-540-73228-0_9
+> 
+> - Models and Termination of Proof Reduction in the lambda Pi-Calculus Modulo Theory, G. Dowek, ICALP 2017, http://doi.org/10.4230/LIPIcs.ICALP.2017.109
+> 
+> - Multiversal Polymorphic Algebraic Theories: Syntax, Semantics, Translations, and Equational Logic, by Marcelo Fiore and Makoto Hamana, LICS 2013, https://doi.org/10.1109/LICS.2013.59.
+ 
+> Finally, note that van de Pol's work has been generalized to other domains than N, in a categorical framework by Makoto Hamana in "An initial algebra approach to term rewriting systems with variable binders", HOSC 2006, 10.1007/s10990-006-8747-5.
+
+CK: The observation here is that we aren't so much extending van de Pol's work, but rather building on the earlier work by Carsten and me that considered higher-order polynomials (based on van de Pol's work). Will put that in.
+
+> *) l257. Definition 4.8 is not very clear and its validity is not explained.
+> 
+> - What are the brackets around \sigma in s R_{\forall(\alpha:\kappa)[\sigma]} t?
+
+CK: Fixed.
+
+> - You define two relations >_\sigma. The first one by coinduction. The second one from the first one. This is confusing to use the same name.
+> 
+> - What does "coinductively" mean?
+> 
+> - Why do you need coinduction?
+> 
+> - l273. Shouldn't the domain of C be the free variables of t and s?
+> 
+> - Why not taking Lem 4.9 as definition?
+> 
+> - l278. Why would proofs be less perspicuous?
+> 
+> - l314. (1) missing after second lift.
+
+CK: Fixed.
+
+> - l315. s missing before second u: su+1 > su.
+
+CK: Fixed.
+
+> - l316. idem.
+
+CK: Fixed.
+
+
+> l21. Incorrect DOI. Page bottoms mention CVIT 2016. The copyright also. This should be updated.
+> 
+> l44. I understand that the termination of system F cannot be reduced to the termination of simply-typed lambda-calculus. But why the termination of a polymorphic system couldn't be equivalent to the termination of a simply-typed system with infinitely many rules? Could you elaborate on this, give more evidence?
+> 
+> l47. References [4,5] are not the more recent ones.
+> 
+> l58. introduce -> recall the definition of
+> 
+> l76. not ... or ... -> neither ... nor ...
+
+CK: Fixed.
+
+> l80. \chi_* is in \Sigma^T_*, not \Sigma^T_\kappa
+
+CK: Changed.
+
+> Section 2. Is it really useful to recall basic properties of Fw like Lemma 2.4, 2.6, 2.7? Isn't it possible to refer to some article or book like the chapter "Lambda calculi with types", by H. Barendregt, in the Handbook of logic in computer science?
+
+CK: It's not like we put in a proof, so I don't think this is a problem.
+
+> l139. What is m in m<k?
+
+CK: It's introduced in line 139. Not sure how to make this clearer. Maybe not put it in the definition, since the lay-out may be causing the confusion?
+
+> l92. * is used both as a kind and as an operator between terms and types. This is unfortunate. Couldn't you use different symbols?
+
+CK: Fair point, but I don't know which ones we should then use.
+
+> l124, l136, l139, l144, l258: why using parentheses after \forall?
+> 
+> l161. rewrite rule -> rewriting rule
+
+CK: It's quite standard in the literature to use "rewrite rule". I don't think we need to act on this one.
+
+> l161. Def 3.5. There is no explicit restriction on the kinds of terms that can be used in a set of rewriting rules. Can they be non PFS terms?
+> 
+> l172. Why \beta is restricted to *?
+> 
+> l205. As + is left-associative, s+t+u should be read as (s+t)+u, hence as +(+st)u.
+
+CK: Changed.
+
+> l208. parial -> partial
+
+CK: Fixed.
+
+> l215. m.n -> m\times n. parentheses are useless.
+> 
+> l209. smallest relation on which terms? I?
+> 
+> l224. Why *rules* are invariant by \equiv? It doesn't seem to be the case. For instance, if \sigma beta-reduces to nat, then lift_\sigma.s is not reducible while lift_nat.s is reducible. But the *relation* can be invariant if you add this constraint in the definition.
+> 
+> l236-237. Why is it important not to be able to test for zero? What is the relation with testing the equality of two types by using the non-left-linear rule defining J? Could you elaborate on this?
+> 
+> l242. Theorem 4.4. Could you provide some proof sketch?
+> l352. This is the first time that you mention that your goal is to prove the termination on PFS terms.
+> 
+> l355. Shouldn't C be a PFS context?
+> 
+> l382. Strictly speaking >^J depends on TM too.
+> 
+> l384. Why Lemma 5.7 does not come before Definition 5.6?
+> 
+> l512. Pol -> van de Pol
+> 
+> l424-425. Could you align arrows to make this more readable? Put (*) in the left margin to find it more easily.
+> 
+> l499. Is f.x+b = (f.x)+b or f.(x+b)?
+> 
+> l531. 2*x+1: You should mention in l205 that 2*x+1 should be understood as (2*x)+1 and not 2*(x+1).
+> 
+> Could you find shorter notations for lift, flatten, etc.? For instance \uparrow for lift, and \downarrow for flatten?
+> 
+> You could also remove type annotations as they can be inferred from type annotations in abstractions.
+> 
+> l538. toward+s
+> 
+> l552. [5] is subsumed by more recent publications as mentioned in major remarks and the "The computability path ordering", by F. Blanqui, J.-P. Jouannaud and A. Rubio, LMCS 2015, http://doi.org/10.2168/LMCS-11(4:3)2015.
+> 
+> l588 and later. What is \ ?
+> 
+> l598. How Girard's method is based on Tait's method?
+> 
+> The authors can perhaps find other interesting polymorphic examples in "Iteration and coiteration schemes for higher-order and nested datatypes", by A. Abel, R. Matthes and T. Uustalu, TCS 2005, http://doi.org/10.1016/j.tcs.2004.10.017.
+> 
+> 
+> ----------------------- REVIEW 2 ---------------------
+> PAPER: 24
+> TITLE: Polymorphic Higher-order Termination
+> AUTHORS: Łukasz Czajka and Cynthia Kop
+> 
+> Overall evaluation: 2 (accept)
+> 
+> ----------- Overall evaluation -----------
+> Summary.
+> 
+> This is a great paper, generalizing termination proofs for simply typed higher-order rewrite systems by monotonic functionals. The result is a termination proof method for rewrite systems defined by constants and rewrite rules in F-omega, including impredicative type constructors. The method proceeds by providing a monotonic ("safe") interpretation of all function symbols in a subset of F-omega terms, that play the role of higher-order impredicative polynomials. (so the method is more syntactic than the usual interpretation in a monotonic algebra). The proof obligation for termination is to show that [[l]] > [[r]] for all rules under this interpretation.
+> Moreover, if for some rules only >= holds, one can at least progress by removing the proper >-rules.
+> 
+> The paper includes two examples to show its potential:
+> - a Haskell-like fold over heterogeneous typed polymorphic lists (every element has a different type)
+> - normalization of 2nd-order intuistionic logic natural deduction proofs with permutative conversions
+> In the latter case, a few permutative conversions could not be proved terminating, as the authors show.
+> 
+> 
+> Evaluation.
+> 
+> This is as far as I know very innovative work. Already the set of (higher-order, impredicative) polynomials with their basic properties is interesting.
+> The work is thorough. All definitions are given in large detail, and there are numerous pages with proofs in the appendix.
+> The paper is well-readable, with some effort. Crucial steps are also explained at an intuitive level. I'm not an expert in impredicativity, so for me some questions remained unanswered (see below). (but I fully realize that the authors have already used the pages within the limit very efficiently).
+> 
+> The class of Polymorphic Functional Systems may turn out to be to wild in the end (at least I cannot oversee what is possible here), but this work would already be relevant if only "tamed" subset of this class yields useful results. Also, F-omega is closely related (somehow) to Haskell's type system.
+> 
+> The only minor issue is that the second example doesn't work out fully. The authors are very clear about that (already in the introduction). I wonder if it is not more clear to present a core calculus + full termination proof (which is already sufficient to prove cut elimination), and leave the extra rules with permutative conversions as an open question for future work.
+> 
+> 
+> Remaining Questions.
+> 
+> - why F-omega, why not just system F? I believe (not 100% sure) that the given examples could be handled in system F as well. What is the exact relationship between F-omega and Haskell's types?
+> It is not clear to me if the paper would simplify a lot if it is restricted to system F only, and what we would loose.
+> 
+> - I'm bothered by the J-example from [3]. (J tau tau -> lambda x.x leads to non-termination). It seems that J can be interpreted by a simple higher-order polynomial? That would be problematic, or wouldn't it? Does this mean that there is no >= interpretation for beta-reduction in F-omega? A deeper treatment of the (implications of) this example would be useful.
+> 
+> - I couldn't follow the fine details of the definitions and proofs by coinduction. It would do no harm to explain the definition, not only at an intuitive level (although that was helpful as well). Can you give a concrete example on how to derive > or >= already at Def. 4.8?
+> 
+> - Def 4.2: Would it be possible to _avoid_ introducing the constants flatten, lift, +, * at higher types, and instead DEFINE those as abbreviated terms, with induction on types? (where we see (s*\chi) as smaller than (FORALL x.s). This would avoid quite some complexity, in particular termination of ~~>
+> (at least that strategy works for simply typed case)
+> 
+> - Is the problem if for interpretation terms s,t "s>t" computable?
+> 
+> - I didn't get l435: "J(cons) is not required to be safe for x, since x is not an argument...".
+> In the definition of J(cons) x seems to be an argument. This looks dangerous to me. Can you explain this better?
+> 
+> - In [16], permutative conversions for the simply typed case required exponentiation. This raises two questions: why do you insist on polynomials, why not add 2^x to the basic functions? And: would that help to find an interpretation of the final rules?
+> 
+> - Would it be doable to formalize your proofs in Coq or Agda?
+> 
+> - l. 172: Please explain the weird type for A. Also, please indicate what A_{x,y} means precisely. I don't see immediately why the rule for A is well-typed, and how the A is used to make the rule for foldl well-typed.
+> 
+> - l. 236: why is the sentence about case distinction on 0 there? I'm missing the connection with the previous sentence about J.
+> 
+> 
+> 
+> Thanks for the answers in the rebuttal, they clarified most of the questions. I hope this is useful in making the final version even more understandable. In particular, I don't disagree with using co-induction, but it does no harm to remind the user of the shape of a co-inductive definition scheme.
+> 
+> 
+> Typos / small remarks:
+> 
+> - p3, l89: the condition s:tau is missing. Also, how do you handle "contexts"?
+> (e.g. x:sigma |- s:tau)
+> 
+> -p3, l90: some brackets are required to make sense of this term with many :::
+> 
+> -p3, l112: we will also use \x.s: I believe this notation only appears in the appendix.
+> 
+> - p3, Lemma 2.6, case 2: doesn't this require an extra condition, that alpha and tau are of the same kind?
+> 
+> - p3, Lemma 2.7: one of the "and"s must be "then". I believe the first one.
+> 
+> - p4, Def 3.2: it would be more clear to present this as a definition of PFS types and terms, and avoid "We assume..." (l. 135)
+> 
+> - p5, l. 172: \lambda a.s -> \Lambda a.s
+> 
+> - p9, Lem 4.22: f t R s then … -> If t R s then …
+> 
+> 
+> ----------------------- REVIEW 3 ---------------------
+> PAPER: 24
+> TITLE: Polymorphic Higher-order Termination
+> AUTHORS: Łukasz Czajka and Cynthia Kop
+> 
+> Overall evaluation: 1 (weak accept)
+> 
+> ----------- Overall evaluation -----------
+> The paper introduces a methodology to prove termination of higher-order
+> rewriting with full impredicative polimorphism.
+> 
+> The introduction of the problem is quite nice, it makes clear how impredicative
+> polimorphism is used in practice and how problematic can be to prove termination
+> of higher-order systems with this characteristic. Also the presentation of the
+> F_\omega systems and the polymorphic functional systems is clear in the paper.
+> 
+> Once they have the presentation, the authors follow the classic schema for
+> proving termination: interpretation definition, orderings, a removal technique
+> and an large example. The authors neither go further defining a dependency pair
+> notion nor a way to automate the proofs. Since one of the authors have a vast
+> experience on adapting dependency pairs to higher-order, it would be really nice
+> if she/they could explain the problems they could find to do this task or if it is just a
+> straightforward extension.
+> 
+> Even with these cons, I think the paper is interesting and the topic is
+> appropriate for the conference, so I recommend acceptance of the paper.
+> 
+> Typos:
+> 
+> page 23:6, line 226: rules 4-13.
+> 
