@@ -15,9 +15,25 @@ CK: Note: I have started some of the changes in final.tex.
 
 > The paper may be sometimes difficult to follow. For instance, in the Definition 4.8 of the ordering on the interpretation set I, which is probably the most delicate and important point of the paper, the authors use co-induction. More explanations on the validity of this definition and how to prove s > t would be welcome: the authors do not discuss the decidability of this ordering, and not everyone is familiar with co-induction.
  
+CK: Actually there *is* an intuitive explanation right below the definition -- but those who merely skim or are looking particularly for definitions can easily miss that. I can see two ways to address this:
+1) Put the intuition in a "remark" environment, and in Definition 4.8 add something like (see also Remark 4.9 for the intuition)?
+2) Put the intuition that explains coinduction immediately below line 258, and put the part from 259 to 263 in a separate definition.
+
+CK: Either way, I think referencing some standard work -- or preferably an easily accessible text -- regarding coinduction might be interesting, given that some of the likely readers are not that well-versed in coinduction.
+
 > No details are given in the paper concerning the proof of Theorem 4.4, the termination of the relation defined in Definition 4.2 page 6, which is an important ingredient of the criterion. The result seems correct though and the proof given in the appendix, based on Girard's reducibility candidates, standard. Mentioning this would be a minimum. We may also wander whether some termination criterion could not be applied here.
  
+CK: A proof sketch of a few lines (and then a pointer to the appendix) would indeed not be amiss here. It's probably best if you do that. :)
+
 > The lack of short notations make it difficult to read the example 6.6 page 13 and the interpretation of IPC2 page 14, and grasp the essence of these interpretations, since no intuition is given concerning these interpretations and how the authors found them.
+
+CK: I have added _some_ extra text in Example 6.6, and a lot to
+Example 5.14 where those interpretations are defined.  Can you judge
+whether it's up to scratch?
+
+CK: I will add more intuition on the interpretations for IPC2 tomorrow.
+
+
  
 > All together, I find the result very interesting and useful, and as the authors can probably improve the presentation before the deadline, I am in favor of acceptance.
 

@@ -1382,7 +1382,20 @@ $
   \end{array}
   \]
 Note that $\Termmap(\mathtt{cons})$ is \emph{not} required to be safe
-for $x$, since $x$ is not an argument of $\mathtt{cons}$.
+for $x$, since $x$ is not an argument of $\mathtt{cons}$\CKchange{:
+following its declaration, $\mathtt{cons}$ takes one type and two terms
+as arguments. The variable $x$ is only part of the \emph{interpretation}.
+Note also that the current interpretation is a mostly straightforward
+extension of Example~\ref{ex:notyetmono}: we retain the same \emph{core}
+interpretations (which, intuitively, encode $\mathtt{@}$ and
+$\mathtt{A}$ as forms of application and encode a list as the function
+that executes a fold over the list's contents), but we add a clause
+$\oplus \lift(\flatten(x))$ for each argument $x$ that the initial
+interpretation is not safe for.  The only further change is that, in
+$\Termmap(\mathtt{cons})$, the part between brackets has to be extended.
+This was necessitated by the change to $\Termmap(\mathtt{foldl})$, in
+order for the rules to still be oriented (as we will do in
+Example \ref{ex_fold_final}).}
 \end{example}
 
 \section{Proving termination with rule removal}\label{sec_rule_removal}
@@ -1551,7 +1564,8 @@ polynomial interpretations.
 
 \begin{example}\label{ex_fold_final}
 We now have the tools to finish the example of
-heterogeneous lists.  The proof obligation from Example
+heterogeneous lists \CKchange{(still using the interpretation from
+Example \ref{ex_fold_interpretation}).}  The proof obligation from Example
 \ref{ex_fold_intermediate}, that
 $\interpret{@_{\sigma,\tau}(\abs{x:\sigma}{s},t)} \succeq
 \interpret{s[x:=t]}$, is completed by
@@ -1569,7 +1583,9 @@ $\interpret{\mathtt{foldl}_\sigma(f,s,\nil)} =
 \ref{lem_lift_approx}(\ref{lem_lift_approx:plussplit}) and
 \ref{lem:plusparts}(\ref{lem:plusparts:removefromsucceq}).
 %
-For the last rule note that:
+For the last rule note that \CKchange{(using only Lemmas
+\ref{lem_leadsto_to_approx} and
+\ref{lem_lift_approx}(\ref{lem_lift_approx:plussplit})):}
 \[
 \begin{array}{l}
 \interpret{\mathtt{foldl}_\sigma(f,s,\cons_\tau(h,t))} \approx \\
