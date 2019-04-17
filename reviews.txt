@@ -31,13 +31,9 @@ CK: I have added _some_ extra text in Example 6.6, and a lot to
 Example 5.14 where those interpretations are defined.  Can you judge
 whether it's up to scratch?
 
-CK: I will add more intuition on the interpretations for IPC2 tomorrow.
-
-
+CK: I have now also added a fair bit of extra text in Section 7 (hurray
+for 2 extra pages).  Please judge!
  
-> All together, I find the result very interesting and useful, and as the authors can probably improve the presentation before the deadline, I am in favor of acceptance.
-
-
 > *) l29. It is mentioned that polymorphic rewriting frameworks are usually restricted to rank-1 polymorphism, and no references are given either for frameworks with rank-1 polymorphism or for more general frameworks. I think that this statement is incorrect, and that the authors should provide some references like:
 > 
 > For rank-1 polymorphism:
@@ -63,10 +59,17 @@ CK: I will add more intuition on the interpretations for IPC2 tomorrow.
 > - Models and Termination of Proof Reduction in the lambda Pi-Calculus Modulo Theory, G. Dowek, ICALP 2017, http://doi.org/10.4230/LIPIcs.ICALP.2017.109
 > 
 > - Multiversal Polymorphic Algebraic Theories: Syntax, Semantics, Translations, and Equational Logic, by Marcelo Fiore and Makoto Hamana, LICS 2013, https://doi.org/10.1109/LICS.2013.59.
- 
+
+CK: Okay... Let's just remove that part of the motivation. :P  It is
+truly not that important.  Agreed?
+
 > Finally, note that van de Pol's work has been generalized to other domains than N, in a categorical framework by Makoto Hamana in "An initial algebra approach to term rewriting systems with variable binders", HOSC 2006, 10.1007/s10990-006-8747-5.
 
-CK: The observation here is that we aren't so much extending van de Pol's work, but rather building on the earlier work by Carsten and me that considered higher-order polynomials (based on van de Pol's work). Will put that in.
+CK: The observation here is that we aren't so much extending van de Pol's work, but rather building on the earlier work by Carsten and me that considered higher-order polynomials (based on van de Pol's work). My inclination would be to say:
+* those works were monomorphic, now we're going to do full polymorphism
+* this goes beyond shallow polymorphism as follows (see example)
+* due to this added complexity, we here particularly extend _polynomial_
+  interpretations, so not Jaco's full work.
 
 > *) l257. Definition 4.8 is not very clear and its validity is not explained.
 > 

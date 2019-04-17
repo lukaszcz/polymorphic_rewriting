@@ -1692,7 +1692,9 @@ conversions~\cite{PolSchwichtenberg1995}, in the hope of providing a
 more perspicuous proof of this well-known result. Notably, they did
 not treat disjunction, as we will do. More fundamentally, their method
 cannot handle impredicative polymorphism necessary for second-order
-logic.
+logic. \CKchange{On the other hand, their method can handle
+interpretations of base-type terms into arbitrary algebras, whereas
+ours is limited to the natural numbers.}
 \end{remark}
 
 The system IPC2 can be seen as a PFS with type constructors:
@@ -1742,7 +1744,15 @@ We have the following function symbols:
 \end{array}
 \]
 
-And 28 reduction rules, including the following (the full set of rules is in Appendix \ref{app_ineqs}):
+\CKchange{Again, the types represent formulas in intuitionistic
+second-order propositional logic, and the terms represent proofs.
+For example, a term $\mathtt{case}_{\sigma,\tau,\rho}\ s\ u\ v$
+is a proof term of the formula $\rho$, built from a proof $s$ of
+$\mathtt{or}\ \sigma\ \tau$, a proof $u$ that $\sigma$ implies $\rho$
+and a proof $v$ that $\tau$ implies $\rho$.
+Proof terms can be simplified using 28 reduction rules, including
+the following} (the full set of rules is available in Appendix
+\ref{app_ineqs}):
 \[
 \begin{array}{rclrcl}
 @_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] &
@@ -1770,6 +1780,10 @@ And 28 reduction rules, including the following (the full set of rules is in App
   \abs{y}{t})) \red
   \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x}{\epsilon_\rho(s)},
   \abs{y}{\epsilon_\rho(t)}) \\
+\CKchange{\proj^2_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}\,\rho,\pi}(u,
+  \abs{x:\sigma}{s},\abs{y:\tau}{t}))\red
+  \mathtt{case}_{\sigma,\tau,\pi}(u,\abs{x:\sigma}{\proj^2_{\rho,\pi}(s)},
+  \abs{y:\tau}{\proj^2_{\rho,\pi}(t)})} \\
 \mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,\tau,\mathtt{or}\,
   \rho\,\pi}(u,\abs{x}{s},\abs{y}{t}),\abs{z}{v},
   \abs{a}{w}) \red \\
@@ -1809,8 +1823,28 @@ more details).
   \end{array}
   \]
 
-Now, most of the rules can be oriented strictly (so using $\succinterpret$)
-by the safe interpretation:
+\CKchange{We do not currently have a structural method to find a
+suitable interpretation.  Instead, we used the following manual process.
+We start by noting the minimal requirements given by the first set of
+rules (e.g., that $\proj^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,
+t)) \succeq s$); to orient these inequalities, it would be good to for
+instance have $\interpret{\mathtt{pair}_{\sigma,\tau}(s,t)} \succeq
+\pair{\interpret{s}}{\interpret{t}}_{\typeinterpret{\sigma},
+\typeinterpret{\tau}}$ and $\interpret{\proj^i_{\sigma,\tau}(s)} =
+\pi^i_{\typeinterpret{\sigma},\typeinterpret{\tau}}(\interpret{s})$.
+To make the interpretation safe, we additionally include clauses
+$\lift(\flatten(x))$ for any unsafe arguments $x$; to make the rules
+\emph{strictly} oriented, we include clauses $\lift(1)$.  %Moreover, we
+%multiply the first argument of several function symbols by
+%$\lift(2)$, since it is typically this symbol that is decreased.
+Unfortunately, this approach does not suffice to orient the rules
+where some terms are duplicated, such as the second- and third-last
+rules.  To handle these rules, we \emph{multiply} the first argument
+of several symbols with the second (and possily third).  Some further
+tweaking gives the following safe interpretation, which orients most
+of the rules:}
+%Now, most of the rules can be oriented strictly (so using $\succinterpret$)
+%by the safe interpretation:
 \[
 \begin{array}{rclcrcl}
 \Typemap(\bot) & = & \nat
