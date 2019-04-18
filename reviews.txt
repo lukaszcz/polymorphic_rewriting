@@ -152,15 +152,16 @@ CK: Fixed.
 > l21. Incorrect DOI. Page bottoms mention CVIT 2016. The copyright also. This should be updated.
 >
 
-LC: the editors will?
+LC: the editors will update?
 
 > l44. I understand that the termination of system F cannot be reduced to the termination of simply-typed lambda-calculus. But why the termination of a polymorphic system couldn't be equivalent to the termination of a simply-typed system with infinitely many rules? Could you elaborate on this, give more evidence?
 >
 
-LC: I don't understand what he means here. Maybe they can be reduced
-*somehow*, but not in a straightforward way by instantiating the type
-quantifiers. This is obvious, because how do you instantiate a
-quantifier at a negative position?
+LC: I don't understand what the reviewer means here. Maybe they can be
+reduced *somehow*, but not in a straightforward way by instantiating
+the type quantifiers. This is obvious, because how do you instantiate
+a quantifier at a negative position? I clarified it a bit, by
+mentioning the negative occurrences.
 
 > l47. References [4,5] are not the more recent ones.
 >
@@ -223,42 +224,100 @@ CK: Changed.
 CK: Fixed.
 
 > l215. m.n -> m\times n. parentheses are useless.
+
+LC: changed
+
 >
 > l209. smallest relation on which terms? I?
 >
+
+LC: fixed
+
 > l224. Why *rules* are invariant by \equiv? It doesn't seem to be the case. For instance, if \sigma beta-reduces to nat, then lift_\sigma.s is not reducible while lift_nat.s is reducible. But the *relation* can be invariant if you add this constraint in the definition.
 >
+
+LC: The reviewer didn't get that the terms are beta-equivalence classes
+w.r.t. reduction in types. I tried to make it more clear now.
+
 > l236-237. Why is it important not to be able to test for zero? What is the relation with testing the equality of two types by using the non-left-linear rule defining J? Could you elaborate on this?
 >
+
+LC: I elaborated.
+
 > l242. Theorem 4.4. Could you provide some proof sketch?
+
+LC: I added a brief description.
+
 > l352. This is the first time that you mention that your goal is to prove the termination on PFS terms.
 >
+
+LC: Should we mention this earlier?
+
 > l355. Shouldn't C be a PFS context?
 >
+
+LC: contexts were defined only for PFSs. Should we make this somehow
+more clear?
+
 > l382. Strictly speaking >^J depends on TM too.
 >
+
+LC: fixed
+
 > l384. Why Lemma 5.7 does not come before Definition 5.6?
 >
+
+LC: fixed
+
 > l512. Pol -> van de Pol
 >
+
+LC: fixed
+
 > l424-425. Could you align arrows to make this more readable? Put (*) in the left margin to find it more easily.
 >
+
+LC: fixed?
+
 > l499. Is f.x+b = (f.x)+b or f.(x+b)?
 >
+
+LC: fixed
+
 > l531. 2*x+1: You should mention in l205 that 2*x+1 should be understood as (2*x)+1 and not 2*(x+1).
 >
+
+LC: fixed
+
 > Could you find shorter notations for lift, flatten, etc.? For instance \uparrow for lift, and \downarrow for flatten?
 >
 > You could also remove type annotations as they can be inferred from type annotations in abstractions.
 >
+
+LC: should we do this?
+
 > l538. toward+s
 >
+
+LC: fixed
+
 > l552. [5] is subsumed by more recent publications as mentioned in major remarks and the "The computability path ordering", by F. Blanqui, J.-P. Jouannaud and A. Rubio, LMCS 2015, http://doi.org/10.2168/LMCS-11(4:3)2015.
 >
+
+LC: Haven't changed yet, but we should.
+
 > l588 and later. What is \ ?
 >
+
+LC: fixed
+
 > l598. How Girard's method is based on Tait's method?
 >
+
+LC: fixed (it is based in the sense of extending it with a non-trivial
+idea of how to interpret the impredicative type quantifiers, but I
+don't think we need to explain it here, so I rephrased)
+
 > The authors can perhaps find other interesting polymorphic examples in "Iteration and coiteration schemes for higher-order and nested datatypes", by A. Abel, R. Matthes and T. Uustalu, TCS 2005, http://doi.org/10.1016/j.tcs.2004.10.017.
 >
 >

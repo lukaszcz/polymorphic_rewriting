@@ -192,7 +192,8 @@ the result is a term of type~$\tau[\subst{\alpha}{\rho}]$.
 Impredicativity of polymorphism means that the type itself may be
 substituted for its own type variable, e.g., if $\mathtt{f} : \forall
 \alpha . \tau$ then $f (\forall \alpha . \tau) :
-\tau[\subst{\alpha}{\forall\alpha.\tau}]$. This prevents a translation
+\tau[\subst{\alpha}{\forall\alpha.\tau}]$. \LCchange{Negative occurrences of
+impredicative type quantifiers} prevent a translation
 into an infinite set of simply typed rules by instantiating the type
 variables. The above example is not directly reducible to shallow
 polymorphism as used in the~ML programming language or the polymorphic
@@ -350,8 +351,7 @@ interchangeably.
 
 We will often abuse notation to omit $\cdot$ and $*$. Thus, $s t$ can
 refer to both $\app{s}{t}$ and $\tapp{s}{t}$. This is not ambiguous
-due to typing. We will also use $\abstraction{a}{s}$ for either
-$\abs{a}{s}$ or $\tabs{a}{s}$.
+due to typing.
 
 \begin{lemma}[Substitution lemma]\label{lem:substitution}
   \begin{enumerate}
@@ -619,7 +619,8 @@ be a powerful aid in defining the \CKchange{partial} ordering $\succ$ in Section
 
 \begin{defn}
   We define the relation $\arrW$ on interpretation terms as the
-  smallest relation for which the following properties are satisfied:
+  smallest relation on~$\Iterms$ for which the following properties
+  are satisfied:
   \begin{enumerate}
   \item\label{arrW:mono:abs}
     if $s \arrW t$ then both $\abs{x}{s} \arrW \abs{x}{t}$ and
@@ -636,10 +637,10 @@ be a powerful aid in defining the \CKchange{partial} ordering $\succ$ in Section
     \arrW s[\subst{\alpha}{\sigma}]$
     ($\beta$-reduction)
   \item\label{arrW:plus:base}
-    $\app{\app{\oplus_{\nat}}{n}}{m} \arrW (n+m)$
+    $\app{\app{\oplus_{\nat}}{n}}{m} \arrW n+m$
     and
     $\app{\app{\otimes_{\nat}}{n}}{m}
-    \arrW (n \cdot m)$
+    \arrW n \times m$
   \item\label{arrW:circ:arrow} $\app{\app{\circ_{\sigma \arrtype
         \tau}}{s}}{t} \arrW
     \abs{x:\sigma}{\app{\app{\circ_\tau}{(\app{s}{x})}}{(\app{t}{x})}}$
@@ -659,11 +660,14 @@ be a powerful aid in defining the \CKchange{partial} ordering $\succ$ in Section
   \item $\app{\lift_{\quant{\alpha}{\sigma}}}{s} \arrW
     \tabs{\alpha}{\app{\lift_{\sigma}}{s}}$
   \end{enumerate}
-  Note that the above rules are invariant under~$\equiv$ (by
-  confluence of $\beta$-reduction on types), so they correctly define
-  a relation on interpretation terms -- the equivalence classes
-  of~$\equiv$. We say that $s$ is a \emph{redex} if $s$ reduces by one
-  of the rules 4--13.
+  Recall Definition~\ref{def_terms} and Definition~\ref{def_iterms} of
+  the set of interpretation terms~$\Iterms$ as the set of the
+  equivalence classes of~$\equiv$. So above e.g.~$\lift_\nat$ denotes
+  the equivalence class of all preterms $\lift_\sigma$ with
+  $\sigma =_\beta \nat$. Hence, the above rules are invariant
+  under~$\equiv$ (by confluence of $\beta$-reduction on types), and
+  they correctly define a relation on interpretation terms. We say
+  that $s$ is a \emph{redex} if $s$ reduces by one of the rules 4--13.
 %
   A \emph{final interpretation term} is an interpretation term $s \in
   \Iterms$ such that (a) $s$ is closed, and (b) $s$ is in normal form
@@ -833,7 +837,7 @@ properties and the details of the definition do not matter.
 Note that for closed $s,t$ and closed~$\sigma$ in $\beta$-normal form,
 $s \succ_\sigma t$ iff $s \succ_\sigma^0 t$ (and analogously
 for~$\succeq,\approx$). In this case we shall often omit the
-superscript.
+superscript~$0$.
 
 The definition of~$\succ$ and~$\succeq$ may be reformulated as
 follows.
@@ -853,10 +857,8 @@ follows.
 \end{proof}
 
 In what follows, all proofs by coinduction could be reformulated to
-instead use the %characterisation of $\succ$, $\succeq$ and~$\approx$
-%from the above lemma
-lemma above. However, this would arguably make the proofs
-less perspicuous and more difficult to formalise.
+instead use the lemma above. However, this would arguably make the
+proofs less perspicuous and more difficult to formalise.
 
 Our next task is to show that $\succeq$ and $\succ$ have the
 desired properties of an ordering pair; e.g., transitivity and
@@ -877,20 +879,20 @@ implicitly.
 \end{lemma}
 
 \begin{proof}
-  It suffices to show this for~$\succ^0$ and closed terms and closed types in
-  $\beta$-normal form, because any infinite sequence $t_1 \succ_\tau^0
+  It suffices to show this for closed terms and closed types in
+  $\beta$-normal form, because any infinite sequence $t_1 \succ_\tau
   t_2 \succ_\tau t_3 \succ_\tau \ldots$ induces an infinite sequence
-  $\cl(t_1) \succ_{\nf_\beta(\cl(\tau))}^0 \cl(t_2)
-  \succ_{\nf_\beta(\cl(\tau))}^0 \cl(t_3) \succ_{\nf_\beta(\cl(\tau))}^0
+  $\cl(t_1) \succ_{\nf_\beta(\cl(\tau))} \cl(t_2)
+  \succ_{\nf_\beta(\cl(\tau))} \cl(t_3) \succ_{\nf_\beta(\cl(\tau))}
   \ldots$ for any closure~$\cl$. By induction on the size of a
   $\beta$-normal type~$\tau$ (with size measured as the number of
   occurrences of~$\forall$ and~$\arrtype$) one proves that there does
-  not exist an infinite sequence $t_1 \succ_\tau^0 t_2 \succ_\tau^0 t_3
-  \succ_\tau^0 \ldots$ For instance, if $\alpha$ has kind~$\kappa$ and
-  $t_1 \succ_{\forall\alpha\tau}^0 t_2 \succ_{\forall\alpha\tau}^0 t_3
-  \succ_{\forall\alpha\tau}^0 \ldots$ then $\tapp{t_1}{\chi_\kappa}
-  \succ_{\tau'}^0 \tapp{t_2}{\chi_\kappa} \succ_{\tau'}^0
-  \tapp{t_3}{\chi_\kappa} \succ_{\tau'}^0 \ldots$, where
+  not exist an infinite sequence $t_1 \succ_\tau t_2 \succ_\tau t_3
+  \succ_\tau \ldots$ For instance, if $\alpha$ has kind~$\kappa$ and
+  $t_1 \succ_{\forall\alpha\tau} t_2 \succ_{\forall\alpha\tau} t_3
+  \succ_{\forall\alpha\tau} \ldots$ then $\tapp{t_1}{\chi_\kappa}
+  \succ_{\tau'} \tapp{t_2}{\chi_\kappa} \succ_{\tau'}
+  \tapp{t_3}{\chi_\kappa} \succ_{\tau'} \ldots$, where
   $\tau'=\nf_\beta(\tau[\subst{\alpha}{\chi_\kappa}])$. Because $\tau$
   is in $\beta$-normal form, all redexes in
   $\tau[\subst{\alpha}{\chi_\kappa}]$ are created by the substitution
@@ -906,29 +908,29 @@ implicitly.
 
 \begin{proof}
   We show this for~$\succ$, the proof for~$\succeq$ being
-  analogous. Again, it suffices to prove this for~$\succ^0$ and closed
+  analogous. Again, it suffices to prove this for closed
   terms and closed types in $\beta$-normal form. We proceed by
   coinduction.
 
-  If $t_1 \succ_\nat^0 t_2 \succ_\nat^0 t_3$ then $t_1\da > t_2\da >
-  t_3\da$, so $t_1\da > t_3\da$. Thus $t_1 \succ_\nat^0 t_3$.
+  If $t_1 \succ_\nat t_2 \succ_\nat t_3$ then $t_1\da > t_2\da >
+  t_3\da$, so $t_1\da > t_3\da$. Thus $t_1 \succ_\nat t_3$.
 
-  If $t_1 \succ_{\sigma\arrtype\tau}^0t_2\succ_{\sigma\arrtype\tau}^0t_3$
-  then $\app{t_1}{q}\succ_{\tau}^0\app{t_2}{q}\succ_\tau^0\app{t_3}{q}$
+  If $t_1 \succ_{\sigma\arrtype\tau}t_2\succ_{\sigma\arrtype\tau}t_3$
+  then $\app{t_1}{q}\succ_{\tau}\app{t_2}{q}\succ_\tau\app{t_3}{q}$
   for $q \in \Iterms^f_\sigma$. Hence
-  $\app{t_1}{q}\succ_\tau^0\app{t_3}{q}$ for $q \in \Iterms^f_\sigma$ by
-  the coinductive hypothesis. Thus $t_1\succ_{\sigma\arrtype\tau}^0
+  $\app{t_1}{q}\succ_\tau\app{t_3}{q}$ for $q \in \Iterms^f_\sigma$ by
+  the coinductive hypothesis. Thus $t_1\succ_{\sigma\arrtype\tau}
   t_3$.
 
   If $t_1
-  \succ_{\forall(\alpha:\kappa)\sigma}^0t_2\succ_{\forall(\alpha:\kappa)\sigma}^0t_3$
+  \succ_{\forall(\alpha:\kappa)\sigma}t_2\succ_{\forall(\alpha:\kappa)\sigma}t_3$
   then
-  $\tapp{t_1}{\tau}\succ_{\sigma'}^0\tapp{t_2}{\tau}\succ_{\sigma'}^0\tapp{t_3}{\tau}$
+  $\tapp{t_1}{\tau}\succ_{\sigma'}\tapp{t_2}{\tau}\succ_{\sigma'}\tapp{t_3}{\tau}$
   for any closed~$\tau$ of kind~$\kappa$, where
   $\sigma' = \nf_\beta(\sigma[\subst{\alpha}{\tau}])$. By the
   coinductive hypothesis
-  $\tapp{t_1}{\tau}\succ_{\sigma'}^0\tapp{t_3}{\tau}$; thus
-  $t_1\succ_{\forall\alpha\sigma}^0t_3$.
+  $\tapp{t_1}{\tau}\succ_{\sigma'}\tapp{t_3}{\tau}$; thus
+  $t_1\succ_{\forall\alpha\sigma}t_3$.
 \end{proof}
 
 \begin{lemma}\label{lem_reflexive}
@@ -936,7 +938,7 @@ implicitly.
 \end{lemma}
 
 \begin{proof}
-  By coinduction one shows that $\succeq_\sigma^0$ is reflexive on
+  By coinduction one shows that $\succeq_\sigma$ is reflexive on
   closed terms for closed $\beta$-normal~$\sigma$. The case
   of~$\succeq$ is then immediate from definitions.
 \end{proof}
@@ -1022,7 +1024,7 @@ under term formation operations. We will need these results in the next section.
 \begin{proof}
   Without loss of generality we may assume $\sigma$ closed and in
   $\beta$-normal form. By coinduction we show
-  $\lift(n) u_1 \ldots u_k \succeq^0 \lift(m) u_1 \ldots u_k$ for closed
+  $\lift(n) u_1 \ldots u_k \succeq \lift(m) u_1 \ldots u_k$ for closed
   $u_1,\ldots,u_k$. First note that
   $(\lift\,t) u_1 \ldots u_k \leadsto^* \lift(t)$ (with a different
   type subscript in~$\lift$ on the right side, omitted for
@@ -1030,15 +1032,15 @@ under term formation operations. We will need these results in the next section.
   $(\lift(n) u_1 \ldots u_k)\da = n \ge m = (\lift(m) u_1 \ldots
   u_k)\da$. If $\sigma = \tau_1\arrtype\tau_2$ then by the coinductive
   hypothesis
-  $\lift(n) u_1 \ldots u_k q \succeq_{\tau_2}^0 \lift(m) u_1 \ldots u_k
+  $\lift(n) u_1 \ldots u_k q \succeq_{\tau_2} \lift(m) u_1 \ldots u_k
   q$ for any $q \in \Iterms^f_{\tau_1}$, so
-  $\lift(n) u_1 \ldots u_k \succeq_{\sigma}^0 \lift(m) u_1 \ldots u_k$
+  $\lift(n) u_1 \ldots u_k \succeq_{\sigma} \lift(m) u_1 \ldots u_k$
   by definition. If $\sigma = \forall(\alpha:\kappa)\tau$ then by the
   coinductive hypothesis
-  $\lift(n) u_1 \ldots u_k \xi \succeq_{\sigma'}^0 \lift(m) u_1 \ldots
+  $\lift(n) u_1 \ldots u_k \xi \succeq_{\sigma'} \lift(m) u_1 \ldots
   u_k \xi$ for any closed $\xi \in \Tc_\kappa$, where
   $\sigma' = \tau[\subst{\alpha}{\xi}]$. Hence
-  $\lift(n) u_1 \ldots u_k \succeq_{\sigma}^0 \lift(m) u_1 \ldots u_k$
+  $\lift(n) u_1 \ldots u_k \succeq_{\sigma} \lift(m) u_1 \ldots u_k$
   by definition.
 \end{proof}
 
@@ -1094,8 +1096,8 @@ under term formation operations. We will need these results in the next section.
   $\beta$-normal form. The proof is similar to the proof of
   Lemma~\ref{lem:liftgreater}. For instance, we show by coinduction
   that for closed $w_1,\ldots,w_n$ (denoted $\vec{w}$): if
-  $s \vec{w} \succ^0 t \vec{w}$ and $u \vec{w} \succeq^0 \lift(1) \vec{w}$
-  then $(s \otimes u) \vec{w} \succ^0 (t \otimes u) \vec{w}$.
+  $s \vec{w} \succ t \vec{w}$ and $u \vec{w} \succeq \lift(1) \vec{w}$
+  then $(s \otimes u) \vec{w} \succ (t \otimes u) \vec{w}$.
 \end{proof}
 
 The following lemma depends on the lemmas above. The full proof may be
@@ -1182,10 +1184,11 @@ Similarly, we employ a \emph{symbol mapping} as the key
 ingredient to interpret PFS terms.
 
 \begin{defn}
-  A \emph{symbol mapping} is a function $\Termmap$ which assigns to
-  each function symbol $\mathtt{f} : \rho$ a closed interpretation
-  term $\Termmap(\mathtt{f})$ of type~$\typeinterpret{\rho}$. For a
-  fixed symbol mapping $\Termmap$, we define the \emph{interpretation
+  Given a fixed type constructor mapping~$\Typemap$, a \emph{symbol
+    mapping} is a function $\Termmap$ which assigns to each function
+  symbol $\mathtt{f} : \rho$ a closed interpretation term
+  $\Termmap(\mathtt{f})$ of type~$\typeinterpret{\rho}$. For a fixed
+  symbol mapping $\Termmap$, we define the \emph{interpretation
     mapping} $\interpret{s}$ inductively:
   \[
     \begin{array}{rclcrclcrcl}
@@ -1200,7 +1203,8 @@ ingredient to interpret PFS terms.
   \]
 \end{defn}
 
-Essentially, $\interpret{\cdot}$ substitutes
+Note that $\typeinterpret{\sigma},\typeinterpret{\tau}$ above depend
+on~$\Typemap$. Essentially, $\interpret{\cdot}$ substitutes
 $\Typemap(\mathtt{c})$ for type constructor symbols $\mathtt{c}$, and
 $\Termmap(\mathtt{f})$ for function symbols $\mathtt{f}$, thus mapping
 $A$-terms to interpretation terms.  This translation preserves typing:
@@ -1213,14 +1217,6 @@ $A$-terms to interpretation terms.  This translation preserves typing:
   By induction on the form of $s$, using
   Lemma~\ref{lem:substitutioninterpret:types}.
 \end{proof}
-
-\begin{defn}
-  For a fixed type constructor mapping $\Typemap$ and symbol mapping
-  $\Termmap$, the \emph{interpretation pair}
-  $(\succeqinterpret,\succinterpret)$ is defined as follows: $s
-  \succeqinterpret t$ if $\interpret{s} \succeq \interpret{t}$, and $s
-  \succinterpret t$ if $\interpret{s} \succ \interpret{t}$.
-\end{defn}
 
 \begin{lemma}\label{lem:substitutioninterpret}
   For all $s,t,x,\alpha,\tau$:
@@ -1238,9 +1234,17 @@ $A$-terms to interpretation terms.  This translation preserves typing:
   Induction on~$s$.
 \end{proof}
 
+\begin{defn}
+  For a fixed type constructor mapping $\Typemap$ and symbol mapping
+  $\Termmap$, the \emph{interpretation pair}
+  $(\succeqinterpret,\succinterpret)$ is defined as follows: $s
+  \succeqinterpret t$ if $\interpret{s} \succeq \interpret{t}$, and $s
+  \succinterpret t$ if $\interpret{s} \succ \interpret{t}$.
+\end{defn}
+
 \begin{remark}
 The polymorphic lambda-calculus has a much greater expressive power
-than the simply-typed lambda-calculus. Arbitrary inductive data types
+than the simply-typed lambda-calculus. Inductive data types
 may be encoded, along with their constructors and recursors with
 appropriate derived reduction rules. This makes
 our
@@ -1359,13 +1363,11 @@ $
 
   Finally, assume $C = \app{t}{C'}$. Then $t = \mathtt{f} \rho_1
   \ldots \rho_n t_1 \ldots t_m$ where
-%  \[
-$
+  \[
   \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n
   : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype
   \tau
-%  \]
-$
+  \]
   with~$\tau$ a type atom, $m < k$, and $\Termmap(\mathtt{f}) =
   \tabs{\alpha_1 \dots \alpha_n}{\abs{x_1 \dots x_k}{u}}$ with $u$
   safe for each~$x_i$. Without loss of generality assume $m=k-1$. Then
@@ -1700,7 +1702,7 @@ last two rules, and continue the rule removal algorithm with only the
 first two, which together define $\beta$-reduction.  This is trivial,
 for instance with an interpretation
 $\Termmap(@) = \Lambda \alpha.\Lambda \beta.\lambda f.\lambda x.
-f \cdot x \oplus \lift_\beta(\flatten_\alpha(x) \oplus 1)$ and
+(f \cdot x) \oplus \lift_\beta(\flatten_\alpha(x) \oplus 1)$ and
 $\Termmap(\mathtt{A}) = \Lambda \alpha.\Lambda \beta.\lambda x.
 x * \beta \oplus \lift_{\alpha\beta}(1)$.
 \end{example}
@@ -1729,7 +1731,7 @@ in~\cite{Tatsuta2007}. To our knowledge, termination of the full
 system~IPC2 remains an open problem, strictly speaking.
 
 \begin{remark}
-Our method builds on the work of Pol and Schwichtenberg, who used
+Our method builds on the work of van de Pol and Schwichtenberg, who used
 higher-order polynomial interpretations to prove termination of a
 fragment of intuitionistic first-order logic with permutative
 conversions~\cite{PolSchwichtenberg1995}, in the hope of providing a
@@ -1740,7 +1742,7 @@ logic. \CKchange{On the other hand, their method can handle
 interpretations of base-type terms into arbitrary algebras, whereas
 ours is limited to the natural numbers.}
 \LC{Can we put this sentence somewhere else? It feels a bit out of
-  place for me, because here we're talking about how Pol \&
+  place for me, because here we're talking about how van de Pol \&
   Schwichtenberg applies specifically to a system with permutative
   conversions, and the fact that the method allows interpretations of
   base-type terms into arbitrary algebras is irrelevant for this,
@@ -1959,14 +1961,15 @@ of the rules:
 \end{array}
 \]
 
-The derivations to orient rules with these
-interpretations are also given in Appendix \ref{app_ineqs}.
+Above, $\otimes$ binds stronger than~$\oplus$. The derivations to
+orient rules with these interpretations are also given in Appendix
+\ref{app_ineqs}.
 
 The only rules that are not oriented with this interpretation -- not
 with~$\succeq$ either -- are the ones of the form
 $f(\mathtt{let}(s,t), \dots) \red \mathtt{let}(s,f(t,\dots))$, like
 the rule marked (*) above. Nonetheless, this is already a significant
-step toward a systematic, extensible methodology of termination proofs
+step towards a systematic, extensible methodology of termination proofs
 for IPC2 and similar systems of higher-order logic. Verifying the
 orientations is still tedious, but our method raises hope for at least
 partial automation, as was done with polynomial interpretations for
@@ -2003,7 +2006,8 @@ orderings (see, e.g., \cite{jou:rub:99}) or dependency pairs
 \subsection{Strong Normalisation of~$\arrW$}
 
 By~$\SN$ we denote the set of all interpretation terms terminating
-w.r.t.~$\arrW$.
+w.r.t.~$\arrW$. We will use $\abstraction{a}{s}$ for either
+$\abs{a}{s}$ or $\tabs{a}{s}$, depending on typing.
 
 For $t \in \SN$ by~$\nu(t)$ we denote the length of the longest
 reduction starting at~$t$. The following lemma is obvious, but worth
