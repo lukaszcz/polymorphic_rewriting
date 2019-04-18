@@ -356,26 +356,56 @@ don't think we need to explain it here, so I rephrased)
 > - why F-omega, why not just system F? I believe (not 100% sure) that the given examples could be handled in system F as well. What is the exact relationship between F-omega and Haskell's types?
 > It is not clear to me if the paper would simplify a lot if it is restricted to system F only, and what we would loose.
 >
+
+LC: I briefly mentioned the type constructors.
+
 > - I'm bothered by the J-example from [3]. (J tau tau -> lambda x.x leads to non-termination). It seems that J can be interpreted by a simple higher-order polynomial? That would be problematic, or wouldn't it? Does this mean that there is no >= interpretation for beta-reduction in F-omega? A deeper treatment of the (implications of) this example would be useful.
 >
+
+LC: I added more explanations.
+
 > - I couldn't follow the fine details of the definitions and proofs by coinduction. It would do no harm to explain the definition, not only at an intuitive level (although that was helpful as well). Can you give a concrete example on how to derive > or >= already at Def. 4.8?
 >
+
+LC: maybe we should give an example of how to derive > or >=?
+
 > - Def 4.2: Would it be possible to _avoid_ introducing the constants flatten, lift, +, * at higher types, and instead DEFINE those as abbreviated terms, with induction on types? (where we see (s*\chi) as smaller than (FORALL x.s). This would avoid quite some complexity, in particular termination of ~~>
 > (at least that strategy works for simply typed case)
 >
+
+LC: I don't think it's necessary to explain this in the paper?
+
 > - Is the problem if for interpretation terms s,t "s>t" computable?
 >
+
+LC: should we explain this?
+
 > - I didn't get l435: "J(cons) is not required to be safe for x, since x is not an argument...".
 > In the definition of J(cons) x seems to be an argument. This looks dangerous to me. Can you explain this better?
 >
+
+LC: I think you explained it already?
+
 > - In [16], permutative conversions for the simply typed case required exponentiation. This raises two questions: why do you insist on polynomials, why not add 2^x to the basic functions? And: would that help to find an interpretation of the final rules?
 >
+
+LC: I mentioned that adding exponentiation is not a fundamental problem.
+
 > - Would it be doable to formalize your proofs in Coq or Agda?
 >
+
+LC: I don't think we need to speculate about this in the paper?
+
 > - l. 172: Please explain the weird type for A. Also, please indicate what A_{x,y} means precisely. I don't see immediately why the rule for A is well-typed, and how the A is used to make the rule for foldl well-typed.
 >
+
+LC: TODO
+
 > - l. 236: why is the sentence about case distinction on 0 there? I'm missing the connection with the previous sentence about J.
 >
+
+LC: added more explanations
+
 >
 >
 > Thanks for the answers in the rebuttal, they clarified most of the questions. I hope this is useful in making the final version even more understandable. In particular, I don't disagree with using co-induction, but it does no harm to remind the user of the shape of a co-inductive definition scheme.
@@ -386,20 +416,44 @@ don't think we need to explain it here, so I rephrased)
 > - p3, l89: the condition s:tau is missing. Also, how do you handle "contexts"?
 > (e.g. x:sigma |- s:tau)
 >
+
+LC: fixed
+
 > -p3, l90: some brackets are required to make sense of this term with many :::
 >
+
+LC: done
+
 > -p3, l112: we will also use \x.s: I believe this notation only appears in the appendix.
 >
+
+LC: moved to appendix
+
 > - p3, Lemma 2.6, case 2: doesn't this require an extra condition, that alpha and tau are of the same kind?
 >
+
+LC: added explanation
+
 > - p3, Lemma 2.7: one of the "and"s must be "then". I believe the first one.
 >
+
+LC: fixed
+
 > - p4, Def 3.2: it would be more clear to present this as a definition of PFS types and terms, and avoid "We assume..." (l. 135)
 >
+
+LC: done
+
 > - p5, l. 172: \lambda a.s -> \Lambda a.s
 >
+
+LC: done
+
 > - p9, Lem 4.22: f t R s then … -> If t R s then …
 >
+
+LC: fixed
+
 >
 > ----------------------- REVIEW 3 ---------------------
 > PAPER: 24

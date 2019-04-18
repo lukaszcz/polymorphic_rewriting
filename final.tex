@@ -219,8 +219,10 @@ substantially easier in the future.
 In this section we recall the definition of System~$\Fomega$ (see
 e.g.~\cite[Section~11.7]{SorensenUrzyczyn2006}), which will form a
 basis both of our interpretations and of a general syntactic framework
-for the investigated systems. We assume familiarity with core notions
-of lambda calculi such as substitution and $\alpha$-conversion.
+for the investigated systems. \LCchange{In comparison to System~$\mathrm{F}$,
+System~$\Fomega$ includes type constructors which results in a more
+uniform treatment.} We assume familiarity with core notions of lambda
+calculi such as substitution and $\alpha$-conversion.
 
 \begin{defn}\label{def_types}
   \emph{Kinds} are defined inductively: $*$ is a kind, and if
@@ -296,8 +298,8 @@ of lambda calculi such as substitution and $\alpha$-conversion.
   \item $\mathtt{f} : \sigma$ for all
     $(\mathtt{f} : \sigma) \in \Sigma$.
   \item $\abs{x:\sigma}{s} : \sigma \arrtype \tau$ if
-    $(x : \sigma) \in \Vars$.
-  \item $\tabs{\alpha:\kappa}{s} : \quant{\alpha:\kappa}{\sigma}$ if
+    $(x : \sigma) \in \Vars$ and $s : \tau$.
+  \item $(\tabs{\alpha:\kappa}{s}) : (\quant{\alpha:\kappa}{\sigma})$ if
     $s : \sigma$ and $\alpha$ does not occur free in the type of a
     free variable of~$s$.
   \item $\app{s}{t} : \tau$ if $s : \sigma \arrtype \tau$ and
@@ -322,6 +324,10 @@ of lambda calculi such as substitution and $\alpha$-conversion.
   define the equivalence relation~$\equiv$ by: $s \equiv t$ iff $s$
   and $t$ are identical modulo $\beta$-conversion in types.
 \end{defn}
+
+\LCchange{Note that we present terms in orthodox Church-style, i.e.,
+  instead of using contexts each variable has a globally fixed type
+  associated to it.}
 
 \begin{lemma}
   If $s : \tau$ and $s \equiv t$ then $t : \tau$.
@@ -351,7 +357,9 @@ interchangeably.
 
 We will often abuse notation to omit $\cdot$ and $*$. Thus, $s t$ can
 refer to both $\app{s}{t}$ and $\tapp{s}{t}$. This is not ambiguous
-due to typing.
+due to typing. When writing $\sigma[\subst{\alpha}{\tau}]$ we
+implicitly assume that $\alpha$ and $\tau$ have the same
+kind. Analogously with $t[\subst{x}{s}]$.
 
 \begin{lemma}[Substitution lemma]\label{lem:substitution}
   \begin{enumerate}
@@ -367,7 +375,7 @@ due to typing.
 \end{proof}
 
 \begin{lemma}[Generation lemma]\label{lem:generation}
-  If $t : \sigma$ and there is a type~$\sigma'$ such that
+  If $t : \sigma$ then there is a type~$\sigma'$ such that
   $\sigma' =_\beta \sigma$ and $\FTV(\sigma') \subseteq \FTV(t)$ and
   one of the following holds.
   \begin{itemize}
@@ -412,18 +420,18 @@ develop in Sections \ref{sec:World}--\ref{sec_rule_removal}.
   set~$\Sigma^T = \bigcup_{\kappa}\Sigma^T_\kappa$ of type constructor
   symbols.
 
-  We assume given a fixed set~$\Sigma$ of function symbols, such
-  that for $\mathtt{f} : \sigma \in \Sigma$ we can write:
+  Let~$\Sigma$ be a set of function symbols such
+  that for $\mathtt{f} : \sigma \in \Sigma$:
     \[
     \sigma = \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n : \kappa_n)
     . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype \tau
     \quad\quad (\text{with}\ \tau\ \text{a type atom})
     \]
-  We define \emph{PFS
-    terms} as in Definition~\ref{def_terms} (based on
-  Definition~\ref{def_preterms}) with the restriction that
-  for any subterm $\app{s}{u}$ of a term~$t$, we have $s =
-    \mathtt{f} \rho_1 \ldots \rho_n u_1 \ldots u_m$ where:
+    We define \emph{PFS terms} as in Definition~\ref{def_terms} (based
+    on Definition~\ref{def_preterms}), parameterised by~$\Sigma$, with
+    the restriction that for any subterm $\app{s}{u}$ of a term~$t$,
+    we have $s = \mathtt{f} \rho_1 \ldots \rho_n u_1 \ldots u_m$
+    where:
     \[
     \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots
     \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
@@ -523,7 +531,7 @@ Similarly, $\beta$-reduction of type abstraction can be modelled
 by including a symbol
 $\mathtt{A} : \forall \alpha : * \arrkind * . \forall \beta . (\forall
 \gamma.\alpha \gamma) \arrtype \alpha \beta$ and rules
-$\mathtt{A}_{\varphi,\sigma}(\abs{\alpha}{s}) \red s[\alpha:=\sigma]$.
+$\mathtt{A}_{\varphi,\sigma}(\tabs{\alpha}{s}) \red s[\alpha:=\sigma]$.
 We can also use rules
 $(\tabs{\alpha}{s})*\tau \red s[\alpha:=\tau]$ without the extra
 symbol, but to apply our method it may be
@@ -608,7 +616,12 @@ instead of $\tapp{\oplus}{\tau}$, $\tapp{\otimes}{\tau}$, etc. We will
 also use $\oplus$ and $\otimes$ in \emph{infix, left-associative}
 notation, and omit the type denotation where it is clear from
 context. Thus, $s \oplus t \oplus u$ should be read as
-$\oplus_\sigma\,(\oplus_\sigma\,s\,t)\,u$ if $s$ has type $\sigma$.
+$\oplus_\sigma\,(\oplus_\sigma\,s\,t)\,u$ if $s$ has type
+$\sigma$. \LCchange{Thus, our interpretation terms include natural
+  numbers with the operations of addition and multiplication. It would
+  not cause any fundamental problems to add more operations, e.g.,
+  exponentiation, but we refrain from doing so for the sake of
+  simplicity.}
 
 \paragraph*{Normalising interpretation terms}
 
@@ -688,7 +701,8 @@ modifications which are not of a logical nature. For instance, adding
 a constant $\mathtt{J} : \forall \alpha \beta . \alpha \arrtype \beta$
 with a reduction rule
 $\mathtt{J} \tau \tau \leadsto \lambda x : \tau . x$ makes the system
-non-terminating~\cite{Girard1971}. Our rules do not allow such a
+non-terminating~\cite{Girard1971}. \LCchange{This rule breaks
+  parametricity by allowing to compare two arbitrary types.} Our rules do not allow such a
 definition. \LCchange{Moreover, the natural number constants cannot be
   distinguished ``inside'' the system. In other words, we could
   replace all natural number constants with 0 and this would not
@@ -1017,7 +1031,7 @@ under term formation operations. We will need these results in the next section.
 \end{proof}
 
 \begin{lemma}\label{lem:liftgreater}
-  For $R \in \{\succeq,\succ\}$: If $n\:R\:m$ then
+  For $R \in \{\succeq,\succ\}$: if $n\:R\:m$ then
   $\lift_\sigma n\:R\:\lift_\sigma m$ for all types $\sigma$.
 \end{lemma}
 
@@ -1045,7 +1059,7 @@ under term formation operations. We will need these results in the next section.
 \end{proof}
 
 \begin{lemma}\label{lem_flatten_succ}
-  For $R \in \{\succeq,\succ\}$: f $t\:R_\sigma\:s$ then
+  For $R \in \{\succeq,\succ\}$: if $t\:R_\sigma\:s$ then
   $\flatten_\sigma t\:R_\nat\: \flatten_\sigma s$ for all types
   $\sigma$.
 \end{lemma}
