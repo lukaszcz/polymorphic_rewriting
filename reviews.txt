@@ -9,6 +9,8 @@ know what they mean here?
 LC: I don't know. Maybe they mean the things you enter on the webpage
 when submitting?
 
+CK: I think I'll mail Herman about this tomorrow.
+
 > * If needed, you can use an appendix of at most 5 pages.
 
 CK: That's substantially less than what we need. I would normally say: let's put up a separate version as a technical report with the full appendix. However, if I recall correctly, submission to FSCD happens by submitting first to arxiv. (Although I don't think I've seen instructions yet...) If that is the case, then we cannot also have a separate version with a longer appendix, as Arxiv will complain about two very similar versions of the same paper. What to do with that?
@@ -17,48 +19,49 @@ LC: That's LMCS which requires an arxiv version. For FSCD you just
 upload the paper to the Dagstuhl Submission Server. I'd say: let's put
 up a separate version as a technical report.
 
-CK: Note: I have started some of the changes in final.tex.
+CK: Okay. The right bugger is that we don't have an arxiv url to put in the final version so we can point to where the appendix is -- due to Easter, I think we would have had to submit something yesterday to get it in time, and I didn't think of it.  Should we give a url on our own webpage? (Mine or yours?)
 
 > ----------------------- REVIEW 1 ---------------------
 
-> The paper may be sometimes difficult to follow. For instance, in the Definition 4.8 of the ordering on the interpretation set I, which is probably the most delicate and important point of the paper, the authors use co-induction. More explanations on the validity of this definition and how to prove s > t would be welcome: the authors do not discuss the decidability of this ordering, and not everyone is familiar with co-induction.
+[DONE] The paper may be sometimes difficult to follow. For instance, in the Definition 4.8 of the ordering on the interpretation set I, which is probably the most delicate and important point of the paper, the authors use co-induction. More explanations on the validity of this definition and how to prove s > t would be welcome: the authors do not discuss the decidability of this ordering, and not everyone is familiar with co-induction.
 
-CK: Actually there *is* an intuitive explanation right below the definition -- but those who merely skim or are looking particularly for definitions can easily miss that. I can see two ways to address this:
-1) Put the intuition in a "remark" environment, and in Definition 4.8 add something like (see also Remark 4.9 for the intuition)?
-2) Put the intuition that explains coinduction immediately below line
-258, and put the part from 259 to 263 in a separate definition.
+  CK: Actually there *is* an intuitive explanation right below the definition --
+  but those who merely skim or are looking particularly for definitions can easily miss that. I can see two ways to address this:
+  1) Put the intuition in a "remark" environment, and in Definition 4.8 add something like (see also Remark 4.9 for the intuition)?
+  2) Put the intuition that explains coinduction immediately below line
+  258, and put the part from 259 to 263 in a separate definition.
+  
+  LC: I went with the second suggestion and added some more explanations.
+  
+  CK: Either way, I think referencing some standard work -- or
+  preferably an easily accessible text -- regarding coinduction might be
+  interesting, given that some of the likely readers are not that
+  well-versed in coinduction.
+  
+  LC: I added some references. My frustration here has always been that
+  I don't know of a single reference that is accessible (in the sense of
+  easily understandable) and explains this exactly in the way I want to
+  use it and is close to how one normally writes this in e.g. Coq (if
+  they accept my ITP paper then maybe there will be one, but I'm very
+  unsure about this).
 
-LC: I went with the second suggestion and added some more explanations.
+[DONE] No details are given in the paper concerning the proof of Theorem 4.4, the termination of the relation defined in Definition 4.2 page 6, which is an important ingredient of the criterion. The result seems correct though and the proof given in the appendix, based on Girard's reducibility candidates, standard. Mentioning this would be a minimum. We may also wander whether some termination criterion could not be applied here.
 
-CK: Either way, I think referencing some standard work -- or
-preferably an easily accessible text -- regarding coinduction might be
-interesting, given that some of the likely readers are not that
-well-versed in coinduction.
+  CK: A proof sketch of a few lines (and then a pointer to the appendix)
+  would indeed not be amiss here. It's probably best if you do that. :)
+  
+  LC: OK, done
 
-LC: I added some references. My frustration here has always been that
-I don't know of a single reference that is accessible (in the sense of
-easily understandable) and explains this exactly in the way I want to
-use it and is close to how one normally writes this in e.g. Coq (if
-they accept my ITP paper then maybe there will be one, but I'm very
-unsure about this).
+[DONE] The lack of short notations make it difficult to read the example 6.6 page 13 and the interpretation of IPC2 page 14, and grasp the essence of these interpretations, since no intuition is given concerning these interpretations and how the authors found them.
 
-> No details are given in the paper concerning the proof of Theorem 4.4, the termination of the relation defined in Definition 4.2 page 6, which is an important ingredient of the criterion. The result seems correct though and the proof given in the appendix, based on Girard's reducibility candidates, standard. Mentioning this would be a minimum. We may also wander whether some termination criterion could not be applied here.
-
-CK: A proof sketch of a few lines (and then a pointer to the appendix)
-would indeed not be amiss here. It's probably best if you do that. :)
-
-LC: OK, done
-
-> The lack of short notations make it difficult to read the example 6.6 page 13 and the interpretation of IPC2 page 14, and grasp the essence of these interpretations, since no intuition is given concerning these interpretations and how the authors found them.
-
-CK: I have added _some_ extra text in Example 6.6, and a lot to
-Example 5.14 where those interpretations are defined.  Can you judge
-whether it's up to scratch?
-
-CK: I have now also added a fair bit of extra text in Section 7 (hurray
-for 2 extra pages).  Please judge!
-
-LC: yes, looks good
+  CK: I have added _some_ extra text in Example 6.6, and a lot to
+  Example 5.14 where those interpretations are defined.  Can you judge
+  whether it's up to scratch?
+  
+  CK: I have now also added a fair bit of extra text in Section 7 (hurray
+  for 2 extra pages).  Please judge!
+  
+  LC: yes, looks good
 
 > *) l29. It is mentioned that polymorphic rewriting frameworks are usually restricted to rank-1 polymorphism, and no references are given either for frameworks with rank-1 polymorphism or for more general frameworks. I think that this statement is incorrect, and that the authors should provide some references like:
 >
@@ -91,6 +94,8 @@ truly not that important.  Agreed?
 
 LC: I think we should add some of the references anyway.
 
+CK: But where?
+
 > Finally, note that van de Pol's work has been generalized to other domains than N, in a categorical framework by Makoto Hamana in "An initial algebra approach to term rewriting systems with variable binders", HOSC 2006, 10.1007/s10990-006-8747-5.
 
 CK: The observation here is that we aren't so much extending van de Pol's work, but rather building on the earlier work by Carsten and me that considered higher-order polynomials (based on van de Pol's work). My inclination would be to say:
@@ -101,89 +106,118 @@ CK: The observation here is that we aren't so much extending van de Pol's work, 
 
 LC: seems reasonable
 
-> *) l257. Definition 4.8 is not very clear and its validity is not explained.
->
-> - What are the brackets around \sigma in s R_{\forall(\alpha:\kappa)[\sigma]} t?
+CK: I have now reformulated the text and added a bit about why we only extend polynomials.
+Please check whether you agree (and whether there is still a good place to put in the
+given citations).
 
-CK: Fixed.
+CK: Note: I also considered, as an alternative, the following structure:
+  - first paragraph unaltered
+  - second paragraph explains what we do, and that we only expand higher-order polynomials
+  - then a \paragraph{About full impredicative polymorphism} or something like that,
+    which contains the paragraphs explaining the differences between shallow and full
+    polymorphism and the difficulties involved
+  - then the last paragraph separately
+However, I did not like to put the disclaimer "we don't generalise Jaco's work completely"
+on the first page, and wasn't sure about \paragraphs in the introduction, so I left it as
+is.  You may feel differently (this alternative setup probably does make it easier to put
+the citations in.)
 
-> - You define two relations >_\sigma. The first one by coinduction. The second one from the first one. This is confusing to use the same name.
->
+[DONE] *) l257. Definition 4.8 is not very clear and its validity is not explained.
 
-LC: fixed
+[DONE] - What are the brackets around \sigma in s R_{\forall(\alpha:\kappa)[\sigma]} t?
 
-> - What does "coinductively" mean?
->
+  CK: Fixed.
 
-LC: I think I've dealt with this.
+[DONE] - You define two relations >_\sigma. The first one by coinduction. The second one from the first one. This is confusing to use the same name.
 
-> - Why do you need coinduction?
->
-> - l273. Shouldn't the domain of C be the free variables of t and s?
+  LC: fixed
 
-LC: this doesn't matter, easily seen form the definition; I'm not sure
-if it is essential to mention this explicitly
+[DONE] - What does "coinductively" mean?
 
->
-> - Why not taking Lem 4.9 as definition?
->
+  LC: I think I've dealt with this.
 
-LC: I think there is a brief explanation why coinduction is
-preferable. I also mentioned easier formalization.
+[DONE] - Why do you need coinduction?
+
+  CK: I think your explanation suffices.
+
+[DONE] - l273. Shouldn't the domain of C be the free variables of t and s?
+
+  LC: this doesn't matter, easily seen form the definition; I'm not sure
+  if it is essential to mention this explicitly
+
+  CK: Yeah, it's fine to leave.
+
+[DONE] - Why not taking Lem 4.9 as definition?
+
+  LC: I think there is a brief explanation why coinduction is
+  preferable. I also mentioned easier formalization.
+
+  CK: I think the explanation suffices, although it will still make people who
+  are not used to coinduction unhappy.  I don't think we can make them happier
+  without changing the paper to use 4.9 as the definition, though, and we don't
+  want to do that.
 
 > - l278. Why would proofs be less perspicuous?
->
 
 LC: I mentioned formalisation.
 
-> - l314. (1) missing after second lift.
+CK: I think the reason for the "perspicuous" is something like "an inductive
+proof -- and a coinductive proof works in much the same way -- is generally more
+practical than reasoning about an arbitrary sequence of terms and types".  But
+I don't think that needs much explanation.  Regarding the formalisation: in the
+rebuttal you said something on the lines of "a formalisation using this lemma
+would basically go via the coinductive definition" -- do you think you could
+formulate that in the 0.9 line we have to spare here?
 
-CK: Fixed.
+[DONE] - l314. (1) missing after second lift.
 
-> - l315. s missing before second u: su+1 > su.
+  CK: Fixed.
 
-CK: Fixed.
+[DONE] - l315. s missing before second u: su+1 > su.
 
-> - l316. idem.
+  CK: Fixed.
 
-CK: Fixed.
+[DONE] - l316. idem.
 
+  CK: Fixed.
 
-> l21. Incorrect DOI. Page bottoms mention CVIT 2016. The copyright also. This should be updated.
->
+[DONE] l21. Incorrect DOI. Page bottoms mention CVIT 2016. The copyright also. This should be updated.
 
-LC: the editors will update?
+  LC: the editors will update?
 
-> l44. I understand that the termination of system F cannot be reduced to the termination of simply-typed lambda-calculus. But why the termination of a polymorphic system couldn't be equivalent to the termination of a simply-typed system with infinitely many rules? Could you elaborate on this, give more evidence?
->
+  CK: Yes, I believe so.
 
-LC: I don't understand what the reviewer means here. Maybe they can be
-reduced *somehow*, but not in a straightforward way by instantiating
-the type quantifiers. This is obvious, because how do you instantiate
-a quantifier at a negative position? I clarified it a bit, by
-mentioning the negative occurrences.
+[DONE] l44. I understand that the termination of system F cannot be reduced to the termination of simply-typed lambda-calculus. But why the termination of a polymorphic system couldn't be equivalent to the termination of a simply-typed system with infinitely many rules? Could you elaborate on this, give more evidence?
+
+  LC: I don't understand what the reviewer means here. Maybe they can be
+  reduced *somehow*, but not in a straightforward way by instantiating
+  the type quantifiers. This is obvious, because how do you instantiate
+  a quantifier at a negative position? I clarified it a bit, by
+  mentioning the negative occurrences.
+
+  CK: I think it suffices.
 
 > l47. References [4,5] are not the more recent ones.
->
 
 LC: we should replace them with some of the other suggested references?
 
-> l58. introduce -> recall the definition of
->
+CK: They have been removed altogether. (However, the argument about them not being recent is because the termination method in 2007 paper is incorrect, so I don't like to cite it.) I don't know what to say about those papers on the calculus of constructions or dependent types, so have not put them in.
 
-LC: fixed
+[DONE] l58. introduce -> recall the definition of
 
-> l76. not ... or ... -> neither ... nor ...
+  LC: fixed
 
-CK: Fixed.
+[DONE] l76. not ... or ... -> neither ... nor ...
 
-> l80. \chi_* is in \Sigma^T_*, not \Sigma^T_\kappa
+  CK: Fixed.
 
-CK: Changed.
+[DONE] l80. \chi_* is in \Sigma^T_*, not \Sigma^T_\kappa
 
-> Section 2. Is it really useful to recall basic properties of Fw like Lemma 2.4, 2.6, 2.7? Isn't it possible to refer to some article or book like the chapter "Lambda calculi with types", by H. Barendregt, in the Handbook of logic in computer science?
+  CK: Changed.
 
-CK: It's not like we put in a proof, so I don't think this is a problem.
+[DONE] Section 2. Is it really useful to recall basic properties of Fw like Lemma 2.4, 2.6, 2.7? Isn't it possible to refer to some article or book like the chapter "Lambda calculi with types", by H. Barendregt, in the Handbook of logic in computer science?
+
+  CK: It's not like we put in a proof, so I don't think this is a problem.
 
 > l139. What is m in m<k?
 
@@ -197,67 +231,74 @@ LC: If we want to change this then we should invent a new symbol for
 type application. Or omit the application symbols entirely (as is
 standard in type theory).
 
+CK: We _usually_ omit the application symbols, but here I think we need
+to make them explicit because we say "you can have *this* but not *that*".
+I do not know what best to do this on short notice.
+
 > l124, l136, l139, l144, l258: why using parentheses after \forall?
->
 
 LC: he's right, they're not strictly necessary. Should we change this?
+
+CK: I guess we're not consistent about it, since \forall *is* used without the brackets in Example 3.7 and the text above it. So, while I actually think it increases readability, I wouldn't mind changing this, provided it is done consistently (either always use the brackets or never).
 
 > l161. rewrite rule -> rewriting rule
 
 CK: It's quite standard in the literature to use "rewrite rule". I don't think we need to act on this one.
 
 > l161. Def 3.5. There is no explicit restriction on the kinds of terms that can be used in a set of rewriting rules. Can they be non PFS terms?
->
+
+CK: No. (Updated.)
+
 > l172. Why \beta is restricted to *?
->
 
 LC: We really encode system F here, not F-omega. We should reformulate
 this somehow. Encoding F-omega would be more tedious, because you then
 need a separate application operator for every kind.
 
-> l205. As + is left-associative, s+t+u should be read as (s+t)+u, hence as +(+st)u.
+CK: Can you do this? You are far more familiar with these systems than I am.
 
-CK: Changed.
+[DONE] l205. As + is left-associative, s+t+u should be read as (s+t)+u, hence as +(+st)u.
 
-> l208. parial -> partial
+  CK: Changed.
 
-CK: Fixed.
+[DONE] l208. parial -> partial
 
-> l215. m.n -> m\times n. parentheses are useless.
+  CK: Fixed.
 
-LC: changed
+[DONE] l215. m.n -> m\times n. parentheses are useless.
 
->
-> l209. smallest relation on which terms? I?
->
+  LC: changed
 
-LC: fixed
+[DONE] l209. smallest relation on which terms? I?
 
-> l224. Why *rules* are invariant by \equiv? It doesn't seem to be the case. For instance, if \sigma beta-reduces to nat, then lift_\sigma.s is not reducible while lift_nat.s is reducible. But the *relation* can be invariant if you add this constraint in the definition.
->
+  LC: fixed
 
-LC: The reviewer didn't get that the terms are beta-equivalence classes
-w.r.t. reduction in types. I tried to make it more clear now.
+[DONE] l224. Why *rules* are invariant by \equiv? It doesn't seem to be the case. For instance, if \sigma beta-reduces to nat, then lift_\sigma.s is not reducible while lift_nat.s is reducible. But the *relation* can be invariant if you add this constraint in the definition.
 
-> l236-237. Why is it important not to be able to test for zero? What is the relation with testing the equality of two types by using the non-left-linear rule defining J? Could you elaborate on this?
->
+  LC: The reviewer didn't get that the terms are beta-equivalence classes
+  w.r.t. reduction in types. I tried to make it more clear now.
 
-LC: I elaborated.
+[DONE] l236-237. Why is it important not to be able to test for zero? What is the relation with testing the equality of two types by using the non-left-linear rule defining J? Could you elaborate on this?
 
-> l242. Theorem 4.4. Could you provide some proof sketch?
+  LC: I elaborated.
 
-LC: I added a brief description.
+[DONE] l242. Theorem 4.4. Could you provide some proof sketch?
+
+  LC: I added a brief description.
 
 > l352. This is the first time that you mention that your goal is to prove the termination on PFS terms.
->
 
 LC: Should we mention this earlier?
 
+CK: It should have been clear already, yes. For example, it is implied by the introduction paragraph of Section 3.
+Perhaps we should make this more clear, and add an "overview of the paper" paragraph to the introduction?
+
 > l355. Shouldn't C be a PFS context?
->
 
 LC: contexts were defined only for PFSs. Should we make this somehow
 more clear?
+
+CK: I am not sure how.
 
 > l382. Strictly speaking >^J depends on TM too.
 >
