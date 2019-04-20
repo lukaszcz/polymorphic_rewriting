@@ -1397,11 +1397,11 @@ $
 
   Finally, assume $C = \app{t}{C'}$. Then $t = \mathtt{f} \rho_1
   \ldots \rho_n t_1 \ldots t_m$ where
-  \[
+  $
   \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots \forall (\alpha_n
   : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype \sigma_k \arrtype
   \tau
-  \]
+  $
   with~$\tau$ a type atom, $m < k$, and $\Termmap(\mathtt{f}) =
   \tabs{\alpha_1 \dots \alpha_n}{\abs{x_1 \dots x_k}{u}}$ with $u$
   safe for each~$x_i$. Without loss of generality assume $m=k-1$. Then
@@ -1848,38 +1848,38 @@ set of rules is available in \CKchange{\cite[Appendix~B]{versionwithappendix}}:
 \end{array}
 \]
 \[
-\begin{array}{l}
-@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) \red
+\begin{array}{ll}
+& @_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) \red
   \epsilon_\tau(s) \\
-\mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}\,\sigma\,\tau}(
+& \mathtt{case}_{\sigma,\tau,\rho}(\epsilon_{\mathtt{or}\,\sigma\,\tau}(
   u),\abs{x}{s},\abs{y}{t}) \red \epsilon_\rho(u) \\
-\epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,\abs{x}{s},
+& \epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,\abs{x}{s},
   \abs{y}{t})) \red
   \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x}{\epsilon_\rho(s)},
   \abs{y}{\epsilon_\rho(t)}) \\
-  \proj^2_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}\,\rho,\pi}(u,
+& \proj^2_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}\,\rho,\pi}(u,
   \abs{x:\sigma}{s},\abs{y:\tau}{t}))\red
   \mathtt{case}_{\sigma,\tau,\pi}(u,\abs{x:\sigma}{\proj^2_{\rho,\pi}(s)},
   \abs{y:\tau}{\proj^2_{\rho,\pi}(t)}) \\
-\mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,\tau,\mathtt{or}\,
+& \mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,\tau,\mathtt{or}\,
   \rho\,\pi}(u,\abs{x}{s},\abs{y}{t}),\abs{z}{v},
   \abs{a}{w}) \red \\
-  \phantom{AB}
+& \phantom{AB}
   \mathtt{case}_{\sigma,\tau,\xi}(u,\abs{x}{\mathtt{case}_{
   \rho,\pi,\xi}(s,\abs{z}{v},\abs{a}{w})},
   \abs{y}{\mathtt{case}_{\rho,\pi,\xi}(t,\abs{z}{v},
   \abs{a}{w})}) \\
-\mathtt{let}_{\varphi,\rho}(
+& \mathtt{let}_{\varphi,\rho}(
   \mathtt{case}_{\sigma,\tau,\exists\varphi}(
   u,\abs{x}{s},\abs{y}{t}),v) \red
   \mathtt{case}_{\sigma,\tau,\rho}(u,
   \abs{x}{\mathtt{let}_{\varphi,\rho}(s,v)},
   \abs{y}{\mathtt{let}_{\varphi,\rho}(t,v)}) \\
-\mathtt{let}_{\psi,\rho}(\mathtt{let}_{\varphi,\exists\psi}(s,
+\hspace{-10pt}
+(*) & \mathtt{let}_{\psi,\rho}(\mathtt{let}_{\varphi,\exists\psi}(s,
   \tabs{\alpha}{\abs{x:\varphi\alpha}{t}}),u) \red
   \mathtt{let}_{\varphi,\rho}(s,\tabs{\alpha}{\abs{x:
-  \varphi\alpha}{\mathtt{let}_{\psi,\rho}(t,u)}})
-  \hfill (*) \\
+  \varphi\alpha}{\mathtt{let}_{\psi,\rho}(t,u)}}) \\
 \end{array}
 \]
 
@@ -1894,9 +1894,11 @@ more details).
     \pair{t_1}{t_2}_{\sigma,\tau} &=& \tabs{p}{\abs{x:\sigma\arrtype\tau\arrtype p}{x t_1 t_2}} & &
     \pi^2_{\sigma,\tau}(t) &=& t \tau (\abs{x:\sigma}{\abs{y:\tau}{y}}) \\
     \Sigma \alpha . \sigma &=& \forall p . (\forall \alpha . \sigma \arrtype p) \arrtype p & \quad &
+    \phantom{ABCD}
     \expair{\tau}{t}_{\Sigma\alpha.\sigma} &=& \tabs{p}{\abs{x:\forall\alpha.\sigma\arrtype p}{x \tau t}} \\
-    & & & &
-    \xlet{\rho}{t}{\alpha,x:\sigma}{s} &=& t \rho (\tabs{\alpha}{\abs{x:\sigma}{s}}) \\
+    & &
+    \multicolumn{3}{r}{
+    \xlet{\rho}{t}{\alpha,x:\sigma}{s}} &=& t \rho (\tabs{\alpha}{\abs{x:\sigma}{s}}) \\
   \end{array}
   \]
 
@@ -2066,7 +2068,7 @@ stating explicitly.
   \mathbb{N}$ is obviously in $\SN$.
 \end{proof}
 
-In the rest of this section we adapt Tait-Girard method of candidates
+In the rest of this section we adapt Tait-Girard's method of candidates
 to prove termination of~$\arrW$. The proof is an adaptation of
 chapters~6 and~14 from the book~\cite{Girard1989}, and chapters~10
 and~11 from the book~\cite{SorensenUrzyczyn2006}.
