@@ -549,7 +549,16 @@ Similarly, $\beta$-reduction of type abstraction can be modelled
 by including a symbol
 $\mathtt{A} : \forall \alpha : * \arrkind * . \forall \beta . (\forall
 \gamma.\alpha \gamma) \arrtype \alpha \beta$ and rules
-$\mathtt{A}_{\varphi,\sigma}(\tabs{\alpha}{s}) \red s[\alpha:=\sigma]$.
+\CKchange{$\mathtt{A}_{\abs{\gamma}{\sigma},\tau}(\tabs{\gamma}{s}) \red s[\gamma:=\tau]$.}%
+  \footnote{\CKchange{The use of a type constructor variable $\alpha$ of kind
+  $* \arrkind *$ makes it possible to do type substitution as part of
+  a rule.
+  An application $s * \tau$ with $s : \quant{\gamma}{\sigma}$ is
+  encoded as $\mathtt{A}_{\abs{\gamma}{\sigma},\tau}(s)$, so
+  $\alpha$ is substituted with $\abs{\gamma}{\tau}$.
+  This is well-typed because $(\abs{\gamma}{\sigma})\gamma =_\beta
+  \sigma$ and $(\abs{\gamma}{\sigma})\tau =_\beta \sigma[\gamma:=\tau]$.
+  }}
 We can also use rules
 $(\tabs{\alpha}{s})*\tau \red s[\alpha:=\tau]$ without the extra
 symbol, but to apply our method it may be

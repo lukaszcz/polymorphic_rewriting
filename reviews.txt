@@ -362,155 +362,105 @@ CK: We're not citing it anymore now, though.
 CK: Not for a final version, I think. But perhaps good for a journal extension?
 
 > ----------------------- REVIEW 2 ---------------------
-> PAPER: 24
-> TITLE: Polymorphic Higher-order Termination
-> AUTHORS: Łukasz Czajka and Cynthia Kop
->
-> Overall evaluation: 2 (accept)
->
-> ----------- Overall evaluation -----------
-> Summary.
->
-> This is a great paper, generalizing termination proofs for simply typed higher-order rewrite systems by monotonic functionals. The result is a termination proof method for rewrite systems defined by constants and rewrite rules in F-omega, including impredicative type constructors. The method proceeds by providing a monotonic ("safe") interpretation of all function symbols in a subset of F-omega terms, that play the role of higher-order impredicative polynomials. (so the method is more syntactic than the usual interpretation in a monotonic algebra). The proof obligation for termination is to show that [[l]] > [[r]] for all rules under this interpretation.
-> Moreover, if for some rules only >= holds, one can at least progress by removing the proper >-rules.
->
-> The paper includes two examples to show its potential:
-> - a Haskell-like fold over heterogeneous typed polymorphic lists (every element has a different type)
-> - normalization of 2nd-order intuistionic logic natural deduction proofs with permutative conversions
-> In the latter case, a few permutative conversions could not be proved terminating, as the authors show.
->
->
-> Evaluation.
->
-> This is as far as I know very innovative work. Already the set of (higher-order, impredicative) polynomials with their basic properties is interesting.
-> The work is thorough. All definitions are given in large detail, and there are numerous pages with proofs in the appendix.
-> The paper is well-readable, with some effort. Crucial steps are also explained at an intuitive level. I'm not an expert in impredicativity, so for me some questions remained unanswered (see below). (but I fully realize that the authors have already used the pages within the limit very efficiently).
->
-> The class of Polymorphic Functional Systems may turn out to be to wild in the end (at least I cannot oversee what is possible here), but this work would already be relevant if only "tamed" subset of this class yields useful results. Also, F-omega is closely related (somehow) to Haskell's type system.
->
+
 > The only minor issue is that the second example doesn't work out fully. The authors are very clear about that (already in the introduction). I wonder if it is not more clear to present a core calculus + full termination proof (which is already sufficient to prove cut elimination), and leave the extra rules with permutative conversions as an open question for future work.
->
->
-> Remaining Questions.
->
-> - why F-omega, why not just system F? I believe (not 100% sure) that the given examples could be handled in system F as well. What is the exact relationship between F-omega and Haskell's types?
-> It is not clear to me if the paper would simplify a lot if it is restricted to system F only, and what we would loose.
->
 
-LC: I briefly mentioned the type constructors.
+CK: I would rather ot change the paper too far for the final version, so let's not.
 
-> - I'm bothered by the J-example from [3]. (J tau tau -> lambda x.x leads to non-termination). It seems that J can be interpreted by a simple higher-order polynomial? That would be problematic, or wouldn't it? Does this mean that there is no >= interpretation for beta-reduction in F-omega? A deeper treatment of the (implications of) this example would be useful.
->
+[DONE] - why F-omega, why not just system F? I believe (not 100% sure) that the given examples could be handled in system F as well. What is the exact relationship between F-omega and Haskell's types? It is not clear to me if the paper would simplify a lot if it is restricted to system F only, and what we would loose.
 
-LC: I added more explanations.
+  LC: I briefly mentioned the type constructors.
+
+[DONE] - I'm bothered by the J-example from [3]. (J tau tau -> lambda x.x leads to non-termination). It seems that J can be interpreted by a simple higher-order polynomial? That would be problematic, or wouldn't it? Does this mean that there is no >= interpretation for beta-reduction in F-omega? A deeper treatment of the (implications of) this example would be useful.
+
+  LC: I added more explanations.
 
 > - I couldn't follow the fine details of the definitions and proofs by coinduction. It would do no harm to explain the definition, not only at an intuitive level (although that was helpful as well). Can you give a concrete example on how to derive > or >= already at Def. 4.8?
 >
 
 LC: maybe we should give an example of how to derive > or >=?
 
+CK: I guess we could... How hard would it be to give a coinductive proof here that ∀α.lift_α(1) > ∀α.lift_α(0)?
+
 > - Def 4.2: Would it be possible to _avoid_ introducing the constants flatten, lift, +, * at higher types, and instead DEFINE those as abbreviated terms, with induction on types? (where we see (s*\chi) as smaller than (FORALL x.s). This would avoid quite some complexity, in particular termination of ~~>
 > (at least that strategy works for simply typed case)
->
 
 LC: I don't think it's necessary to explain this in the paper?
 
+CK: I don't think it is.  It wouldn't be bad to have it in a footnote or remark somewhere, but it isn't really necessary either.
+
 > - Is the problem if for interpretation terms s,t "s>t" computable?
->
 
 LC: should we explain this?
 
-> - I didn't get l435: "J(cons) is not required to be safe for x, since x is not an argument...".
-> In the definition of J(cons) x seems to be an argument. This looks dangerous to me. Can you explain this better?
->
+CK: It is an interesting question because if the relation was computable, we would have to justify why we do not provide an algorithm. Is there a one- or two-line explanation why it isn't computable? We could then remark in Section 6, before introducing the lemmas, that since it isn't computable we'll just give some lemmas to work with it.
 
-LC: I think you explained it already?
+[DONE] - I didn't get l435: "J(cons) is not required to be safe for x, since x is not an argument...".  In the definition of J(cons) x seems to be an argument. This looks dangerous to me. Can you explain this better?
 
-> - In [16], permutative conversions for the simply typed case required exponentiation. This raises two questions: why do you insist on polynomials, why not add 2^x to the basic functions? And: would that help to find an interpretation of the final rules?
->
+  LC: I think you explained it already?
 
-LC: I mentioned that adding exponentiation is not a fundamental problem.
+[DONE] - In [16], permutative conversions for the simply typed case required exponentiation. This raises two questions: why do you insist on polynomials, why not add 2^x to the basic functions? And: would that help to find an interpretation of the final rules?
+
+  LC: I mentioned that adding exponentiation is not a fundamental problem.
+
+  CK: Might be interesting to see what they do in [16] to manage existential quantification, though. (Although not for the final version of this.)
 
 > - Would it be doable to formalize your proofs in Coq or Agda?
 >
 
 LC: I don't think we need to speculate about this in the paper?
 
+CK: Not necessarily, although formalisation is mentioned as a reason for using a co-inductive definition. We could mention this as a possible direction for future work in section 8, although it might be deceptive since we don't actually intend to do that.
+
 > - l. 172: Please explain the weird type for A. Also, please indicate what A_{x,y} means precisely. I don't see immediately why the rule for A is well-typed, and how the A is used to make the rule for foldl well-typed.
->
 
 LC: TODO
 
-> - l. 236: why is the sentence about case distinction on 0 there? I'm missing the connection with the previous sentence about J.
->
+CK: I wrote something up. Please check!
 
-LC: added more explanations
+[DONE] - l. 236: why is the sentence about case distinction on 0 there? I'm missing the connection with the previous sentence about J.
 
->
->
+  LC: added more explanations
+
 > Thanks for the answers in the rebuttal, they clarified most of the questions. I hope this is useful in making the final version even more understandable. In particular, I don't disagree with using co-induction, but it does no harm to remind the user of the shape of a co-inductive definition scheme.
->
->
-> Typos / small remarks:
->
-> - p3, l89: the condition s:tau is missing. Also, how do you handle "contexts"?
-> (e.g. x:sigma |- s:tau)
->
 
-LC: fixed
+[DONE] - p3, l89: the condition s:tau is missing. Also, how do you handle "contexts"? (e.g. x:sigma |- s:tau)
 
-> -p3, l90: some brackets are required to make sense of this term with many :::
->
+  LC: fixed
 
-LC: done
+[DONE] -p3, l90: some brackets are required to make sense of this term with many :::
 
-> -p3, l112: we will also use \x.s: I believe this notation only appears in the appendix.
->
+  LC: done
 
-LC: moved to appendix
+[DONE] -p3, l112: we will also use \x.s: I believe this notation only appears in the appendix.
 
-> - p3, Lemma 2.6, case 2: doesn't this require an extra condition, that alpha and tau are of the same kind?
->
+  LC: moved to appendix
 
-LC: added explanation
+[DONE] - p3, Lemma 2.6, case 2: doesn't this require an extra condition, that alpha and tau are of the same kind?
 
-> - p3, Lemma 2.7: one of the "and"s must be "then". I believe the first one.
->
+  LC: added explanation
 
-LC: fixed
+[DONE] - p3, Lemma 2.7: one of the "and"s must be "then". I believe the first one.
+
+  LC: fixed
 
 > - p4, Def 3.2: it would be more clear to present this as a definition of PFS types and terms, and avoid "We assume..." (l. 135)
->
 
 LC: done
 
-> - p5, l. 172: \lambda a.s -> \Lambda a.s
->
+CK: The "done" is only on avoiding "We assume"? (I am not sure what exactly the reviewer wanted here.)
 
-LC: done
+[DONE] - p5, l. 172: \lambda a.s -> \Lambda a.s
 
-> - p9, Lem 4.22: f t R s then … -> If t R s then …
->
+  LC: done
 
-LC: fixed
+[DONE] - p9, Lem 4.22: f t R s then … -> If t R s then …
+
+  LC: fixed
 
 >
 > ----------------------- REVIEW 3 ---------------------
-> PAPER: 24
-> TITLE: Polymorphic Higher-order Termination
-> AUTHORS: Łukasz Czajka and Cynthia Kop
->
-> Overall evaluation: 1 (weak accept)
->
-> ----------- Overall evaluation -----------
-> The paper introduces a methodology to prove termination of higher-order
-> rewriting with full impredicative polimorphism.
->
-> The introduction of the problem is quite nice, it makes clear how impredicative
-> polimorphism is used in practice and how problematic can be to prove termination
-> of higher-order systems with this characteristic. Also the presentation of the
-> F_\omega systems and the polymorphic functional systems is clear in the paper.
->
+
 > Once they have the presentation, the authors follow the classic schema for
 > proving termination: interpretation definition, orderings, a removal technique
 > and an large example. The authors neither go further defining a dependency pair
@@ -518,12 +468,10 @@ LC: fixed
 > experience on adapting dependency pairs to higher-order, it would be really nice
 > if she/they could explain the problems they could find to do this task or if it is just a
 > straightforward extension.
->
-> Even with these cons, I think the paper is interesting and the topic is
-> appropriate for the conference, so I recommend acceptance of the paper.
->
-> Typos:
->
-> page 23:6, line 226: rules 4-13.
->
-LC: fixed
+
+CK: Should I say more about this? I could add a few lines in the future work where
+we already refer to these things, but it would be highly speculative.
+
+[DONE] page 23:6, line 226: rules 4-13.
+  
+  LC: fixed
