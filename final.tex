@@ -191,10 +191,11 @@ The above states that $\List$ is a type ($*$), gives the types of its
 two constructors $\nil$ and $\cons$, and defines the corresponding
 fold-left function~$\mathtt{foldl}$. Each element of a heterogenous
 list may have a different type. In practice, one would
-  constrain the type variable~$\alpha$ above with a type class to
+  constrain the type variable~$\alpha$ %above
+  with a type class to
   guarantee the existence of some operations on list elements.  The
 function argument of~$\mathtt{foldl}$ receives the element together
-with its type. The $\forall$-quantifier binds type variables -- a term
+with its type. The $\forall$-quantifier binds type variables: a term
 of type $\forall \alpha . \tau$ takes a type~$\rho$ as an argument and
 the result is a term of type~$\tau[\subst{\alpha}{\rho}]$.
 
@@ -207,43 +208,56 @@ into an infinite set of simply typed rules by instantiating the type
 variables. The above example is not directly reducible to shallow
 polymorphism as used in the~ML programming language.
 
-\medskip\noindent\textbf{Related work.} The term rewriting literature
+\medskip\noindent\CKchange{\textbf{Related work.} The term rewriting literature
 has various examples of higher-order term rewriting systems with some
-forms of polymorphism.  To start, there are several lines of research
-that consider shallow polymorphic rewriting
-(e.g.,\cite{ham:18,jou:rub:07,wah:04}), where (as in ML-like
+forms of polymorphism.  To start, there are several studies that
+consider shallow polymorphic rewriting
+(e.g., \cite{ham:18,jou:rub:07,wah:04}), where (as in ML-like
 languages) systems like $\mathtt{foldl}$ above cannot be handled.
-Other works consider extensions of the lambda-Pi-calculus
+Other works consider extensions of the $\lambda\Pi$-calculus
 \cite{cou:dow:07,dow:17} or the calculus of constructions 
 \cite{bla:05,wal:03} with rewriting rules; only the latter
-includes full impredicative polymorphism.  The termination methods
-for these systems are mostly syntactic methods, such as the recursive
+includes full impredicative polymorphism.  The termination techniques
+presented for these systems are mostly syntactic (e.g., a recursive
 path ordering \cite{jou:rub:07,wal:03}, or general schema
-\cite{bla:05}.  An exception is \cite{dow:17}, which defines
+\cite{bla:05}), as opposed to our more semantic method based on
+interpretations.
+An exception is \cite{dow:17}, which defines
 interpretations into $\Pi$-algebras; this technique bears some
-similarity to the one we will define, although the methodologies are
+similarity to ours, although the methodologies are
 quite different.  A categorical definition for a general polymorphic
 rewriting framework is presented in \cite{fio:ham:13}, but no
-termination methods are considered for this framework.
+termination methods are considered for it.}
 
-\medskip\noindent\textbf{Our approach.}
-
-or the polymorphic
-higher-order rewriting formalisms of~\cite{jou:oka:91,jou:rub:99}.
-
-The technique we develop in this paper can be used to handle
-systems like the one above.
-\CKchange{Due to the additional complications of full polymorphism, we have
+\medskip\noindent\CKchange{\textbf{Our approach.}
+The technique we develop in this paper operates on \emph{Polymorphic
+Functional Systems (PFSs)}, a form of higher-order term rewriting systems
+with full impredicative formalism (Section \ref{sec_systems}), that
+various systems of interest can be encoded into (including the example
+of heterogeneous fold above). Then, our methodology follows a standard
+procedure:
+\begin{itemize}
+\item we define a well-ordered set $(\Iterms,\succ,\succeq)$
+  (Section \ref{sec:World});
+\item we provide a general methodology to map each PFS term $s$ to a
+  natural number $\interpret{s}$, parameterised by a core interpretation
+  for each function symbol (Section \ref{sec_reduction_pairs});
+\item we present a number of lemmas to make it easy to prove that
+  $s \succ t$ or $s \succeq t$ whenever $s$ reduces to $t$
+  (Section \ref{sec_rule_removal}).
+\end{itemize}
+Due to the additional complications of full polymorphism, we have
 elected to only generalise higher-order polynomial interpretations,
-and not v.d. Pol's weakly monotonic algebras; e.g., we fix the natural
-numbers as the base algebra and only consider addition and
-multiplication as operations.  We believe that the same ideas could be
-used to obtain a true generalisation of v.d. Pol's work, but it would
-be harder to present concisely.}
+and not v.d. Pol's weakly monotonic algebras.  That is, terms of base
+type are always interpreted to natural numbers and all functions are
+interpreted to combinations of addition and multiplication.  It may be
+possible to extend the same ideas to obtain a true generalisation of
+v.d. Pol's work, but it is not immediately obvious how because the
+polynomial shape of interpretations is inherent in our core set
+$\Iterms$.}
 
-\LC{I'm not sure if I believe that we can obtain a true generalisation
-of v.d. Pol's work, because our approach is (and needs to be) more syntactic.}
-
+%The technique we develop in this paper can be used to handle
+%systems like $\mathtt{foldl}$ above.
 We will use the system of heterogeneous fold above as a running
 example to demonstrate our method.  However, termination of this
 system can be shown in other ways (e.g., an enco\-ding in
@@ -259,17 +273,17 @@ difficult, with some incorrect claims in the literature and no uniform
 methodology. It is our goal to make such termination proofs
 substantially easier in the future.
 
-Complete proofs for the results in this paper are available
-in an online appendix.~\cite{versionwithappendix}.
+%Complete proofs for the results in this paper are available
+%in an online appendix.~\cite{versionwithappendix}.
 
 \section{Preliminaries}\label{sec_preliminaries}
 
 In this section we recall the definition of System~$\Fomega$ (see
 e.g.~\cite[Section~11.7]{SorensenUrzyczyn2006}), which will form a
 basis both of our interpretations and of a general syntactic framework
-for the investigated systems. \LCchange{In comparison to System~$\mathrm{F}$,
+for the investigated systems. In comparison to System~$\mathrm{F}$,
 System~$\Fomega$ includes type constructors which results in a more
-uniform treatment.} We assume familiarity with core notions of lambda
+uniform treatment. We assume familiarity with core notions of lambda
 calculi such as substitution and $\alpha$-conversion.
 
 \begin{defn}\label{def_types}
@@ -931,9 +945,9 @@ follows.
 
 In what follows, all proofs by coinduction could be reformulated to
 instead use the lemma above. However, this would arguably make the
-proofs less perspicuous. \LC{Moreover, a coinductive definition is better
+proofs less perspicuous. Moreover, a coinductive definition is better
 suited for a formalisation -- the coinductive proofs here could be
-written in Coq almost verbatim.}
+written in Coq almost verbatim.
 
 Our next task is to show that $\succeq$ and $\succ$ have the
 desired properties of an ordering pair; e.g., transitivity and

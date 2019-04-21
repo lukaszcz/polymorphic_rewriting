@@ -82,7 +82,7 @@ definitely need to mention related work on termination in polymorphic
 systems! You know more about this, so maybe you add. Maybe make a
 separate paragraph in the introduction about related work?
 
-CK: But I don't. That's the problem -- I don't know how CoC or the lambda-Pi-calculus relate to what we're doing...
+CK: I have now updated (and extended) the introduction quite a bit.
 
 > Finally, note that van de Pol's work has been generalized to other domains than N, in a categorical framework by Makoto Hamana in "An initial algebra approach to term rewriting systems with variable binders", HOSC 2006, 10.1007/s10990-006-8747-5.
 
@@ -97,18 +97,6 @@ LC: seems reasonable
 CK: I have now reformulated the text and added a bit about why we only extend polynomials.
 Please check whether you agree (and whether there is still a good place to put in the
 given citations).
-
-CK: Note: I also considered, as an alternative, the following structure:
-  - first paragraph unaltered
-  - second paragraph explains what we do, and that we only expand higher-order polynomials
-  - then a \paragraph{About full impredicative polymorphism} or something like that,
-    which contains the paragraphs explaining the differences between shallow and full
-    polymorphism and the difficulties involved
-  - then the last paragraph separately
-However, I did not like to put the disclaimer "we don't generalise Jaco's work completely"
-on the first page, and wasn't sure about \paragraphs in the introduction, so I left it as
-is.  You may feel differently (this alternative setup probably does make it easier to put
-the citations in.)
 
 > l47. References [4,5] are not the more recent ones.
 
@@ -128,6 +116,8 @@ polymorphism there. Hence, the termination conditions for the extra
 rewrite rules can handle (some) impredicative polymorphism. We should
 cite this.
 
+CK: Done.
+
 > l552. [5] is subsumed by more recent publications as mentioned in major remarks and the "The computability path ordering", by F. Blanqui, J.-P. Jouannaud and A. Rubio, LMCS 2015, http://doi.org/10.2168/LMCS-11(4:3)2015.
 >
 
@@ -135,38 +125,11 @@ LC: Haven't changed yet, but we should.
 
 CK: We're not citing it anymore now, though.
 
-
-> - l278. Why would proofs be less perspicuous?
-
-LC: I mentioned formalisation.
-
-CK: I think the reason for the "perspicuous" is something like "an inductive
-proof -- and a coinductive proof works in much the same way -- is generally more
-practical than reasoning about an arbitrary sequence of terms and types".  But
-I don't think that needs much explanation.  Regarding the formalisation: in the
-rebuttal you said something on the lines of "a formalisation using this lemma
-would basically go via the coinductive definition" -- do you think you could
-formulate that in the 0.9 line we have to spare here?
-
-LC: wrote something
+CK: Citing the more recent one now, incorrect though it is.
 
 > l139. What is m in m<k?
 
 CK: It's introduced in line 139. Not sure how to make this clearer. Maybe not put it in the definition, since the lay-out may be causing the confusion?
-
-> l92. * is used both as a kind and as an operator between terms and types. This is unfortunate. Couldn't you use different symbols?
-
-CK: Fair point, but I don't know which ones we should then use.
-
-LC: If we want to change this then we should invent a new symbol for
-type application. Or omit the application symbols entirely (as is
-standard in type theory).
-
-CK: We _usually_ omit the application symbols, but here I think we need
-to make them explicit because we say "you can have *this* but not *that*".
-I do not know what best to do this on short notice.
-
-LC: let's leave it
 
 > l124, l136, l139, l144, l258: why using parentheses after \forall?
 
@@ -369,3 +332,19 @@ calculus. That's why I suggested concentrating on polymorphism when we
 were talking just about doing proofs for some systems with permutative
 conversions, because impredicative polymorphism seems to be the hard
 part.
+
+[DONE] l92. * is used both as a kind and as an operator between terms and types. This is unfortunate. Couldn't you use different symbols?
+
+  CK: Fair point, but I don't know which ones we should then use.
+  
+  LC: If we want to change this then we should invent a new symbol for
+  type application. Or omit the application symbols entirely (as is
+  standard in type theory).
+  
+  CK: We _usually_ omit the application symbols, but here I think we need
+  to make them explicit because we say "you can have *this* but not *that*".
+  I do not know what best to do this on short notice.
+  
+  LC: let's leave it
+
+
