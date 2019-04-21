@@ -28,26 +28,47 @@ CK: Okay. I don't know whether we can still get an arxiv url on time. I propose 
 > For rank-1 polymorphism:
 >
 > - Polymorphic higher-order recursive path orderings, by J.-P. Jouannaud and A. Rubio, JACM 2007. http://doi.org/10.1145/1206035.1206037
->
+
+  CK: I do not like to cite it because this paper is incorrect -- particularly in the way it treats types. That's why I tend to cite the 1999 version, which is correct and has been formally proved. Although in all fairness, the other papers listed here might well be incorrect as well; I owuldn't know without reading them thoroughly.
+
 > - Normal higher-order termination, by J.-P. Jouannaud and A. Rubio, TOCL 2015. http://doi.org/10.1145/2699913
->
+
+  CK: They use a recursive path ordering (and the "normal" is about beta-eta-normal).
+
 > - Dependent type theory with first-order parameterized data types and well-founded recursion, by David Wahlstedt, PhD, Chalmers University of Technology, 2007.
->
+
+  CK: They use size-change termination, a structural property.
+
 > - Polymorphic Rewrite Rules: Confluence, Type Inference, and Instance Validation, by M. Hamana, best paper award at FLOPS 2018, https://doi.org/10.1007/978-3-319-90686-7_7, web interface on http://www.cs.gunma-u.ac.jp/hamana/polysol/
->
+
+  CK: This considers confluence, not termination.
+
 > For full polymorphism:
 >
 > - Termination of rewriting in the calculus of constructions, D. Walukiewicz-Chrząszcz, JFP 2003, http://doi.org/10.1017/S0956796802004641
->
+
+  CK: uses an extension of the higher-order recursive path ordering for CoC + rewriting
+
 > - Definitions by rewriting in the calculus of constructions, F. Blanqui, MSCS 2005, http://doi.org/10.1017/S0960129504004426
->
+
+  CK: uses an extension of the general schema for CoC + rewriting
+
 > - The Dedukti system (https://deducteam.github.io/), developed since many years now, although based on dependent types only can encode full polymorphism by using type-level rewriting.
->
+
+  CK: considers Lambda-Pi-calculus Modulo, which is lambda-pi-calculus with computation ruless. I cannot find anything about termination.
+
 > - Embedding pure type systems in the lambda-Pi-calculus modulo, D. Cousineau and G. Dowek, TLCA 2007, http://doi.org/10.1007/978-3-540-73228-0_9
->
+
+  CK: considers Lambda-Pi-calculus Modulo.  Regarding termination, the only thing I could find is http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.102.4096&rep=rep1&type=pdf : proposition 4 (page 9), which reduces it to termination of something else, but does not give a method.
+
 > - Models and Termination of Proof Reduction in the lambda Pi-Calculus Modulo Theory, G. Dowek, ICALP 2017, http://doi.org/10.4230/LIPIcs.ICALP.2017.109
->
+
+  CK: Termination follows if the system is super-consistent, which means that for all complete \Pi-algebras B the theory has a model in B. This seems somewhat related, as a model is basically an interpretation; however, Pi-algebras are very different from what we do, and they have to prove something for _all_ Pi-algebras while we do it only for one _given_ algebra.
+
 > - Multiversal Polymorphic Algebraic Theories: Syntax, Semantics, Translations, and Equational Logic, by Marcelo Fiore and Makoto Hamana, LICS 2013, https://doi.org/10.1109/LICS.2013.59.
+
+  CK: This seems to define some way of doing polymorphic rewriting? I have no hope of understanding this given that it is steeped in category theory. Termination is not mentioned.
+
 
 CK: Okay... Let's just remove that part of the motivation. :P  It is
 truly not that important.  Agreed?
@@ -60,6 +81,8 @@ LC: in the introduction, when mentioning polymorphism. I think we
 definitely need to mention related work on termination in polymorphic
 systems! You know more about this, so maybe you add. Maybe make a
 separate paragraph in the introduction about related work?
+
+CK: But I don't. That's the problem -- I don't know how CoC or the lambda-Pi-calculus relate to what we're doing...
 
 > Finally, note that van de Pol's work has been generalized to other domains than N, in a categorical framework by Makoto Hamana in "An initial algebra approach to term rewriting systems with variable binders", HOSC 2006, 10.1007/s10990-006-8747-5.
 
