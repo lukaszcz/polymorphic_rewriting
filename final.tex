@@ -214,9 +214,12 @@ multiplication as operations.  We believe that the same ideas could be
 used to obtain a true generalisation of v.d. Pol's work, but it would
 be harder to present concisely.}
 
-\CKchange{We will use the system of heterogeneous fold above as a running
+\LC{I'm not sure if I believe that we can obtain a true generalisation
+of v.d. Pol's work, because our approach is (and needs to be) more syntactic.}
+
+We will use the system of heterogeneous fold above as a running
 example to demonstrate our method.  However, termination of this
-system} can be shown in other ways (e.g., an enco\-ding in
+system can be shown in other ways (e.g., an enco\-ding in
 System~$\mathtt{F}$). Hence, we will also study a more complex example
 in Section~\ref{sec:examples}: termination of a substantial fragment
 of~IPC2, i.e., full intuitionistic second-order propositional logic
@@ -229,8 +232,8 @@ difficult, with some incorrect claims in the literature and no uniform
 methodology. It is our goal to make such termination proofs
 substantially easier in the future.
 
-\CKchange{Complete proofs for the results in this paper are available
-in an online appendix.~\cite{versionwithappendix}.}
+Complete proofs for the results in this paper are available
+in an online appendix.~\cite{versionwithappendix}.
 
 \section{Preliminaries}\label{sec_preliminaries}
 
@@ -540,8 +543,8 @@ monotonic closure generates the rewrite relation.
 \end{defn}
 
 While PFS-terms are a restriction from the general terms
-of system $\Fomega$, the reduction relation allows us to actually encode
-$\Fomega$ as a PFS: we can do so by including the symbol
+of system $\Fomega$, the reduction relation allows us to actually encode,
+e.g., system~$\mathtt{F}$ as a PFS: we can do so by including the symbol
 ${@} : \forall\alpha\forall\beta . (\alpha \arrtype \beta) \arrtype \alpha
 \arrtype \beta$ in $\Sigma$ and adding all rules of the form
 $@_{\sigma,\tau}(\abs{x}{s},t) \red s[x:=t]$.
@@ -549,8 +552,8 @@ Similarly, $\beta$-reduction of type abstraction can be modelled
 by including a symbol
 $\mathtt{A} : \forall \alpha : * \arrkind * . \forall \beta . (\forall
 \gamma.\alpha \gamma) \arrtype \alpha \beta$ and rules
-\CKchange{$\mathtt{A}_{\abs{\gamma}{\sigma},\tau}(\tabs{\gamma}{s}) \red s[\gamma:=\tau]$.}%
-  \footnote{\CKchange{The use of a type constructor variable $\alpha$ of kind
+$\mathtt{A}_{\abs{\gamma}{\sigma},\tau}(\tabs{\gamma}{s}) \red s[\gamma:=\tau]$.%
+  \footnote{The use of a type constructor variable $\alpha$ of kind
   $* \arrkind *$ makes it possible to do type substitution as part of
   a rule.
   An application $s * \tau$ with $s : \quant{\gamma}{\sigma}$ is
@@ -558,7 +561,7 @@ $\mathtt{A} : \forall \alpha : * \arrkind * . \forall \beta . (\forall
   $\alpha$ is substituted with $\abs{\gamma}{\tau}$.
   This is well-typed because $(\abs{\gamma}{\sigma})\gamma =_\beta
   \sigma$ and $(\abs{\gamma}{\sigma})\tau =_\beta \sigma[\gamma:=\tau]$.
-  }}
+  }
 We can also use rules
 $(\tabs{\alpha}{s})*\tau \red s[\alpha:=\tau]$ without the extra
 symbol, but to apply our method it may be
@@ -730,7 +733,7 @@ a constant $\mathtt{J} : \forall \alpha \beta . \alpha \arrtype \beta$
 with a reduction rule
 $\mathtt{J} \tau \tau \leadsto \lambda x : \tau . x$ makes the system
 non-terminating~\cite{Girard1971}. This rule breaks parametricity by
-\CKchange{making it possible} to compare two arbitrary types. Our rules do not allow such a
+making it possible to compare two arbitrary types. Our rules do not allow such a
 definition. Moreover, the natural number constants cannot be
   distinguished ``inside'' the system. In other words, we could
   replace all natural number constants with 0 and this would not
@@ -745,8 +748,8 @@ definition. Moreover, the natural number constants cannot be
   that the standard termination proof still generalises.
 
 Now we state some properties of~$\arrW$, including strong
-normalisation. Because of space limitations, most \CKchange{(complete)}
-proofs are delegated to \CKchange{\cite[Appendix~A.1]{versionwithappendix}.}
+normalisation. Because of space limitations, most (complete)
+proofs are delegated to \cite[Appendix~A.1]{versionwithappendix}.
 
 \begin{lemma}[Subject reduction]
   If $t : \tau$ and $t \arrW t'$ then $t' : \tau$.
@@ -901,7 +904,9 @@ follows.
 
 In what follows, all proofs by coinduction could be reformulated to
 instead use the lemma above. However, this would arguably make the
-proofs less perspicuous and more difficult to formalise.
+proofs less perspicuous. \LC{Moreover, a coinductive definition is better
+suited for a formalisation -- the coinductive proofs here could be
+written in Coq almost verbatim.}
 
 Our next task is to show that $\succeq$ and $\succ$ have the
 desired properties of an ordering pair; e.g., transitivity and

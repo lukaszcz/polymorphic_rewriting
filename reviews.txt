@@ -56,6 +56,11 @@ LC: I think we should add some of the references anyway.
 
 CK: But where?
 
+LC: in the introduction, when mentioning polymorphism. I think we
+definitely need to mention related work on termination in polymorphic
+systems! You know more about this, so maybe you add. Maybe make a
+separate paragraph in the introduction about related work?
+
 > Finally, note that van de Pol's work has been generalized to other domains than N, in a categorical framework by Makoto Hamana in "An initial algebra approach to term rewriting systems with variable binders", HOSC 2006, 10.1007/s10990-006-8747-5.
 
 CK: The observation here is that we aren't so much extending van de Pol's work, but rather building on the earlier work by Carsten and me that considered higher-order polynomials (based on van de Pol's work). My inclination would be to say:
@@ -86,7 +91,19 @@ the citations in.)
 
 LC: we should replace them with some of the other suggested references?
 
-CK: They have been removed altogether. (However, the argument about them not being recent is because the termination method in 2007 paper is incorrect, so I don't like to cite it.) I don't know what to say about those papers on the calculus of constructions or dependent types, so have not put them in.
+CK: They have been removed altogether. (However, the argument about
+them not being recent is because the termination method in 2007 paper
+is incorrect, so I don't like to cite it.) I don't know what to say
+about those papers on the calculus of constructions or dependent
+types, so have not put them in.
+
+LC: in the "calculus of construction" papers they extend the calculus
+of constructions (CoC) with rewrite rules, and show that if the
+rewrite rules satisfy a specific termination criterion, then the whole
+system is terminating. CoC subsumes F-omega, so there is impredicative
+polymorphism there. Hence, the termination conditions for the extra
+rewrite rules can handle (some) impredicative polymorphism. We should
+cite this.
 
 > l552. [5] is subsumed by more recent publications as mentioned in major remarks and the "The computability path ordering", by F. Blanqui, J.-P. Jouannaud and A. Rubio, LMCS 2015, http://doi.org/10.2168/LMCS-11(4:3)2015.
 >
@@ -108,6 +125,7 @@ rebuttal you said something on the lines of "a formalisation using this lemma
 would basically go via the coinductive definition" -- do you think you could
 formulate that in the 0.9 line we have to spare here?
 
+LC: wrote something
 
 > l139. What is m in m<k?
 
@@ -125,11 +143,20 @@ CK: We _usually_ omit the application symbols, but here I think we need
 to make them explicit because we say "you can have *this* but not *that*".
 I do not know what best to do this on short notice.
 
+LC: let's leave it
+
 > l124, l136, l139, l144, l258: why using parentheses after \forall?
 
 LC: he's right, they're not strictly necessary. Should we change this?
 
-CK: I guess we're not consistent about it, since \forall *is* used without the brackets in Example 3.7 and the text above it. So, while I actually think it increases readability, I wouldn't mind changing this, provided it is done consistently (either always use the brackets or never).
+CK: I guess we're not consistent about it, since \forall *is* used
+without the brackets in Example 3.7 and the text above it. So, while I
+actually think it increases readability, I wouldn't mind changing
+this, provided it is done consistently (either always use the brackets
+or never).
+
+LC: leave it, I can find all forall's, sometimes we use \quant,
+sometimes \forall
 
 > l161. rewrite rule -> rewriting rule
 
@@ -147,6 +174,7 @@ need a separate application operator for every kind.
 
 CK: Can you do this? You are far more familiar with these systems than I am.
 
+LC: OK, I just said we're encoding system F instead of F-omega
 
 > l352. This is the first time that you mention that your goal is to prove the termination on PFS terms.
 
@@ -155,6 +183,11 @@ LC: Should we mention this earlier?
 CK: It should have been clear already, yes. For example, it is implied by the introduction paragraph of Section 3.
 Perhaps we should make this more clear, and add an "overview of the paper" paragraph to the introduction?
 
+LC: I never like the "overview" paragraphs in introductions. They usually
+say what the names of the sections are and duplicate their first
+sentences. If the paper is not too long, you can just look at the
+section names, so I think it makes no sense to duplicate this
+information.
 
 > l355. Shouldn't C be a PFS context?
 
@@ -169,6 +202,8 @@ LC: fixed
 
 CK: Wait, what changed?
 
+LC: I explicitly remarked that there is a dependency, without changing
+the notation.
 
 > l424-425. Could you align arrows to make this more readable? Put (*) in the left margin to find it more easily.
 
@@ -185,11 +220,21 @@ LC: should we do this?
 
 CK: At this point, it would mean changing the entire paper. I would rather not do it.
 
+LC: ok, let's leave it
 
 > The only minor issue is that the second example doesn't work out fully. The authors are very clear about that (already in the introduction). I wonder if it is not more clear to present a core calculus + full termination proof (which is already sufficient to prove cut elimination), and leave the extra rules with permutative conversions as an open question for future work.
 
 CK: I would rather not change the paper too far for the final version, so let's not.
 
+LC: I think the comment is stupid, because termination of the core
+calculus can be shown by a completely standard encoding in system F,
+whose termination is well-known. These are the permutative conversions
+which are of any difficulty here, and the point is to show that the
+method can handle at least some of them. In fact, because the extra
+connectives may be encoded in F, it makes no sense to even consider
+the core calculus without the permutative conversions (when you don't
+need permutative conversions, just use system F with other connectives
+encoded).
 
 > - I couldn't follow the fine details of the definitions and proofs by coinduction. It would do no harm to explain the definition, not only at an intuitive level (although that was helpful as well). Can you give a concrete example on how to derive > or >= already at Def. 4.8?
 
@@ -197,6 +242,9 @@ LC: maybe we should give an example of how to derive > or >=?
 
 CK: I guess we could... How hard would it be to give a coinductive proof here that ∀α.lift_α(1) > ∀α.lift_α(0)?
 
+LC: You meant \Lambda α . lift_α(1) > \Lambda α . lift_α(0)? This can
+only be shown by generalising to lift_sigma(1) > lift_sigma(0) for any
+closed type sigma, and we already have Lemma lem:liftgreater for this.
 
 > - Def 4.2: Would it be possible to _avoid_ introducing the constants flatten, lift, +, * at higher types, and instead DEFINE those as abbreviated terms, with induction on types? (where we see (s*\chi) as smaller than (FORALL x.s). This would avoid quite some complexity, in particular termination of ~~>
 > (at least that strategy works for simply typed case)
@@ -211,6 +259,8 @@ LC: should we explain this?
 
 CK: It is an interesting question because if the relation was computable, we would have to justify why we do not provide an algorithm. Is there a one- or two-line explanation why it isn't computable? We could then remark in Section 6, before introducing the lemmas, that since it isn't computable we'll just give some lemmas to work with it.
 
+LC: not sure about the explanation; it's infinite, so there's no
+obvious way to compute it, but I don't think I have a precise argument.
 
 > - Would it be doable to formalize your proofs in Coq or Agda?
 
@@ -224,6 +274,7 @@ LC: TODO
 
 CK: I wrote something up. Please check!
 
+LC: looks good
 
 > - p4, Def 3.2: it would be more clear to present this as a definition of PFS types and terms, and avoid "We assume..." (l. 135)
 
@@ -231,6 +282,8 @@ LC: done
 
 CK: The "done" is only on avoiding "We assume"? (I am not sure what exactly the reviewer wanted here.)
 
+LC: yes, I'm also actually not completely sure either, just rephrased the
+definition slightly
 
 > Once they have the presentation, the authors follow the classic schema for
 > proving termination: interpretation definition, orderings, a removal technique
@@ -243,6 +296,8 @@ CK: The "done" is only on avoiding "We assume"? (I am not sure what exactly the 
 CK: Should I say more about this? I could add a few lines in the future work where
 we already refer to these things, but it would be highly speculative.
 
+LC: I think there's enough.
+
 ---------- COMPLETED BUT PERHAPS USEFUL DISCUSSION FOR THE FUTURE ----------
 
 [DONE] The paper may be sometimes difficult to follow. For instance, in the Definition 4.8 of the ordering on the interpretation set I, which is probably the most delicate and important point of the paper, the authors use co-induction. More explanations on the validity of this definition and how to prove s > t would be welcome: the authors do not discuss the decidability of this ordering, and not everyone is familiar with co-induction.
@@ -252,14 +307,14 @@ we already refer to these things, but it would be highly speculative.
   1) Put the intuition in a "remark" environment, and in Definition 4.8 add something like (see also Remark 4.9 for the intuition)?
   2) Put the intuition that explains coinduction immediately below line
   258, and put the part from 259 to 263 in a separate definition.
-  
+
   LC: I went with the second suggestion and added some more explanations.
-  
+
   CK: Either way, I think referencing some standard work -- or
   preferably an easily accessible text -- regarding coinduction might be
   interesting, given that some of the likely readers are not that
   well-versed in coinduction.
-  
+
   LC: I added some references. My frustration here has always been that
   I don't know of a single reference that is accessible (in the sense of
   easily understandable) and explains this exactly in the way I want to
@@ -279,4 +334,15 @@ we already refer to these things, but it would be highly speculative.
 
   CK: Might be interesting to see what they do in [16] to manage existential quantification, though. (Although not for the final version of this.)
 
-
+LC: they erase to conjunction, but this won't work here; there they
+have a first-order quantifier which is not impredicative, so you can
+"erase" it. This is, by the way, a general method that usually works
+with non-polymorphic dependent types (first-order individual
+quantification is one) -- you just forget the dependencies -- in this
+way you can e.g. reduce the termination of the calculus of
+constructions to termination of F-omega -- when you erase the
+non-polymorphic dependencies you're left with the "core" polymorphic
+calculus. That's why I suggested concentrating on polymorphism when we
+were talking just about doing proofs for some systems with permutative
+conversions, because impredicative polymorphism seems to be the hard
+part.
