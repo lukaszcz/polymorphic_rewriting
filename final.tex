@@ -161,6 +161,10 @@ interpretation are both limited to \emph{monomorphic} systems.}
 In this paper, we \CKchange{will further generalise polynomial}
 interpretations to a higher-order formalism with full impredicative
 polymorphism.
+%
+%\medskip\noindent\textbf{Term rewriting with full impredicative
+%polymorphism.}
+%
 \CKchange{This goes beyond shallow (rank-1, weak) polymorphism,
 where type quantifiers are effectively allowed only at the top of a
 type: it would be relatively easy to extend the methods to such a
@@ -201,7 +205,30 @@ substituted for its own type variable, e.g., if $\mathtt{f} : \forall
 impredicative type quantifiers prevent a translation
 into an infinite set of simply typed rules by instantiating the type
 variables. The above example is not directly reducible to shallow
-polymorphism as used in the~ML programming language or the polymorphic
+polymorphism as used in the~ML programming language.
+
+\medskip\noindent\textbf{Related work.} The term rewriting literature
+has various examples of higher-order term rewriting systems with some
+forms of polymorphism.  To start, there are several lines of research
+that consider shallow polymorphic rewriting
+(e.g.,\cite{ham:18,jou:rub:07,wah:04}), where (as in ML-like
+languages) systems like $\mathtt{foldl}$ above cannot be handled.
+Other works consider extensions of the lambda-Pi-calculus
+\cite{cou:dow:07,dow:17} or the calculus of constructions 
+\cite{bla:05,wal:03} with rewriting rules; only the latter
+includes full impredicative polymorphism.  The termination methods
+for these systems are mostly syntactic methods, such as the recursive
+path ordering \cite{jou:rub:07,wal:03}, or general schema
+\cite{bla:05}.  An exception is \cite{dow:17}, which defines
+interpretations into $\Pi$-algebras; this technique bears some
+similarity to the one we will define, although the methodologies are
+quite different.  A categorical definition for a general polymorphic
+rewriting framework is presented in \cite{fio:ham:13}, but no
+termination methods are considered for this framework.
+
+\medskip\noindent\textbf{Our approach.}
+
+or the polymorphic
 higher-order rewriting formalisms of~\cite{jou:oka:91,jou:rub:99}.
 
 The technique we develop in this paper can be used to handle
