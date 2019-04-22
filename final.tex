@@ -84,7 +84,7 @@
 \newcommand{\LCchange}[1]{\textcolor{red}{#1}}
 
 \newcommand{\onlypaper}[1]{}
-\newcommand{\onlyarxiv}[1]{\textcolor{red}{#1}}
+\newcommand{\onlyarxiv}[1]{\textcolor{green}{#1}}
 
 \title{Polymorphic Higher-order Termination}
 
@@ -211,10 +211,6 @@ into an infinite set of simply typed rules by instantiating the type
 variables. The above example is not directly reducible to shallow
 polymorphism as used in the~ML programming language.
 
-\LC{If \cite{jou:rub:07} is really \emph{fundamentally} incorrect, and
-  not easily corrigible, then I think we should cite \cite{jou:rub:99}
-  instead, and ignore this particular suggestion.}
-
 \medskip\noindent\textbf{Related work.} The term rewriting literature
 has various examples of higher-order term rewriting systems with some
 forms of polymorphism.  To start, there are several studies that
@@ -239,7 +235,7 @@ termination methods are considered for it.
 \medskip\noindent\textbf{Our approach.}
 The technique we develop in this paper operates on \emph{Polymorphic
 Functional Systems (PFSs)}, a form of higher-order term rewriting systems
-with full impredicative \LCchange{polymorphism} (Section \ref{sec_systems}), that
+with full impredicative polymorphism (Section \ref{sec_systems}), that
 various systems of interest can be encoded into (including the example
 of heterogeneous fold above). Then, our methodology follows a standard
 procedure:
@@ -263,19 +259,6 @@ interpreted to combinations of addition and multiplication.
 %possible to extend the same ideas to obtain a true generalisation of
 %v.d. Pol's work, but it is not immediately obvious how because
 %\LCchange{our method is more syntactic}.
-
-%the
-%polynomial shape of interpretations is inherent in our core set
-%$\Iterms$.
-
-% LC: I don't think this has anything to do with polynomials. We can
-% easily add more monotonic non-polynomial operations. This is a more
-% fundamental problem with impredicative polymorphism. You cannot have
-% a model of system Fomega in which A -> B is interpreted by the set
-% of all functions from A to B. This is why I think it is probably
-% impossible to have a "true" generalisation of v.d. Pol, in a strict
-% sense. That's why I think it's better to leave the above paragraph
-% out.
 
 We will use the system of heterogeneous fold above as a running
 example to demonstrate our method.  However, termination of this
@@ -809,7 +792,9 @@ definition. Moreover, the natural number constants cannot be
 
 Now we state some properties of~$\arrW$, including strong
 normalisation. Because of space limitations, most (complete)
-proofs are delegated to \cite[Appendix~A.1]{versionwithappendix}.
+proofs are delegated to 
+\onlypaper{\cite[Appendix~A.1]{versionwithappendix}}%
+\onlyarxiv{Appendix~\ref{app_proofs_SN}}.
 
 \begin{lemma}[Subject reduction]
   If $t : \tau$ and $t \arrW t'$ then $t' : \tau$.
@@ -831,7 +816,9 @@ proofs are delegated to \cite[Appendix~A.1]{versionwithappendix}.
   is an adaptation of chapters~6 and~14 from the
   book~\cite{Girard1989}, and chapters~10 and~11 from the
   book~\cite{SorensenUrzyczyn2006}.
-  Details are available in \cite[Appendix A.1]{versionwithappendix}.
+  Details are available in 
+  \onlypaper{\cite[Appendix A.1]{versionwithappendix}}%
+  \onlyarxiv{Appendix~\ref{app_proofs_SN}}.
 \end{proof}
 
 \begin{lemma}\label{lem_unique_final}
@@ -1209,7 +1196,10 @@ under term formation operations. We will need these results in the next section.
 \end{proof}
 
 The following lemma depends on the lemmas above. The full proof may be
-found in \cite[Appendix~A.2]{versionwithappendix}. The proof is actually quite
+found in
+\onlypaper{\cite[Appendix~A.2]{versionwithappendix}}%
+\onlyarxiv{Appendix~\ref{sec_weakly_monotone_proof}}.
+The proof is actually quite
 complex, and uses a method similar to Girard's method of candidates
 for the termination proof.
 
@@ -1659,7 +1649,8 @@ Lemma \ref{lem:plustimesmonotonic} which states (among other things)
 that $s \succ t$ implies $s \oplus u \succ t \oplus u$.
 In addition, we can use the
 calculation rules below. The proofs may be found in
-\cite[Appendix~A.3]{versionwithappendix}.
+\onlypaper{\cite[Appendix~A.3]{versionwithappendix}}%
+\onlyarxiv{Appendix~\ref{app_rule_removal}}.
 
 \begin{lemma}\label{lem:approxproperties}
 For all types $\sigma$ and all terms $s,t,u$ of type $\sigma$, we
@@ -1902,7 +1893,9 @@ the formula $\rho$, built from a proof $s$ of
 $\mathtt{or}\ \sigma\ \tau$, a proof $u$ that $\sigma$ implies $\rho$
 and a proof $v$ that $\tau$ implies $\rho$.  Proof terms can be
 simplified using 28 reduction rules, including the following (the full
-set of rules is available in \cite[Appendix~B]{versionwithappendix}):
+set of rules is available in
+\onlypaper{\cite[Appendix~B]{versionwithappendix}}%
+\onlyarxiv{Appendix~\ref{app_ineqs}}):
 \[
 \begin{array}{rclrcl}
 @_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] &
@@ -2063,7 +2056,8 @@ of the rules:
 
 Above, $\otimes$ binds stronger than~$\oplus$. The derivations to
 orient rules with these interpretations are also given in
-\cite[Appendix~B]{versionwithappendix}.
+\onlypaper{\cite[Appendix~B]{versionwithappendix}}%
+\onlyarxiv{Appendix~\ref{app_ineqs}}.
 
 The only rules that are not oriented with this interpretation -- not
 with~$\succeq$ either -- are the ones of the form
@@ -2103,7 +2097,7 @@ orderings (see, e.g., \cite{jou:rub:07}) or dependency pairs
 
 \section{Complete proofs}\label{app_proofs}
 
-\subsection{Strong Normalisation of~$\arrW$}
+\subsection{Strong Normalisation of~$\arrW$}\label{app_proofs_SN}
 
 By~$\SN$ we denote the set of all interpretation terms terminating
 w.r.t.~$\arrW$. We will use $\abstraction{a}{s}$ for either
@@ -3395,7 +3389,7 @@ each~$x : \tau$.
   \succeq_\tau t[\subst{x}{s'}]$ by Corollary~\ref{cor_gteq_succeq}.
 \end{proof}
 
-\subsection{Proofs for Section~\ref{sec_rule_removal}}
+\subsection{Proofs for Section~\ref{sec_rule_removal}}\label{app_rule_removal}
 
 { \renewcommand{\thelemma}{\ref{lem:plusparts}}
 \begin{lemma}
