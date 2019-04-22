@@ -84,7 +84,7 @@
 \newcommand{\LCchange}[1]{\textcolor{red}{#1}}
 
 \newcommand{\onlypaper}[1]{}
-\newcommand{\onlyarxiv}[1]{\textcolor{green}{#1}}
+\newcommand{\onlyarxiv}[1]{#1}
 
 \title{Polymorphic Higher-order Termination}
 
@@ -154,7 +154,7 @@ systems~\cite[Chapter~11]{Terese2003} has been an active area of
 research for several decades.
 One powerful method, introduced by v.d. Pol \cite{Pol1993,pol:96},
 interprets terms into \emph{weakly monotonic algebras}.  In later work
-\cite{FuhsKop2012,Kop2012}, these algebra interpetations are specialised
+\cite{FuhsKop2012,Kop2012}, these algebra interpretations are specialised
 into \emph{higher-order polynomial interpretations}, a generalisation of
 the popular -- and highly automatable -- technique of polynomial
 interpretations for first-order term rewriting.
@@ -179,7 +179,7 @@ examples of rewrite systems which require higher-rank impredicative
 polymorphism.
 
 For instance, in recent extensions of Haskell one may define a type of
-heterogenous lists.
+heterogeneous lists.
 \[
 \begin{array}{ll}
   \List : * &
@@ -192,7 +192,7 @@ heterogenous lists.
 \]
 The above states that $\List$ is a type ($*$), gives the types of its
 two constructors $\nil$ and $\cons$, and defines the corresponding
-fold-left function~$\mathtt{foldl}$. Each element of a heterogenous
+fold-left function~$\mathtt{foldl}$. Each element of a heterogeneous
 list may have a different type. In practice, one would
   constrain the type variable~$\alpha$ %above
   with a type class to
@@ -277,6 +277,9 @@ substantially easier in the future.
 
 \onlypaper{Complete proofs for the results in this paper are available
 in an online appendix.~\cite{versionwithappendix}.}%
+\onlyarxiv{This is a pre-publication copy of a paper at FSCD 2019.  In
+particular, it contains an appendix with complete proofs for the results
+in this paper.}
 
 \section{Preliminaries}\label{sec_preliminaries}
 
@@ -351,7 +354,7 @@ calculi such as substitution and $\alpha$-conversion.
   We assume given an infinite set $\Vars$ of variables, each paired
   with a type, denoted $x : \tau$. We assume given a fixed set
   $\Sigma$ of \emph{function symbols}, each paired with a closed type,
-  denoted $\mathtt{f} : \tau$. Every variabe~$x$ and every function
+  denoted $\mathtt{f} : \tau$. Every variable~$x$ and every function
   symbol $\mathtt{f}$ occurs only with one type declaration.
 
   The set of \emph{preterms} consists of all expressions~$s$ such that
@@ -408,7 +411,7 @@ associated to it.
 
 Because $\beta$-reduction on types is confluent and terminating, every
 term has a canonical preterm representative -- the one with all types
-occurring in it $\beta$-normalized.
+occurring in it $\beta$-normalised.
 We define $\FTV(t)$
 as the value of~$\FTV$ on the canonical representative of~$t$.
 We say that $t$ is \emph{closed} if both $\FTV(t) = \emptyset$
@@ -1604,7 +1607,7 @@ sufficient safety criteria. The second and third
 requirements have to be verified for each individual rule.
 
 \begin{example}\label{ex_fold_intermediate}
-  We continue with our example of fold on heterogenous lists. We prove
+  We continue with our example of fold on heterogeneous lists. We prove
   termination by rule removal, using the symbol mapping from
   Example~\ref{ex_fold_interpretation}.
   We will show:
@@ -1949,7 +1952,7 @@ set of rules is available in
 \end{array}
 \]
 
-To define an intepretation for~IPC2, we will use the
+To define an interpretation for~IPC2, we will use the
 standard encoding of
 product and existential types (see~\cite[Chapter~11]{Girard1989} for
 more details).
@@ -1985,7 +1988,7 @@ $\lift(\flatten(x))$ for any unsafe arguments $x$; to make the rules
 Unfortunately, this approach does not suffice to orient the rules
 where some terms are duplicated, such as the second- and third-last
 rules.  To handle these rules, we \emph{multiply} the first argument
-of several symbols with the second (and possily third).  Some further
+of several symbols with the second (and possibly third).  Some further
 tweaking gives the following safe interpretation, which orients most
 of the rules:
 %Now, most of the rules can be oriented strictly (so using $\succinterpret$)
@@ -2880,7 +2883,7 @@ method of candidates from the termination proof.
     \in \{\oplus,\otimes\}$,
   \item if $t : \nat$ then $\lift_\tau t \in X$.
   \end{enumerate}
-  and the relation~$\ge^X$ satifies the following properties:
+  and the relation~$\ge^X$ satisfies the following properties:
   \begin{enumerate}
   \item ${\succeq} \cap X \times X \subseteq {\ge^X}$,
   \item if $t_1 \ge^X t_2$ and $t_1' \leadsto t_1$ (resp.~$t_2'
