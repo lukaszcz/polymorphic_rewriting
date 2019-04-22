@@ -148,20 +148,6 @@ sometimes \forall
 
 CK: It's quite standard in the literature to use "rewrite rule". I don't think we need to act on this one.
 
-> l161. Def 3.5. There is no explicit restriction on the kinds of terms that can be used in a set of rewriting rules. Can they be non PFS terms?
-
-CK: No. (Updated.)
-
-> l172. Why \beta is restricted to *?
-
-LC: We really encode system F here, not F-omega. We should reformulate
-this somehow. Encoding F-omega would be more tedious, because you then
-need a separate application operator for every kind.
-
-CK: Can you do this? You are far more familiar with these systems than I am.
-
-LC: OK, I just said we're encoding system F instead of F-omega
-
 > l352. This is the first time that you mention that your goal is to prove the termination on PFS terms.
 
 LC: Should we mention this earlier?
@@ -175,12 +161,16 @@ sentences. If the paper is not too long, you can just look at the
 section names, so I think it makes no sense to duplicate this
 information.
 
+CK: Slightly reformulated (we don't want to prove termination of PFS _terms_ but of the PFS), and added a paragraph in the introduction that gives an overview of the technique (not merely the paper).
+
 > l355. Shouldn't C be a PFS context?
 
 LC: contexts were defined only for PFSs. Should we make this somehow
 more clear?
 
 CK: I am not sure how.
+
+CK: Let's leave it.
 
 > l382. Strictly speaking >^J depends on TM too.
 
@@ -191,36 +181,7 @@ CK: Wait, what changed?
 LC: I explicitly remarked that there is a dependency, without changing
 the notation.
 
-> l424-425. Could you align arrows to make this more readable? Put (*) in the left margin to find it more easily.
-
-LC: fixed?
-
-CK: This seems to be aout 525-525. Aligning arrows would not make this more readable. I did put the (*) in the left margin (or close enough).
-
-
-> Could you find shorter notations for lift, flatten, etc.? For instance \uparrow for lift, and \downarrow for flatten?
-
-> You could also remove type annotations as they can be inferred from type annotations in abstractions.
-
-LC: should we do this?
-
-CK: At this point, it would mean changing the entire paper. I would rather not do it.
-
-LC: ok, let's leave it
-
-> The only minor issue is that the second example doesn't work out fully. The authors are very clear about that (already in the introduction). I wonder if it is not more clear to present a core calculus + full termination proof (which is already sufficient to prove cut elimination), and leave the extra rules with permutative conversions as an open question for future work.
-
-CK: I would rather not change the paper too far for the final version, so let's not.
-
-LC: I think the comment is stupid, because termination of the core
-calculus can be shown by a completely standard encoding in system F,
-whose termination is well-known. These are the permutative conversions
-which are of any difficulty here, and the point is to show that the
-method can handle at least some of them. In fact, because the extra
-connectives may be encoded in F, it makes no sense to even consider
-the core calculus without the permutative conversions (when you don't
-need permutative conversions, just use system F with other connectives
-encoded).
+CK: Where? Definition 5.7 seems unchanged.
 
 > - I couldn't follow the fine details of the definitions and proofs by coinduction. It would do no harm to explain the definition, not only at an intuitive level (although that was helpful as well). Can you give a concrete example on how to derive > or >= already at Def. 4.8?
 
@@ -232,12 +193,7 @@ LC: You meant \Lambda α . lift_α(1) > \Lambda α . lift_α(0)? This can
 only be shown by generalising to lift_sigma(1) > lift_sigma(0) for any
 closed type sigma, and we already have Lemma lem:liftgreater for this.
 
-> - Def 4.2: Would it be possible to _avoid_ introducing the constants flatten, lift, +, * at higher types, and instead DEFINE those as abbreviated terms, with induction on types? (where we see (s*\chi) as smaller than (FORALL x.s). This would avoid quite some complexity, in particular termination of ~~>
-> (at least that strategy works for simply typed case)
-
-LC: I don't think it's necessary to explain this in the paper?
-
-CK: I don't think it is.  It wouldn't be bad to have it in a footnote or remark somewhere, but it isn't really necessary either.
+CK: Meh. Leave it, I guess. The concrete examples come soon enough (in Section 4.3).
 
 > - Is the problem if for interpretation terms s,t "s>t" computable?
 
@@ -248,41 +204,7 @@ CK: It is an interesting question because if the relation was computable, we wou
 LC: not sure about the explanation; it's infinite, so there's no
 obvious way to compute it, but I don't think I have a precise argument.
 
-> - Would it be doable to formalize your proofs in Coq or Agda?
-
-LC: I don't think we need to speculate about this in the paper?
-
-CK: Not necessarily, although formalisation is mentioned as a reason for using a co-inductive definition. We could mention this as a possible direction for future work in section 8, although it might be deceptive since we don't actually intend to do that.
-
-> - l. 172: Please explain the weird type for A. Also, please indicate what A_{x,y} means precisely. I don't see immediately why the rule for A is well-typed, and how the A is used to make the rule for foldl well-typed.
-
-LC: TODO
-
-CK: I wrote something up. Please check!
-
-LC: looks good
-
-> - p4, Def 3.2: it would be more clear to present this as a definition of PFS types and terms, and avoid "We assume..." (l. 135)
-
-LC: done
-
-CK: The "done" is only on avoiding "We assume"? (I am not sure what exactly the reviewer wanted here.)
-
-LC: yes, I'm also actually not completely sure either, just rephrased the
-definition slightly
-
-> Once they have the presentation, the authors follow the classic schema for
-> proving termination: interpretation definition, orderings, a removal technique
-> and an large example. The authors neither go further defining a dependency pair
-> notion nor a way to automate the proofs. Since one of the authors have a vast
-> experience on adapting dependency pairs to higher-order, it would be really nice
-> if she/they could explain the problems they could find to do this task or if it is just a
-> straightforward extension.
-
-CK: Should I say more about this? I could add a few lines in the future work where
-we already refer to these things, but it would be highly speculative.
-
-LC: I think there's enough.
+CK: Okay. Then let's leave it!
 
 ---------- COMPLETED BUT PERHAPS USEFUL DISCUSSION FOR THE FUTURE ----------
 
@@ -346,5 +268,32 @@ part.
   I do not know what best to do this on short notice.
   
   LC: let's leave it
+
+[DONE] The only minor issue is that the second example doesn't work out fully. The authors are very clear about that (already in the introduction). I wonder if it is not more clear to present a core calculus + full termination proof (which is already sufficient to prove cut elimination), and leave the extra rules with permutative conversions as an open question for future work.
+
+  CK: I would rather not change the paper too far for the final version, so let's not.
+
+  LC: I think the comment is stupid, because termination of the core
+  calculus can be shown by a completely standard encoding in system F,
+  whose termination is well-known. These are the permutative conversions
+  which are of any difficulty here, and the point is to show that the
+  method can handle at least some of them. In fact, because the extra
+  connectives may be encoded in F, it makes no sense to even consider
+  the core calculus without the permutative conversions (when you don't
+  need permutative conversions, just use system F with other connectives
+  encoded).
+
+> Once they have the presentation, the authors follow the classic schema for
+> proving termination: interpretation definition, orderings, a removal technique
+> and an large example. The authors neither go further defining a dependency pair
+> notion nor a way to automate the proofs. Since one of the authors have a vast
+> experience on adapting dependency pairs to higher-order, it would be really nice
+> if she/they could explain the problems they could find to do this task or if it is just a
+> straightforward extension.
+
+CK: Should I say more about this? I could add a few lines in the future work where
+we already refer to these things, but it would be highly speculative.
+
+LC: I think there's enough.
 
 
