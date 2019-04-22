@@ -159,20 +159,20 @@ into \emph{higher-order polynomial interpretations}, a generalisation of
 the popular -- and highly automatable -- technique of polynomial
 interpretations for first-order term rewriting.
 
-\CKchange{The methods of weakly monotonic algebras and polynomial
-interpretation are both limited to \emph{monomorphic} systems.}
-In this paper, we \CKchange{will further generalise polynomial}
+The methods of weakly monotonic algebras and polynomial
+interpretation are both limited to \emph{monomorphic} systems.
+In this paper, we will further generalise polynomial
 interpretations to a higher-order formalism with full impredicative
 polymorphism.
 %
 %\medskip\noindent\textbf{Term rewriting with full impredicative
 %polymorphism.}
 %
-\CKchange{This goes beyond shallow (rank-1, weak) polymorphism,
+This goes beyond shallow (rank-1, weak) polymorphism,
 where type quantifiers are effectively allowed only at the top of a
-type: it would be relatively easy to extend the methods to such a
-system since shallowly polymorphic rules can be seen as defining an
-infinite set of monomorphic rules.}
+type: it would be relatively easy to extend the methods to a system
+with shallow polymorphism since shallowly polymorphic rules can be seen as defining an
+infinite set of monomorphic rules.
 While shallow polymorphism often suffices
 in functional programming practice, there do exist interesting
 examples of rewrite systems which require higher-rank impredicative
@@ -211,14 +211,18 @@ into an infinite set of simply typed rules by instantiating the type
 variables. The above example is not directly reducible to shallow
 polymorphism as used in the~ML programming language.
 
-\medskip\noindent\CKchange{\textbf{Related work.} The term rewriting literature
+\LC{If \cite{jou:rub:07} is really \emph{fundamentally} incorrect, and
+  not easily corrigible, then I think we should cite \cite{jou:rub:99}
+  instead, and ignore this particular suggestion.}
+
+\medskip\noindent\textbf{Related work.} The term rewriting literature
 has various examples of higher-order term rewriting systems with some
 forms of polymorphism.  To start, there are several studies that
 consider shallow polymorphic rewriting
 (e.g., \cite{ham:18,jou:rub:07,wah:04}), where (as in ML-like
 languages) systems like $\mathtt{foldl}$ above cannot be handled.
 Other works consider extensions of the $\lambda\Pi$-calculus
-\cite{cou:dow:07,dow:17} or the calculus of constructions 
+\cite{cou:dow:07,dow:17} or the calculus of constructions
 \cite{bla:05,wal:03} with rewriting rules; only the latter
 includes full impredicative polymorphism.  The termination techniques
 presented for these systems are mostly syntactic (e.g., a recursive
@@ -230,12 +234,12 @@ interpretations into $\Pi$-algebras; this technique bears some
 similarity to ours, although the methodologies are
 quite different.  A categorical definition for a general polymorphic
 rewriting framework is presented in \cite{fio:ham:13}, but no
-termination methods are considered for it.}
+termination methods are considered for it.
 
-\medskip\noindent\CKchange{\textbf{Our approach.}
+\medskip\noindent\textbf{Our approach.}
 The technique we develop in this paper operates on \emph{Polymorphic
 Functional Systems (PFSs)}, a form of higher-order term rewriting systems
-with full impredicative formalism (Section \ref{sec_systems}), that
+with full impredicative \LCchange{polymorphism} (Section \ref{sec_systems}), that
 various systems of interest can be encoded into (including the example
 of heterogeneous fold above). Then, our methodology follows a standard
 procedure:
@@ -253,14 +257,26 @@ Due to the additional complications of full polymorphism, we have
 elected to only generalise higher-order polynomial interpretations,
 and not v.d. Pol's weakly monotonic algebras.  That is, terms of base
 type are always interpreted to natural numbers and all functions are
-interpreted to combinations of addition and multiplication.  It may be
-possible to extend the same ideas to obtain a true generalisation of
-v.d. Pol's work, but it is not immediately obvious how because the
-polynomial shape of interpretations is inherent in our core set
-$\Iterms$.}
+interpreted to combinations of addition and multiplication.
 
-%The technique we develop in this paper can be used to handle
-%systems like $\mathtt{foldl}$ above.
+% It may be
+%possible to extend the same ideas to obtain a true generalisation of
+%v.d. Pol's work, but it is not immediately obvious how because
+%\LCchange{our method is more syntactic}.
+
+%the
+%polynomial shape of interpretations is inherent in our core set
+%$\Iterms$.
+
+% LC: I don't think this has anything to do with polynomials. We can
+% easily add more monotonic non-polynomial operations. This is a more
+% fundamental problem with impredicative polymorphism. You cannot have
+% a model of system Fomega in which A -> B is interpreted by the set
+% of all functions from A to B. This is why I think it is probably
+% impossible to have a "true" generalisation of v.d. Pol, in a strict
+% sense. That's why I think it's better to leave the above paragraph
+% out.
+
 We will use the system of heterogeneous fold above as a running
 example to demonstrate our method.  However, termination of this
 system can be shown in other ways (e.g., an enco\-ding in
@@ -693,7 +709,7 @@ context. Thus, $s \oplus t \oplus u$ should be read as
 $\oplus_\sigma\,(\oplus_\sigma\,s\,t)\,u$ if $s$ has type
 $\sigma$. Thus, our interpretation terms include natural
   numbers with the operations of addition and multiplication. It would
-  not cause any fundamental problems to add more \CKchange{monotonic} operations, e.g.,
+  not cause any fundamental problems to add more monotonic operations, e.g.,
   exponentiation, but we refrain from doing so for the sake of
   simplicity.
 
@@ -701,7 +717,7 @@ $\sigma$. Thus, our interpretation terms include natural
 
 The set $\Iterms$ of interpretation terms can be reduced through
 a relation $\arrW$, that we will define below.  This relation will
-be a powerful aid in defining the \CKchange{partial} ordering $\succ$ in Section
+be a powerful aid in defining the partial ordering $\succ$ in Section
 \ref{subsec:succ}.
 
 \begin{defn}
@@ -749,8 +765,8 @@ be a powerful aid in defining the \CKchange{partial} ordering $\succ$ in Section
   \end{enumerate}
   Recall Definition~\ref{def_terms} and Definition~\ref{def_iterms} of
   the set of interpretation terms~$\Iterms$ as the set of the
-  equivalence classes of~$\equiv$. So\CKchange{, for instance,
-  $\lift_\nat$ above} denotes
+  equivalence classes of~$\equiv$. So, for instance,
+  $\lift_\nat$ above denotes
   the equivalence class of all preterms $\lift_\sigma$ with
   $\sigma =_\beta \nat$. Hence, the above rules are invariant
   under~$\equiv$ (by confluence of $\beta$-reduction on types), and
@@ -815,7 +831,7 @@ proofs are delegated to \cite[Appendix~A.1]{versionwithappendix}.
   is an adaptation of chapters~6 and~14 from the
   book~\cite{Girard1989}, and chapters~10 and~11 from the
   book~\cite{SorensenUrzyczyn2006}.
-  \CKchange{Details are available in \cite[Appendix A.1]{versionwithappendix}.}
+  Details are available in \cite[Appendix A.1]{versionwithappendix}.
 \end{proof}
 
 \begin{lemma}\label{lem_unique_final}
@@ -1193,7 +1209,7 @@ under term formation operations. We will need these results in the next section.
 \end{proof}
 
 The following lemma depends on the lemmas above. The full proof may be
-found in \CKchange{\cite[Appendix~A.2]{versionwithappendix}}. The proof is actually quite
+found in \cite[Appendix~A.2]{versionwithappendix}. The proof is actually quite
 complex, and uses a method similar to Girard's method of candidates
 for the termination proof.
 
@@ -1643,7 +1659,7 @@ Lemma \ref{lem:plustimesmonotonic} which states (among other things)
 that $s \succ t$ implies $s \oplus u \succ t \oplus u$.
 In addition, we can use the
 calculation rules below. The proofs may be found in
-\CKchange{\cite[Appendix~A.3]{versionwithappendix}}.
+\cite[Appendix~A.3]{versionwithappendix}.
 
 \begin{lemma}\label{lem:approxproperties}
 For all types $\sigma$ and all terms $s,t,u$ of type $\sigma$, we
@@ -1886,7 +1902,7 @@ the formula $\rho$, built from a proof $s$ of
 $\mathtt{or}\ \sigma\ \tau$, a proof $u$ that $\sigma$ implies $\rho$
 and a proof $v$ that $\tau$ implies $\rho$.  Proof terms can be
 simplified using 28 reduction rules, including the following (the full
-set of rules is available in \CKchange{\cite[Appendix~B]{versionwithappendix}}:
+set of rules is available in \cite[Appendix~B]{versionwithappendix}):
 \[
 \begin{array}{rclrcl}
 @_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] &
@@ -2047,7 +2063,7 @@ of the rules:
 
 Above, $\otimes$ binds stronger than~$\oplus$. The derivations to
 orient rules with these interpretations are also given in
-\CKchange{\cite[Appendix~B]{versionwithappendix}}.
+\cite[Appendix~B]{versionwithappendix}.
 
 The only rules that are not oriented with this interpretation -- not
 with~$\succeq$ either -- are the ones of the form
@@ -3486,9 +3502,6 @@ have:
   Lemma~\ref{lem_succ_red}.
 \end{proof}
 
-%CK: Let's start this on a new page. This is going to be a lot of
-%paying attention how page endings work, and I don't want to block any
-%future changes to Appendix A!
 \clearpage
 \section{Proving the inequalities in \refsec{examples}}\label{app_ineqs}
 
