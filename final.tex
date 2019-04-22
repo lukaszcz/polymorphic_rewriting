@@ -387,9 +387,9 @@ calculi such as substitution and $\alpha$-conversion.
   and $t$ are identical modulo $\beta$-conversion in types.
 \end{defn}
 
-\LCchange{Note that we present terms in orthodox Church-style, i.e.,
-  instead of using contexts each variable has a globally fixed type
-  associated to it.}
+Note that we present terms in orthodox Church-style, i.e.,
+instead of using contexts each variable has a globally fixed type
+associated to it.
 
 \begin{lemma}
   If $s : \tau$ and $s \equiv t$ then $t : \tau$.
@@ -498,7 +498,7 @@ develop in Sections \ref{sec:World}--\ref{sec_rule_removal}.
     \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots
     \forall (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype
     \sigma_k \arrtype \tau
-    \quad\quad (\text{with}\ \tau\ \text{a type atom and}\ m < k)
+    \quad\quad (\text{with}\ \tau\ \text{a type atom and}\ k > m)
     \]
 \end{defn}
 
@@ -549,9 +549,9 @@ define this relation, we need two additional notions.
 \end{defn}
 
 \begin{defn}\label{def:context}
-  A \emph{$\sigma$-context}~$C_\sigma$ is a term with a fresh function
+  A \emph{$\sigma$-context}~$C_\sigma$ is a \CKchange{PFS} term with a fresh function
   symbol $\Box_\sigma \notin \Sigma$ of type~$\sigma$ occurring
-  exactly once. By~$C_\sigma[t]$ we denote a term obtained
+  exactly once. By~$C_\sigma[t]$ we denote a \CKchange{PFS} term obtained
   from~$C_\sigma$ by substituting~$t$ for~$\Box_\sigma$. We drop the
   $\sigma$ subscripts when clear or irrelevant.
 \end{defn}
@@ -565,7 +565,7 @@ monotonic closure generates the rewrite relation.
   have the same type; and (c) if $(\ell,r) \in \Rules$
   then $(\delta(\ell),\delta(r)) \in \Rules$ for any
   replacement~$\delta$.  The reduction relation $\arr{\Rules}$
-  \CKchange{on PFS terms} is defined by:
+  on PFS terms is defined by:
 
 \begin{center}
   $t \arr{\Rules}
@@ -1085,7 +1085,7 @@ s$ for all closed $s$, so if $(s \oplus \lift_{\nat \arrtype \nat}(1))u
 Following Example \ref{ex:arrWreduce} and Lemma \ref{lem_succ_red},
 this holds if $s u \oplus 1 \succ s u$.  By definition, this is the
 case if $(s u \oplus 1)\downarrow > (s u)\downarrow$ in the natural numbers,
-which is clearly the case for any $s,u$.
+which clearly holds for any $s,u$.
 \end{example}
 
 \subsection{Weak monotonicity}\label{subsec:weakmono}
@@ -1204,7 +1204,8 @@ for the termination proof.
 
 \section{A reduction pair for PFS terms}\label{sec_reduction_pairs}
 
-Recall that our goal is to prove termination of PFS terms.  To
+Recall that our goal is to prove termination of \CKchange{reduction in
+a PFS}.  To
 do so, in this section we will define a systematic way to generate
 \emph{reduction pairs}. We fix a~PFS~$A$, and define:
 
@@ -1340,8 +1341,6 @@ our
 interpretation method easier to apply, even in the non-polymorphic
 setting, thanks to more
 sophisticated ``programming'' in the interpretations.
-% LC: I don't think we have any "programming" to speak of in the types
-% (and I don't think we need it).
 The reader is advised to consult e.g.~\cite[Chapter~11]{Girard1989}
 for more background and explanations. We demonstrate the idea
 by presenting an encoding for the recursive type $\List$ and its
@@ -2073,8 +2072,8 @@ term rewriting -- for automatically finding a suitable interpretation.
 
 In addition, it would be worth exploring improvements of the method
 that would allow us to handle the remaining rules of IPC2, or
-extending other techniques for higher-order termination such as path
-orderings (see, e.g., \cite{jou:rub:99}) or dependency pairs
+extending other techniques for higher-order termination such as
+orderings (see, e.g., \cite{jou:rub:07}) or dependency pairs
 (e.g.,~\cite{kop:raa:12,suz:kus:bla:11}).
 
 \addcontentsline{toc}{section}{References}
