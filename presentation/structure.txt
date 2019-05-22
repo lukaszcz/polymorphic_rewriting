@@ -1,0 +1,40 @@
+Proposed structure:
+===================
+* PROBLEM STATEMENT:
+  - start with polynomial interpretations for first-order rewriting: this is well-known (one slide)
+  - show polynomial interpretations for higher-order rewriting: this is less well-known, but follows similar patterns as the first-order case (one slide)
+  - pose the question: can we do something similar if we go one step further up?
+    + show an example system with shallow polymorphic rules
+    + show some example systems with non-shallow polymorphic rules
+    + show how these examples can all be formulated in our PFSs (essentially: a definition by example)
+    Here make sure to discuss the application domains.
+
+* METHODOLOGY IDEA:
+  - core idea: map all terms to a set A for which there is a well-founded ordering, and prove that rules are included in the ordering
+  - observe that for first-order rewriting we can choose (N, >) (but there are other interpretations)
+  - observe that for monomorphic higher-order, we can choose weakly monotonic functionals over N (but there are other choices for the base set)
+  - propose that for polymorphic rewriting, we actually use a set of system-F like terms
+    + show somewhat of how this could look
+
+* METHODOLOGY PART 1: DEFINING THE UNDERLYING SET
+  - sketch what our set I looks like;
+  - show what \leadsto does (basically beta-reduction) and say that this is essentially functions over N, but in a polymorphic way
+    (if you'd take out type abstraction, you would pretty much exactly get the higher-order polynomial interpretations from before)
+  - present \succ and \succeq, and say that by coinduction you can show that that's well-defined
+  - give an example of something being greater than something else (Example 4.20?)
+
+* METHODOLOGY PART 2: TRANSLATING PFSs
+  - show how type mappings work in the fold example
+  - show how function symbol mappings work in the same example
+
+* RESULTS
+  - show a bunch of calculation rules we can use
+  - summarise that fold is easy, just like some other examples
+  - briefly show IPC2 and acknowledge that the ext rules are still problematic, but that the rest works
+    (moreover, observe that the interpretations were found by basically looking at what would work in a first-order variation, and extending these ideas)
+  - note that we have had to do this manually, but that this has given some actionable ideas for automation
+
+* CONCLUSIONS AND FUTURE WORK
+  - summary slide
+  - bullet point list for where else we could go with this
+
