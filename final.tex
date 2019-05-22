@@ -4,6 +4,8 @@
 \usepackage{proof}
 \usepackage[dvipsnames]{xcolor}
 
+\nolinenumbers
+
 %\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
 
 \bibliographystyle{plainurl}% the mandatory bibstyle
@@ -78,17 +80,10 @@
 \newcommand{\xlet}[4]{\mathtt{let}_{#1}\,#2\,\mathtt{be}\,[#3]\,\mathtt{in}\,#4}
 \newcommand{\proj}{\mathtt{pr}}
 
-\newcommand{\CK}[1]{\textcolor{violet}{CK: #1}}
-\newcommand{\CKchange}[1]{\textcolor{blue}{#1}}
-\newcommand{\LC}[1]{\textcolor{red}{LC: #1}}
-\newcommand{\LCchange}[1]{\textcolor{red}{#1}}
-
-\newcommand{\onlypaper}[1]{}
-\newcommand{\onlyarxiv}[1]{#1}
+\newcommand{\onlypaper}[1]{#1}
+\newcommand{\onlyarxiv}[1]{}
 
 \title{Polymorphic Higher-order Termination}
-
-%\titlerunning{Dummy short title}
 
 \author{{\L}ukasz Czajka}{Faculty of Informatics, TU Dortmund, Germany \and \url{http://www.mimuw.edu.pl/~lukaszcz/} }{lukaszcz@mimuw.edu.pl}{https://orcid.org/0000-0001-8083-4280}{}
 
@@ -106,8 +101,9 @@
 
 %\category{}%optional, e.g. invited paper
 
-%\relatedversion{A full version of the paper is available at \url{...}.}
-%\supplement{}%optional, e.g. related research data, source code, ... hosted on a repository like zenodo, figshare, GitHub, ...
+\onlypaper{
+\relatedversion{Complete proofs for results in this paper are
+available in an online appendix \cite{versionwithappendix}.}}
 
 %\acknowledgements{I want to thank \dots}%optional
 
@@ -116,17 +112,17 @@
 %\hideLIPIcs  %uncomment to remove references to LIPIcs series (logo, DOI, ...), e.g. when preparing a pre-final version to be uploaded to arXiv or another public repository
 
 %Editor-only macros:: begin (do not touch as author)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\EventEditors{John Q. Open and Joan R. Access}
-\EventNoEds{2}
-\EventLongTitle{42nd Conference on Very Important Topics (CVIT 2016)}
-\EventShortTitle{CVIT 2016}
-\EventAcronym{CVIT}
-\EventYear{2016}
-\EventDate{December 24--27, 2016}
-\EventLocation{Little Whinging, United Kingdom}
+\EventEditors{Herman Geuvers}
+\EventNoEds{1}
+\EventLongTitle{4th International Conference on Formal Structures for Computation and Deduction (FSCD 2019)}
+\EventShortTitle{FSCD 2019}
+\EventAcronym{FSCD}
+\EventYear{2019}
+\EventDate{June 24--30, 2019}
+\EventLocation{Dortmund, Germany}
 \EventLogo{}
-\SeriesVolume{42}
-\ArticleNo{23}
+\SeriesVolume{131}
+\ArticleNo{12}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
@@ -275,8 +271,6 @@ difficult, with some incorrect claims in the literature and no uniform
 methodology. It is our goal to make such termination proofs
 substantially easier in the future.
 
-\onlypaper{Complete proofs for the results in this paper are available
-in an online appendix.~\cite{versionwithappendix}.}%
 \onlyarxiv{This is a pre-publication copy of a paper at FSCD 2019.  In
 particular, it contains an appendix with complete proofs for the results
 in this paper.}
@@ -554,9 +548,9 @@ define this relation, we need two additional notions.
 \end{defn}
 
 \begin{defn}\label{def:context}
-  A \emph{$\sigma$-context}~$C_\sigma$ is a \CKchange{PFS} term with a fresh function
+  A \emph{$\sigma$-context}~$C_\sigma$ is a PFS term with a fresh function
   symbol $\Box_\sigma \notin \Sigma$ of type~$\sigma$ occurring
-  exactly once. By~$C_\sigma[t]$ we denote a \CKchange{PFS} term obtained
+  exactly once. By~$C_\sigma[t]$ we denote a PFS term obtained
   from~$C_\sigma$ by substituting~$t$ for~$\Box_\sigma$. We drop the
   $\sigma$ subscripts when clear or irrelevant.
 \end{defn}
@@ -1216,8 +1210,8 @@ for the termination proof.
 
 \section{A reduction pair for PFS terms}\label{sec_reduction_pairs}
 
-Recall that our goal is to prove termination of \CKchange{reduction in
-a PFS}.  To
+Recall that our goal is to prove termination of reduction in
+a PFS.  To
 do so, in this section we will define a systematic way to generate
 \emph{reduction pairs}. We fix a~PFS~$A$, and define:
 
@@ -1758,9 +1752,9 @@ For the last rule note that (using only Lemmas
 \flatten(\interpret{h}))\ )\ \oplus \\
 \phantom{A}
 \lift_{\typeinterpret{\sigma}}(\flatten(\interpret{f} * \typeinterpret{
-\tau} \cdot \interpret{s} \cdot \interpret{h}) \oplus
+\tau}\! \cdot\! \interpret{s}\! \cdot\! \interpret{h}) \oplus
 \flatten(\interpret{h}) \oplus
-\flatten(\interpret{f}) \oplus\flatten(\interpret{s}) \oplus 2) \\
+\flatten(\interpret{f}) \oplus\flatten(\interpret{s})\oplus 2) \\
 \end{array}
 \]
 On the right-hand side of the inequality, noting that
@@ -1793,7 +1787,8 @@ $\lift_{\sigma \arrtype \tau}(u) \cdot w \arrW^*
   \oplus \flatten(\interpret{h}))\ )\ \oplus \\
 \phantom{A}
   \lift_{\typeinterpret{\sigma}}(\flatten(\interpret{f}) \oplus
-  \flatten(\interpret{f} * \typeinterpret{\tau} \cdot \interpret{s} \cdot
+  \flatten(\interpret{f} * \typeinterpret{\tau}\!\cdot\!\interpret{s}
+  \!\cdot\!
   \interpret{h}) \oplus \flatten(\interpret{s}) \oplus \flatten(\interpret{h}) \oplus 1)
 \end{array}
 \]
@@ -1901,19 +1896,21 @@ set of rules is available in
 \onlyarxiv{Appendix~\ref{app_ineqs}}):
 \[
 \begin{array}{rclrcl}
-@_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] &
-\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{\sigma,\tau}(u),
-  \abs{x}{s},\abs{y}{t}) & \red & s[x:=u] \\
+@_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] \\
 
 \mathtt{tapp}_{\abs{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \red &
   s[\alpha:=\tau] &
-\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^2_{\sigma,\tau}(u),
-  \abs{x}{s},\abs{y}{t}) & \red & t[x:=u] \\
-
-\proj^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & s &
 \mathtt{let}_{\varphi,\rho}(\mathtt{ext}_{\varphi,\tau}(s),\tabs{\alpha}{\abs{x}{t}}) & \red & t[\alpha:=\tau][x:=s] \\
 
-\proj^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & t \\
+\proj^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & s &
+\!\!\!\!\!\!\!
+\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{\sigma,\tau}(u),
+  \abs{x}{s},\abs{y}{t}) & \red & s[x:=u] \\
+
+\proj^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & t &
+\!\!\!\!\!\!\!
+\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^2_{\sigma,\tau}(u),
+  \abs{x}{s},\abs{y}{t}) & \red & t[x:=u] \\
 \end{array}
 \]
 \[
@@ -1927,9 +1924,9 @@ set of rules is available in
   \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x}{\epsilon_\rho(s)},
   \abs{y}{\epsilon_\rho(t)}) \\
 & \proj^2_{\rho,\pi}(\mathtt{case}_{\sigma,\tau,\mathtt{and}\,\rho,\pi}(u,
-  \abs{x:\sigma}{s},\abs{y:\tau}{t}))\red
-  \mathtt{case}_{\sigma,\tau,\pi}(u,\abs{x:\sigma}{\proj^2_{\rho,\pi}(s)},
-  \abs{y:\tau}{\proj^2_{\rho,\pi}(t)}) \\
+  \abs{x}{s},\abs{y}{t}))\red
+  \mathtt{case}_{\sigma,\tau,\pi}(u,\abs{x}{\proj^2_{\rho,\pi}(s)},
+  \abs{y}{\proj^2_{\rho,\pi}(t)}) \\
 & \mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,\tau,\mathtt{or}\,
   \rho\,\pi}(u,\abs{x}{s},\abs{y}{t}),\abs{z}{v},
   \abs{a}{w}) \red \\
@@ -2009,31 +2006,31 @@ of the rules:
 \Termmap(\epsilon) & = & \Lambda \alpha:* . \lambda x:\nat. &
   \mathtt{lift}_\alpha(2 \otimes x \oplus 1) \\
 \Termmap(@) & = & \Lambda\alpha\Lambda\beta\lambda x: \alpha \arrtype \beta . \lambda y :
-  \alpha . \quad & \lift_\beta(2) \otimes (x \cdot y) \oplus
+  \alpha . & \lift_\beta(2) \otimes (x \cdot y) \oplus
   \lift_\beta(\flatten_\alpha(y)\ \oplus \\
   & & & \phantom{AB}\flatten_{\alpha \arrtype \beta}(x) \otimes
   \flatten_\beta(y) \oplus 1) \\
-\Termmap(\mathtt{tapp}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta . \lambda x : \quant{\gamma}{\alpha\gamma} . \quad &
+\Termmap(\mathtt{tapp}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta . \lambda x : \quant{\gamma}{\alpha\gamma}.\!\!\!\!\! &
   \lift_{\alpha\beta}(2) \otimes
   (x * \beta) \oplus \lift_{\alpha\beta}(1) \\
-\Termmap(\mathtt{ext}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta : * . \lambda x:\alpha\beta . &
+\Termmap(\mathtt{ext}) & = & \Lambda \alpha : * \arrkind * . \Lambda \beta : * . \lambda x:\alpha\beta.\!\!\!\!\! &
   \expair{\beta}{x} \oplus \lift_{\Sigma\gamma.\beta\gamma}(
   \flatten_{\alpha\gamma}(x)) \\
 \Termmap(\mathtt{pair}) & = & \Lambda \alpha \Lambda \beta \lambda x :
-  \alpha, y : \beta.\quad & \pair{x}{y} \oplus \lift_{
+  \alpha, y : \beta. & \pair{x}{y} \oplus \lift_{
   \alpha \times \beta}(\flatten_\alpha(x) \oplus \flatten_{\beta}(y)) \\
 \Termmap(\proj^1) & = & \Lambda \alpha \Lambda \beta \lambda x :
-  \alpha \times \beta . \quad
+  \alpha \times \beta .
   & \lift_\alpha(2) \otimes \pi^1(x) \oplus \lift_{\alpha}(1) \\
 \Termmap(\proj^2) & = & \Lambda \alpha \Lambda \beta \lambda x :
-  \alpha\times\beta.\quad
+  \alpha\times\beta.
   & \lift_\beta(2) \otimes \pi^2(x) \oplus \lift_{\beta}(1) \\
 \Termmap(\mathtt{in}^1) & = & \Lambda \alpha \Lambda \beta
-  \lambda x : \alpha.\quad & \pair{x}{\lift_\beta(1)}
+  \lambda x : \alpha. & \pair{x}{\lift_\beta(1)}
   \oplus \lift_{\alpha
   \times \beta}(\flatten_{\alpha}(x)) \\
 \Termmap(\mathtt{in}^2) & = & \Lambda \alpha \Lambda \beta
-  \lambda x : \beta.\quad & \pair{\lift_\alpha(1)}{x}
+  \lambda x : \beta. & \pair{\lift_\alpha(1)}{x}
   \oplus \lift_{\alpha \times \beta}(\flatten_{\beta}(x)) \\
 \end{array}
 \]
@@ -2094,6 +2091,8 @@ orderings (see, e.g., \cite{jou:rub:07}) or dependency pairs
 
 \addcontentsline{toc}{section}{References}
 \bibliography{references}
+
+\end{document}
 
 \clearpage
 \appendix
