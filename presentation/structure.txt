@@ -4,10 +4,10 @@ Proposed structure:
   - start with polynomial interpretations for first-order rewriting: this is well-known (one slide)
   - show polynomial interpretations for higher-order rewriting: this is less well-known, but follows similar patterns as the first-order case (one slide)
   - pose the question: can we do something similar if we go one step further up?
-    + show an example system with shallow polymorphic rules
-    + show some example systems with non-shallow polymorphic rules
+    + show an example system with shallow polymorphic rules (LC: homogenous fold?)
+    + show some example systems with non-shallow polymorphic rules (LC: heterogenous fold?)
     + show how these examples can all be formulated in our PFSs (essentially: a definition by example)
-    Here make sure to discuss the application domains.
+    Here make sure to discuss the application domains: Haskell, logic.
 
 * METHODOLOGY IDEA:
   - core idea: map all terms to a set A for which there is a well-founded ordering, and prove that rules are included in the ordering
@@ -15,17 +15,28 @@ Proposed structure:
   - observe that for monomorphic higher-order, we can choose weakly monotonic functionals over N (but there are other choices for the base set)
   - propose that for polymorphic rewriting, we actually use a set of system-F like terms
     + show somewhat of how this could look
+    + LC: explain that no direct "set-theoretic" extension of weakly
+      monotonic functionals is possible, which is why we use a
+      concrete rewrite system in the interpretation
 
 * METHODOLOGY PART 1: DEFINING THE UNDERLYING SET
   - sketch what our set I looks like;
-  - show what \leadsto does (basically beta-reduction) and say that this is essentially functions over N, but in a polymorphic way
+  - show what \leadsto does (basically beta-reduction PLUS shuffling things around) and say that this is essentially functions over N, but in a polymorphic way
     (if you'd take out type abstraction, you would pretty much exactly get the higher-order polynomial interpretations from before)
-  - present \succ and \succeq, and say that by coinduction you can show that that's well-defined
+  - remark about termination of \leadsto; that the proof method is standard, but the question itself subtle (key feature of F-omega: parametricity -- here broken but only a bit)
+  - present coinductive definitions of \succ and \succeq, describe the intuitions (infinite derivation; largest set)
   - give an example of something being greater than something else (Example 4.20?)
+  - \succ is well-founded
+  - \succ and \succeq are compatible
 
 * METHODOLOGY PART 2: TRANSLATING PFSs
+  - reduction pairs
+  - describe Theorem 5.13
+  - describe rule removal
   - show how type mappings work in the fold example
   - show how function symbol mappings work in the same example
+  - remark about the possibility of encoding inductive data types and
+    (primitive) recursive functions in the interpretations
 
 * RESULTS
   - show a bunch of calculation rules we can use
@@ -37,4 +48,3 @@ Proposed structure:
 * CONCLUSIONS AND FUTURE WORK
   - summary slide
   - bullet point list for where else we could go with this
-
