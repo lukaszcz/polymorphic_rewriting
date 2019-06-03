@@ -1,0 +1,282 @@
+\documentclass[10pt,presentation,color=names]{beamer}
+\usepackage{etex}
+\usetheme{boxes}
+
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{caption label separator}{: }
+\setbeamercolor{caption name}{fg=normal text.fg}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize items}{$\cdot$}
+\setbeamertemplate{footline}[frame number]
+
+\usepackage[all]{xy}
+\usepackage{proof}
+
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{stmaryrd}
+\usepackage{latexsym} % for nicer \leadsto
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[english]{babel}
+
+\usefonttheme{professionalfonts}
+\renewcommand{\sfdefault}{\rmdefault}
+
+\newcommand{\Fomega}{\mathtt{F}_\omega}
+
+\newcommand{\Typevars}{\mathcal{A}}
+\newcommand{\Vars}{\mathcal{V}}
+\newcommand{\Rules}{\mathcal{R}}
+\newcommand{\Iterms}{\mathcal{I}}
+\newcommand{\ITypes}{\mathcal{Y}}
+
+\newcommand{\arrkind}{\Rightarrow}
+\newcommand{\arrtype}{\rightarrow}
+\newcommand{\quant}[2]{\forall #1.#2}
+
+\newcommand{\abstraction}[2]{\backslash #1.#2}
+\newcommand{\app}[2]{#1 \cdot #2}
+\newcommand{\tapp}[2]{#1 * #2}
+\newcommand{\subst}[2]{#1:=#2}
+
+\newcommand{\abs}[2]{\lambda #1.#2}
+\newcommand{\tabs}[2]{\Lambda #1.#2}
+\newcommand{\pair}[2]{\langle #1,#2 \rangle}
+\newcommand{\expair}[2]{[#1,#2]}
+
+\newcommand{\arrW}{\leadsto}
+\newcommand{\arr}[1]{\longrightarrow_{#1}}
+\newcommand{\red}{\longrightarrow}
+\newcommand{\arrrbeta}{\arrW_\beta^*}
+
+\newcommand{\nat}{\mathtt{nat}}
+\newcommand{\flatten}{\mathtt{flatten}}
+\newcommand{\lift}{\mathtt{lift}}
+
+\newcommand{\typeinterpret}[1]{\llbracket #1 \rrbracket}
+\newcommand{\interpret}[1]{\llbracket #1 \rrbracket}
+\newcommand{\itp}[1]{\llbracket #1 \rrbracket}
+
+\newcommand{\refsec}[1]{Section~\ref{sec:#1}}
+
+\newcommand{\FTV}{\mathrm{FTV}}
+\newcommand{\FV}{\mathrm{FV}}
+\newcommand{\Tc}{\mathcal{T}}
+\newcommand{\Vc}{\mathcal{V}}
+\newcommand{\Xc}{\mathcal{X}}
+
+\newcommand{\cl}{\mathcal{C}}
+\newcommand{\dom}{\mathrm{dom}}
+\newcommand{\nf}{\mathrm{nf}}
+
+\newcommand{\da}{\mathord{\downarrow}}
+\newcommand{\SN}{\mathrm{SN}}
+\newcommand{\Cb}{\mathbb{C}}
+\newcommand{\Nbb}{\mathbb{N}}
+\newcommand{\val}[3]{\ensuremath{\llbracket#1\rrbracket_{#2}^{#3}}}
+\newcommand{\gteq}[3]{\ensuremath{\ge_{#1}^{#2,#3}}}
+
+\newcommand{\Typemap}{\mathcal{T\!M}}
+\newcommand{\Termmap}{\mathcal{J}}
+\newcommand{\succinterpret}{\succ^{\Termmap}}
+\newcommand{\succeqinterpret}{\succeq^{\Termmap}}
+
+\newcommand{\List}{\mathtt{List}}
+\newcommand{\Pair}{\mathtt{Pair}}
+\newcommand{\nil}{\mathtt{nil}}
+\newcommand{\cons}{\mathtt{cons}}
+\newcommand{\fold}{\mathtt{fold}}
+\newcommand{\xlet}[4]{\mathtt{let}_{#1}\,#2\,\mathtt{be}\,[#3]\,\mathtt{in}\,#4}
+\newcommand{\proj}{\mathtt{pr}}
+
+\title{Polymorphic Higher-order Termination}
+
+\author{\L{}ukasz Czajka, TU Dortmund University\\Cynthia Kop, Radboud University Nijmegen}
+
+\date{June 2019}
+
+\begin{document}
+\maketitle
+
+\begin{frame}{Polynomial interpretations: first-order}
+
+\end{frame}
+
+\begin{frame}{Polynomial interpretations: higher-order}
+
+\end{frame}
+
+\begin{frame}{Polynomial interpretations: polymorphic higher-order}
+  \framesubtitle{Shallow polymorphism: homogeneous fold}
+  \[
+  \begin{array}{l}
+    \List : * \to * \\
+    \mathtt{nil} : \forall \alpha . \List(\alpha) \\
+    \mathtt{cons} : \forall \alpha . \alpha \arrtype \List(\alpha) \arrtype \List(\alpha) \quad\quad \\
+    \mathtt{foldl} : \forall \alpha \beta . (\beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List(\alpha) \arrtype \beta \\
+    \mathtt{foldl}_{\tau,\sigma}(f,a,\nil_\tau) \red a \\
+    \mathtt{foldl}_{\tau,\sigma}(f,a,\cons_\tau(x,l)) \red \mathtt{foldl}_{\tau,\sigma}(f,f a x,l)
+  \end{array}
+  \]
+\end{frame}
+
+\begin{frame}{Polynomial interpretations: polymorphic higher-order}
+  \framesubtitle{Higher-rank impredicative polymorphism: heterogeneous fold}
+  \[
+  \begin{array}{l}
+    \List : * \\
+    \mathtt{nil} : \List \\
+    \mathtt{cons} : \forall \alpha . \alpha \arrtype \List \arrtype \List \quad\quad \\
+    \mathtt{foldl} : \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \beta \\
+    \mathtt{foldl}_\sigma(f,a,\nil) \red a \\
+    \mathtt{foldl}_\sigma(f,a,\cons_\tau(x,l)) \red \mathtt{foldl}_\sigma(f,f \tau a x,l)
+  \end{array}
+  \]
+\end{frame}
+
+\begin{frame}{Polynomial interpretations: polymorphic higher-order}
+  \framesubtitle{Heterogeneous fold as a Polymorphic Functional System}
+  Function symbols:
+  \[
+  \begin{array}{rcl}
+    @ & : & \forall \alpha \forall \beta . (\alpha \arrtype \beta) \arrtype \alpha \arrtype \beta \\
+    \mathtt{A} & : & \forall \alpha : * \arrkind * . \forall \beta .
+    (\forall \gamma .\alpha \gamma) \arrtype \alpha \beta \\
+    \mathtt{nil} & : & \List \\
+    \mathtt{cons} & : & \forall \alpha . \alpha \arrtype \List \arrtype \List \\
+    \mathtt{foldl} & : & \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \beta
+  \end{array}
+  \]\pause
+  Rules:
+  \[
+  \begin{array}{rcl}
+    @_{\sigma,\tau}(\abs{x:\sigma}{s},t) & \red & s[x:=t] \\
+    \mathtt{A}_{\abs{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \red & s[\alpha:=\tau] \\
+    \mathtt{foldl}_\sigma(f,s,\nil) & \red & s \\
+    \mathtt{foldl}_\sigma(f,s,\cons_\tau(h,t)) & \red & \\
+    \multicolumn{3}{c}{\quad\quad\mathtt{foldl}_\sigma(f,@_{\tau,\sigma}(@_{\sigma,\tau\arrtype\sigma}(\mathtt{A}_{\abs{\alpha}{\sigma\arrtype\alpha\arrtype\sigma},\tau}(f),s),h),t)}
+  \end{array}
+  \]
+\end{frame}
+
+\begin{frame}{Polynomial interpretations: polymorphic higher-order}
+  \framesubtitle{Interpretation terms: extension of system~$\Fomega$}
+  Type constructors:
+  \[
+  \begin{array}{rcl}
+    \Tc_{*} &::=& \Vc_{*} \mid \Sigma^T_{*} \mid \Tc_{\kappa\arrkind
+      *}\Tc_{\kappa} \mid \forall\Vc_\kappa\Tc_* \mid
+    \Tc_*\arrtype\Tc_* \\ \Tc_{\kappa_1\arrkind\kappa_2} &::=&
+    \Vc_{\kappa_1\arrkind\kappa_2} \mid
+    \Sigma^T_{\kappa_1\arrkind\kappa_2} \mid
+    \Tc_{\kappa\arrkind(\kappa_1\arrkind\kappa_2)}\Tc_{\kappa} \mid
+    \lambda \Vc_{\kappa_1} \Tc_{\kappa_2}
+  \end{array}
+  \]
+  \pause
+  \begin{example}
+  If $\Sigma^T_{*} = \{ \List \}$ and $\Sigma^T_{* \arrkind * \arrkind
+    *} = \{ \Pair \}$, types are for instance $\List$ and $\forall
+  \alpha.\Pair\,\alpha\,\List$.  The expression $\Pair\,\List$ is a
+  type constructor, but not a type.  If $\Sigma^T_{(* \arrkind *)
+    \arrkind *} = \{ \exists \}$ and $\sigma \in \Tc_{* \arrkind *}$,
+  then both $\exists(\sigma)$ and $\exists (\lambda
+  \alpha.\sigma\alpha)$ are types.
+  \end{example}
+\end{frame}
+
+\begin{frame}{Polynomial interpretations: polymorphic higher-order}
+  \framesubtitle{Interpretation terms: extension of system~$\Fomega$}
+  Terms:
+  \begin{itemize}
+  \item $x : \sigma$ for $(x : \sigma) \in \Vars$.
+  \item $\mathtt{f} : \sigma$ for all
+    $(\mathtt{f} : \sigma) \in \Sigma$.
+  \item $\abs{x:\sigma}{s} : \sigma \arrtype \tau$ if
+    $(x : \sigma) \in \Vars$ and $s : \tau$.
+  \item $(\tabs{\alpha:\kappa}{s}) : (\quant{\alpha:\kappa}{\sigma})$ if
+    $s : \sigma$ and $\alpha$ does not occur free in the type of a
+    free variable of~$s$.
+  \item $\app{s}{t} : \tau$ if $s : \sigma \arrtype \tau$ and
+    $t : \sigma$
+  \item $\tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$ if
+    $s : \quant{\alpha:\kappa}{\sigma}$ and~$\tau$ is a type
+    constructor of kind~$\kappa$,
+  \item $s : \tau$ if $s : \tau'$ and $\tau =_\beta \tau'$.
+  \end{itemize}
+  \pause
+  Signature: $\Sigma^T = \{ \nat : * \}$ and $\Sigma = \{ n : \nat
+  \mid n \in \Nbb \} \cup \Sigma_f$, where $\Sigma_f = \{ \oplus :
+  \forall \alpha . \alpha \arrtype \alpha \arrtype \alpha, \otimes :
+  \forall \alpha . \alpha \arrtype \alpha \arrtype \alpha, \flatten :
+  \forall \alpha . \alpha \arrtype \nat, \lift : \forall \alpha . \nat
+  \arrtype \alpha \}$.
+\end{frame}
+
+\begin{frame}{Polynomial interpretations: polymorphic higher-order}
+  \framesubtitle{Interpretation terms: extension of system~$\Fomega$}
+  Reductions:
+  \begin{enumerate}
+  \item\label{arrW:mono:abs}
+    if $s \arrW t$ then both $\abs{x}{s} \arrW \abs{x}{t}$ and
+    $\tabs{\alpha}{s} \arrW \tabs{\alpha}{t}$
+  \item\label{arrW:mono:right}
+    if $s \arrW t$ then $\app{u}{s} \arrW \app{u}{t}$
+  \item\label{arrW:mono:left}
+    if $s \arrW t$ then both $\app{s}{u} \arrW \app{t}{u}$ and
+    $\tapp{s}{\sigma} \arrW \tapp{t}{\sigma}$
+  \item\label{arrW:beta:abs} $\app{(\abs{x:\sigma}{s})}{t} \arrW
+    s[\subst{x}{t}]$
+    and
+    $\tapp{(\tabs{\alpha}{s})}{\sigma}
+    \arrW s[\subst{\alpha}{\sigma}]$
+    ($\beta$-reduction)
+  \item\label{arrW:plus:base}
+    $\app{\app{\oplus_{\nat}}{n}}{m} \arrW n+m$
+    and
+    $\app{\app{\otimes_{\nat}}{n}}{m}
+    \arrW n \times m$
+  \item\label{arrW:circ:arrow} $\app{\app{\circ_{\sigma \arrtype
+        \tau}}{s}}{t} \arrW
+    \abs{x:\sigma}{\app{\app{\circ_\tau}{(\app{s}{x})}}{(\app{t}{x})}}$
+    for $\circ \in \{ \oplus, \otimes \}$
+  \item\label{arrW:circ:forall}
+    $\app{\app{\circ_{\quant{\alpha}{\sigma}}}{s}}{t} \arrW
+    \tabs{\alpha}{\app{\app{\circ_\sigma}{(\tapp{s}{\alpha})}}{(
+        \tapp{t}{\alpha})}}$ for $\circ \in \{ \oplus, \otimes \}$
+  \item $\app{\flatten_\nat}{s} \arrW s$
+  \item $\app{\flatten_{\sigma \arrtype \tau}}{s} \arrW
+    \app{\flatten_\tau}{(\app{s}{(\app{\lift_\sigma}{0})})}$
+  \item $\app{\flatten_{\quant{\alpha:\kappa}{\sigma}}}{s} \arrW
+    \app{\flatten_{\sigma[\subst{\alpha}{\chi_\kappa}]}}{(\tapp{s}{\chi_\kappa})}$
+  \item $\app{\lift_\nat}{s} \arrW s$
+  \item $\app{\lift_{\sigma \arrtype \tau}}{s} \arrW
+    \abs{x:\sigma}{\app{\lift_{\tau}}{s}}$
+  \item $\app{\lift_{\quant{\alpha}{\sigma}}}{s} \arrW
+    \tabs{\alpha}{\app{\lift_{\sigma}}{s}}$
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{The well-founded order}
+  The relation $s \succ_{\sigma} t$ is defined coinductively by:
+  \[
+  \begin{array}{c}
+    \infer={s \succ_\nat t}{s\da > t\da \text{ in }\mathbb{N}} \\ \\
+    \infer={s \succ_{\sigma\arrtype\tau} t}{\app{s}{q} \succ_{\tau} \app{t}{q} \text{ for all } q \in \Iterms^f_\sigma} \\ \\
+    \infer={s \succ_{\forall(\alpha:\kappa).\sigma} t}{\tapp{s}{\tau} \succ_{\nf_\beta(\sigma[\subst{\alpha}{\tau}])} \tapp{t}{\tau} \text{ for all closed } \tau \in \Tc_{\kappa}}
+  \end{array}
+  \]
+\end{frame}
+
+\begin{frame}{The well-founded order}
+  \framesubtitle{Infinite derivations}
+  In any derivation of $s \succ_{\forall\alpha . \alpha} t$ there is an infinite branch.
+  \[
+  \infer={s \succ_{\forall \alpha . \alpha} t}{\infer={\tapp{s}{\forall\alpha.\alpha} \succ_{\forall \alpha . \alpha}
+    \tapp{t}{\forall\alpha.\alpha}}{\infer={\tapp{\tapp{s}{\forall\alpha.\alpha}}{\forall \alpha . \alpha} \succ_{\forall \alpha . \alpha}
+\tapp{\tapp{t}{\forall\alpha.\alpha}}{\forall\alpha.\alpha}}{\vdots} & \ldots} & \ldots}
+  \]
+\end{frame}
+
+\end{document}

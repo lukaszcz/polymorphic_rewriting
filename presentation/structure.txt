@@ -4,8 +4,8 @@ Proposed structure:
   - start with polynomial interpretations for first-order rewriting: this is well-known (one slide)
   - show polynomial interpretations for higher-order rewriting: this is less well-known, but follows similar patterns as the first-order case (one slide)
   - pose the question: can we do something similar if we go one step further up?
-    + show an example system with shallow polymorphic rules (LC: homogenous fold?)
-    + show some example systems with non-shallow polymorphic rules (LC: heterogenous fold?)
+    + show an example system with shallow polymorphic rules (LC: homogeneous fold?)
+    + show some example systems with non-shallow polymorphic rules (LC: heterogeneous fold?)
     + show how these examples can all be formulated in our PFSs (essentially: a definition by example)
     Here make sure to discuss the application domains: Haskell, logic.
 
