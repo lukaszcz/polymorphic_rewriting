@@ -82,13 +82,19 @@
 \newcommand{\succinterpret}{\succ^{\Termmap}}
 \newcommand{\succeqinterpret}{\succeq^{\Termmap}}
 
+\newcommand{\symb}[1]{\textcolor{blue}{\mathtt{#1}}}
+\newcommand{\var}[1]{\textcolor{red}{#1}}
+\newcommand{\binder}[1]{\textcolor{purple}{#1}}
+
 \newcommand{\List}{\mathtt{List}}
 \newcommand{\Pair}{\mathtt{Pair}}
-\newcommand{\nil}{\mathtt{nil}}
-\newcommand{\cons}{\mathtt{cons}}
-\newcommand{\fold}{\mathtt{fold}}
+\newcommand{\Nat}{\mathtt{Nat}}
+\newcommand{\nil}{\symb{nil}}
+\newcommand{\cons}{\symb{cons}}
+\newcommand{\map}{\symb{map}}
+\newcommand{\fold}{\symb{fold}}
 \newcommand{\xlet}[4]{\mathtt{let}_{#1}\,#2\,\mathtt{be}\,[#3]\,\mathtt{in}\,#4}
-\newcommand{\proj}{\mathtt{pr}}
+\newcommand{\proj}{\symb{pr}}
 
 \title{Polymorphic Higher-order Termination}
 
@@ -101,17 +107,175 @@
 
 \begin{frame}{Polynomial interpretations: first-order}
 
+%STORY: talk about TRSs and what we mean by termination .
+%STORY: introduce polynomial interpretations as one of the oldest techniques to prove it.
+%STORY: discuss on a high level how the interpretation given here works.
+
+\textbf{Question:} Does the following TRS terminate?
+\[
+\begin{array}{rcl}
+\symb{append}(\nil, \var{ys}) & \red & \var{ys} \\
+\symb{append}(\cons(\var{x},\var{xs}),\var{ys}) & \red & \cons(\var{x},\symb{append}(\var{xs},\var{ys})) \\
+\end{array}
+\]
+
+\ \\\pause
+\textbf{Answer:} Yes, it does. \pause
+Let:
+\[
+\begin{array}{rcl}
+\interpret{\nil} & = & 1 \\
+\interpret{\cons}(s,t) & = & 1 + \interpret{s} + \interpret{t} \\
+\interpret{\symb{append}}(s,t) & = & 2 * \interpret{s} + \interpret{t} \\
+\end{array}
+\]
+\pause Then:
+\[
+\begin{array}{rcl}
+\interpret{\symb{append}(\nil, \var{ys})} & = & 2 + \var{ys} \\
+  & > & \var{ys} \\
+  & = & \interpret{\var{ys}} \\\
+\interpret{\symb{append}(\cons(\var{x},\var{xs}),\var{ys})} & = & 2 + 2\var{x} + 2\var{xs} + ys \\
+  & > & 1 + \var{x} + 2\var{xs} + \var{ys} \\
+  & = & \interpret{\cons(\var{x},\symb{append}(\var{xs},\var{ys}))} \\
+\end{array}
+\]
 \end{frame}
 
+%CK: Note that I chose map rather than fold because there is no polynomial interpretation for
+%    monomorphic fold -- at least, not in the earlier definitions. There may be one with our
+%    definitions; that I do not know.
 \begin{frame}{Polynomial interpretations: higher-order}
 
+%STORY: We can try to use the same idea for higher-order rewriting, as seen for instance in functional programming and various proof systems.
+
+\textbf{Question:} Does the following higher-order TRS terminate?
+\[
+\begin{array}{rcl}
+\map(\var{F},\nil) & \red & \nil \\
+\map(\var{F},\cons(\var{x},\var{xs})) & \red & \cons(\var{F} \cdot \var{x},\map(\var{F},\var{xs})) \\
+\end{array}
+\]
+
+%STORY: Would it surprise you if I told you that this might actually be non-terminating?
+
+\ \\\pause
+\textbf{Answer:} Depends on the type. \pause It terminates if:
+\[
+\begin{array}{rcl}
+\nil & : & \List \\
+\cons & : & \Nat \arrtype \List \arrtype \List \\
+\map & : & (\Nat \arrtype \Nat) \arrtype \List \arrtype \List \\
+\end{array}
+\]
+
+\pause Let:
+\[
+\begin{array}{rcl}
+\interpret{\nil} & = & 0 \\
+\interpret{\cons(s,t)} & = & 1 + \interpret{s} + \interpret{t} \\
+\interpret{\map(s,t)} & = & (2 + \interpret{t}) * (1 + \interpret{s}(\interpret{t})) \\
+\interpret{s\ t} & = & \interpret{s}(\interpret{t}) + \interpret{t}\ \ \text{if}\ s : \Nat \arrtype \Nat \\
+\end{array}
+\]
+
+\pause Then:
+\[
+\begin{array}{rcl}
+\interpret{\map(\var{F},\nil)} & = & \var{F}(0) + 1 \\
+ & > & 0 = \interpret{\nil} \\
+\interpret{\map(\var{F},\cons(\var{x},\var{xs}))} & = &
+  (2 + \var{F}(1 + \var{x} + \var{xs})) * (2 + \var{x} + \var{xs}) \\
+  & > & 1 + \var{F}(\var{x}) + \var{x} + (2 + \var{xs}) * (1 + \var{F}(\var{xs})) \\
+  & = & \interpret{\cons(\var{F} \cdot \var{x},\map(\var{F},\var{xs}))} \\
+\end{array}
+\]
+
 \end{frame}
+
+\begin{frame}{Polynomial interpretations: polymorphic higher-order}
+
+\textbf{Question:} Does the following polymorphic HO-TRS terminate?
+\[
+\begin{array}{rcl}
+\map(\var{F},\nil) & \red & \nil \\
+\map(\var{F},\cons(\var{x},\var{xs})) & \red & \cons(\var{F} \cdot \var{x},\map(\var{F},\var{xs})) \\
+\end{array}
+\]
+\[
+\begin{array}{rcll}
+\nil & : & \forall \alpha. & \List(\alpha) \\
+\cons & : & \forall \alpha. & \alpha \arrtype \List(\alpha) \arrtype \List(\alpha) \\
+\map & : & \forall \alpha \beta. & (\alpha \arrtype \beta) \arrtype \List(\alpha) \arrtype \List(\beta) \\
+\end{array}
+\]
+
+\pause\ \\
+\textbf{Question:} What about the following?
+\[
+\begin{array}{rcl}
+\fold(\var{F},\var{a},\nil) & \red & \var{a} \\
+\fold(\var{F},\var{a},\cons(\var{x},\var{xs})) & \red & \fold(\var{F},\var{F}\ \var{a}\ \var{x},\var{xs})
+\end{array}
+\]
+\[
+\begin{array}{rcll}
+\fold & : & \forall \alpha \beta . & (\beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List(\alpha) \arrtype \beta \\
+\end{array}
+\]
+\end{frame}
+
+\begin{frame}{Shallow vs.\ Higher-rank impredicative polymorphism}
+\textbf{Shallow polymorphism:}
+\[
+\begin{array}{rcllr}
+\uncover<2->{\List} & \uncover<2->{:} & \multicolumn{2}{l}{\uncover<2->{* \arrtype *}} & \uncover<2>{\alert{\Longleftarrow}} \\
+\nil & : & \forall \alpha. & \List(\alpha) \\
+\cons & : & \forall \alpha. & \alpha \arrtype \List(\alpha) \arrtype \List(\alpha) \\
+\fold & : & \forall \alpha \beta . & (\beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List(\alpha) \arrtype \beta \\
+\end{array}
+\]
+\[
+\begin{array}{rclr}
+\fold_{\only<2->{\tau,\sigma}}(\var{F},\var{a},\nil_{\only<2->{\tau}}) & \red & \var{a} & \uncover<2>{\alert{\Longleftarrow}} \\
+\fold_{\only<2->{\tau,\sigma}}(\var{F},\var{a},\cons_{\only<2->{\tau}}(\var{x},\var{xs})) & \red
+  & \fold_{\only<2->{\tau,\sigma}}(\var{F},\var{F}\ \var{a}\ \var{x},\var{xs}) & \uncover<2>{\alert{\Longleftarrow}} \\
+\end{array}
+\]
+
+\pause\pause\ \\
+\textbf{Higher-rank impredicative polymorphism}
+\[
+\begin{array}{rcllr}
+\List & : & & * \\
+\nil & : & & \List \\
+\cons & : & \forall \alpha. & \alpha \arrtype \List \arrtype \List \\
+\fold & : & \forall \beta . & (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \beta \\
+\end{array}
+\]
+\[
+\begin{array}{rclr}
+\fold_{\sigma}(\var{F},\var{a},\nil) & \red & \var{a} & \uncover<2>{\alert{\Longleftarrow}} \\
+\fold_{\sigma}(\var{F},\var{a},\cons_{\tau}(\var{x},\var{xs})) & \red & \fold_{\sigma}(\var{F},\var{F}\ \tau\ \var{a}\ \var{x},\var{xs}) \\
+\end{array}
+\]
+\end{frame}
+
+
+
+%* PROBLEM STATEMENT:
+%  - pose the question: can we do something similar if we go one step further up?
+%    + show an example system with shallow polymorphic rules (LC: homogeneous fold?)
+%    + show some example systems with non-shallow polymorphic rules (LC: heterogeneous fold?)
+%    + show how these examples can all be formulated in our PFSs (essentially: a definition by example)
+%    Here make sure to discuss the application domains: Haskell, logic.
+
 
 \begin{frame}{Polynomial interpretations: polymorphic higher-order}
   \framesubtitle{Shallow polymorphism: homogeneous fold}
   \[
   \begin{array}{l}
-    \List : * \to * \\
+    \List : * \red * \\
     \mathtt{nil} : \forall \alpha . \List(\alpha) \\
     \mathtt{cons} : \forall \alpha . \alpha \arrtype \List(\alpha) \arrtype \List(\alpha) \quad\quad \\
     \mathtt{foldl} : \forall \alpha \beta . (\beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List(\alpha) \arrtype \beta \\
@@ -278,5 +442,42 @@
 \tapp{\tapp{t}{\forall\alpha.\alpha}}{\forall\alpha.\alpha}}{\vdots} & \ldots} & \ldots}
   \]
 \end{frame}
+
+\begin{frame}{Bonus slide because people might just ask}
+
+%STORY: In slide 2 I mention that termination of map actually depends on the type. Not everyone will believe it, so if they ask, here is the example of non-termination.
+
+\textbf{Question:} Does the following higher-order TRS terminate?
+\[
+\begin{array}{rcl}
+\map(\var{F},\nil) & \red & \nil \\
+\map(\var{F},\cons(\var{x},\var{xs})) & \red & \cons(\var{F} \cdot \var{x},\map(\var{F},\var{xs})) \\
+\end{array}
+\]
+
+\textbf{Answer:} Depends.
+%NOTE: The following is optional. I would be inclined to show it, but go over it very quickly, to show that types are important, but not waste too much time on it.
+%It's not the point of this talk, after all -- but does help to illustrate to the RTA part of the audience why we look at types so much.
+\alert{Not} terminating if:
+\[
+\begin{array}{rcl}
+\nil & : & \mathtt{o} \\
+\cons & : & (\mathtt{o} \arrtype \mathtt{o}) \arrtype \mathtt{o} \arrtype \mathtt{o} \\
+\map & : & ((\mathtt{o} \arrtype \mathtt{o}) \arrtype \mathtt{o}) \arrtype \mathtt{o} \arrtype \mathtt{o} \\
+\end{array}
+\]
+
+Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \binder{x}},\binder{x})},\nil)$. Then:
+\[
+\begin{array}{ll}
+& \map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \omega},\omega) \\
+\red & \cons(\ (\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \omega})\ 
+  (\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \binder{x}},\binder{x})})\ , \map(\dots)) \\
+\red_\beta & \cons(\ (\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \binder{x}},\binder{x})})\ \omega\ , \map(\dots)) \\
+\red_\beta & \cons(\ \underline{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \omega},\omega)}\ , \map(\dots)) \\
+\end{array}
+\]
+\end{frame}
+
 
 \end{document}
