@@ -147,7 +147,52 @@ Let:
 %    definitions; that I do not know.
 \begin{frame}{Polynomial interpretations: higher-order}
 
-%STORY: We can try to use the same idea for higher-order rewriting, as seen for instance in functional programming and various proof systems.
+\textbf{Question:} Does the following higher-order TRS terminate?
+\[
+\begin{array}{rcl}
+\map(\var{F},\nil) & \red & \nil \\
+\map(\var{F},\cons(\var{x},\var{xs})) & \red & \cons(\var{F} \cdot \var{x},\map(\var{F},\var{xs})) \\
+\end{array}
+\]
+
+\ \\\pause
+\textbf{Answer:} Depends. \pause
+%STORY: Would it surprise you if I told you that this might actually be non-terminating?
+\alert{Not} terminating if:
+\[
+\begin{array}{rcl}
+\nil & : & \mathtt{o} \\
+\cons & : & (\mathtt{o} \arrtype \mathtt{o}) \arrtype \mathtt{o} \arrtype \mathtt{o} \\
+\map & : & ((\mathtt{o} \arrtype \mathtt{o}) \arrtype \mathtt{o}) \arrtype \mathtt{o} \arrtype \mathtt{o} \\
+\end{array}
+\]
+
+%STORY: Types are important; especially when you have lambda-abstraction, you have to be careful. With the given typing, the rules above can be used to encode the untyped lambda-calculus. This is exemplified by the following non-terminating term.
+%NOTE: This would be told very quickly, to show to the RTA crowd why types are important; however, I do not want to waste too much time on it as it's not the point of the talk.
+%It's not the point of this talk, after all -- but does help to illustrate to the RTA part of the audience why we look at types so much.
+\ \\\pause
+Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \binder{x}},\binder{x})},\nil)$. Then:
+\[
+\begin{array}{ll}
+& \map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \omega},\omega) \\
+\red & \cons(\ (\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \omega})\ 
+  (\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \binder{x}},\binder{x})})\ , \map(\dots)) \\
+\red_\beta & \cons(\ (\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \binder{x}},\binder{x})})\ \omega\ , \map(\dots)) \\
+\red_\beta & \cons(\ \underline{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \omega},\omega)}\ , \map(\dots)) \\
+\end{array}
+\]
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\ \\
+\end{frame}
+
+\begin{frame}{Polynomial interpretations: higher-order}
+
+%STORY: If the types work out, we can try to use the same idea for higher-order rewriting, as seen for instance in functional programming and various proof systems.
+%STORY: Here give a very rough sketch of Jaco's work.
 
 \textbf{Question:} Does the following higher-order TRS terminate?
 \[
@@ -157,10 +202,8 @@ Let:
 \end{array}
 \]
 
-%STORY: Would it surprise you if I told you that this might actually be non-terminating?
-
-\ \\\pause
-\textbf{Answer:} Depends on the type. \pause It terminates if:
+\ \\
+\textbf{Answer:} Depends. \pause It \alert{does} terminate if:
 \[
 \begin{array}{rcl}
 \nil & : & \List \\
@@ -195,6 +238,8 @@ Let:
 
 \begin{frame}{Polynomial interpretations: polymorphic higher-order}
 
+%STORY: Let's take this a step further and go for a polymorphic system. This is the kind of polymorphism that we see in ML-like language.
+
 \textbf{Question:} Does the following polymorphic HO-TRS terminate?
 \[
 \begin{array}{rcl}
@@ -210,6 +255,7 @@ Let:
 \end{array}
 \]
 
+%STORY: Now, it actually is terminating, and we could see that by considering all possible type instances. Let's look at another example.
 \pause\ \\
 \textbf{Question:} What about the following?
 \[
@@ -223,6 +269,8 @@ Let:
 \fold & : & \forall \alpha \beta . & (\beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List(\alpha) \arrtype \beta \\
 \end{array}
 \]
+%STORY: Note that this example is somewhat different than map, because a functional variable is applied repeatedly on the same item; that is, you build a term like F^n(x).
+%STORY: This cannot be handled with the "higher-order polynomial" interpretations from the last slide, although arguably that's just a weakness of that definition of polynomials.
 \end{frame}
 
 \begin{frame}{Shallow vs.\ Higher-rank impredicative polymorphism}
@@ -259,16 +307,53 @@ Let:
 \fold_{\sigma}(\var{F},\var{a},\cons_{\tau}(\var{x},\var{xs})) & \red & \fold_{\sigma}(\var{F},\var{F}\ \tau\ \var{a}\ \var{x},\var{xs}) \\
 \end{array}
 \]
+
+%STORY: Here make sure to discuss the application domains: Haskell, logic.
 \end{frame}
 
+\begin{frame}{Our goal: handle systems like this!}
+\framesubtitle{Polymorphic functional systems}
 
+%STORY: There are many ways to formalise systems like this; we use the following because it's convenient:
+\begin{itemize}
+\item Function symbols have a type: $\forall \alpha_1 \dots \alpha_n.\sigma_1 \arrtype \dots \arrtype \sigma_k \arrtype \tau$
+\item Terms are variables, abstractions, type abstractions and: $\symb{f}_{\pi_1,\dots,\pi_n}(s_1,\dots,s_k) : \tau[\alpha_1:=\pi_1,\dots,\alpha_n:=\pi_n]$.
+  \pause
+%STORY: Okay, so what does this mean for the fold system that we just saw?
+%STORY: (before the first pause) This is what we had, but note that we have those applications there.
+%STORY: (before the second pause) So, we introduce function symbols for application and type application, and corresponding rules.
+%STORY: (before the third pause) Then, we replace the applications and type applications accordingly.
+\[
+\begin{array}{rcllrl}
+\List & : & & * \\
+\nil & : & & \List \\
+\cons & : & \forall \alpha. & \alpha \arrtype \List \arrtype \List \\
+\fold & : & \forall \beta . & (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \beta \\
+\uncover<3->{\symb{@}} & \uncover<3->{:} & \uncover<3->{\forall \alpha\forall \beta. & (\alpha \arrtype \beta) \arrtype (\alpha \arrtype \beta)} &
+  \uncover<3->{\alert{\Longleftarrow}} \\
+\uncover<3->{\symb{tapp}} & \uncover<3->{:} & \uncover<3->{\forall \alpha : * \arrkind *.\forall \beta.} & \uncover<3->{(\forall \gamma.\alpha\gamma) \arrtype \alpha\beta} &
+  \uncover<3->{\alert{\Longleftarrow}} \\
+\end{array}
+\]
+\[
+\begin{array}{rcll}
+\fold_{\sigma}(\var{F},\var{a},\nil) & \red & \var{a} \\
+\fold_{\sigma}(\var{F},\var{a},\cons_{\tau}(\var{x},\var{xs})) & \red & \uncover<1-3>{\fold_{\sigma}(\var{F},\var{F}\ \tau\ \var{a}\ \var{x},\var{xs})} \\
+  \multicolumn{4}{r}{\uncover<4->{
+    \fold_{\sigma}(\var{F},\symb{@}_{\tau,\sigma}(\symb{@}_{\sigma,\tau \arrtype \sigma}(\symb{tapp}_{\lambda \alpha.\sigma \arrtype \alpha \arrtype \sigma,\tau}(\var{F}), \var{a}), \var{x}),\var{xs})
+  }} \\
+\uncover<3->{\symb{@}_{\sigma,\tau}(\abs{x:\sigma.s},t)} & \uncover<3->{\red} & \uncover<3->{s[x:=t]} &
+  \uncover<3->{\alert{\Longleftarrow}} \\
+\uncover<3->{\symb{tapp}_{\lambda \alpha.\sigma,\tau}(\tabs{\alpha}{s})} & \uncover<3->{\red} & \uncover<3->{s[\alpha:=\tau]} &
+  \uncover<3->{\alert{\Longleftarrow}} \\
+\end{array}
+\]
+%STORY: This is not a natural formalism. It doesn't need to be: it is just meant to define the method. Real polymorphic systems would be translated into it.
+\item\pause\pause\pause \textbf{\alert{Note:} not meant as a formalism of interest by itself, but only as a tool to analyse polymorphic systems.}
+\end{itemize}
+\end{frame}
 
-%* PROBLEM STATEMENT:
-%  - pose the question: can we do something similar if we go one step further up?
-%    + show an example system with shallow polymorphic rules (LC: homogeneous fold?)
-%    + show some example systems with non-shallow polymorphic rules (LC: heterogeneous fold?)
-%    + show how these examples can all be formulated in our PFSs (essentially: a definition by example)
-%    Here make sure to discuss the application domains: Haskell, logic.
+%=================================================
 
 
 \begin{frame}{Polynomial interpretations: polymorphic higher-order}
@@ -441,42 +526,6 @@ Let:
     \tapp{t}{\forall\alpha.\alpha}}{\infer={\tapp{\tapp{s}{\forall\alpha.\alpha}}{\forall \alpha . \alpha} \succ_{\forall \alpha . \alpha}
 \tapp{\tapp{t}{\forall\alpha.\alpha}}{\forall\alpha.\alpha}}{\vdots} & \ldots} & \ldots}
   \]
-\end{frame}
-
-\begin{frame}{Bonus slide because people might just ask}
-
-%STORY: In slide 2 I mention that termination of map actually depends on the type. Not everyone will believe it, so if they ask, here is the example of non-termination.
-
-\textbf{Question:} Does the following higher-order TRS terminate?
-\[
-\begin{array}{rcl}
-\map(\var{F},\nil) & \red & \nil \\
-\map(\var{F},\cons(\var{x},\var{xs})) & \red & \cons(\var{F} \cdot \var{x},\map(\var{F},\var{xs})) \\
-\end{array}
-\]
-
-\textbf{Answer:} Depends.
-%NOTE: The following is optional. I would be inclined to show it, but go over it very quickly, to show that types are important, but not waste too much time on it.
-%It's not the point of this talk, after all -- but does help to illustrate to the RTA part of the audience why we look at types so much.
-\alert{Not} terminating if:
-\[
-\begin{array}{rcl}
-\nil & : & \mathtt{o} \\
-\cons & : & (\mathtt{o} \arrtype \mathtt{o}) \arrtype \mathtt{o} \arrtype \mathtt{o} \\
-\map & : & ((\mathtt{o} \arrtype \mathtt{o}) \arrtype \mathtt{o}) \arrtype \mathtt{o} \arrtype \mathtt{o} \\
-\end{array}
-\]
-
-Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \binder{x}},\binder{x})},\nil)$. Then:
-\[
-\begin{array}{ll}
-& \map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \omega},\omega) \\
-\red & \cons(\ (\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \omega})\ 
-  (\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \binder{x}},\binder{x})})\ , \map(\dots)) \\
-\red_\beta & \cons(\ (\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \binder{x}},\binder{x})})\ \omega\ , \map(\dots)) \\
-\red_\beta & \cons(\ \underline{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \omega},\omega)}\ , \map(\dots)) \\
-\end{array}
-\]
 \end{frame}
 
 
