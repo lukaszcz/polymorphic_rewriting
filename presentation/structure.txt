@@ -31,10 +31,10 @@ Proposed structure:
 
 * METHODOLOGY PART 2: TRANSLATING PFSs
   - reduction pairs
-  - describe Theorem 5.13
-  - describe rule removal
   - show how type mappings work in the fold example
   - show how function symbol mappings work in the same example
+  - describe Theorem 5.13
+  - describe rule removal
   - remark about the possibility of encoding inductive data types and
     (primitive) recursive functions in the interpretations
 

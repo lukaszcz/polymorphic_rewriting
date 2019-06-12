@@ -97,6 +97,11 @@
 \newcommand{\xlet}[4]{\mathtt{let}_{#1}\,#2\,\mathtt{be}\,[#3]\,\mathtt{in}\,#4}
 \newcommand{\proj}{\symb{pr}}
 
+\newcommand{\CK}[1]{\textcolor{violet}{CK: #1}}
+\newcommand{\CKchange}[1]{\textcolor{blue}{#1}}
+\newcommand{\LC}[1]{\textcolor{red}{LC: #1}}
+\newcommand{\LCchange}[1]{\textcolor{red}{#1}}
+
 \title{Polymorphic Higher-order Termination}
 
 \author{\L{}ukasz Czajka, TU Dortmund University\\Cynthia Kop, Radboud University Nijmegen}
@@ -146,6 +151,11 @@ Let:
 %CK: Note that I chose map rather than fold because there is no polynomial interpretation for
 %    monomorphic fold -- at least, not in the earlier definitions. There may be one with our
 %    definitions; that I do not know.
+%LC: Well, monomorphic fold should be just a modification of our fold
+%    example from the paper (I mean, using our framework -- you need
+%    the encodings of inductive data types; you can define lists with
+%    a fixed type of elements analogously to homogeneous polymorphic
+%    lists)
 \begin{frame}{Polynomial interpretations: higher-order}
 
 \textbf{Question:} Does the following higher-order TRS terminate?
@@ -167,6 +177,11 @@ Let:
 \map & : & ((\mathtt{o} \arrtype \mathtt{o}) \arrtype \mathtt{o}) \arrtype \mathtt{o} \arrtype \mathtt{o} \\
 \end{array}
 \]
+\LC{The types don't match! $\var{F} : (o \to o) \to o$, $x : o \to o$,
+  so $\var{F} x : o$, but the first argument of $\cons$ expects $o \to
+  o$. I don't understand what you wanted to write here.}
+
+% LC: maybe we can just say that if we consider this untyped, then it doesn't terminate?
 
 %STORY: Types are important; especially when you have lambda-abstraction, you have to be careful. With the given typing, the rules above can be used to encode the untyped lambda-calculus. This is exemplified by the following non-terminating term.
 %NOTE: This would be told very quickly, to show to the RTA crowd why types are important; however, I do not want to waste too much time on it as it's not the point of the talk.
@@ -176,7 +191,7 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
 \[
 \begin{array}{ll}
 & \map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \omega},\omega) \\
-\red & \cons(\ (\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \omega})\ 
+\red & \cons(\ (\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \omega})\
   (\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \binder{x}},\binder{x})})\ , \map(\dots)) \\
 \red_\beta & \cons(\ (\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \binder{x}},\binder{x})})\ \omega\ , \map(\dots)) \\
 \red_\beta & \cons(\ \underline{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \omega},\omega)}\ , \map(\dots)) \\
@@ -274,7 +289,7 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
 %STORY: This cannot be handled with the "higher-order polynomial" interpretations from the last slide, although arguably that's just a weakness of that definition of polynomials.
 \end{frame}
 
-\begin{frame}{Shallow vs.\ Higher-rank impredicative polymorphism}
+\begin{frame}{Shallow vs.\ Higher-rank polymorphism}
 \textbf{Shallow polymorphism:}
 \[
 \begin{array}{rcllr}
@@ -293,7 +308,7 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
 \]
 
 \pause\pause\ \\
-\textbf{Higher-rank impredicative polymorphism}
+\textbf{Higher-rank polymorphism:}
 \[
 \begin{array}{rcllr}
 \List & : & & * \\
@@ -395,7 +410,7 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
   %STORY: point at the variable F
 \item\pause $\WM_{\Nat \arrtype \List \arrtype \List} = \{$weakly monotonic functions from $\mathbb{N} \times \mathbb{N}$ to $\mathbb{N}\}$
   %STORY: point at the function symbol cons
-\item\pause $\WM_{(\Nat \arrtype \Nat) \arrtype \List \arrtype \List} = \{$ weakly monotonic functionals from $\WM_{\Nat \arrtype \Nat} \times \mathbb{N}$ to $\mathbb{N}\}$
+\item\pause $\WM_{(\Nat \arrtype \Nat) \arrtype \List \arrtype \List} = \{$weakly monotonic functionals from $\WM_{\Nat \arrtype \Nat} \times \mathbb{N}$ to $\mathbb{N}\}$
   %STORY: point at the function symbol map
 \end{itemize}
 
@@ -435,6 +450,26 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
   %STORY: explain that no direct "set-theoretic" extension of weakly monotonic functionals
   %STORY: is possible, which is why we use a concrete rewrite system in the interpretation
   %CK: (What is this explanation, though?)
+
+  %LC: It's not trivial, and I don't know it even roughly off the top
+  %    of my head. We just mention the well-known (in the type theory
+  %    community) paper by Reynolds: ``Polymorphism is not
+  %    set-theoretic'', SDT 1984. Essentially, you cannot have a model
+  %    of System F where a type A -> B would be interpreted by the set
+  %    of all functions from the interpretation of A to the
+  %    interpretation of B. Strictly speaking, here we only consider
+  %    weakly monotonic functions, but this most probably also
+  %    generalises to such a situation. I would need to look into that
+  %    to check if this translates verbatim or some more fiddling is
+  %    required, but I would be quite surprised if Reynold's argument
+  %    didn't work here. In fact, I suspect that it works
+  %    ``verbatim'', because the contradiction essentially comes from
+  %    some cardinality considerations and weak monotonicity doesn't
+  %    seem to save us from cardinality explosion when forming
+  %    function spaces.
+  %    In short, we can just say it's very unlikely that such a model
+  %    exists because of Reynolds' result. Maybe we can say more if I
+  %    find time to read the  Reynolds' paper before FSCD.
 \item\pause Alternative: use polynomial interpretations to a set of \alert{terms}, not \alert{functions}!
 \end{itemize}
 
@@ -459,60 +494,6 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
 \end{frame}
 
 %=================================================
-
-
-\begin{frame}{Polynomial interpretations: polymorphic higher-order}
-  \framesubtitle{Shallow polymorphism: homogeneous fold}
-  \[
-  \begin{array}{l}
-    \List : * \red * \\
-    \mathtt{nil} : \forall \alpha . \List(\alpha) \\
-    \mathtt{cons} : \forall \alpha . \alpha \arrtype \List(\alpha) \arrtype \List(\alpha) \quad\quad \\
-    \mathtt{foldl} : \forall \alpha \beta . (\beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List(\alpha) \arrtype \beta \\
-    \mathtt{foldl}_{\tau,\sigma}(f,a,\nil_\tau) \red a \\
-    \mathtt{foldl}_{\tau,\sigma}(f,a,\cons_\tau(x,l)) \red \mathtt{foldl}_{\tau,\sigma}(f,f a x,l)
-  \end{array}
-  \]
-\end{frame}
-
-\begin{frame}{Polynomial interpretations: polymorphic higher-order}
-  \framesubtitle{Higher-rank impredicative polymorphism: heterogeneous fold}
-  \[
-  \begin{array}{l}
-    \List : * \\
-    \mathtt{nil} : \List \\
-    \mathtt{cons} : \forall \alpha . \alpha \arrtype \List \arrtype \List \quad\quad \\
-    \mathtt{foldl} : \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \beta \\
-    \mathtt{foldl}_\sigma(f,a,\nil) \red a \\
-    \mathtt{foldl}_\sigma(f,a,\cons_\tau(x,l)) \red \mathtt{foldl}_\sigma(f,f \tau a x,l)
-  \end{array}
-  \]
-\end{frame}
-
-\begin{frame}{Polynomial interpretations: polymorphic higher-order}
-  \framesubtitle{Heterogeneous fold as a Polymorphic Functional System}
-  Function symbols:
-  \[
-  \begin{array}{rcl}
-    @ & : & \forall \alpha \forall \beta . (\alpha \arrtype \beta) \arrtype \alpha \arrtype \beta \\
-    \mathtt{A} & : & \forall \alpha : * \arrkind * . \forall \beta .
-    (\forall \gamma .\alpha \gamma) \arrtype \alpha \beta \\
-    \mathtt{nil} & : & \List \\
-    \mathtt{cons} & : & \forall \alpha . \alpha \arrtype \List \arrtype \List \\
-    \mathtt{foldl} & : & \forall \beta . (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \beta
-  \end{array}
-  \]\pause
-  Rules:
-  \[
-  \begin{array}{rcl}
-    @_{\sigma,\tau}(\abs{x:\sigma}{s},t) & \red & s[x:=t] \\
-    \mathtt{A}_{\abs{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \red & s[\alpha:=\tau] \\
-    \mathtt{foldl}_\sigma(f,s,\nil) & \red & s \\
-    \mathtt{foldl}_\sigma(f,s,\cons_\tau(h,t)) & \red & \\
-    \multicolumn{3}{c}{\quad\quad\mathtt{foldl}_\sigma(f,@_{\tau,\sigma}(@_{\sigma,\tau\arrtype\sigma}(\mathtt{A}_{\abs{\alpha}{\sigma\arrtype\alpha\arrtype\sigma},\tau}(f),s),h),t)}
-  \end{array}
-  \]
-\end{frame}
 
 \begin{frame}{Polynomial interpretations: polymorphic higher-order}
   \framesubtitle{Interpretation terms: extension of system~$\Fomega$}
@@ -612,6 +593,21 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
   \end{enumerate}
 \end{frame}
 
+\begin{frame}{Polynomial interpretations: polymorphic higher-order}
+  \framesubtitle{Interpretation terms: extension of system~$\Fomega$}
+  \begin{theorem}
+    The reduction relation $\leadsto$ is terminating.
+  \end{theorem}
+  % STORY: the termination proof method is standard (Tait-Girard,
+  % computability, candidates), but the question itself subtle because
+  % of the ``matching'' on types
+  \pause
+  \begin{corollary}
+    All closed normal interpretation terms of type $\nat$ are natural
+    numbers.
+  \end{corollary}
+\end{frame}
+
 \begin{frame}{The well-founded order}
   The relation $s \succ_{\sigma} t$ is defined coinductively by:
   \[
@@ -621,16 +617,176 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
     \infer={s \succ_{\forall(\alpha:\kappa).\sigma} t}{\tapp{s}{\tau} \succ_{\nf_\beta(\sigma[\subst{\alpha}{\tau}])} \tapp{t}{\tau} \text{ for all closed } \tau \in \Tc_{\kappa}}
   \end{array}
   \]
+  % STORY: say this should be interpreted as: s \succ t holds if this
+  % can be justified using a possibly infinite proof built from the
+  % rules above
+
+  % STORY: more precisely, we define \succ for closed terms by
+  % coinduction, and the lift this to arbitrary terms (uninteresting
+  % details)
+
+  % STORY: \da means taking the normal form; because the terms are
+  % closed the normal forms must be natural numbers by the corollary,
+  % so we can just compare them with the order on natural numbers
+\end{frame}
+
+\begin{frame}{The well-founded order}
+  \framesubtitle{Example derivation}
+  \[
+  \infer={s \oplus \lift_{\nat\to\nat}(1) \succ_{\nat\to\nat} s}{
+    \infer={(s \oplus \lift_{\nat\to\nat}(1)) u \succ_\nat s u \text{ for any } u \in \Iterms^f_\nat}{
+      ((s \oplus \lift_{\nat\to\nat}(1)) u)\da > (su)\da \text{ for any } u \in \Iterms^f_\nat
+    }
+  }
+  \]
+
+  \medskip
+  \pause
+
+  $((s \oplus \lift_{\nat\to\nat}(1)) u)\da > (su)\da$ holds because
+  \[
+  (s \oplus \lift_{\nat\to\nat}(1)) u \leadsto^+ su \oplus \lift_{\nat\to\nat}(1) u \leadsto^+ su \oplus 1
+  \]
 \end{frame}
 
 \begin{frame}{The well-founded order}
   \framesubtitle{Infinite derivations}
   In any derivation of $s \succ_{\forall\alpha . \alpha} t$ there is an infinite branch.
   \[
-  \infer={s \succ_{\forall \alpha . \alpha} t}{\infer={\tapp{s}{\forall\alpha.\alpha} \succ_{\forall \alpha . \alpha}
-    \tapp{t}{\forall\alpha.\alpha}}{\infer={\tapp{\tapp{s}{\forall\alpha.\alpha}}{\forall \alpha . \alpha} \succ_{\forall \alpha . \alpha}
-\tapp{\tapp{t}{\forall\alpha.\alpha}}{\forall\alpha.\alpha}}{\vdots} & \ldots} & \ldots}
+  \infer={s \succ_{\forall \alpha . \alpha} t}{
+    \infer={\tapp{s}{\forall\alpha.\alpha} \succ_{\forall \alpha . \alpha} \tapp{t}{\forall\alpha.\alpha}}{
+      \infer={\tapp{\tapp{s}{\forall\alpha.\alpha}}{
+          \forall \alpha . \alpha} \succ_{\forall \alpha . \alpha}\tapp{\tapp{t}{\forall\alpha.\alpha}}{\forall\alpha.\alpha}}{\vdots} &
+      \ldots} &
+    \ldots
+  }
   \]
+  % STORY: the need for infinite derivations comes from the
+  % impredicative universal type quantifier
+\end{frame}
+
+\begin{frame}{The well-founded order}
+  \begin{lemma}
+    $\succ$ is well-founded
+  \end{lemma}
+
+  \pause
+
+  \begin{lemma}[compatibility]
+    $\succeq$ and~$\succ$ are compatible, i.e., $\succ \cdot
+    \succeq\ \subseteq\ \succ$ and $\succeq \cdot
+    \succ\ \subseteq\ \succ$.
+  \end{lemma}
+
+  \pause
+
+  \begin{lemma}[weak monotonicity]
+    If $s \succeq s'$ then $t[\subst{x}{s}] \succeq t[\subst{x}{s'}]$.
+  \end{lemma}
+\end{frame}
+
+\begin{frame}{Reduction pair}
+  We consider again $A$-terms of a fixed PFS~$A$.\pause
+
+  \begin{definition}
+    A binary relation~$R$ on $A$-terms is \emph{monotonic} if $R(s, t)$
+    implies $R(C[s], C[t])$ for every context~$C$ (we assume $s,t$ have
+    the same type~$\sigma$).
+
+    A \emph{reduction pair} is a pair~$(\succeq^A,\succ^A)$ of a
+    quasi-order~$\succeq^A$ on $A$-terms and a well-founded
+    ordering~$\succ^A$ on $A$-terms such that:
+    \begin{itemize}
+    \item
+      $\succeq^A$ and~$\succ^A$ are compatible, i.e., ${\succ^A} \cdot
+      {\succeq^A} \subseteq {\succ^A}$ and ${\succeq^A} \cdot {\succ^A}
+      \subseteq {\succ^A}$, and
+    \item $\succeq^A$ and~$\succ^A$ are both monotonic.
+    \end{itemize}
+  \end{definition}
+\end{frame}
+
+\begin{frame}{Symbol mapping and interpretation pair}
+  \begin{definition}
+    A \emph{type constructor mapping} is a function $\Typemap$ which
+    maps each type constructor symbol to a closed interpretation type
+    constructor of the same kind. A fixed type constructor mapping
+    $\Typemap$ is extended inductively to a function from type
+    constructors to closed interpretation type constructors in the
+    expected way. We denote the extended \emph{interpretation (type)
+      mapping} by~$\typeinterpret{\sigma}$. Thus,
+    e.g.~$\typeinterpret{\quant{\alpha}{\sigma}} =
+    \quant{\alpha}{\typeinterpret{\sigma}}$ and $\typeinterpret{\sigma
+      \arrtype \tau} = \typeinterpret{\sigma} \arrtype
+    \typeinterpret{\tau}$.
+  \end{definition}
+
+  \begin{definition}
+    Given a fixed type constructor mapping~$\Typemap$, a \emph{symbol
+      mapping} is a function $\Termmap$ which assigns to each function
+    symbol $\mathtt{f} : \rho$ a closed interpretation term
+    $\Termmap(\mathtt{f})$ of type~$\typeinterpret{\rho}$. We inductively extend a
+    symbol mapping $\Termmap$ to an \emph{interpretation
+      mapping} $\interpret{s}$ on $A$-terms.
+  \end{definition}
+
+  \begin{definition}
+    For a fixed type constructor mapping $\Typemap$ and symbol mapping
+    $\Termmap$, the \emph{interpretation pair}
+    $(\succeqinterpret,\succinterpret)$ is defined as follows: $s
+    \succeqinterpret t$ if $\interpret{s} \succeq \interpret{t}$, and $s
+    \succinterpret t$ if $\interpret{s} \succ \interpret{t}$.
+  \end{definition}
+\end{frame}
+
+\begin{frame}{Safety}
+  \begin{definition}
+    If $s_1 \succ s_2$ implies $t[\subst{x}{s_1}] \succ
+    t[\subst{x}{s_2}]$, then the interpretation term~$t$ is \emph{safe
+      for~$x$}. A symbol mapping~$\Termmap$ is \emph{safe} if for all
+    \[
+    \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots \forall
+    (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype \sigma_k
+    \arrtype \tau
+    \]
+    with~$\tau$ a type atom we have: $\Termmap(\mathtt{f}) =
+    \tabs{\alpha_1 \dots \alpha_n}{\abs{x_1 \dots x_k}{t}}$ with $t$
+    safe for each~$x_i$.
+  \end{definition}
+
+  \pause
+
+  \begin{enumerate}
+  \item $x u_1 \ldots u_m$ is safe for~$x$.
+  \item If $t$ is safe for~$x$ then so are~$\lift(t)$
+    and~$\flatten(t)$.
+  \item If $s_1$ is safe for~$x$ or $s_2$ is safe for~$x$ then $s_1
+    \oplus s_2$ is safe for~$x$.
+  \item If either
+      (a)
+      $s_1$ is safe for~$x$ and $s_2 \succeq \lift(1)$, or
+      (b)
+      $s_2$ is safe for~$x$ and $s_1 \succeq \lift(1)$,
+    then $s_1 \otimes s_2$ is safe for~$x$.
+  \item If~$t$ is safe for~$x$ then so is~$\tabs{\alpha}{t}$
+    and~$\abs{y}{t}$ ($y \ne x$).
+  \end{enumerate}
+
+  \pause
+
+  \begin{theorem}
+    If~$\Termmap$ is safe then the interpretation pair
+    $(\succeqinterpret,\succinterpret)$ is a reduction pair.
+  \end{theorem}
+\end{frame}
+
+\begin{frame}{Rule removal}
+\end{frame}
+
+\begin{frame}{Results}
+\end{frame}
+
+\begin{frame}{Conclusions and future work}
 \end{frame}
 
 
