@@ -65,6 +65,7 @@
 \newcommand{\Tc}{\mathcal{T}}
 \newcommand{\Vc}{\mathcal{V}}
 \newcommand{\Xc}{\mathcal{X}}
+\newcommand{\WM}{\mathcal{W\!M}}
 
 \newcommand{\cl}{\mathcal{C}}
 \newcommand{\dom}{\mathrm{dom}}
@@ -330,9 +331,9 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
 \cons & : & \forall \alpha. & \alpha \arrtype \List \arrtype \List \\
 \fold & : & \forall \beta . & (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \beta \\
 \uncover<3->{\symb{@}} & \uncover<3->{:} & \uncover<3->{\forall \alpha\forall \beta. & (\alpha \arrtype \beta) \arrtype (\alpha \arrtype \beta)} &
-  \uncover<3->{\alert{\Longleftarrow}} \\
+  \uncover<3>{\alert{\Longleftarrow}} \\
 \uncover<3->{\symb{tapp}} & \uncover<3->{:} & \uncover<3->{\forall \alpha : * \arrkind *.\forall \beta.} & \uncover<3->{(\forall \gamma.\alpha\gamma) \arrtype \alpha\beta} &
-  \uncover<3->{\alert{\Longleftarrow}} \\
+  \uncover<3>{\alert{\Longleftarrow}} \\
 \end{array}
 \]
 \[
@@ -343,14 +344,118 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
     \fold_{\sigma}(\var{F},\symb{@}_{\tau,\sigma}(\symb{@}_{\sigma,\tau \arrtype \sigma}(\symb{tapp}_{\lambda \alpha.\sigma \arrtype \alpha \arrtype \sigma,\tau}(\var{F}), \var{a}), \var{x}),\var{xs})
   }} \\
 \uncover<3->{\symb{@}_{\sigma,\tau}(\abs{x:\sigma.s},t)} & \uncover<3->{\red} & \uncover<3->{s[x:=t]} &
-  \uncover<3->{\alert{\Longleftarrow}} \\
+  \uncover<3>{\alert{\Longleftarrow}} \\
 \uncover<3->{\symb{tapp}_{\lambda \alpha.\sigma,\tau}(\tabs{\alpha}{s})} & \uncover<3->{\red} & \uncover<3->{s[\alpha:=\tau]} &
-  \uncover<3->{\alert{\Longleftarrow}} \\
+  \uncover<3>{\alert{\Longleftarrow}} \\
 \end{array}
 \]
 %STORY: This is not a natural formalism. It doesn't need to be: it is just meant to define the method. Real polymorphic systems would be translated into it.
 \item\pause\pause\pause \textbf{\alert{Note:} not meant as a formalism of interest by itself, but only as a tool to analyse polymorphic systems.}
 \end{itemize}
+\end{frame}
+
+\begin{frame}{Monomorphic higher-order algebras [Pol96]}
+
+\textbf{Idea:}
+\begin{itemize}
+\item Choose a set $\mathcal{A}$ with well-founded ordering $\succ$.
+\item Define:
+  \begin{itemize}
+  \item $\WM_{\kappa} = \mathcal{A}$ if $\kappa$ is a \alert{base type}
+  \item $\WM_{\sigma \arrtype \tau} = \{ f \in \WM_\sigma \Longrightarrow \WM_\tau \mid f\ \text{is weakly monotonic} \}$.
+  \end{itemize}
+\item Terms of type $\sigma$ are mapped to $\WM_\Sigma$.
+\end{itemize}
+
+\ \\\textbf{Natural choice:} natural numbers
+
+\end{frame}
+
+\begin{frame}{Monomorphic higher-order algebras [Pol96]}
+
+\[
+\begin{array}{rcl}
+\map(\var{F},\nil) & \red & \nil \\
+\map(\var{F},\cons(\var{x},\var{xs})) & \red & \cons(\var{F} \cdot \var{x},\map(\var{F},\var{xs})) \\
+\end{array}
+\]
+\[
+\begin{array}{rcl}
+\nil & : & \List \\
+\cons & : & \Nat \arrtype \List \arrtype \List \\
+\map & : & (\Nat \arrtype \Nat) \arrtype \List \arrtype \List \\
+\end{array}
+\]
+
+\ \\\textbf{Interpretation to $\mathbb{N}$:}
+\begin{itemize}
+\item\pause $\WM_{\List} = \WM_{\Nat} = \mathbb{N}$
+  %STORY: point at for instance list, x and xs, but also at the whole terms
+\item\pause $\WM_{\Nat \arrtype \Nat} = \{$weakly monotonic functions from $\mathbb{N}$ to $\mathbb{N}\}$
+  %STORY: point at the variable F
+\item\pause $\WM_{\Nat \arrtype \List \arrtype \List} = \{$weakly monotonic functions from $\mathbb{N} \times \mathbb{N}$ to $\mathbb{N}\}$
+  %STORY: point at the function symbol cons
+\item\pause $\WM_{(\Nat \arrtype \Nat) \arrtype \List \arrtype \List} = \{$ weakly monotonic functionals from $\WM_{\Nat \arrtype \Nat} \times \mathbb{N}$ to $\mathbb{N}\}$
+  %STORY: point at the function symbol map
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Monomorphic higher-order polynomial interpretations [FuhKop12]}
+
+\textbf{Interpretation:}
+\[
+\begin{array}{rcl}
+\interpret{\nil} & = & 0 \\
+\interpret{\cons(s,t)} & = & 1 + \interpret{s} + \interpret{t} \\
+\interpret{\map(s,t)} & = & (2 + \interpret{t}) * (1 + \interpret{s}(\interpret{t})) \\
+\interpret{s\ t} & = & \interpret{s}(\interpret{t}) + \interpret{t}\ \ \text{if}\ s : \Nat \arrtype \Nat \\
+\end{array}
+\]
+
+\pause\ \\\textbf{Put differently:}
+\[
+\begin{array}{rcl}
+\interpret{\nil} & = & 0 \\
+\interpret{\cons} & = & \lambda x y.1 + x + y \\
+\interpret{\map} & = & \lambda f x.(2 + x) * (1 + f(x)) \\
+\interpret{@_{\Nat,\Nat}} & = & \lambda f x.f(x) + x \\
+\end{array}
+\]
+
+\end{frame}
+
+\begin{frame}{Polymorphic higher-order interpretations (our work)}
+
+\begin{itemize}
+\item Problem: set-theoretic interpretation \alert{\textbf{fails}}.
+  \begin{itemize}
+  \item[] (How to interpret $\Lambda \alpha.\lambda x:\alpha.x$?)
+  \end{itemize}
+  %STORY: explain that no direct "set-theoretic" extension of weakly monotonic functionals
+  %STORY: is possible, which is why we use a concrete rewrite system in the interpretation
+  %CK: (What is this explanation, though?)
+\item\pause Alternative: use polynomial interpretations to a set of \alert{terms}, not \alert{functions}!
+\end{itemize}
+
+\ \\\pause\textbf{Example:}
+\[
+\begin{array}{rcll}
+\nil & : & \forall \alpha. & \List(\alpha) \\
+\cons & : & \forall \alpha. & \alpha \arrtype \List(\alpha) \arrtype \List(\alpha) \\
+\map & : & \forall \alpha \beta. & (\alpha \arrtype \beta) \arrtype \List(\alpha) \arrtype \List(\beta) \\
+\end{array}
+\]
+
+\[
+\begin{array}{rcll}
+\typeinterpret{\List(\alpha)} & = & \alpha \\
+\interpret{\nil} & = & \Lambda \alpha. & \lift_\alpha(0) \\
+\interpret{\cons} & = & \Lambda \alpha.\lambda xy. & \lift_\alpha(1) \oplus x \oplus y \\
+\interpret{\map} & = & \Lambda \alpha\beta.\lambda f x. & (\lift_\beta(2) \oplus \lift_\beta(\flatten_\alpha(x))) \\
+  & & & \otimes\ (\lift_\beta(1) \oplus f(x)) \\
+\end{array}
+\]
 \end{frame}
 
 %=================================================
