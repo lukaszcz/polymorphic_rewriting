@@ -333,8 +333,9 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
 %STORY: There are many ways to formalise systems like this; we use the following because it's convenient:
 \begin{itemize}
 \item Function symbols have a type: $\forall \alpha_1 \dots \alpha_n.\sigma_1 \arrtype \dots \arrtype \sigma_k \arrtype \tau$
-\item Terms are variables, abstractions, type abstractions and: $\symb{f}_{\pi_1,\dots,\pi_n}(s_1,\dots,s_k) : \tau[\alpha_1:=\pi_1,\dots,\alpha_n:=\pi_n]$.
-  \pause
+\item Terms are variables, abstractions, type (constructor) abstractions and: $\symb{f}_{\pi_1,\dots,\pi_n}(s_1,\dots,s_k) : \tau[\alpha_1:=\pi_1,\dots,\alpha_n:=\pi_n]$.
+\item Variables and abstractions at the head of a term \emph{not
+  allowed}: $\lambda x . x t$, $(\lambda x . t) u$. \pause
 %STORY: Okay, so what does this mean for the fold system that we just saw?
 %STORY: (before the first pause) This is what we had, but note that we have those applications there.
 %STORY: (before the second pause) So, we introduce function symbols for application and type application, and corresponding rules.
@@ -364,6 +365,9 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
   \uncover<3>{\alert{\Longleftarrow}} \\
 \end{array}
 \]
+%LC: STORY: the type of tapp quantifies of a type constructor alpha
+%(this type constructor is a ``function'' from a type to a type); this
+%is why we need F-omega and not only system F
 %STORY: This is not a natural formalism. It doesn't need to be: it is just meant to define the method. Real polymorphic systems would be translated into it.
 \item\pause\pause\pause \textbf{\alert{Note:} not meant as a formalism of interest by itself, but only as a tool to analyse polymorphic systems.}
 \end{itemize}
@@ -493,105 +497,82 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
 \]
 \end{frame}
 
-%=================================================
-
-\begin{frame}{Polynomial interpretations: polymorphic higher-order}
+\begin{frame}<1>[label=mainframe]
+  \frametitle{Polynomial interpretations: polymorphic higher-order}
   \framesubtitle{Interpretation terms: extension of system~$\Fomega$}
-  Type constructors:
-  \[
-  \begin{array}{rcl}
-    \Tc_{*} &::=& \Vc_{*} \mid \Sigma^T_{*} \mid \Tc_{\kappa\arrkind
-      *}\Tc_{\kappa} \mid \forall\Vc_\kappa\Tc_* \mid
-    \Tc_*\arrtype\Tc_* \\ \Tc_{\kappa_1\arrkind\kappa_2} &::=&
-    \Vc_{\kappa_1\arrkind\kappa_2} \mid
-    \Sigma^T_{\kappa_1\arrkind\kappa_2} \mid
-    \Tc_{\kappa\arrkind(\kappa_1\arrkind\kappa_2)}\Tc_{\kappa} \mid
-    \lambda \Vc_{\kappa_1} \Tc_{\kappa_2}
-  \end{array}
-  \]
-  \pause
-  \begin{example}
-  If $\Sigma^T_{*} = \{ \List \}$ and $\Sigma^T_{* \arrkind * \arrkind
-    *} = \{ \Pair \}$, types are for instance $\List$ and $\forall
-  \alpha.\Pair\,\alpha\,\List$.  The expression $\Pair\,\List$ is a
-  type constructor, but not a type.  If $\Sigma^T_{(* \arrkind *)
-    \arrkind *} = \{ \exists \}$ and $\sigma \in \Tc_{* \arrkind *}$,
-  then both $\exists(\sigma)$ and $\exists (\lambda
-  \alpha.\sigma\alpha)$ are types.
-  \end{example}
-\end{frame}
+  % STORY: polymorphic lambda calculus with type constructors (system
+  % F-omega) extended with the type of natural number and custom
+  % operations on natural numbers
+  One type constant~$\nat$.\pause
 
-\begin{frame}{Polynomial interpretations: polymorphic higher-order}
-  \framesubtitle{Interpretation terms: extension of system~$\Fomega$}
-  Terms:
+  \medskip
+
+  % STORY: terms are like for PFSs but without the restrictions
+  Terms: variables, abstractions, type (constructor) abstractions, and
+  function symbols\pause:
   \begin{itemize}
-  \item $x : \sigma$ for $(x : \sigma) \in \Vars$.
-  \item $\mathtt{f} : \sigma$ for all
-    $(\mathtt{f} : \sigma) \in \Sigma$.
-  \item $\abs{x:\sigma}{s} : \sigma \arrtype \tau$ if
-    $(x : \sigma) \in \Vars$ and $s : \tau$.
-  \item $(\tabs{\alpha:\kappa}{s}) : (\quant{\alpha:\kappa}{\sigma})$ if
-    $s : \sigma$ and $\alpha$ does not occur free in the type of a
-    free variable of~$s$.
-  \item $\app{s}{t} : \tau$ if $s : \sigma \arrtype \tau$ and
-    $t : \sigma$
-  \item $\tapp{s}{\tau} : \sigma[\subst{\alpha}{\tau}]$ if
-    $s : \quant{\alpha:\kappa}{\sigma}$ and~$\tau$ is a type
-    constructor of kind~$\kappa$,
-  \item $s : \tau$ if $s : \tau'$ and $\tau =_\beta \tau'$.
+  \item $\oplus : \forall \alpha . \alpha \arrtype \alpha \arrtype
+    \alpha$\pause
+    \[
+    \begin{array}{rcl}
+      n \oplus_{\nat} m &\arrW& n+m\\
+      s \oplus_{\sigma \arrtype \tau} t &\arrW&
+      \abs{x:\sigma}{(\app{s}{x}) \oplus_\tau (\app{t}{x})}\\
+      s \oplus_{\quant{\alpha}{\sigma}} t &\arrW&
+      \tabs{\alpha}{(\tapp{s}{\alpha}) \oplus_\sigma (\tapp{t}{\alpha})}
+    \end{array}
+    \]\pause
+    % STORY: \oplus is addition: on natural numbers as expected, on
+    % functions ``argumentwise''
+    % <<HERE COMES THE NEXT SLIDE>>
+  \item $\otimes : \forall \alpha . \alpha \arrtype \alpha \arrtype
+    \alpha$\pause
+    % STORY: \otimes analogous to \oplus
+  \item $\flatten : \forall \alpha . \alpha \arrtype \nat$\pause
+    \[
+    \begin{array}{rcl}
+      \app{\flatten_\nat}{s} &\arrW& s\\
+      \app{\flatten_{\sigma \arrtype \tau}}{s} &\arrW& \app{\flatten_\tau}{(\app{s}{(\app{\lift_\sigma}{0})})}\\
+      \app{\flatten_{\quant{\alpha}{\sigma}}}{s} &\arrW& \app{\flatten_{\sigma[\subst{\alpha}{\nat}]}}{(\tapp{s}{\nat})}
+    \end{array}
+    \]\pause
+    % STORY: \flatten allows ...
+    % STORY: note that the reductions for \flatten get stuck on type variables
+  \item $\lift : \forall \alpha . \nat \arrtype \alpha$\pause
+    \[
+    \begin{array}{rcl}
+      \app{\lift_\nat}{s} &\arrW& s\\
+      \app{\lift_{\sigma \arrtype \tau}}{s} &\arrW& \abs{x:\sigma}{\app{\lift_{\tau}}{s}}\\
+      \app{\lift_{\quant{\alpha}{\sigma}}}{s} &\arrW& \tabs{\alpha}{\app{\lift_{\sigma}}{s}}
+    \end{array}
+    \]
   \end{itemize}
-  \pause
-  Signature: $\Sigma^T = \{ \nat : * \}$ and $\Sigma = \{ n : \nat
-  \mid n \in \Nbb \} \cup \Sigma_f$, where $\Sigma_f = \{ \oplus :
-  \forall \alpha . \alpha \arrtype \alpha \arrtype \alpha, \otimes :
-  \forall \alpha . \alpha \arrtype \alpha \arrtype \alpha, \flatten :
-  \forall \alpha . \alpha \arrtype \nat, \lift : \forall \alpha . \nat
-  \arrtype \alpha \}$.
+  % STORY: we also have beta-reductions, also for type constructor abstraction, not shown here
 \end{frame}
 
-\begin{frame}{Polynomial interpretations: polymorphic higher-order}
-  \framesubtitle{Interpretation terms: extension of system~$\Fomega$}
-  Reductions:
-  \begin{enumerate}
-  \item\label{arrW:mono:abs}
-    if $s \arrW t$ then both $\abs{x}{s} \arrW \abs{x}{t}$ and
-    $\tabs{\alpha}{s} \arrW \tabs{\alpha}{t}$
-  \item\label{arrW:mono:right}
-    if $s \arrW t$ then $\app{u}{s} \arrW \app{u}{t}$
-  \item\label{arrW:mono:left}
-    if $s \arrW t$ then both $\app{s}{u} \arrW \app{t}{u}$ and
-    $\tapp{s}{\sigma} \arrW \tapp{t}{\sigma}$
-  \item\label{arrW:beta:abs} $\app{(\abs{x:\sigma}{s})}{t} \arrW
-    s[\subst{x}{t}]$
-    and
-    $\tapp{(\tabs{\alpha}{s})}{\sigma}
-    \arrW s[\subst{\alpha}{\sigma}]$
-    ($\beta$-reduction)
-  \item\label{arrW:plus:base}
-    $\app{\app{\oplus_{\nat}}{n}}{m} \arrW n+m$
-    and
-    $\app{\app{\otimes_{\nat}}{n}}{m}
-    \arrW n \times m$
-  \item\label{arrW:circ:arrow} $\app{\app{\circ_{\sigma \arrtype
-        \tau}}{s}}{t} \arrW
-    \abs{x:\sigma}{\app{\app{\circ_\tau}{(\app{s}{x})}}{(\app{t}{x})}}$
-    for $\circ \in \{ \oplus, \otimes \}$
-  \item\label{arrW:circ:forall}
-    $\app{\app{\circ_{\quant{\alpha}{\sigma}}}{s}}{t} \arrW
-    \tabs{\alpha}{\app{\app{\circ_\sigma}{(\tapp{s}{\alpha})}}{(
-        \tapp{t}{\alpha})}}$ for $\circ \in \{ \oplus, \otimes \}$
-  \item $\app{\flatten_\nat}{s} \arrW s$
-  \item $\app{\flatten_{\sigma \arrtype \tau}}{s} \arrW
-    \app{\flatten_\tau}{(\app{s}{(\app{\lift_\sigma}{0})})}$
-  \item $\app{\flatten_{\quant{\alpha:\kappa}{\sigma}}}{s} \arrW
-    \app{\flatten_{\sigma[\subst{\alpha}{\chi_\kappa}]}}{(\tapp{s}{\chi_\kappa})}$
-  \item $\app{\lift_\nat}{s} \arrW s$
-  \item $\app{\lift_{\sigma \arrtype \tau}}{s} \arrW
-    \abs{x:\sigma}{\app{\lift_{\tau}}{s}}$
-  \item $\app{\lift_{\quant{\alpha}{\sigma}}}{s} \arrW
-    \tabs{\alpha}{\app{\lift_{\sigma}}{s}}$
-  \end{enumerate}
+\againframe<2>[noframenumbering]{mainframe}
+\againframe<3>[noframenumbering]{mainframe}
+\againframe<4>[noframenumbering]{mainframe}
+
+\begin{frame}[noframenumbering]
+  % STORY: an inductive definition is not possible because of type
+  % abstractions: how is \oplus_\alpha to be interpreted in \Lambda
+  % \alpha . \oplus_\alpha s t?
+  \begin{center}
+    $\Lambda \alpha . x \oplus_\alpha y$
+  \end{center}
+  \pause
+  \bigskip
+  \[
+  (\Lambda \alpha . x \oplus_\alpha y) \tau \leadsto x \oplus_\tau y
+  \]
 \end{frame}
+
+\againframe<5>[noframenumbering]{mainframe}
+\againframe<6>[noframenumbering]{mainframe}
+\againframe<7>[noframenumbering]{mainframe}
+\againframe<8>[noframenumbering]{mainframe}
+\againframe<9>[noframenumbering]{mainframe}
 
 \begin{frame}{Polynomial interpretations: polymorphic higher-order}
   \framesubtitle{Interpretation terms: extension of system~$\Fomega$}
@@ -600,7 +581,7 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
   \end{theorem}
   % STORY: the termination proof method is standard (Tait-Girard,
   % computability, candidates), but the question itself subtle because
-  % of the ``matching'' on types
+  % of the ``matching'' on types (go back to flatten and lift)
   \pause
   \begin{corollary}
     All closed normal interpretation terms of type $\nat$ are natural
@@ -640,7 +621,7 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
   }
   \]
 
-  \medskip
+  \bigskip
   \pause
 
   $((s \oplus \lift_{\nat\to\nat}(1)) u)\da > (su)\da$ holds because
@@ -684,6 +665,8 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
     If $s \succeq s'$ then $t[\subst{x}{s}] \succeq t[\subst{x}{s'}]$.
   \end{lemma}
 \end{frame}
+
+%=================================================
 
 \begin{frame}{Reduction pair}
   We consider again $A$-terms of a fixed PFS~$A$.\pause
