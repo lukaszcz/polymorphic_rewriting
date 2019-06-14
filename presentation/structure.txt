@@ -26,8 +26,6 @@ Proposed structure:
   - remark about termination of \leadsto; that the proof method is standard, but the question itself subtle (key feature of F-omega: parametricity -- here broken but only a bit)
   - present coinductive definitions of \succ and \succeq, describe the intuitions (infinite derivation; largest set)
   - give an example of something being greater than something else (Example 4.20?)
-  - \succ is well-founded
-  - \succ and \succeq are compatible
 
 * METHODOLOGY PART 2: TRANSLATING PFSs
   - reduction pairs

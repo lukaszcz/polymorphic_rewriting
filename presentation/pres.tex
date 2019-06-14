@@ -86,6 +86,7 @@
 \newcommand{\symb}[1]{\textcolor{blue}{\mathtt{#1}}}
 \newcommand{\var}[1]{\textcolor{red}{#1}}
 \newcommand{\binder}[1]{\textcolor{purple}{#1}}
+\newcommand{\highlight}[1]{\textcolor{blue}{#1}}
 
 \newcommand{\List}{\mathtt{List}}
 \newcommand{\Pair}{\mathtt{Pair}}
@@ -536,7 +537,9 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
       \app{\flatten_{\quant{\alpha}{\sigma}}}{s} &\arrW& \app{\flatten_{\sigma[\subst{\alpha}{\nat}]}}{(\tapp{s}{\nat})}
     \end{array}
     \]\pause
-    % STORY: \flatten allows ...
+    % STORY: flatten allows to convert a value of any type to a
+    % natural number; for functions it recursively converts the
+    % application of the function to a fixed argument
     % STORY: note that the reductions for \flatten get stuck on type variables
   \item $\lift : \forall \alpha . \nat \arrtype \alpha$\pause
     \[
@@ -546,6 +549,8 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
       \app{\lift_{\quant{\alpha}{\sigma}}}{s} &\arrW& \tabs{\alpha}{\app{\lift_{\sigma}}{s}}
     \end{array}
     \]
+    % STORY: lift allows to convert a natural number to a value of any
+    % given type
   \end{itemize}
   % STORY: we also have beta-reductions, also for type constructor abstraction, not shown here
 \end{frame}
@@ -603,7 +608,7 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
   % rules above
 
   % STORY: more precisely, we define \succ for closed terms by
-  % coinduction, and the lift this to arbitrary terms (uninteresting
+  % coinduction, and then lift this to arbitrary terms (uninteresting
   % details)
 
   % STORY: \da means taking the normal form; because the terms are
@@ -646,87 +651,111 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
   % impredicative universal type quantifier
 \end{frame}
 
-\begin{frame}{The well-founded order}
-  \begin{lemma}
-    $\succ$ is well-founded
-  \end{lemma}
-
-  \pause
-
-  \begin{lemma}[compatibility]
-    $\succeq$ and~$\succ$ are compatible, i.e., $\succ \cdot
-    \succeq\ \subseteq\ \succ$ and $\succeq \cdot
-    \succ\ \subseteq\ \succ$.
-  \end{lemma}
-
-  \pause
-
-  \begin{lemma}[weak monotonicity]
-    If $s \succeq s'$ then $t[\subst{x}{s}] \succeq t[\subst{x}{s'}]$.
-  \end{lemma}
-\end{frame}
-
-%=================================================
-
-\begin{frame}{Reduction pair}
-  We consider again $A$-terms of a fixed PFS~$A$.\pause
+\begin{frame}{Reduction pairs and rule removal}
+  We consider again a fixed PFS~$A$ and relations on $A$-terms.\pause
 
   \begin{definition}
-    A binary relation~$R$ on $A$-terms is \emph{monotonic} if $R(s, t)$
-    implies $R(C[s], C[t])$ for every context~$C$ (we assume $s,t$ have
-    the same type~$\sigma$).
-
-    A \emph{reduction pair} is a pair~$(\succeq^A,\succ^A)$ of a
-    quasi-order~$\succeq^A$ on $A$-terms and a well-founded
-    ordering~$\succ^A$ on $A$-terms such that:
+    A \emph{reduction pair} $(\succeq^A,\succ^A)$:
     \begin{itemize}
+    \item $\succeq^A$ is a quasi-order and $\succ^A$ is a well-founded
+      order,\pause
     \item
-      $\succeq^A$ and~$\succ^A$ are compatible, i.e., ${\succ^A} \cdot
+      $\succeq^A$ and~$\succ^A$ are \emph{compatible}, i.e., ${\succ^A} \cdot
       {\succeq^A} \subseteq {\succ^A}$ and ${\succeq^A} \cdot {\succ^A}
-      \subseteq {\succ^A}$, and
-    \item $\succeq^A$ and~$\succ^A$ are both monotonic.
+      \subseteq {\succ^A}$,\pause
+    \item $\succeq^A$ and~$\succ^A$ are both \emph{monotonic}, i.e.,
+      $s \succ^A t$ implies $C[s] \succ^A C[t]$ for every context~$C$.
+    \end{itemize}
+  \end{definition}
+  \pause
+  \begin{theorem}
+    Let $\Rules = \Rules_1 \cup \Rules_2$, and suppose that
+    $\Rules_1\subseteq{\succ^\Rules}$ and
+    $\Rules_2\subseteq{\succeq^\Rules}$ for a reduction pair
+    $(\succeq^\Rules,\succ^\Rules)$. Then $\arr{\Rules}$ is
+    terminating if and only if $\arr{\Rules_2}$ is (so certainly if
+    $\Rules_2 = \emptyset$).
+  \end{theorem}
+  \pause
+  % STORY: assume a an infinite $\Rules$-reduction contains infinitely
+  % many $\Rules_1$-steps; then contradiction by the process outlined
+  % below
+  \begin{proof}
+    \[
+    \only<6>{\cdot \to_{\Rules_1} \cdot \to_{\Rules_1} \cdot
+      \to_{\Rules_2} \cdot \to_{\Rules_2} \cdot \to_{\Rules_1} \cdot
+      \to_{\Rules_2} \cdot \to_{\Rules_1} \ldots}
+    \only<7>{\cdot \succ \cdot \succ \cdot \succeq \cdot \succeq \cdot
+      \succ \cdot \succeq \cdot \succ \ldots}
+    \only<8>{\cdot \succ \cdot \succ \cdot \highlight{\succeq \cdot \succeq} \cdot
+      \succ \cdot \succeq \cdot \succ \ldots}
+    \only<9>{\cdot \succ \cdot \succ \cdot \highlight{\succeq} \cdot
+      \succ \cdot \succeq \cdot \succ \ldots}
+    \only<10>{\cdot \succ \cdot \succ \cdot \succeq \cdot
+      \succ \cdot \succeq \cdot \succ \ldots}
+    \only<11>{\cdot \succ \cdot \highlight{\succ \cdot \succeq} \cdot
+      \highlight{\succ \cdot \succeq} \cdot \succ \ldots}
+    \only<12>{\cdot \succ \cdot \highlight{\succ} \cdot
+      \highlight{\succ} \cdot \succ \ldots}
+    \only<13>{\cdot \succ \cdot \succ \cdot \succ \cdot \succ \ldots}
+    \]
+  \end{proof}
+  % STORY: talk about how this can be used for rule removal
+\end{frame}
+
+\begin{frame}{Interpretation pairs}
+  If we can map types to interpretation types and terms to
+  interpretation terms, then we can construct a reduction pair for a
+  PFS using the pair $(\succeq,\succ)$.
+  % STORY: recall that \succeq, \succ are defined on interpretation
+  % terms, and we want a reduction pair on PFS terms
+  \pause
+  \begin{definition}
+    For a fixed type constructor mapping $\Typemap$ and symbol mapping
+    $\Termmap$, we define the \emph{interpretation pair}
+    $(\succeqinterpret,\succinterpret)$:
+    \begin{itemize}
+    \item $s \succeqinterpret t$ if $\interpret{s} \succeq \interpret{t}$,
+    \item $s \succinterpret t$ if $\interpret{s} \succ \interpret{t}$.
     \end{itemize}
   \end{definition}
 \end{frame}
 
-\begin{frame}{Symbol mapping and interpretation pair}
-  \begin{definition}
-    A \emph{type constructor mapping} is a function $\Typemap$ which
-    maps each type constructor symbol to a closed interpretation type
-    constructor of the same kind. A fixed type constructor mapping
-    $\Typemap$ is extended inductively to a function from type
-    constructors to closed interpretation type constructors in the
-    expected way. We denote the extended \emph{interpretation (type)
-      mapping} by~$\typeinterpret{\sigma}$. Thus,
-    e.g.~$\typeinterpret{\quant{\alpha}{\sigma}} =
-    \quant{\alpha}{\typeinterpret{\sigma}}$ and $\typeinterpret{\sigma
-      \arrtype \tau} = \typeinterpret{\sigma} \arrtype
-    \typeinterpret{\tau}$.
-  \end{definition}
+\begin{frame}{Interpretation pairs}
+  \framesubtitle{Type and function symbol mapping}
+  % STORY: we only need to find an interpretation for type symbols and
+  % function symbols; the mapping then extends inductively in the
+  % expected manner
+  \[
+  \begin{array}{rcll}
+    \Typemap(\List) & = & \multicolumn{2}{l}{
+      \quant{\beta}{(\quant{\alpha}{\beta \arrtype
+      \alpha \arrtype \beta}) \arrtype \beta \arrtype \beta}}\\
+  \Termmap(\mathtt{nil}) & = & & \Lambda \beta.\lambda f : \forall\alpha.\beta\to\alpha\to\beta.\abs{x:\beta}{x} \\
+  \Termmap(\mathtt{foldl}) & = & \Lambda \beta.\lambda f. \lambda x.
+  \lambda l. & l \beta f x \oplus \lift_\beta(1)
+  \end{array}
+  \]
+  \pause
+  This function symbol mapping does not work: monotonicity \textcolor{red}{fails}.\pause
 
-  \begin{definition}
-    Given a fixed type constructor mapping~$\Typemap$, a \emph{symbol
-      mapping} is a function $\Termmap$ which assigns to each function
-    symbol $\mathtt{f} : \rho$ a closed interpretation term
-    $\Termmap(\mathtt{f})$ of type~$\typeinterpret{\rho}$. We inductively extend a
-    symbol mapping $\Termmap$ to an \emph{interpretation
-      mapping} $\interpret{s}$ on $A$-terms.
-  \end{definition}
+  \medskip
 
-  \begin{definition}
-    For a fixed type constructor mapping $\Typemap$ and symbol mapping
-    $\Termmap$, the \emph{interpretation pair}
-    $(\succeqinterpret,\succinterpret)$ is defined as follows: $s
-    \succeqinterpret t$ if $\interpret{s} \succeq \interpret{t}$, and $s
-    \succinterpret t$ if $\interpret{s} \succ \interpret{t}$.
-  \end{definition}
+  $\interpret{\mathtt{foldl}_{\sigma}(\abs{x}{s},t,\nil)} =
+  \interpret{\mathtt{fold}_{\sigma}(\abs{x}{w},t,\nil)}$ regardless of
+  $s$ and $w$, so a reduction in $s$ would not cause a decrease in
+  $\succinterpret$.
 \end{frame}
 
 \begin{frame}{Safety}
   \begin{definition}
     If $s_1 \succ s_2$ implies $t[\subst{x}{s_1}] \succ
     t[\subst{x}{s_2}]$, then the interpretation term~$t$ is \emph{safe
-      for~$x$}. A symbol mapping~$\Termmap$ is \emph{safe} if for all
+      for~$x$}.
+  \end{definition}
+  \pause
+  \begin{definition}
+    A symbol mapping~$\Termmap$ is \emph{safe} if for all
     \[
     \mathtt{f} : \forall (\alpha_1 : \kappa_1) \ldots \forall
     (\alpha_n : \kappa_n) . \sigma_1 \arrtype \ldots \arrtype \sigma_k
@@ -739,37 +768,155 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
 
   \pause
 
-  \begin{enumerate}
-  \item $x u_1 \ldots u_m$ is safe for~$x$.
-  \item If $t$ is safe for~$x$ then so are~$\lift(t)$
-    and~$\flatten(t)$.
-  \item If $s_1$ is safe for~$x$ or $s_2$ is safe for~$x$ then $s_1
-    \oplus s_2$ is safe for~$x$.
-  \item If either
-      (a)
-      $s_1$ is safe for~$x$ and $s_2 \succeq \lift(1)$, or
-      (b)
-      $s_2$ is safe for~$x$ and $s_1 \succeq \lift(1)$,
-    then $s_1 \otimes s_2$ is safe for~$x$.
-  \item If~$t$ is safe for~$x$ then so is~$\tabs{\alpha}{t}$
-    and~$\abs{y}{t}$ ($y \ne x$).
-  \end{enumerate}
-
-  \pause
-
   \begin{theorem}
     If~$\Termmap$ is safe then the interpretation pair
     $(\succeqinterpret,\succinterpret)$ is a reduction pair.
   \end{theorem}
 \end{frame}
 
-\begin{frame}{Rule removal}
+\begin{frame}{Interpretation pairs}
+  \framesubtitle{Type and function symbol mapping}
+  % STORY: we need to find a safe interpretation
+  \[
+  \begin{array}{rcll}
+    \Typemap(\List) & = & \multicolumn{2}{l}{
+      \quant{\beta}{(\quant{\alpha}{\beta \arrtype
+      \alpha \arrtype \beta}) \arrtype \beta \arrtype \beta}}\\
+  \Termmap(\mathtt{@}) & = & \Lambda \alpha.\Lambda\beta.
+    \lambda f.\lambda x. &
+    f \cdot x \oplus \lift_\beta(\flatten_\alpha(x)) \\
+  \Termmap(\mathtt{A}) & = & \Lambda \alpha.\Lambda \beta.\lambda x. &
+    x * \beta \\
+  \Termmap(\mathtt{nil}) & = & & \Lambda \beta.\lambda f.\abs{x}{x} \\
+  \Termmap(\mathtt{cons}) & = & \Lambda \alpha.\lambda h.\lambda t. &
+    \Lambda \beta.\lambda f.\lambda x.
+    t \beta f (f \alpha x h \oplus \lift_\beta(\flatten_\beta(x)\
+    \oplus \\
+    & & & \phantom{ABCDEFGHIJKLMNOP,} \flatten_\alpha(h)))\ \oplus\  \\
+    & & & \phantom{ABCDE\ }
+    \lift_\beta(\flatten_\beta(f\alpha x h) \oplus
+    \flatten_\alpha(h) \oplus 1) \\
+  \Termmap(\mathtt{foldl}) & = & \Lambda \beta.\lambda f. \lambda x.
+    \lambda l. & l \beta f x \oplus \lift_\beta(\flatten_{\forall \alpha.
+    \beta \arrtype \alpha \arrtype \beta}(f)\ \oplus \\
+    & & & \phantom{ABCDEFG\ \ }
+    \flatten_\beta(x) \oplus 1) \\
+  \end{array}
+  \]
+  % STORY: $\Termmap(cons)$ is not required to be safe for x, since x
+  % is not an argument of cons: following its declaration, cons takes
+  % one type and two terms as arguments. The variable x is only part
+  % of the interpretation.
+  % STORY: Note that the current interpretation is a mostly
+  % straightforward extension of the one before: we retain the same
+  % core interpretations (which, intuitively, encode @ and A as forms
+  % of application and encode a list as the function that executes a
+  % fold over the list's contents), but we add a clause \oplus
+  % \lift(\flatten(x)) for each argument x that the previous
+  % interpretation was not safe for.
 \end{frame}
 
 \begin{frame}{Results}
+  \framesubtitle{IPC2}
+  % STORY: intuitionistic propositional second-order logic (system F)
+  % with all connectives and permutative conversions
+
+  The system IPC2 can be seen as a PFS with type constructors:
+  \[
+  \begin{array}{c}
+    \Sigma^T_\kappa = \{\quad
+    \bot : *,\quad
+    \mathtt{or} : * \arrkind * \arrkind *,\quad
+    \mathtt{and} : * \arrkind * \arrkind *,\quad
+    \exists : (* \arrkind *) \arrkind *
+    \}
+  \end{array}
+  \]
+  and function symbols:
+  \[
+  \begin{array}{rclcrcl}
+    @ & : & \forall \alpha \forall \beta . (\alpha \arrtype \beta) \arrtype \alpha \arrtype \beta &
+    \quad &
+    \epsilon & : & \forall \alpha . \bot \arrtype \alpha \\
+
+    \mathtt{tapp} & : & \forall \alpha : * \arrkind * . \forall \beta .
+    (\forall \beta [\alpha \beta]) \arrtype \alpha \beta &
+    \quad &
+    \proj^1 & : & \forall \alpha \forall \beta . \mathtt{and}\, \alpha\, \beta \arrtype \alpha \\
+
+    \mathtt{pair} & : & \forall \alpha \forall \beta . \alpha \arrtype \beta \arrtype
+    \mathtt{and}\, \alpha\, \beta &
+    \quad &
+    \proj^2 & : & \forall \alpha \forall \beta . \mathtt{and}\, \alpha\, \beta \arrtype \beta \\
+
+    \mathtt{case} & : & \forall \alpha \forall \beta \forall \gamma . \mathtt{or}\, \alpha\, \beta \arrtype
+    (\alpha \arrtype \gamma) \arrtype (\beta \arrtype \gamma) \arrtype \gamma &
+    \quad &
+    \mathtt{in}^1 & : & \forall \alpha \forall \beta . \alpha \arrtype
+    \mathtt{or}\, \alpha\, \beta \\
+
+    \mathtt{let} & : & \forall \alpha : * \arrkind * . \forall \beta .
+    (\exists (\alpha)) \arrtype
+    (\forall \gamma . \alpha \gamma \arrtype \beta) \arrtype \beta &
+    \quad &
+    \mathtt{in}^2 & : & \forall \alpha \forall \beta . \beta \arrtype
+    \mathtt{or}\, \alpha\, \beta \\
+
+    \mathtt{ext} & : & \forall \alpha : * \arrkind * . \forall \beta . \alpha \beta \arrtype
+    \exists (\alpha)
+  \end{array}
+  \]
+  and 28 reduction rules:
+\[
+\begin{array}{rcl}
+@_{\sigma,\tau}(\abs{x}{s},t) & \red & s[x:=t] \\
+
+\mathtt{tapp}_{\abs{\alpha}{\sigma},\tau}(\tabs{\alpha}{s}) & \red &
+  s[\alpha:=\tau] \\
+\mathtt{let}_{\varphi,\rho}(\mathtt{ext}_{\varphi,\tau}(s),\tabs{\alpha}{\abs{x}{t}}) & \red & t[\alpha:=\tau][x:=s] \\
+
+\proj^1_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & s \\
+\!\!\!\!\!\!\!
+\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^1_{\sigma,\tau}(u),
+  \abs{x}{s},\abs{y}{t}) & \red & s[x:=u] \\
+
+\proj^2_{\sigma,\tau}(\mathtt{pair}_{\sigma,\tau}(s,t)) & \red & t  \\
+\!\!\!\!\!\!\!
+\mathtt{case}_{\sigma,\tau,\rho}(\mathtt{in}^2_{\sigma,\tau}(u),
+  \abs{x}{s},\abs{y}{t}) & \red & t[x:=u] \\
+@_{\sigma,\tau}(\epsilon_{\sigma \arrtype \tau}(s),t) &\red&
+  \epsilon_\tau(s) \\
+\epsilon_\rho(\mathtt{case}_{\sigma,\tau,\bot}(u,\abs{x}{s},
+  \abs{y}{t})) &\red&
+  \mathtt{case}_{\sigma,\tau,\rho}(u,\abs{x}{\epsilon_\rho(s)},
+  \abs{y}{\epsilon_\rho(t)}) \\
+\mathtt{case}_{\rho,\pi,\xi}(\mathtt{case}_{\sigma,\tau,\mathtt{or}\,
+  \rho\,\pi}(u,\abs{x}{s},\abs{y}{t}),\abs{z}{v},
+  \abs{a}{w}) &\red&
+  \mathtt{case}_{\sigma,\tau,\xi}(u,\abs{x}{\mathtt{case}_{
+  \rho,\pi,\xi}(s,\abs{z}{v},\abs{a}{w})},
+  \abs{y}{\mathtt{case}_{\rho,\pi,\xi}(t,\abs{z}{v},
+  \abs{a}{w})})
+\end{array}
+\]
 \end{frame}
 
 \begin{frame}{Conclusions and future work}
+  A powerful and \emph{systematic} methodology to prove termination of
+  higher-order rewriting with full impredicative polymorphism.\pause
+
+  \bigskip
+  Future work:
+  \begin{itemize}
+  \item automation\pause
+    % 1. Automatic verification that a given interpretation suffices
+    % 2. automatically finding a suitable interpretation -- building
+    % on existing termination provers for first- and higher-order term
+    % rewriting
+  \item handle the remaining rules of IPC2\pause
+  \item extend other techniques for higher-order termination:
+    orderings, dependency pairs
+  \end{itemize}
 \end{frame}
 
 

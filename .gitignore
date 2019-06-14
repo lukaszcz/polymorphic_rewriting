@@ -7,5 +7,7 @@
 *.toc
 *.pages
 *.vtc
+*.nav
+*.snm
 *~
 .DS_Store
