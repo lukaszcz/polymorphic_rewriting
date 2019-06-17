@@ -175,27 +175,22 @@ Let:
 \begin{array}{rcl}
 \nil & : & \mathtt{o} \\
 \cons & : & (\mathtt{o} \arrtype \mathtt{o}) \arrtype \mathtt{o} \arrtype \mathtt{o} \\
-\map & : & ((\mathtt{o} \arrtype \mathtt{o}) \arrtype \mathtt{o}) \arrtype \mathtt{o} \arrtype \mathtt{o} \\
+\map & : & ((\mathtt{o} \arrtype \mathtt{o}) \arrtype \mathtt{o} \arrtype \mathtt{o}) \arrtype \mathtt{o} \arrtype \mathtt{o} \\
 \end{array}
 \]
-\LC{The types don't match! $\var{F} : (o \to o) \to o$, $x : o \to o$,
-  so $\var{F} x : o$, but the first argument of $\cons$ expects $o \to
-  o$. I don't understand what you wanted to write here.}
-
-% LC: maybe we can just say that if we consider this untyped, then it doesn't terminate?
 
 %STORY: Types are important; especially when you have lambda-abstraction, you have to be careful. With the given typing, the rules above can be used to encode the untyped lambda-calculus. This is exemplified by the following non-terminating term.
 %NOTE: This would be told very quickly, to show to the RTA crowd why types are important; however, I do not want to waste too much time on it as it's not the point of the talk.
 %It's not the point of this talk, after all -- but does help to illustrate to the RTA part of the audience why we look at types so much.
 \ \\\pause
-Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \binder{x}},\binder{x})},\nil)$. Then:
+Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\abs{\binder{z}:\mathtt{o}}{\binder{y}\ \binder{x}}},\binder{x})},\nil)$. Then:
 \[
 \begin{array}{ll}
-& \map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \omega},\omega) \\
-\red & \cons(\ (\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \omega})\
-  (\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \binder{x}},\binder{x})})\ , \map(\dots)) \\
-\red_\beta & \cons(\ (\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \binder{x}},\binder{x})})\ \omega\ , \map(\dots)) \\
-\red_\beta & \cons(\ \underline{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\binder{y}\ \omega},\omega)}\ , \map(\dots)) \\
+& \map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\abs{\binder{z}:\mathtt{o}}{\binder{y}\ \omega}},\omega) \\
+\red & \cons(\ (\abs{\binder{y}}{\abs{z}{\binder{y}\ \omega}})\
+  (\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\abs{\binder{z}:\mathtt{o}}{\binder{y}\ \binder{x}}},\binder{x})})\ , \map(\dots)) \\
+\red_\beta & \cons(\ \abs{\binder{z}:\mathtt{o}}{(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\abs{\binder{z}:\mathtt{o}}{\binder{y}\ \binder{x}}},\binder{x})})\ \omega}\ , \map(\dots)) \\
+\red_\beta & \cons(\ \abs{\binder{z}:\mathtt{o}}{\underline{\map(\abs{\binder{y}:\mathtt{o} \arrtype \mathtt{o}}{\abs{\binder{z}:\mathtt{o}}{\binder{y}\ \omega}},\omega)}}\ , \map(\dots)) \\
 \end{array}
 \]
 \ \\
