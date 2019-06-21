@@ -99,6 +99,9 @@
 \newcommand{\xlet}[4]{\mathtt{let}_{#1}\,#2\,\mathtt{be}\,[#3]\,\mathtt{in}\,#4}
 \newcommand{\proj}{\symb{pr}}
 
+\newcommand{\rcons}{\textcolor{olive}{\mathtt{cons}}}
+\newcommand{\rnil}{\textcolor{olive}{\mathtt{nil}}}
+
 \newcommand{\CK}[1]{\textcolor{violet}{CK: #1}}
 \newcommand{\CKchange}[1]{\textcolor{blue}{#1}}
 \newcommand{\LC}[1]{\textcolor{red}{LC: #1}}
@@ -290,12 +293,13 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
 \textbf{Shallow polymorphism:}
 \[
 \begin{array}{rcllr}
-\uncover<2->{\List} & \uncover<2->{:} & \multicolumn{2}{l}{\uncover<2->{* \arrtype *}} & \uncover<2>{\alert{\Longleftarrow}} \\
+\uncover<2->{\List} & \uncover<2->{:} & \multicolumn{2}{l}{\uncover<2->{* \arrkind *}} & \uncover<2>{\alert{\Longleftarrow}} \\
 \nil & : & \forall \alpha. & \List(\alpha) \\
 \cons & : & \forall \alpha. & \alpha \arrtype \List(\alpha) \arrtype \List(\alpha) \\
 \fold & : & \forall \alpha \beta . & (\beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List(\alpha) \arrtype \beta \\
 \end{array}
 \]
+% STORY: List : * => * is a function from a type to a type (so then List(alpha) is a type)
 \[
 \begin{array}{rclr}
 \fold_{\only<2->{\tau,\sigma}}(\var{F},\var{a},\nil_{\only<2->{\tau}}) & \red & \var{a} & \uncover<2>{\alert{\Longleftarrow}} \\
@@ -303,6 +307,10 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
   & \fold_{\only<2->{\tau,\sigma}}(\var{F},\var{F}\ \var{a}\ \var{x},\var{xs}) & \uncover<2>{\alert{\Longleftarrow}} \\
 \end{array}
 \]
+% STORY: Now fold, cons, nil also take types as arguments; e.g. nil :
+% forall alpha . List(alpha) means nil takes a type argument alpha and
+% returns an element of type List(alpha) -- recall List is a function
+% from types (*) to types (*), so List(alpha) is a type
 
 \pause\pause\ \\
 \textbf{Higher-rank polymorphism:}
@@ -314,14 +322,40 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
 \fold & : & \forall \beta . & (\forall \alpha . \beta \arrtype \alpha \arrtype \beta) \arrtype \beta \arrtype \List \arrtype \beta \\
 \end{array}
 \]
+% STORY: List : * is a type
 \[
 \begin{array}{rclr}
 \fold_{\sigma}(\var{F},\var{a},\nil) & \red & \var{a} & \uncover<2>{\alert{\Longleftarrow}} \\
 \fold_{\sigma}(\var{F},\var{a},\cons_{\tau}(\var{x},\var{xs})) & \red & \fold_{\sigma}(\var{F},\var{F}\ \tau\ \var{a}\ \var{x},\var{xs}) \\
 \end{array}
 \]
+% STORY: Here the list may contain elements of arbitrary types; the
+% function F receives the type of the element together with the
+% element.
 
 %STORY: Here make sure to discuss the application domains: Haskell, logic.
+\end{frame}
+
+\begin{frame}{Polymorphism}
+\[
+\begin{array}{rcl}
+\fold_{\sigma}(\var{F},\var{a},\nil) & \red & \var{a} \\
+\fold_{\sigma}(\var{F},\var{a},\cons_{\tau}(\var{x},\var{xs})) & \red & \fold_{\sigma}(\var{F},\var{F}\ \tau\ \var{a}\ \var{x},\var{xs}) \\
+\end{array}
+\]
+\bigskip
+\pause
+\[
+\begin{array}{rcl}
+  \fold_{\List}(\rcons,\rnil,\cons_{\tau_1}(a_1,\cons_{\tau_2}(a_2,\nil))) \pause
+  &\red& \\
+  \fold_{\List}(\rcons,\rcons_{\tau_1}(a_1,\rnil),\cons_{\tau_2}(a_2,\nil)) \pause
+  &\red& \\
+  \fold_{\List}(\rcons,\rcons_{\tau_2}(a_2,\rcons_{\tau_1}(a_1,\rnil)),\nil) \pause
+  &\red& \\
+  \rcons_{\tau_2}(a_2,\rcons_{\tau_1}(a_1,\rnil))
+\end{array}
+\]
 \end{frame}
 
 \begin{frame}{Our goal: handle systems like this!}
@@ -365,6 +399,9 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
 %LC: STORY: the type of tapp quantifies of a type constructor alpha
 %(this type constructor is a ``function'' from a type to a type); this
 %is why we need F-omega and not only system F
+% STORY: About tapp: we do here an analogous thing to term
+% application, but for type application, don't worry about the details
+% of tapp right now.
 %STORY: This is not a natural formalism. It doesn't need to be: it is just meant to define the method. Real polymorphic systems would be translated into it.
 \item\pause\pause\pause \textbf{\alert{Note:} not meant as a formalism of interest by itself, but only as a tool to analyse polymorphic systems.}
 \end{itemize}
@@ -503,9 +540,7 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
 \end{description}
 \end{frame}
 
-\begin{frame} %<1>[label=mainframe]
-  %\frametitle{Polynomial interpretations: polymorphic higher-order}
-  %\framesubtitle{Interpretation terms: extension of system~$\Fomega$}
+\begin{frame}<1>[label=mainframe]
   \frametitle{A set of interpretation terms}
   \framesubtitle{An extension of system~$\Fomega$}
   % STORY: polymorphic lambda calculus with type constructors (system
@@ -562,32 +597,31 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
   % STORY: we also have beta-reductions, also for type constructor abstraction, not shown here
 \end{frame}
 
-%\againframe<2>[noframenumbering]{mainframe}
-%\againframe<3>[noframenumbering]{mainframe}
-%\againframe<4>[noframenumbering]{mainframe}
-%
-%\begin{frame}[noframenumbering]
-%  % STORY: an inductive definition is not possible because of type
-%  % abstractions: how is \oplus_\alpha to be interpreted in \Lambda
-%  % \alpha . \oplus_\alpha s t?
-%  \begin{center}
-%    $\Lambda \alpha . x \oplus_\alpha y$
-%  \end{center}
-%  \pause
-%  \bigskip
-%  \[
-%  (\Lambda \alpha . x \oplus_\alpha y) \tau \leadsto x \oplus_\tau y
-%  \]
-%\end{frame}
-%
-%\againframe<5>[noframenumbering]{mainframe}
-%\againframe<6>[noframenumbering]{mainframe}
-%\againframe<7>[noframenumbering]{mainframe}
-%\againframe<8>[noframenumbering]{mainframe}
-%\againframe<9>[noframenumbering]{mainframe}
+\againframe<2>[noframenumbering]{mainframe}
+\againframe<3>[noframenumbering]{mainframe}
+\againframe<4>[noframenumbering]{mainframe}
 
-\begin{frame} %{Polynomial interpretations: polymorphic higher-order}
-  %\framesubtitle{Interpretation terms: extension of system~$\Fomega$}
+\begin{frame}[noframenumbering]
+  % STORY: an inductive definition is not possible because of type
+  % abstractions: how is \oplus_\alpha to be interpreted in \Lambda
+  % \alpha . \oplus_\alpha s t?
+  \begin{center}
+    $\Lambda \alpha . x \oplus_\alpha y$
+  \end{center}
+  \pause
+  \bigskip
+  \[
+  (\Lambda \alpha . x \oplus_\alpha y) \tau \leadsto x \oplus_\tau y
+  \]
+\end{frame}
+
+\againframe<5>[noframenumbering]{mainframe}
+\againframe<6>[noframenumbering]{mainframe}
+\againframe<7>[noframenumbering]{mainframe}
+\againframe<8>[noframenumbering]{mainframe}
+\againframe<9>[noframenumbering]{mainframe}
+
+\begin{frame}
   \frametitle{A set of interpretation terms}
   \framesubtitle{An extension of system~$\Fomega$}
   \begin{theorem}
@@ -660,111 +694,6 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
   % impredicative universal type quantifier
 \end{frame}
 
-% \begin{frame}{Reduction pairs and rule removal}
-% 
-% \only<1>{Given:}\only<2->{Suppose:}
-% \[
-% \begin{array}{rcl}
-% \fold_{\sigma}(F,a,\nil) & \only<1>{\red}\only<2->{\succ^A} & a \\
-% \fold_{\sigma}(F,a,\cons_{\tau}(x,xs)) & \only<1>{\red}\only<2->{\succeq^A} \\
-%   \multicolumn{3}{r}{
-%     \phantom{AB}
-%     \fold_{\sigma}(F,\symb{@}_{\tau,\sigma}(\symb{@}_{\sigma,\tau \arrtype \sigma}(\symb{tapp}_{\lambda \alpha.\sigma \arrtype \alpha \arrtype \sigma,\tau}(F), a), x),xs)
-%   } \\
-% \symb{@}_{\sigma,\tau}(\abs{x:\sigma.s},t) & \only<1>{\red}\only<2->{\succ^A} & s[x:=t] \\
-% \symb{tapp}_{\lambda \alpha.\sigma,\tau}(\tabs{\alpha}{s}) & \only<1>{\red}\only<2->{\succeq^A} & s[\alpha:=\tau] \\
-% \end{array}
-% \]
-% 
-% \ \\\pause\pause And:
-% \begin{itemize}
-% \item $\succ^A$ is a well-founded order; $\succeq^A$ a compatible quasi-order;
-% \item $\succ^A$ and $\succeq^A$ are both \emph{monotonic} \\(e.g., $s \succ^A t$ implies $C[s] \succ^A C[t]$).
-% \end{itemize}
-% 
-% \ \\\pause Then:
-% \[
-% \begin{array}{rcl}
-% \hbox{\sout{$\fold_{\sigma}(F,a,\nil$)}} & \hbox{\sout{$\red$}} & \hbox{\sout{$a$}} \\
-% \fold_{\sigma}(F,a,\cons_{\tau}(x,xs)) & \red \\
-%   \multicolumn{3}{r}{
-%     \phantom{AB}
-%     \fold_{\sigma}(F,\symb{@}_{\tau,\sigma}(\symb{@}_{\sigma,\tau \arrtype \sigma}(\symb{tapp}_{\lambda \alpha.\sigma \arrtype \alpha \arrtype \sigma,\tau}(F), a), x),xs)
-%   } \\
-% \hbox{\sout{$\symb{@}_{\sigma,\tau}(\abs{x:\sigma.s},t)$}} & \hbox{\sout{$\red$}} & \hbox{\sout{$s[x:=t]$}} \\
-% \symb{tapp}_{\lambda \alpha.\sigma,\tau}(\tabs{\alpha}{s}) & \red & s[\alpha:=\tau] \\
-% \end{array}
-% \]
-% 
-% %  We consider again a fixed PFS~$A$ and relations on $A$-terms.\pause
-% %
-% %  \begin{definition}
-% %    A \emph{reduction pair} $(\succeq^A,\succ^A)$:
-% %    \begin{itemize}
-% %    \item $\succeq^A$ is a quasi-order and $\succ^A$ is a well-founded
-% %      order,\pause
-% %    \item
-% %      $\succeq^A$ and~$\succ^A$ are \emph{compatible}, i.e., ${\succ^A} \cdot
-% %      {\succeq^A} \subseteq {\succ^A}$ and ${\succeq^A} \cdot {\succ^A}
-% %      \subseteq {\succ^A}$,\pause
-% %    \item $\succeq^A$ and~$\succ^A$ are both \emph{monotonic}, i.e.,
-% %      $s \succ^A t$ implies $C[s] \succ^A C[t]$ for every context~$C$.
-% %    \end{itemize}
-% %  \end{definition}
-% %  \pause
-% %  \begin{theorem}
-% %    Let $\Rules = \Rules_1 \cup \Rules_2$, and suppose that
-% %    $\Rules_1\subseteq{\succ^\Rules}$ and
-% %    $\Rules_2\subseteq{\succeq^\Rules}$ for a reduction pair
-% %    $(\succeq^\Rules,\succ^\Rules)$. Then $\arr{\Rules}$ is
-% %    terminating if and only if $\arr{\Rules_2}$ is (so certainly if
-% %    $\Rules_2 = \emptyset$).
-% %  \end{theorem}
-% %  \pause
-% %  % STORY: assume a an infinite $\Rules$-reduction contains infinitely
-% %  % many $\Rules_1$-steps; then contradiction by the process outlined
-% %  % below
-% %  \begin{proof}
-% %    \[
-% %    \only<6>{\cdot \to_{\Rules_1} \cdot \to_{\Rules_1} \cdot
-% %      \to_{\Rules_2} \cdot \to_{\Rules_2} \cdot \to_{\Rules_1} \cdot
-% %      \to_{\Rules_2} \cdot \to_{\Rules_1} \ldots}
-% %    \only<7>{\cdot \succ \cdot \succ \cdot \succeq \cdot \succeq \cdot
-% %      \succ \cdot \succeq \cdot \succ \ldots}
-% %    \only<8>{\cdot \succ \cdot \succ \cdot \highlight{\succeq \cdot \succeq} \cdot
-% %      \succ \cdot \succeq \cdot \succ \ldots}
-% %    \only<9>{\cdot \succ \cdot \succ \cdot \highlight{\succeq} \cdot
-% %      \succ \cdot \succeq \cdot \succ \ldots}
-% %    \only<10>{\cdot \succ \cdot \succ \cdot \succeq \cdot
-% %      \succ \cdot \succeq \cdot \succ \ldots}
-% %    \only<11>{\cdot \succ \cdot \highlight{\succ \cdot \succeq} \cdot
-% %      \highlight{\succ \cdot \succeq} \cdot \succ \ldots}
-% %    \only<12>{\cdot \succ \cdot \highlight{\succ} \cdot
-% %      \highlight{\succ} \cdot \succ \ldots}
-% %    \only<13>{\cdot \succ \cdot \succ \cdot \succ \cdot \succ \ldots}
-% %    \]
-% %  \end{proof}
-% %  % STORY: talk about how this can be used for rule removal
-% \end{frame}
-
-%  \begin{frame}{Interpretation pairs}
-%    If we can map types to interpretation types and terms to
-%    interpretation terms, then we can construct a reduction pair for a
-%    PFS using the pair $(\succeq,\succ)$.
-%    % STORY: recall that \succeq, \succ are defined on interpretation
-%    % terms, and we want a reduction pair on PFS terms
-%    \pause
-%    \begin{definition}
-%      For a fixed type constructor mapping $\Typemap$ and symbol mapping
-%      $\Termmap$, we define the \emph{interpretation pair}
-%      $(\succeqinterpret,\succinterpret)$:
-%      \begin{itemize}
-%      \item $s \succeqinterpret t$ if $\interpret{s} \succeq \interpret{t}$,
-%      \item $s \succinterpret t$ if $\interpret{s} \succ \interpret{t}$.
-%      \end{itemize}
-%    \end{definition}
-%  \end{frame}
-
 \begin{frame}{How to interpret terms?}
   \framesubtitle{Type and function symbol mapping}
   % STORY: we only need to find an interpretation for type symbols and
@@ -784,6 +713,8 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
   \end{array}
   \]
   \pause
+  Girard, ``Proofs and Types'', Chapter~11
+  \pause
   \[
   \begin{array}{rll}
   \only<1-2>{\interpret{\fold_{\sigma}(F,a,\nil)}}%
@@ -800,7 +731,6 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
       \phantom{AB}
       \uncover<6->{
         \only<1-9>{\interpret{\fold_{\sigma}(F,\symb{@}_{\tau,\sigma}(\symb{@}_{\sigma,\tau \arrtype \sigma}(\symb{tapp}_{\lambda \alpha.\sigma \arrtype \alpha \arrtype \sigma,\tau}(F), a), x),xs)}}%
-%        \only<9>{\fold_{\sigma}(F,\interpret{F} \typeinterpret{\tau} \interpret{a} \interpret{x},xs)}%
         \only<10->{\interpret{xs} \typeinterpret{\sigma} \interpret{F} (\interpret{F} \typeinterpret{\tau} \interpret{a} \interpret{x}) \oplus \lift_{\typeinterpret{\sigma}}(1)}
         }
     } \\
@@ -840,9 +770,9 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
   $\interpret{\mathtt{foldl}_{\sigma}(\abs{x}{s},t,\nil)} =
   \interpret{\mathtt{fold}_{\sigma}(\abs{x}{w},t,\nil)}$ regardless of
   $s$ and $w$.
-  
+
   \medskip\pause
-  
+
   So if $\mathtt{foldl}_{\sigma}(\abs{x}{s_1},t,\nil) \red \mathtt{foldl}_{\sigma}(\abs{x}{s_2},t,\nil) \red \dots$ \\
   we do not have an infinite decrease in $\succ$.
 \end{frame}
