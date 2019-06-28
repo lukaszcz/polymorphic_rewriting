@@ -340,7 +340,7 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
 \[
 \begin{array}{rcl}
 \fold_{\sigma}(\var{F},\var{a},\nil) & \red & \var{a} \\
-\fold_{\sigma}(\var{F},\var{a},\cons_{\tau}(\var{x},\var{xs})) & \red & \fold_{\sigma}(\var{F},\var{F}\ \tau\ \var{a}\ \var{x},\var{xs}) \\
+\fold_{\sigma}(\var{F},\var{a},\cons_{\tau}(\var{x},\var{xs})) & \red & \fold_{\sigma}(\var{F},\var{F}\ \tau\ \var{x}\ \var{a},\var{xs}) \\
 \end{array}
 \]
 \bigskip
@@ -364,9 +364,7 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
 %STORY: There are many ways to formalise systems like this; we use the following because it's convenient:
 \begin{itemize}
 \item Function symbols have a type: $\forall \alpha_1 \dots \alpha_n.\sigma_1 \arrtype \dots \arrtype \sigma_k \arrtype \tau$
-\item Terms are variables, abstractions, type (constructor) abstractions and: $\symb{f}_{\pi_1,\dots,\pi_n}(s_1,\dots,s_k) : \tau[\alpha_1:=\pi_1,\dots,\alpha_n:=\pi_n]$.\pause
-%\item Variables and abstractions at the head of a term \emph{not
-%  allowed}: $\lambda x . x t$, $(\lambda x . t) u$. \pause
+\item Terms are variables, abstractions, type abstractions and: $\symb{f}_{\pi_1,\dots,\pi_n}(s_1,\dots,s_k) : \tau[\alpha_1:=\pi_1,\dots,\alpha_n:=\pi_n]$.\pause
 %STORY: Okay, so what does this mean for the fold system that we just saw?
 %STORY: (before the first pause) This is what we had, but note that we have those applications there.
 %STORY: (before the second pause) So, we introduce function symbols for application and type application, and corresponding rules.
@@ -536,7 +534,7 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
 \item[Step 1.] Define a set $\Iterms$ of \alert{interpretation terms}.
 \item[Step 2.] Define an ordering relation $\succ$ on the set $\Iterms$.
 \item[Step 3.] Systematically map terms $s$ to interpretation terms $\interpret{s}$.
-\item[Step 4.] Prove that if $s \red_{\Rules} t$ then $\interpret{s} \succ \interpret{t}$..
+\item[Step 4.] Prove that if $s \red_{\Rules} t$ then $\interpret{s} \succ \interpret{t}$.
 \end{description}
 \end{frame}
 
@@ -551,8 +549,8 @@ Let $\omega := \cons(\abs{\binder{x}:o}{\map(\abs{\binder{y}:\mathtt{o} \arrtype
   \medskip
 
   % STORY: terms are like for PFSs but without the restrictions
-  Terms: variables, abstractions, type (constructor) abstractions, and
-  function symbols\pause:
+  Terms: variables, abstractions, type (constructor) abstractions,
+  natural number constants, and function symbols\pause:
   \begin{itemize}
   \item $\oplus : \forall \alpha . \alpha \arrtype \alpha \arrtype
     \alpha$\pause
